@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}Media Center - Register{% endblock %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+<div class="pure-g">
+  <div class="pure-u-1-2">
+    <form class="pure-form pure-form-aligned">
+      <div class="info">
+        Please enter the following information below.
+      </div>
+
+      <div class="success hidden">
+        Your account was created successfully.
+      </div>
+
+      <div class="error hidden">
+      </div>
+
+      <fieldset>
+        <div class="pure-control-group">
+          <label for="name">Username</label>
+          <input id="name" type="text" placeholder="Username">
+        </div>
+
+        <div class="pure-control-group">
+          <label for="name">Display Name</label>
+          <input id="first-name" type="text" placeholder="First Name">
+          <input id="last-name" type="text" placeholder="Surname">
+        </div>
+
+        <div class="pure-control-group">
+          <label for="country">Country of Residence</label>
+          <select id="country">
+            {% for country in view.countries %}
+            <option value="{{ country }}">{{ country }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="pure-control-group">
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="Password">
+        </div>
+
+        <div class="pure-control-group">
+          <label for="retype-password">Re-type Password</label>
+          <input id="retype-password" type="password" placeholder="Password">
+        </div>
+
+        <div class="pure-control-group">
+          <label for="email">Email Address</label>
+          <input id="email" type="email" placeholder="Email Address">
+        </div>
+
+        <div class="pure-control-group">
+          <label>I wish to subscribe to the mailing list</label>
+          <input id="cb" type="checkbox"> 
+        </div>
+
+        <div class="pure-control-group">
+          <button type="submit" class="pure-button pure-button-primary">Submit</button>
+        </div>
+
+      </fieldset>
+    </form>
+  </div>
+</div>
+
+<script src="{% static 'js/register.js' %}" type="text/javascript"></script>
+
+{% endblock %}

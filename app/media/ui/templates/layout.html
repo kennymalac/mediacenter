@@ -1,0 +1,96 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css"/>
+    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"/>
+    <link rel="stylesheet" href="{% static 'js/media-gallery.css' %}"/>
+
+    <style>
+    .pure-button {
+      border-radius: 5px;
+    }
+
+    .info, .success, .error {
+  border: 1px solid;
+  border-radius: 5px;
+  margin: 10px 10px;
+  padding: 10px 10px 10px 15px;
+}
+.info {
+  color: #fff;
+  background-color: #1F8DD6;
+}
+.error {
+  color: #D8000C;
+  background-color: #FFBABA;
+}
+.success {
+  color: #4F8A10;
+  background-color: #DFF2BF;
+}
+
+
+    {% block styles %}
+    <!-- inline CSS because whatever -->
+    {% endblock %}
+    </style>
+
+    <script type="text/javascript" src="{% static 'libs/jquery-3.1.1.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/api.js' %}"></script>
+  </head>
+
+  <body>
+    {% block body %}
+    <header>
+      {% block header %}
+      <div class="pure-menu pure-menu-horizontal">
+        <a href="#" class="pure-menu-heading pure-menu-link">MEDIA SERVER</a>
+        <ul class="pure-menu-list">
+          <li class="pure-menu-item"><a href="/feed" class="pure-menu-link">Feed</a></li>
+          <li class="pure-menu-item"><a href="/chat" class="pure-menu-link">Chat</a></li>
+          <li class="pure-menu-item"><a href="/media" class="pure-menu-link">Media Gallery</a></li>
+        </ul>
+        {% block userlogin %}
+        <form class="pure-form">
+          <fieldset>
+            <input type="text" placeholder="username">
+            <input type="password" placeholder="password">
+
+            <label for="remember">
+              <input id="remember" type="checkbox"> Remember Me
+            </label>
+
+            <button type="submit" class="pure-button pure-button-primary">Sign in</button>
+          </fieldset>
+
+          {% csrf_token %}
+        </form>
+        {% endblock %}
+      </div>
+      {% endblock %}
+    </header>
+    <main>
+      {% block content %}
+      <div class="pure-g">
+        <div class="participants">
+          <div class="participant">
+            <video id="you" autoplay></video>
+          </div>
+          <div class="participant">
+            <video id="peer" autoplay></video>
+          </div>
+        </div>
+      </div>
+      {% endblock %}
+    </main>
+
+    <script type="text/javascript">
+    </script>
+    {% endblock %}
+  </body>
+</html>

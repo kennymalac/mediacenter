@@ -1,0 +1,11 @@
+django==1.10.1
+channels
+djangorestframework
+djangorestframework-jwt
+markdown
+psycopg2
+django-guardian
+django-filter
+django-supervisor
+django-countries
+

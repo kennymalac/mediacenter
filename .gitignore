@@ -1,0 +1,5 @@
+*.desktop
+*.desktop.lock
+app/bin/*
+app/lib/*
+app/include/*
