@@ -3,6 +3,10 @@ from django.views.generic import TemplateView
 from django_countries.data import COUNTRIES
 
 
+class VueView(TemplateView):
+    # Let's try this out B-)
+    template_name = 'program.html'
+
 class RegisterView(TemplateView):
     template_name = 'register.html'
 

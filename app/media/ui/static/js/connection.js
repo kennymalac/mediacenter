@@ -8,11 +8,14 @@ var WSConnection = {
     location: ""
 };
 
-var RTCConnection = {
+class RTCConnection {
+    constructor() {
+        
+    },
     _peerConnection: undefined,
     prepare: function() {
         this._peerConnection = new RTCPeerConnection(RTCconfig);
-        this._peerConnection
+        //this._peerConnection
     },
     cancel: function() {
         // Close the connection here

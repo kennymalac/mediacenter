@@ -1,23 +1,5 @@
-{% extends "layout.html" %}
-
-{% block title %}Media Center - Feed{% endblock %}
-
-{% block content %}
-<style>
-  .user-legend, .user-post, .post-comment {
-  border: 1px solid gray;
-  border-radius: 2px;
-  padding: 10px;
-  }
-  img {
-  display: inline;
-  }
-  .post-content, .post-comment-thread {
-  margin-top: 10px;
-  }
-</style>
-
-<div class="pure-g">
+<template>
+  <div class="pure-g">
   <div class="pure-u">
     <div class="user-post">
       <div class="user-legend">
@@ -59,5 +41,19 @@
       </div>
     </div>
   </div>
-</div>
-{% endblock %}
+  </div>
+</template>
+
+<style scoped>
+.user-legend, .user-post, .post-comment {
+  border: 1px solid gray;
+  border-radius: 2px;
+  padding: 10px;
+  }
+  img {
+  display: inline;
+  }
+  .post-content, .post-comment-thread {
+  margin-top: 10px;
+  }
+</style>
