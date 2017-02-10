@@ -1,6 +1,14 @@
+import {ChatRoom} from 'ChatLib';
+
+
 <!-- <script type="text/javascript" src="{% static 'libs/adapter.js' %}"></script> -->
 
 <script>
+
+export default {
+
+}
+
  /* var errorHandler = function (err) {
   * console.log(err);
   * console.log("error occurred with webRTC");

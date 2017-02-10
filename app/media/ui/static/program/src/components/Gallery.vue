@@ -1,16 +1,193 @@
+import MediaGridItem from 'MediaGridItem';
+
+// The reason media-grid-item is hyphenated is because of lisp.
+// This is a fact
 <template>
     <div class="error info">Please sign in to view the media gallery.</div>
 
-    <media-item v-for="media-datum in galleryMediaList" v-bind:media="media">
-    </media-item>
+    <media-grid-item v-for="media-datum in galleryMediaList" v-bind:media="media">
+    </media-grid-item>
+
+
+    <media-browser>
+        <media-grid-item>
+        </media-grid-item>
+    </media-browser>
 </template>
 
-<style scoped>
- .l-box {
-     padding: .25em;
-     border: 1.5px solid gray;
-     border-radius: 2px;
+<template>
+
+</template>
+
+
+<script>
+ export default {
+     data: () => {
+         return {
+             galleryMediaList: []
+         }
+     }
  }
+</script>
+
+<style scoped>
+ .media-content-box {
+     animation-duration: 1s;
+     animation-name: expand;
+ }
+
+ .media-modal-view {
+     border-radius: 3px/2px;
+     display: block;
+     position: absolute;
+     border: 2px solid #001f3f;
+     width: 85%;
+     height: 50rem;
+     margin-left: 7.5%;
+     margin-right: 7.5%;
+     box-sizing: content-box; 
+     animation-name: slideup;
+ }
+ .media-modal-view .modal-title {
+     width: 100%;
+     height: 2.75rem;
+     display: block;
+     text-align: center;
+     background: linear-gradient(180deg, #001f3f, rgba(52, 73, 94,1.0));
+     color: #DDDDDD;
+     // alternative color: rgba(52, 73, 94,1.0)
+ }
+ /* .media-modal-view .modal-title label { */
+ /*     // silver */
+ /*     // alternative color: rgba(236, 240, 241,1.0); */
+ /* } */
+
+ /* /\* pictogram.type *\/ */
+ /* pictogram.photo { */
+ /*  /\* icon = photo *\/ */
+ /* } */
+
+ /* pictogram.video { */
+ /*  /\* icon = camcorder *\/ */
+ /* } */
+
+ .modal-title .toolbar-icon {
+     /*width: 32px;*/
+     /*height: 32px;*/
+     font-size: 1.5em;
+     margin-right: .5em;
+     text-align: center;
+     display: inline-block;
+     position: relative;
+     cursor: pointer;
+     color: rgb(127, 140, 141);
+     top: .25em;
+     width: 1.25em;
+     height: 1.25em;
+     background: linear-gradient(0deg, #001f3f, rgba(52, 73, 94,1.0));
+ }
+ .modal-title label {
+     
+ }
+
+ .modal-title .ion-play,
+ .modal-title .ion-ios-color-wand-outline,
+ .modal-title .ion-skip-forward,
+ .modal-title .ion-skip-backward {
+     color: white;
+ }
+
+ /* .ion-play { */
+ /*     left: 3.5em; */
+ /* } */
+
+ /* .ion-ios-color-wand-outline { */
+ /*     left: 5.25em; */
+ /* } */
+
+
+ .modal-title .close-btn {
+     position: absolute;
+     right: 0;
+ }
+
+ .toolbar-icon:active {
+     background: linear-gradient(18deg, #001f3f, rgba(52, 73, 94,1.0));
+ }
+
+ .media-modal-view .modal-content {
+     display: block;
+     height: 94%;
+     background-color: rgb(236, 240, 241)/*rgba(149, 165, 166,1.0)*/;
+ }
+
+ .gallery-preview .ion-arrow-left-b, .ion-arrow-right-b {
+     display: inline-block;
+     position: absolute;
+     text-align: center;
+     top: 20%;
+     width: 2.25rem;
+     font-size: 3.5rem;
+     cursor: pointer;
+     color: rgba(52, 73, 94,1.0);/*rgb(127, 140, 141);*/
+ }
+
+ .gallery-preview .ion-arrow-left-b {
+     /*margin-right: 4rem;*/
+     left: 2rem;
+ }
+ .gallery-preview .ion-arrow-right-b {
+     /*margin-left: 4rem;*/
+     right: 2rem;
+ }
+
+ .gallery-preview {
+     display: block;
+     position: relative;
+     width: 90%;
+     left: 5%;
+     top: 82%;
+     margin: 0;
+ }
+
+ .gallery-preview .preview-container {
+     position: relative;
+     display: inline-block;
+     left: 5rem;
+     right: 5rem;
+     top: 0;
+ }
+
+ .media-modal-view hr {
+     width: 90%;
+     border: 0;
+     margin-left: 5%;
+     margin-top: 1rem;
+     height: 1px;
+     /* transparent gray to blueish light gray */
+     background: linear-gradient(135deg, rgba(221, 221, 221, 0), rgba(236, 240, 241,1.0), rgba(221, 221, 221, 0));
+ }
+
+ @keyframes slideup {
+     from {
+         margin-bottom: 100%; 
+     }
+     
+     to {
+         margin-bottom: 30%;
+     }
+ }
+
+ /* @keyframes expand { */
+ /*     from { */
+ 
+ /*     } */
+
+ /*     to { */
+ 
+ /*     } */
+
+ /* } */
 
  .loading-container {
      position: absolute;
@@ -30,7 +207,6 @@
      display: block;
      margin-top: 10rem;
  }
-
 
  /* I gotta separate this loader into a component tho */
  .spinning-whirlpool,
@@ -116,10 +292,3 @@
 	   }
  }
 </style>
-
-<script>
-
- export default {
-
- }
-</script>
