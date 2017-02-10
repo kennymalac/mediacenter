@@ -1,5 +1,10 @@
 <template>
-    <div id="app">
+    <header>
+        <auth-menu></auth-menu>
+    </header>
+
+
+    <div id="program">
         <!-- <img src="./assets/logo.png"> -->
         <router-view></router-view>
     </div>
@@ -7,7 +12,7 @@
 
 <script>
  export default {
-     name: 'app'
+     name: 'program'
  }
 </script>
 

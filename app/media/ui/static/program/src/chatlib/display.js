@@ -1,3 +1,7 @@
+export default {
+    ChatRoom: ChatRoom
+}
+
 // TODO: these need to be user settings
 // Defaults shouldn't always persist across page loads etc.
 var displayConfig = {

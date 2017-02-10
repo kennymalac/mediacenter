@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Feed from 'components/Feed';
-import {Login, Register} from 'components/Auth';
+import Auth from 'components/Auth';
+import Chat from 'components/Chat';
 import Home from 'components/Home';
 import Gallery from 'components/Gallery';
 
@@ -17,12 +18,19 @@ export default new Router({
         {
             path: '/login',
             name: 'Login',
-            component: Auth
+            component: Auth,
+            settings:
         },
         {
             path: '/register',
-            name: 'Login',
-            component: Auth
+            name: 'Register',
+            component: Auth,
+            settings
+        },
+        {
+            path: '/chat',
+            name: 'Chat',
+            component: Chat
         },
         {
             path: '/gallery',
