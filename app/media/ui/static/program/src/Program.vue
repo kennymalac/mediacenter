@@ -3,11 +3,11 @@
         <auth-menu></auth-menu>
     </header>
 
+<!-- ;) -->
 
-    <div id="program">
-        <!-- <img src="./assets/logo.png"> -->
+    <main>
         <router-view></router-view>
-    </div>
+    </main>
   </template>
 
 <script>

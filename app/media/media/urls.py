@@ -14,11 +14,13 @@ router.register(r'blogposts', BlogPostViewSet)
 # router.register(r'media', MediaViewSet)
 
 urlpatterns = [
+    url(r'^/?$', VueView.as_view()),
     url(r'^admin/', admin.site.urls),
-    url(r'^register/', RegisterView.as_view()),
-    url(r'^chat/', ChatView.as_view()),
-    url(r'^feed/', FeedView.as_view()),
-    url(r'^media/', MediaView.as_view()),
+    # DEPRECATED #
+    # url(r'^register/', RegisterView.as_view()),
+    # url(r'^chat/', ChatView.as_view()),
+    # url(r'^feed/', FeedView.as_view()),
+    # url(r'^media/', MediaView.as_view()),
     url(r'^api-token-auth/', obtain_jwt_token),
     url(r'^api/', include(router.urls)),
 ]

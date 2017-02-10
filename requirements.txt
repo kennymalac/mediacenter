@@ -6,6 +6,6 @@ markdown
 psycopg2
 django-guardian
 django-filter
-django-supervisor
+#django-supervisor
 django-countries
 
