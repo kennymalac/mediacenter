@@ -8,20 +8,29 @@ var WSConnection = {
     location: ""
 };
 
-class RTCConnection {
+class RTCConnectionPool {
     constructor() {
-        
+        this.peerConnections = WeakMap();
     },
-    _peerConnection: undefined,
-    prepare: function() {
-        this._peerConnection = new RTCPeerConnection(RTCconfig);
+    prepare() {
+        return new RTCPeerConnection(RTCconfig);
         //this._peerConnection
     },
-    cancel: function() {
-        // Close the connection here
-        this._peerConnection = null;
+    cancel() {
+        // Close the connections here
+        this.peerConnections.empty();
     },
-    receive: function() {
+    receive(peer) {
         //
+        this.peerConnections.push([
+            Symbol(peer.id),
+            Promise(
+                this.prepare,
+                (success) => {
+                    // perform action
+                },
+                (error) => {
+                    // exception raised, fallback
+                })]);
     }
 }

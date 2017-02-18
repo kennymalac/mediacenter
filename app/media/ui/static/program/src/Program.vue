@@ -1,19 +1,26 @@
 <template>
-    <header>
-        <auth-menu></auth-menu>
-    </header>
+    <div id="program">
+        <header>
+            <header-menu/>
+            <!-- <auth-menu></auth-menu> -->
+        </header>
 
-<!-- ;) -->
-
-    <main>
-        <router-view></router-view>
-    </main>
-  </template>
+        <div class="pure-g">
+            <router-view></router-view>
+        </div>
+    </div>
+</template>
 
 <script>
- export default {
-     name: 'program'
- }
+import Header from './components/Header.vue'
+import 'pure-css'
+
+export default {
+    name: 'program',
+    components: {
+        'header-menu': Header
+    }
+}
 </script>
 
 <style>

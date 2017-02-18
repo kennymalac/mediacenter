@@ -1,5 +1,4 @@
 <template>
-  <div class="pure-g">
   <div class="pure-u">
     <div class="user-post">
       <div class="user-legend">
@@ -41,8 +40,16 @@
       </div>
     </div>
   </div>
-  </div>
 </template>
+
+<script>
+export default {
+    name: 'feed',
+    data() {
+        return {}
+    }
+}
+</script>
 
 <style scoped>
 .user-legend, .user-post, .post-comment {

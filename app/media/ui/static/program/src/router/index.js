@@ -1,31 +1,35 @@
-import Vue from 'vue';
-import Router from 'vue-router';
-import Feed from 'components/Feed';
-import Auth from 'components/Auth';
-import Chat from 'components/Chat';
-import Home from 'components/Home';
-import Gallery from 'components/Gallery';
+import Vue from 'vue'
+import Router from 'vue-router'
+import Feed from 'components/Feed'
+import Auth from 'components/Auth'
+import Chat from 'components/Chat'
+import Home from 'components/Home'
+import Gallery from 'components/Gallery'
 
-Vue.use(Router);
+Vue.use(Router)
 
 export default new Router({
+    // mode: 'history',
     routes: [
         {
             path: '/',
-            name: 'Media Center',
+            name: 'Home',
             component: Home
+        },
+        {
+            path: '/feed',
+            name: 'Feed',
+            component: Feed
         },
         {
             path: '/login',
             name: 'Login',
-            component: Auth,
-            settings:
+            component: Auth
         },
         {
             path: '/register',
             name: 'Register',
-            component: Auth,
-            settings
+            component: Auth
         },
         {
             path: '/chat',
@@ -38,4 +42,4 @@ export default new Router({
             component: Gallery
         }
     ]
-});
+})

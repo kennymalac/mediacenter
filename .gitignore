@@ -3,6 +3,7 @@
 app/bin/*
 app/lib/*
 app/include/*
-*/__pycache__/*
-*/__pycache__/*
+__pycache__/*
+__pycache__/*
+*.pyc
 
