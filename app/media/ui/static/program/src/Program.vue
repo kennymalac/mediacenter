@@ -23,12 +23,15 @@ export default {
 }
 </script>
 
-<style>
- #program {
-     font-family: 'Avenir', Helvetica, Arial, sans-serif;
-     -webkit-font-smoothing: antialiased;
-     text-align: center;
-     color: #2c3e50;
-     margin-top: 60px;
- }
+<style lang="scss">
+$ionicons-font-path: "~ionicons/dist/fonts";
+@import "~ionicons/dist/scss/ionicons.scss";
+
+#program {
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    color: #2c3e50;
+    margin-top: 60px;
+}
 </style>

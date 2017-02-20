@@ -1,16 +1,17 @@
 <template>
   <div v-if="!full" class="gallery-horizontal-box">
-
+    <img :alt="media.title" :src="media.src" class="pure-img" />
   </div>
   <div v-if="full" class="pure-u-1-4 l-box">
-    <img alt="{{media.url}}" src="{{media.src}}" class="pure-img" />
+    <img :alt="media.title" :src="media.src" class="pure-img" />
   </div>
 </template>
 
 <script>
 export default {
     name: 'media-grid-item',
-    data: () => {
+    props: ['media'],
+    data() {
         return {
             full: false
         }
