@@ -14,9 +14,6 @@ import {ChatRoom} from 'ChatLib';
     </div>
 </template>
 
-<!-- <script type="text/javascript" src="{% static 'libs/adapter.js' %}"></script> -->
-
-<script>
 
 export default {
 

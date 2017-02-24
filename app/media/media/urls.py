@@ -11,10 +11,10 @@ router = DefaultRouter()
 router.register(r'accounts', AccountViewSet)
 router.register(r'activitylogs', ActivityLogViewSet)
 router.register(r'blogposts', BlogPostViewSet)
-# router.register(r'media', MediaViewSet)
+router.register(r'media', MediaViewSet)
 
 urlpatterns = [
-    url(r'^/?$', VueView.as_view()),
+    url(r'^$', VueView.as_view()),
     url(r'^admin/', admin.site.urls),
     # DEPRECATED #
     # url(r'^register/', RegisterView.as_view()),

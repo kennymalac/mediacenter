@@ -3,9 +3,9 @@ import random
 
 from django.test import TestCase
 from rest_framework import status
-from rest_framework.test import APIRequestFactory, APITestCase
+from rest_framework.test import APIRequestFactory, APITestCase, force_authenticate
 from channels import Channel
-from channels.test import ChannelTestCase
+from channels.tests import ChannelTestCase
 
 from api.models import Account, ActivityLog, Log, BlogPost
 
@@ -47,7 +47,7 @@ class AuthTests(APITestCase):
             'full_name': 'John D. Smith',
             'country': 'US',
         }
-        create_request = factory.post('/account/create', data, format='json')
+        create_request = api_request.post('/account/create', data, format='json')
         # TODO: test for register throttle
         # response = AccountCreate.
         response = view(request)
@@ -71,7 +71,7 @@ class AuthTests(APITestCase):
             'country': 'US',
         }
 
-        create_request = factory.post('/account/create', data, format='json')
+        create_request = api_request.post('/account/create', data, format='json')
         # view =
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -89,7 +89,7 @@ class AuthTests(APITestCase):
             'password': 'testing'
         }
 
-        create_request = factory.post('/account/create', data, format='json')
+        create_request = api_request.post('/account/create', data, format='json')
 
         # view =
         response = view(request)
@@ -107,7 +107,7 @@ class AuthTests(APITestCase):
         data = {
              
         }
-        request = factory.put('/account/settings', data, format='json')
+        request = api_request.put('/account/settings', data, format='json')
         request.user = existing_account
 
         self.assertJSONEqual(existing_account.user_settings, request.data)
@@ -121,24 +121,35 @@ class AuthTests(APITestCase):
         data = {
             
         }
-        request = factory.delete('/account/')
+        request = api_request.delete('/account/')
 
     def test_join_chat_stream(self):
         # Test an active connection over a channel
         pass
 
 
+def make_random_user():
+    user = Account(
+        username='test' + gen_random_string(5),
+        password=gen_random_string(10)
+    )
+    user.save()
+    return user
+
+
 class ActivityLogTests(APITestCase):
+    # def setUp(self):
+    #     super(self).setUp()
 
     def test_create_activity_log(self):
+        user = make_random_user()
+
         data = {
-            'username': 'test' + gen_random_string(5),
-            'password': gen_random_string(10),
             'full_name': 'John D. Smith',
-            'country': 'US',
+            'country': 'US'
         }
-        create_request = factory.post('/account/create', data, format='json')
-        create_request.force_authenticate()
+        create_request = api_request.post('/account/create', data, format='json')
+        force_authenticate(create_request, user)
         # response = AccountCreate.
         response = view(request)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -155,10 +166,10 @@ class ActivityLogTests(APITestCase):
         data = {
             
         }
-        update_request = factory.update('/account/', data, format='json')
-        update_request.force_authenticate()
+        update_request = api_request.patch('/account/', data, format='json')
+        force_authenticate(update_request, user)
         response = view(request)
-        self.assertEqual()
+        #self.assertEqual()
 
     def test_add_activity_logs(self):
         # We should be able to add logs to an ActivityLog instance
@@ -203,7 +214,7 @@ class BlogTests(TestCase):
             'authors': [1,]
         }
 
-        create_request = factory.post('/account/create', data, format='json')
+        create_request = api_request.post('/account/create', data, format='json')
         create_request.force_authenticate()
         # response = AccountCreate.
         response = view(request)
@@ -228,35 +239,123 @@ class BlogTests(TestCase):
         pass
 
     def test_view_permissions(self):
-        # Users who are not permitted to view certain posts should be blocked
+        # Accounts who are not permitted to view certain posts should be blocked
         # A 404 response from the API should also be default
         pass
 
 
-class MediaTests(TestCase):
+class MediaTests(APITestCase):
+    def setUp(self):
+        self.user = make_random_user()
+
+    # def permissionsCheck(self):
+    # TODO: better permissions testing
+    #     pass
 
     def test_upload_photo(self):
-        data = {
+        # TODO get base64 for a test photo
+        image = ""
 
+        data = {
+            'photo': {
+                'data': base64.encode(image)
+            }
         }
+        create_request = api_request.post('/media/create', data, format='json')
+        force_authenticate(create_request, self.user)
 
     def test_upload_multiple_photos(self):
-        pass
+        album = Album()
+        album.save()
+        data = {
+            album: album.id
+        }
+
+        create_request = api_request.post('/media/create', data, format='json')
+        force_authenticate(create_request, self.user)
+
 
     def test_update_photo_tags(self):
-        pass
+        photo = Media(media_type='P')
+        photo.save()
+
+        data = {
+            'photo': photo.id,
+            'tags': ['','']
+        }
+        update_request = api_request.patch('/media/', data, format='json')
+        force_authenticate(update_request, self.user)
 
     def test_update_photo(self):
-        pass
+        photo = Media(media_type='P')
+        photo.save()
+
+        data = {
+            
+        }
+        update_request = api_request.patch('/', data, format='json')
+        force_authenticate(update_request, self.user)
+
+    def test_upload_video(self):
+        video = Media(media_type='V')
+        video.save()
+
+        data = {
+            
+        }
+        create_request = api_request.post('/media/create', data, format='json')
+        force_authenticate(create_request, self.user)
+        #
+
+    def test_upload_multiple_videos(self):
+        data = {
+            
+        }
+        create_request = api_request.post('/media/create', data, format='json')
+        force_authenticate(create_request, self.user)
+        #
+
+    def test_upload_many_media(self):
+        """Uploading both videos and photos"""
+        data = {
+            
+        }
+        create_request = api_request.post('/media/create', data, format='json')
+        force_authenticate(create_request, self.user)
 
     def test_serialize_album(self):
-        pass
+        data = {
+            
+        }
+
+        get_request = api_request.get('', data, format='json')
+        force_authenticate(get_request, self.user)
+
 
     def test_serialize_multiple_albums(self):
-        pass
+        multiple_album_request_data = {
+            
+        }
+
+        get_request = api_request.get('', data, format='json')
+        force_authenticate(get_request, self.user)
 
     def test_serialize_media_entry(self):
-        pass
+        data_to_be_serialized = {
+            
+        }
+
+        get_request = api_request.get('', data)
+        force_authenticate(get_request, self.user)
+
 
     def test_view_permissions(self):
-        pass
+        # Make sure guests can only view public media
+        media_request_data = {
+            
+        }
+
+        # Make sure guests can only view public album metadata
+        album_request_data = {
+            
+        }

@@ -17,12 +17,13 @@ class MultipleSerializerMixin(object):
 
 class AccountViewSet(MultipleSerializerMixin, ModelViewSet):
     """An API for viewing and editing accounts"""
+    queryset = Account.objects.all()
     serializer_classes = {
         'default': AccountSerializer,
         'create': FullAccountSerializer,
     }
-    queryset = Account.objects.all()
     # permission_classes
+
 
 class ActivityLogViewSet(ModelViewSet):
     queryset = ActivityLog.objects.all()
@@ -33,7 +34,18 @@ class BlogPostViewSet(ModelViewSet):
     queryset = BlogPost.objects.all()
     serializer_class = BlogPostSerializer
 
-# class MediaViewSet():
-#   queryset = Media.objects.all()
-#   serializer_class = MediaSerializer
- 
+
+class MediaViewSet(ModelViewSet):
+    # TODO: make this more refined based on user privilege levels
+    queryset = Media.objects.filter()
+    serializer_class = MediaListSerializer
+    pagination_class = AlbumMediaBrowserPagination
+
+
+class AlbumViewSet(MultipleSerializerMixin, ModelViewSet):
+    """An API for viewing and uploading albums"""
+    queryset = Album.objects.all()
+    serializer_classes = {
+        'public': MediaBrowserSerializer,
+        'metadata': AlbumInfoSerializer
+    }

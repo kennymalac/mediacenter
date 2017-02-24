@@ -64,3 +64,43 @@ class BlogPost(models.Model):
             return True
         else:
             return False
+
+
+#class Collage
+
+class Album(models.Model):
+    title = models.CharField(max_length=255)
+    owner = models.ForeignKey(Account)
+    tags = models.ManyToManyField("AlbumTag")
+
+
+class AlbumTag(models.Model):
+    name = models.CharField(max_length=42)
+
+
+class MediaTag(models.Model):
+    name = models.CharField(max_length=42)
+    #
+
+
+mediaChoices = (
+    ('P', "PHOTO"),
+    ('V', "VIDEO"),
+    # ('PE', "PHOTO EMBED")
+)
+
+class Media(models.Model):
+    #album = models
+    title = models.CharField(max_length=140)
+    description = models.TextField()
+    hidden = models.BooleanField(default=False)
+    tags = models.ManyToManyField("MediaTag")
+    media_type = models.CharField(
+        max_length=2,
+        choices=mediaChoices
+    )
+    # permissions = models.JSONField()
+
+    # def can_change(self, user):
+    # 
+    #     if user

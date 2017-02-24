@@ -9,13 +9,20 @@ var displayConfig = {
 };
 
 let layoutMutators = {
-    [Symbol("block")] () {
+    [Symbol("solo")] (count) {
+        // 1 on 1
+        // makes lines for each peer
+
+    },
+    [Symbol("block")] (count) {
+        // 2n^2 people
+        // makes lines for each peer
+
+    },
+    [Symbol("line")] (count) {
         // 
     },
-    [Symbol("line")] () {
-        // 
-    },
-    [Symbol("triangle")] () {
+    [Symbol("triangle")] (count) {
         // 
     }
 }
@@ -23,7 +30,7 @@ let layoutMutators = {
 // Mediator and Observer object over the Chatroom
 class Chat {
     constructor () {
-        this.connection = new RTCConnection;
+        this.connectionPool = new RTCConnectionPool;
         this.socket = null;//= websocket
         this.connection = null;//chat connection
         this.peers = new Set();
@@ -52,6 +59,11 @@ class Chat {
         console.log("error occurred with creating an offer to peer");
     }
 
+    onPeerReceiveError (error) {
+        console.log(error);
+        console.log("error occurred with resolving an offer from a peer");
+    }
+
     offer (who) {
         var pc = new RTCPeerConnection();
         pc.createOffer(function(offer) {
@@ -67,6 +79,31 @@ class Chat {
             Chat.addVideoStream();
             //document.getElementsByClassName("peer") = URL.createObjectURL(e.stream);
         };
+    }
+
+    receive(peer) {
+        var pc = this.connectionPool.prepare(peer.id);
+        this.connectionPool.myConnection.createAnswer().then((answer) => {
+            console.log(answer);
+            if (pc.connectionState == "connecting") {
+                // dispatch an event to show a loading wheel
+            }
+            return pc.setLocalDescription(answer);
+        })
+        .then((peerConn) => {
+            
+        })
+        .catch(this.onPeerReceiveError);
+            // Promise(
+            //     this.connectionPool.prepare,
+            //     (success) => {
+            //         // perform action
+                    
+            //     },
+            //     (error) => {
+            //         // exception raised, fallback
+                    
+            //     })]);
     }
 };
 
@@ -84,7 +121,7 @@ class ChatRoom {
         // Return an empty list of canvases, and an error message.
         if (layout == null) {
             // deleted from a user event or no streams
-            raise Error("No user chats are available.");
+            return new Error("No user chats are available.");
         }
         else {
             // Mutate the existing DOM-representation of the layout

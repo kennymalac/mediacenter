@@ -9,6 +9,9 @@ class AccountManager(UserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
+    def modify_user_settings(self, modified_settings):
+        pass
+
 
 class BlogPostManager(models.Manager):
 
