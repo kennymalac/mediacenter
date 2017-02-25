@@ -27,7 +27,6 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import MediaGridItem from './MediaGridItem'
 import ModalToolbar from './Gui/Modal/ModalToolbar'
 import ModalToolbarItem from './Gui/Modal/ModalToolbarItem'
@@ -80,36 +79,50 @@ export default {
         // goBack
         // goForward
         // applyEffects
-        searchMedia(media) {
-            var params = {}
-            // Fetches available media
-            if (!this.auth.privilegeLevel === "guest") {
-                params.accessLevel = "public"
-            }
-            // TODO this is an authorized request
-            fetch("/api/album/media/", {
-                method: "GET",
-                data: _.extend({
-                    user: this.auth.user.id
-                }, params)
-            })
-            .then(() => {
-                // 
-            })
-        },
-        getMedia(media) {
+        getAlbum(album) {
             // Returns a detailed graph for media items
 
-            fetch("/api/album/media/" + media.id + "?page=" + this.currentPage, {
-                method: "GET",
-                data: {
-                    id: media.id
-                }
+            fetch("/api/album/" + album.id + "/browse", {
+                method: "GET"
             })
-            .then((data) => {
-                this.availableMedia = data.json()
-                //this.
+                .then((response) => {
+                    if (response.status >= 200 && response.status < 300) {
+                        return response.json()
+                    } else {
+                        var error = new Error(response.statusText)
+                        error.response = response
+                        throw error
+                    }
+                })
+
+                .then((data) => {
+                    this.currentAlbum = data
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+        },
+        listMediaItems(album) {
+            fetch("/api/album/" + album.id + "browse?page=" + this.currentPage, {
+                method: "POST"
             })
+                .then((response) => {
+                    if (response.status >= 200 && response.status < 300) {
+                        return response.json()
+                    } else {
+                        var error = new Error(response.statusText)
+                        error.response = response
+                        throw error
+                    }
+                })
+
+                .then((data) => {
+                    this.currentRoster = data
+                })
+
+                .catch((error) => {
+                    console.log(error)
+                })
         }
     }
 }
@@ -135,6 +148,12 @@ export default {
         text-align: center;
         background: linear-gradient(180deg, #001f3f, rgba(52, 73, 94,1.0));
         color: #DDDDDD;
+
+        .toolbar {
+            display: inline-block;
+            position: absolute;
+            left: 10rem;
+        }
         /* &.label { */
         /* } */
         .close-btn {
@@ -158,13 +177,6 @@ export default {
 /*  /\* icon = camcorder *\/ */
 /* } */
 
-
-.modal-title .ion-ios-play,
-.modal-title .ion-ios-color-wand-outline,
-.modal-title .ion-ios-skip-forward,
-.modal-title .ion-ios-skip-backward {
-    color: white;
-}
 
 /* .ion-play { */
 /*     left: 3.5em; */
@@ -206,27 +218,6 @@ export default {
         left: 5rem;
         right: 5rem;
         top: 0;
-    }
-
-    .ion-ios-arrow-back, .ion-ios-arrow-forward {
-        display: inline-block;
-        position: absolute;
-        text-align: center;
-        top: 20%;
-        width: 2.25rem;
-        font-size: 3.5rem;
-        cursor: pointer;
-        color: rgba(52, 73, 94,1.0);/*rgb(127, 140, 141);*/
-    }
-
-    .ion-ios-arrow-back {
-        /*margin-right: 4rem;*/
-        left: 2rem;
-    }
-
-    .ion-ios-arrow-forward {
-        /*margin-left: 4rem;*/
-        right: 2rem;
     }
 }
 

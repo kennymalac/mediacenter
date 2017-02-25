@@ -8,7 +8,7 @@
             {{authError}}
         </div>
 
-        <media-grid-item v-for="mediaItem in galleryMediaList" :media="mediaItem"/>
+        <album-grid-item v-for="albumItem in galleryAlbums" :album="albumItem"/>
 
         <media-browser :media-items="galleryMediaList"/>
     </div>
@@ -17,19 +17,33 @@
 
 <script>
 import MediaGridItem from './MediaGridItem'
+import AlbumGridItem from './AlbumGridItem'
 import MediaBrowser from './MediaBrowser'
 import Loading from './Loading'
 // Dynamic gallery
 
 export default {
+    components: {
+        MediaGridItem,
+        AlbumGridItem,
+        MediaBrowser,
+        Loading
+    },
     data() {
         return {
             full: false,
-            loading: true,
+            loading: false,
+            galleryAlbums: [],
             galleryMediaList: [{}, {}, {}],
             authError: "Please sign in to view the media gallery.",
             infoBox: {
                 status: "error"
+            },
+            auth: {
+                privilegeLevel: "guest",
+                user: {
+                    id: 0
+                }
             }
         }
     },
@@ -40,10 +54,23 @@ export default {
             }
         }
     },
-    components: {
-        MediaGridItem,
-        MediaBrowser,
-        Loading
+    methods: {
+        searchAlbums() {
+            var params = {}
+            // Fetches available media
+            if (!this.auth.privilegeLevel === "guest") {
+                params.accessLevel = "public"
+            }
+            // TODO this is an authorized request
+            fetch("/api/album/", {
+                method: "GET",
+                data: params
+            })
+                .then((data) => {
+                    console.log(data)
+                    // this.albums = galleryAlbums
+                })
+        }
     }
 }
 </script>
@@ -52,5 +79,14 @@ export default {
 .media-content-box {
     animation-duration: 1s;
     animation-name: expand;
+}
+.gallery-horizontal-box {
+    display: inline-block;
+    margin-right: .5rem;
+    border-radius: 4px / 5px;
+    border: 2px solid rgba(52, 73, 94,1.0);
+    background-color: rgba(221, 221, 221, 1);
+    height: 6rem;
+    width: 8rem;
 }
 </style>

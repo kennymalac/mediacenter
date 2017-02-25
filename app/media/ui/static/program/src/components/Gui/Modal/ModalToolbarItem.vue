@@ -7,11 +7,7 @@ export default {
     props: ['iconClass', 'action'],
     data() {
         return {
-            toolbarItemClass: 'toolbar-icon',
-            iconClass: '',
-            action() {
-                // 
-            }
+            toolbarItemClass: 'toolbar-icon'
         }
     }
 }
@@ -33,8 +29,15 @@ export default {
     height: 1.25em;
     background: linear-gradient(0deg, #001f3f, rgba(52, 73, 94,1.0));
 
-    :active {
+    &:active {
         background: linear-gradient(18deg, #001f3f, rgba(52, 73, 94,1.0));
     }
+}
+
+.ion-ios-play,
+.ion-ios-color-wand-outline,
+.ion-ios-skip-forward,
+.ion-ios-skip-backward {
+    color: white;
 }
 </style>
