@@ -67,10 +67,23 @@ class BlogPost(models.Model):
 
 
 #class Collage
+USER_ACCESS_LEVELS = (
+    ('0', "GUEST"),
+    ('1', "USER"),
+    ('2', "FRIEND"),
+    ('4', "MODERATOR"),
+    ('9', "ADMIN")
+)
 
 class Album(models.Model):
     title = models.CharField(max_length=255)
+    description = models.TextField()
     owner = models.ForeignKey(Account)
+    access_level = models.CharField(
+        max_length=1,
+        choices=USER_ACCESS_LEVELS
+    )
+    unlisted = models.BooleanField(default=False)
     tags = models.ManyToManyField("AlbumTag")
 
 

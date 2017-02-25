@@ -1,5 +1,5 @@
 <template>
-    <div class="media-modal-view">
+    <div v-if="isModalOpen" class="media-modal-view">
         <div class="modal-title">
             <!-- position="left" -->
 
@@ -9,7 +9,7 @@
                 Album title
             </label>
 
-            <modal-toolbar-item class="close-btn" :icon-class="'ion-md-close'" />
+            <modal-toolbar-item class="close-btn" :icon-class="'ion-md-close'" :action="closeModal" />
             <hr/>
         </div>
         <div class="modal-content">
@@ -45,6 +45,7 @@ export default {
             mediaItems: [],
             currentRoster: [],
             currentPage: 0,
+            isModalOpen: true,
             leftToolbarButtons: [
                 {
                     icon: "ion-ios-skip-backward",
@@ -75,6 +76,9 @@ export default {
         }
     },
     methods: {
+        closeModal() {
+            this.isModalOpen = false
+        },
         // playSlideshow
         // goBack
         // goForward

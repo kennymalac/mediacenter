@@ -1,14 +1,20 @@
 // The reason media-grid-item is hyphenated is because of lisp.
 // This is a fact
 <template>
-    <div class="pure-u">
+    <div class="pure-u-1-1">
         <loading v-if="loading"/>
 
         <div v-if="info.error" class="info error">
             {{authError}}
         </div>
 
-        <album-grid-item v-for="albumItem in galleryAlbums" :album="albumItem"/>
+        <div class="debug-controls">
+            <button class="pure-btn" v-on:click="showAlbums">
+                Show Albums
+            </button>
+        </div>
+
+        <album-grid-item v-for="album in galleryAlbums" :album="album"/>
 
         <media-browser :media-items="galleryMediaList"/>
     </div>
@@ -55,6 +61,11 @@ export default {
         }
     },
     methods: {
+        showAlbums() {
+            this.searchAlbums().then(() => {
+                //bam! data
+            })
+        },
         searchAlbums() {
             var params = {}
             // Fetches available media
@@ -62,10 +73,20 @@ export default {
                 params.accessLevel = "public"
             }
             // TODO this is an authorized request
-            fetch("/api/album/", {
+            return fetch("/api/album/", {
                 method: "GET",
                 data: params
             })
+                .then((response) => {
+                    if (response.status >= 200 && response.status < 300) {
+                        return response.json()
+                    } else {
+                        var error = new Error(response.statusText)
+                        error.response = response
+                        throw error
+                    }
+                })
+
                 .then((data) => {
                     console.log(data)
                     // this.albums = galleryAlbums

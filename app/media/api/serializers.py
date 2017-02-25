@@ -74,7 +74,6 @@ class AlbumMediaBrowserPagination(PageNumberPagination):
 
 class MediaBrowserSerializer(serializers.HyperlinkedModelSerializer):
     title = serializers.CharField()
-    # TODO consult Django REST framework serializer documentation
     media = serializers.HyperlinkedRelatedField(
         view_name='media-detail',
         many=True,
@@ -84,9 +83,10 @@ class MediaBrowserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Album
         # TODO reevaluate this later
-        fields = ('media')
+        #'thumbnail', 
+        fields = ('title', 'media')
 
-        
+
 class AlbumInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Album

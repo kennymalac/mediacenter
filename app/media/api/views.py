@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import detail_route
 
 from api.models import *
 from api.serializers import *
@@ -14,6 +15,12 @@ class MultipleSerializerMixin(object):
         except (KeyError, AttributeError):
             return super(MultipleSerializerMixin, self).get_serializer_class()
 
+# class AccessLevelsMixin(ModelViewSet):
+#     def __init__(self):
+#         self.access_level = ''
+
+#     def set_privilege(self, request):
+#         if request.user == 
 
 class AccountViewSet(MultipleSerializerMixin, ModelViewSet):
     """An API for viewing and editing accounts"""
@@ -43,9 +50,20 @@ class MediaViewSet(ModelViewSet):
 
 
 class AlbumViewSet(MultipleSerializerMixin, ModelViewSet):
-    """An API for viewing and uploading albums"""
     queryset = Album.objects.all()
+    """An API for viewing and uploading albums"""
     serializer_classes = {
-        'public': MediaBrowserSerializer,
-        'metadata': AlbumInfoSerializer
+        'default': AlbumInfoSerializer,
+        # 'public': 
+        'details': MediaBrowserSerializer
     }
+
+    # def get_queryset(self):
+    #     if self.access_level == 'public':
+    #         return Album.objects.filter(access_level='0')
+
+    @detail_route(methods=['get'], url_path='browse')
+    def details(self, request, pk=None):
+        data = request.data
+        #self.set_privilege(data['access_level'])
+

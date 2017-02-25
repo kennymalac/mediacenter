@@ -1,5 +1,5 @@
 <template>
-    <div v-click="action" :class="[toolbarItemClass, iconClass]"><a></a></div>
+    <div v-on:click="action" :class="[toolbarItemClass, iconClass]"><a></a></div>
 </template>
 
 <script>

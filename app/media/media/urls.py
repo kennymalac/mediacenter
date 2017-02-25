@@ -12,6 +12,7 @@ router.register(r'accounts', AccountViewSet)
 router.register(r'activitylogs', ActivityLogViewSet)
 router.register(r'blogposts', BlogPostViewSet)
 router.register(r'media', MediaViewSet)
+router.register(r'album', AlbumViewSet)
 
 urlpatterns = [
     url(r'^$', VueView.as_view()),
