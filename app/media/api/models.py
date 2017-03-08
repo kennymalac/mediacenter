@@ -18,7 +18,7 @@ class Account(AbstractUser, GuardianUserMixin):
     # Persist a hash of the user's UI display settings
     # Default settings are assigned on account creation
     # profile = JSONField or hyperlinked profile
-    account_settings = JSONField(null=True)
+    account_settings = JSONField(null=True, blank=True)
     REQUIRED_FIELDS = ['first_name', 'last_name', 'email', 'password']
     accounts = api.managers.AccountManager
 
@@ -103,15 +103,17 @@ mediaChoices = (
 )
 
 class Media(models.Model):
-    #album = models
-    title = models.CharField(max_length=140)
-    description = models.TextField()
+    album = models.ForeignKey(Album, blank=True)
+    title = models.CharField(max_length=140, blank=True)
+    description = models.TextField(blank=True)
     hidden = models.BooleanField(default=False)
     tags = models.ManyToManyField("MediaTag")
     media_type = models.CharField(
         max_length=2,
         choices=mediaChoices
     )
+    # TODO configure this
+    src = models.FileField()
     # permissions = models.JSONField()
 
     # def can_change(self, user):

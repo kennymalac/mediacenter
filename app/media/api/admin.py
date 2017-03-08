@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import Media, Album, MediaTag, AlbumTag
+from .models import Account, Media, Album, MediaTag, AlbumTag
+
+
+class AccountAdmin(admin.ModelAdmin):
+    search_fields = ('first_name', 'last_name', 'email', 'country')
+    fields = ('first_name', 'last_name', 'email', 'country', 'account_settings')
+    list_display = ('first_name', 'email', 'country')
 
 
 class MediaTagAdmin(admin.ModelAdmin):
@@ -24,6 +30,7 @@ class AlbumAdmin(admin.ModelAdmin):
     fields = ('title', 'description', 'owner', 'access_level', 'unlisted')
 
 
+admin.site.register(Account, AccountAdmin)
 admin.site.register(MediaTag, MediaTagAdmin)
 admin.site.register(Media, MediaAdmin)
 admin.site.register(AlbumTag, AlbumTagAdmin)

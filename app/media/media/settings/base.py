@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_countries',
     'rest_framework',
+    'rest_framework_extensions',
     'channels',
     'guardian',
     'api',
@@ -140,4 +141,11 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     )
+}
+
+# Custom Media Center settings
+GUESTS_CAN_UPLOAD = False
+ACCEPT_FILETYPES = {
+    'P': ['webp', 'gif', 'gifv', 'png', 'apng', 'jpg', 'jpeg', 'raw'],
+    'V': ['webm', 'mp4', 'mov', 'avi']
 }

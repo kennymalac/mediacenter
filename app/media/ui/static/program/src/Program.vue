@@ -34,4 +34,8 @@ $ionicons-font-path: "~ionicons/dist/fonts";
     color: #2c3e50;
     margin-top: 60px;
 }
+
+.pure-button-error {
+    background: rgb(202, 60, 60); /* this is a maroon */
+}
 </style>

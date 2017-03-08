@@ -48,7 +48,7 @@
                 </div>
 
                 <div class="pure-control-group">
-                    <input type="submit" class="pure-button pure-button-primary">Submit</input>
+                    <input type="submit" class="pure-button pure-button-primary" text="Submit" />
                 </div>
 
             </fieldset>

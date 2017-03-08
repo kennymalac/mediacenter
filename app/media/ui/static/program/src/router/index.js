@@ -5,6 +5,7 @@ import Auth from 'components/Auth'
 import Chat from 'components/Chat'
 import Home from 'components/Home'
 import Gallery from 'components/Gallery'
+import Album from 'components/Album'
 
 Vue.use(Router)
 
@@ -40,6 +41,34 @@ export default new Router({
             path: '/gallery',
             name: 'Gallery',
             component: Gallery
+            // children: [
+            //     {
+            //         path: 'album/:id',
+            //         component: GalleryAlbum
+            //     }
+            // ]
+        },
+        {
+            path: '/album',
+            name: 'Album',
+            component: Album,
+            children: [
+                {
+                    path: 'list',
+                    component: Album,
+                    props: { action: "list" }
+                },
+                {
+                    path: 'manage/:id',
+                    component: Album,
+                    props: { action: "manage" }
+                },
+                {
+                    path: 'create',
+                    component: Album,
+                    props: { action: "create" }
+                }
+            ]
         }
     ]
 })

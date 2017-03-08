@@ -1,23 +1,21 @@
 <template>
     <div class="album gallery-horizontal-box">
-        <img :src="thumbnail.src" :alt="thumbnail.alt" class="pure-img"/>
-        <label>
-            {{title}} by {{owner}}
+        <img v-if="album.thumbnail" :src="album.thumbnail.src" :alt="album.thumbnail.alt" class="pure-img"/>
+        <label v-if="album.title && album.owner">
+            {{album.title}} by {{album.owner.first_name}} {{album.owner.last_name}}
         </label>
     </div>
 </template>
 
 <script>
+// thumbnail: {
+// alt: 'An image',
+// src: ''
+// },
 export default {
+    props: ['album'],
     data() {
         return {
-            title: '',
-            thumbnail: {
-                alt: 'An image',
-                src: ''
-            },
-            owner: '',
-            tags: []
         }
     }
 }

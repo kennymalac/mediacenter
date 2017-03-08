@@ -11,6 +11,9 @@
             <li class="pure-menu-item">
                 <router-link to="/gallery" class="pure-menu-link">Media Gallery</router-link>
             </li>
+            <li class="pure-menu-item">
+                <router-link to="/album/list" class="pure-menu-link">Manage Albums</router-link>
+            </li>
         </ul>
         <!-- {% block userlogin %} -->
         <form class="pure-form">

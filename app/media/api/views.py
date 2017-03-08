@@ -1,6 +1,11 @@
 from django.shortcuts import render
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.decorators import detail_route
+from django.conf import settings
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
+from rest_framework.decorators import api_view, detail_route, parser_classes
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
+from rest_framework.response import Response
+from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from api.models import *
 from api.serializers import *
@@ -42,28 +47,44 @@ class BlogPostViewSet(ModelViewSet):
     serializer_class = BlogPostSerializer
 
 
-class MediaViewSet(ModelViewSet):
+class MediaViewSet(ListModelMixin,
+                   RetrieveModelMixin,
+                   GenericViewSet):
     # TODO: make this more refined based on user privilege levels
-    queryset = Media.objects.filter()
-    serializer_class = MediaListSerializer
+    queryset = Media.objects.filter(hidden=False)
+    serializer_class = MediaSerializer
     pagination_class = AlbumMediaBrowserPagination
 
 
-class AlbumViewSet(MultipleSerializerMixin, ModelViewSet):
+class AlbumViewSet(NestedViewSetMixin, ModelViewSet):
     queryset = Album.objects.all()
     """An API for viewing and uploading albums"""
-    serializer_classes = {
-        'default': AlbumInfoSerializer,
-        # 'public': 
-        'details': MediaBrowserSerializer
-    }
+    serializer_class = AlbumInfoSerializer
+    # serializer_classes = {
+    #     'default': AlbumInfoSerializer,
+    #     # 'public': 
+    #     'details': MediaBrowserSerializer
+    # }
+
+    # @api_view(['POST'])
+    @detail_route(methods=['POST'], url_path='upload')
+    @parser_classes((MultiPartParser, FormParser))
+    def upload_media_items(self, request, *args, **kwargs):
+        # TODO verify user privilege to upload to this album
+        super(MediaViewSet).create(request, args, kwargs)
+
 
     # def get_queryset(self):
     #     if self.access_level == 'public':
     #         return Album.objects.filter(access_level='0')
 
-    @detail_route(methods=['get'], url_path='browse')
-    def details(self, request, pk=None):
-        data = request.data
-        #self.set_privilege(data['access_level'])
+    # @detail_route(methods=['get'], url_path='browse')
+    # def details(self, request, pk=None):
+    #     #self.set_privilege(data['access_level'])
+    #     album = self.get_object()
+    #     serializer = self.get_serializer(
+    #         instance=album,
+    #     )
+
+    #     return Response(serializer.data)
 

@@ -1,7 +1,10 @@
-from api.models import *
+from django.core.paginator import Paginator
+from django_countries.serializer_fields import CountryField
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
-from django_countries.serializer_fields import CountryField
+
+from api.models import *
+
 
 class AccountSerializer(serializers.ModelSerializer):
     country = CountryField()
@@ -58,11 +61,23 @@ class MediaListSerializer(serializers.ListSerializer):
 
 
 class MediaSerializer(serializers.ModelSerializer):
-    title = serializers.CharField()
-    src = serializers.URLField(max_length=200, min_length=None, allow_blank=False)
+    src = serializers.URLField(
+        max_length=1000,
+        min_length=None,
+        allow_blank=False
+    )
 
     class Meta:
+        model = Media
+        fields = ('id', 'title', 'description', 'tags', 'media_type', 'src')
         list_serializer_class = MediaListSerializer
+
+    def parse_src(self, value):
+        # TODO add virus protection
+        if value['filetype'] in ACCEPT_FILETYPES[self.media_type]:
+            return True
+        else:
+            raise TypeError('File type ' + value['filetype'] + ' not valid for media type ' + self.media_type)
 
 
 class AlbumMediaBrowserPagination(PageNumberPagination):
@@ -72,22 +87,28 @@ class AlbumMediaBrowserPagination(PageNumberPagination):
     # essentially we limit this because this will be 24 "guaranteed" CDN requests
 
 
-class MediaBrowserSerializer(serializers.HyperlinkedModelSerializer):
-    title = serializers.CharField()
-    media = serializers.HyperlinkedRelatedField(
-        view_name='media-detail',
-        many=True,
-        read_only=True
-    )
+# class MediaBrowserSerializer(serializers.HyperlinkedModelSerializer):
+#     media_set = SerializerMethodField()
 
-    class Meta:
-        model = Album
-        # TODO reevaluate this later
-        #'thumbnail', 
-        fields = ('title', 'media')
 
+#    class Meta:
+#         model = Album
+#         # TODO reevaluate this later
+#         #'thumbnail', 
+#         fields = ('media_set')
+
+    # def get_media_set(self, obj):
+    #     MediaSerializer(
+    #         many=True,
+    #         read_only=True
+    #     )
+
+    #     return serializer.data
 
 class AlbumInfoSerializer(serializers.ModelSerializer):
+    owner = AccountSerializer(
+        read_only=True
+    )
     class Meta:
         model = Album
-        fields = ('id', 'title', 'tags')
+        fields = ('id', 'title', 'description', 'owner', 'tags')

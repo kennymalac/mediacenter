@@ -8,9 +8,17 @@
             {{authError}}
         </div>
 
-        <div class="debug-controls">
-            <button class="pure-btn" v-on:click="showAlbums">
+        <div class="debug-controls pure-form">
+            <button class="pure-button" v-on:click="showAlbums">
                 Show Albums
+            </button>
+            <button class="pure-button" v-on:click="showCreateAlbum">
+                Create Album
+            </button>
+
+            <input type="text" v-model="album.id" />
+            <button class="pure-button" v-on:click="showAlbumDetails">
+                Album Details
             </button>
         </div>
 
@@ -26,6 +34,7 @@ import MediaGridItem from './MediaGridItem'
 import AlbumGridItem from './AlbumGridItem'
 import MediaBrowser from './MediaBrowser'
 import Loading from './Loading'
+import router from '../router/index.js'
 // Dynamic gallery
 
 export default {
@@ -50,6 +59,11 @@ export default {
                 user: {
                     id: 0
                 }
+            },
+            album: {
+                id: null,
+                title: "",
+                description: ""
             }
         }
     },
@@ -62,9 +76,30 @@ export default {
     },
     methods: {
         showAlbums() {
-            this.searchAlbums().then(() => {
-                //bam! data
+            this.searchAlbums().then((data) => {
+                this.galleryAlbums = data
             })
+        },
+        showAlbumGallery() {
+            router.replace({
+                path: 'gallery/album',
+                params: {
+                    id: this.album.id
+                }
+            })
+        },
+        showAlbumDetails() {
+            // TODO verify privilege
+            router.push({
+                path: 'album',
+                params: {
+                    id: this.album.id
+                }
+            })
+        },
+        showCreateAlbum() {
+            // TODO verify privilege
+            router.push('album/create')
         },
         searchAlbums() {
             var params = {}
@@ -85,11 +120,6 @@ export default {
                         error.response = response
                         throw error
                     }
-                })
-
-                .then((data) => {
-                    console.log(data)
-                    // this.albums = galleryAlbums
                 })
         }
     }
