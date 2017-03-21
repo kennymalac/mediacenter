@@ -9,4 +9,4 @@ django-guardian
 django-filter
 #django-supervisor
 django-countries
-
+python-magic

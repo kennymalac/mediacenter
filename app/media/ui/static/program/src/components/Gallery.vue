@@ -1,5 +1,3 @@
-// The reason media-grid-item is hyphenated is because of lisp.
-// This is a fact
 <template>
     <div class="pure-u-1-1">
         <loading v-if="loading"/>
@@ -22,9 +20,9 @@
             </button>
         </div>
 
-        <album-grid-item v-for="album in galleryAlbums" :album="album"/>
+        <album-grid-item v-for="album in galleryAlbums" @albumSelected="showAlbumGallery" :album="album"/>
 
-        <media-browser :media-items="galleryMediaList"/>
+        <media-browser ref="browser" />
     </div>
 </template>
 
@@ -48,8 +46,8 @@ export default {
         return {
             full: false,
             loading: false,
+            currentAlbum: {},
             galleryAlbums: [],
-            galleryMediaList: [{}, {}, {}],
             authError: "Please sign in to view the media gallery.",
             infoBox: {
                 status: "error"
@@ -80,13 +78,17 @@ export default {
                 this.galleryAlbums = data
             })
         },
-        showAlbumGallery() {
-            router.replace({
-                path: 'gallery/album',
-                params: {
-                    id: this.album.id
-                }
-            })
+        showAlbumGallery(album) {
+            this.loading = true
+            console.log(album)
+            this.$refs.browser.selectAlbum(album)
+            this.loading = false
+            // router.replace({
+            //     path: 'gallery/album',
+            //     params: {
+            //         id: album.id
+            //     }
+            // })
         },
         showAlbumDetails() {
             // TODO verify privilege

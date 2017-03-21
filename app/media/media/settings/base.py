@@ -147,5 +147,17 @@ REST_FRAMEWORK = {
 GUESTS_CAN_UPLOAD = False
 ACCEPT_FILETYPES = {
     'P': ['webp', 'gif', 'gifv', 'png', 'apng', 'jpg', 'jpeg', 'raw'],
-    'V': ['webm', 'mp4', 'mov', 'avi']
+    'A': ['wav', 'webm'],
+    'V': ['webm', 'mp4', 'avi']
+    # 'W'
+}
+ACCEPT_MIMES = {
+    'P': ['image/webp', 'image/gif', 'image/png', 'image/apng', 'image/jpeg', 'image/pjpeg', 'image/raw'],
+    'A': ['audio/wav', 'audio/webm'],
+    'V': ['video/webm', 'video/mp4', 'video/avi']
+}
+
+MAX_FILE_SIZE = {
+    'P': 12582912, #12mb
+    'V': 146800640 # 140mb
 }

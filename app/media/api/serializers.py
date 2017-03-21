@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 from django.core.paginator import Paginator
 from django_countries.serializer_fields import CountryField
 from rest_framework import serializers
@@ -60,24 +62,64 @@ class MediaListSerializer(serializers.ListSerializer):
         pass
 
 
+class MediaSrcField(serializers.FileField):
+    def infer_format(self, dataFile):
+        #
+        # WARNING: this could be DDOSed!
+        #
+        from django.core.files.storage import default_storage
+        from django.core.files.base import ContentFile
+        from os.path import join
+        import magic
+        tmpfile = 'tmp/{}'.format(upload)
+        default_storage.save(tmpfile, ContentFile(dataFile.read()))
+        path_to_tmpfile = join(settings.MEDIA_ROOT, tmpfile)
+
+        file_mime = magic.from_file(path_to_tmpfile, mime=True)
+
+        return file_mime
+
+    def to_internal_value(self, data):
+        file_object = super(ImageField, self).to_internal_value(data)
+        # TODO add virus protection
+
+        try:
+            file_object['ext'] = file_object['name'].split('.')[1]
+        except IndexError:
+            # There is no explicit file extension
+            file_object['ext'] = ''
+
+        if 'mime' not in file_object:
+            # Try to figure out a file format from the associated mimetypes
+            file_object['mime'] = self.infer_format(data.file)
+
+        return file_object
+
+
 class MediaSerializer(serializers.ModelSerializer):
-    src = serializers.URLField(
-        max_length=1000,
-        min_length=None,
-        allow_blank=False
-    )
+    src = MediaSrcField()
 
     class Meta:
         model = Media
         fields = ('id', 'title', 'description', 'tags', 'media_type', 'src')
         list_serializer_class = MediaListSerializer
 
-    def parse_src(self, value):
-        # TODO add virus protection
-        if value['filetype'] in ACCEPT_FILETYPES[self.media_type]:
-            return True
-        else:
-            raise TypeError('File type ' + value['filetype'] + ' not valid for media type ' + self.media_type)
+    def determine_media_type(self, mime):
+        for kind, types in settings.ACCEPT_MIMES.values():
+            if mime in types:
+                return kind
+        raise ValidationError("Media type could not be determined.")
+
+    def validate(self, data):
+        if data['media_type'] not in mediaChoices:
+            data['media_type'] = self.determine_media_type(data['src']['mime'])
+
+        if data['src']['size'] > settings.MAX_FILE_SIZE[data['media_type']]:
+            raise ValidationError('File cannot be stored due to large size')
+
+        acceptable_mimes = settings.ACCEPT_MIMES[data["media_type"]]
+        if data['src']['mime'] not in acceptable_mimes:
+            raise ValidationError('MIME type not valid for media_type')
 
 
 class AlbumMediaBrowserPagination(PageNumberPagination):

@@ -99,7 +99,7 @@ class MediaTag(models.Model):
 mediaChoices = (
     ('P', "PHOTO"),
     ('V', "VIDEO"),
-    # ('PE', "PHOTO EMBED")
+    # ('W', "PHOTO EMBED")
 )
 
 class Media(models.Model):

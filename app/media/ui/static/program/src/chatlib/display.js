@@ -69,7 +69,7 @@ class Chat {
         pc.createOffer(function(offer) {
             pc.setLocalDescription(offer, function() {
                 send("offer", JSON.stringify(pc.localDescription));
-            }, this.onPeerOfferErorr);
+            }, this.onPeerOfferError);
         }, onPeerOfferError, options);
 
         pc.onaddstream = () => {

@@ -4,6 +4,9 @@
         <label v-if="album.title && album.owner">
             {{album.title}} by {{album.owner.first_name}} {{album.owner.last_name}}
         </label>
+        <div>
+            <button v-on:click="selectAlbum()" class="btn">Show</button>
+        </div>
     </div>
 </template>
 
@@ -16,6 +19,11 @@ export default {
     props: ['album'],
     data() {
         return {
+        }
+    },
+    methods: {
+        selectAlbum(album) {
+            this.$emit('albumSelected', this.album)
         }
     }
 }

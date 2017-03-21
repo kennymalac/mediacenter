@@ -1,0 +1,53 @@
+* Main TODO
+** Priority 1 (urgent)
+*** chatlib
+**** TODO allow more than 2 users to video chat at once
+*** media browser
+**** TODO 
+**** TODO 
+**** TODO
+* 
+**** TODO
+**** TODO full test coverage
+*** 
+**** TODO 
+**** TODO full test coverage
+** 
+**** TODO
+**** TODO
+**** TODO
+**** TODO full test coverage
+
+** Priority 2 (necessary)
+*** chatlib
+**** TODO full test coverage
+*** TODO deployment to a VPS
+*** 
+*** 
+** Priority 3 (backlog)
+*** TODO activitylog
+*** 
+*** 
+** Priority 4 (enhancements)
+*** TODO use TypeScript
+*** 
+*** 
+*** 
+** Priority 5 (wishlist)
+*** 
+*** 
+*** 
+*** 
+
+* Old TODO
+** invite only
+** finish the API
+** finish implementing an interface to the WebRTC spec
+** finish implementing 2 person video conferencing
+** finish implementing basic verson of the interface
+** finish activity feed logic
+** integrate monitoring of STUN/ICE servers with supervisord???
+** DONE migrate from static django templates to a SPA using a frontend framework
+   CLOSED: [2017-03-13 Mon 19:35]
+** DONE switch to ECMAScript 6 for all frontend code
+   CLOSED: [2017-03-13 Mon 19:34]

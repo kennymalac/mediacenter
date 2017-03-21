@@ -5,22 +5,24 @@
 
             <modal-toolbar :buttons="leftToolbarButtons"/>
 
-            <label>
-                Album title
+            <label v-if="album.title">
+                {{album.title}}
             </label>
 
             <modal-toolbar-item class="close-btn" :icon-class="'ion-md-close'" :action="closeModal" />
             <hr/>
         </div>
-        <div class="modal-content">
-            Nothing to show.
+        <div class="modal-content" @play="playSlideshow" @nextPhoto="nextPhoto" @prevPhoto="prevPhoto">
+            <div class="gallery-photo-view">
+                <div v-if="photo">Nothing to show.</div>
+            </div>
 
             <div class="gallery-preview">
-                <div class="go-back ion-ios-arrow-back"></div>
+                <div v-on:click="goBack" v-bind:class="{ disabled: atBeginningOfRoster }" class="go-back ion-ios-arrow-back"></div>
                 <div class="preview-container">
                     <media-grid-item v-for="mediaItem in currentRoster" :media="mediaItem"/>
                 </div>
-                <div class="go-forward ion-ios-arrow-forward"></div>
+                <div v-on:click="goForward" v-bind:class="{ disabled: atEndOfRoster }" class="go-forward ion-ios-arrow-forward"></div>
             </div>
         </div>
     </div>
@@ -33,7 +35,6 @@ import ModalToolbarItem from './Gui/Modal/ModalToolbarItem'
 
 export default {
     name: 'media-browser',
-    props: ['mediaItems'],
     components: {
         MediaGridItem,
         ModalToolbar,
@@ -41,28 +42,37 @@ export default {
     },
     data() {
         return {
-            // 
+            //
+            isActive: false,
+            album: {},
             mediaItems: [],
+            pageCache: {},
+            currentMediaItem: {},
             currentRoster: [],
-            currentPage: 0,
+            atBeginningOfRoster: false,
+            atEndOfRoster: false,
+            currentPage: 1,
             isModalOpen: true,
             leftToolbarButtons: [
                 {
                     icon: "ion-ios-skip-backward",
                     action() {
                         // Go back a photo
+                        this.$emit('prevPhoto')
                     }
                 },
                 {
                     icon: "ion-ios-play",
                     action() {
                         // Play a slideshow
+                        this.$emit('play')
                     }
                 },
                 {
                     icon: "ion-ios-skip-forward",
                     action() {
                         // Go forward in the album
+                        this.$emit('nextPhoto')
                     }
                 },
                 {
@@ -70,23 +80,51 @@ export default {
                     action() {
                         // Apply effects to this photo
                         // Slideshow has to be paused
+                        this.$emit('applyEffect')
                     }
                 }
             ]
         }
     },
     methods: {
+        nextPhoto() {
+            //t
+            //this.currentPhoto = photo.next().value
+        },
+        prevPhoto() {
+            //why don't js iterators do previous???
+        },
+        playSlideshow() {
+            //t
+        },
+        // Toolbar item icons
+        goForward() {
+            if (!this.atEndOfRoster && !this.isActive) {
+                this.isActive = true
+                this.currentPage++
+                this.listMediaItems(this.album)
+            }
+        },
+        goBack() {
+            if (!this.atBeginningOfRoster && !this.isActive) {
+                this.isActive = true
+                this.currentPage--
+                this.listMediaItems(this.album)
+            }
+        },
         closeModal() {
             this.isModalOpen = false
         },
         // playSlideshow
-        // goBack
-        // goForward
         // applyEffects
+        selectAlbum(album) {
+            this.getAlbum(album)
+                .then(this.listMediaItems)
+        },
         getAlbum(album) {
             // Returns a detailed graph for media items
 
-            fetch("/api/album/" + album.id + "/browse", {
+            return fetch("/api/album/" + album.id + "/", {
                 method: "GET"
             })
                 .then((response) => {
@@ -100,15 +138,21 @@ export default {
                 })
 
                 .then((data) => {
-                    this.currentAlbum = data
+                    this.album = data
+                    return this.album
                 })
                 .catch((error) => {
                     console.log(error)
                 })
         },
         listMediaItems(album) {
-            fetch("/api/album/" + album.id + "browse?page=" + this.currentPage, {
-                method: "POST"
+            let cachedPage = this.pageCache[this.currentPage]
+            if (cachedPage) {
+                this.currentRoster = cachedPage
+            }
+
+            fetch("/api/album/" + album.id + "/media/?page=" + this.currentPage, {
+                method: "GET"
             })
                 .then((response) => {
                     if (response.status >= 200 && response.status < 300) {
@@ -121,11 +165,16 @@ export default {
                 })
 
                 .then((data) => {
-                    this.currentRoster = data
+                    this.pageCache[this.currentPage] = data.results
+                    this.currentRoster = this.pageCache[this.currentPage]
+                    this.atBeginningOfRoster = (data.previous === null)
+                    this.atEndOfRoster = (data.next === null)
+                    this.isActive = false
                 })
 
                 .catch((error) => {
                     console.log(error)
+                    this.isActive = false
                 })
         }
     }
@@ -166,6 +215,37 @@ export default {
         }
     }
     /* alternative color: rgba(52, 73, 94,1.0)*/
+
+    .go-back, .go-forward {
+        &:active {
+            color: #26619C; /*#34497d;*/
+            /*linear-gradient(18deg, #001f3f, rgba(52, 73, 94,1.0));*/
+        }
+
+        &.disabled {
+            color: rgb(127, 140, 141);
+            cursor: default;
+        }
+
+        display: inline-block;
+        position: absolute;
+        text-align: center;
+        top: 20%;
+        width: 2.25rem;
+        font-size: 3.5rem;
+        cursor: pointer;
+        color: rgb(52, 73, 94);
+    }
+
+    .go-back {
+        /*margin-right: 4rem;*/
+        left: 2rem;
+    }
+
+    .go-forward {
+        /*margin-left: 4rem;*/
+        right: 2rem;
+    }
 }
 /* .media-modal-view .modal-title label { */
 /*     // silver */
@@ -182,13 +262,6 @@ export default {
 /* } */
 
 
-/* .ion-play { */
-/*     left: 3.5em; */
-/* } */
-
-/* .ion-ios-color-wand-outline { */
-/*     left: 5.25em; */
-/* } */
 
 
 .media-modal-view {

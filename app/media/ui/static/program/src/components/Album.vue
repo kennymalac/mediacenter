@@ -23,7 +23,7 @@
         </form>
 
         <form v-on:submit.prevent="save" class="pure-form pure-form-aligned">
-            <legend>Media Items</legend>
+            <legend>Details</legend>
 
             <div class="pure-control-group">
                 <label for="title">Title</label>
@@ -38,32 +38,40 @@
                 <input name="tags" v-model="album.tags_raw" type="text" />
             </div>
 
+            <div class="pure-control-group">
+                <input class="pure-button" type="submit" />
+            </div>
             <!-- TODO drag and drop input -->
 
             <button class="pure-button" v-on:click="createMediaItem">
                 Add media
             </button>
             OR
-            <input v-on:upload="uploadMediaItems" type="file" multiple />
+            <file-upload :multiple="true" @fileReady="addNewMediaItem" />
 
-    <album-media-item-upload-grid-item v-for="mediaItem in album.media" />
 
-            <input class="pure-button" type="submit" />
+        </form>
+
+        <form class="pure-form">
+            <legend>Media Items</legend>
+            <album-media-item-upload-grid-item v-for="file in mediaItems" :file="file" :key="file.id"/>
         </form>
     </div>
 </template>
 
 <script>
 import AlbumMediaItemUploadGridItem from "./AlbumMediaItemUploadGridItem"
-//import router from "../router/index.js"
+import FileUpload from "./FileUpload"
+import router from "../router/index.js"
 
 export default {
     components: {
-        AlbumMediaItemUploadGridItem
+        AlbumMediaItemUploadGridItem,
+        FileUpload
     },
     data() {
         return {
-            isManage: true, // router.props.action === 'manage',
+            mediaItems: [],
             album: {
                 id: null,
                 title: '',
@@ -73,20 +81,28 @@ export default {
             }
         }
     },
+    computed: {
+        action() {
+            return {
+                list: router.action === "list",
+                manage: router.action === "manage",
+                create: router.action === "create"
+            }
+        }
+    },
     methods: {
         createAlbum() {
             //router.replace('manage/:id')
         },
-        createMediaItem() {
-            // TODO refactor this!!!
-            // createElement(AlbumMediaItemUploadGridItem, {
-            //     attrs: [
-            //         class: ['pure-control-group']
-            //     ],
-            // });
-        },
-        uploadMediaItems() {
-            
+        addNewMediaItem(item) {
+            console.log('adding media item', this.mediaItems)
+            //this.$set(this.mediaItems, {id: this.mediaItems.length, file: item}, 0)
+            this.mediaItems.push({id: this.mediaItems.length, file: item})
+            // if (this.action.manage) {
+            //     this.router.id
+            // }
+            // else if (this.action.create) {
+            // }
         },
         save() {
             for (let tag of this.album.tags_raw.split(',')) {

@@ -71,7 +71,7 @@ class AlbumViewSet(NestedViewSetMixin, ModelViewSet):
     @parser_classes((MultiPartParser, FormParser))
     def upload_media_items(self, request, *args, **kwargs):
         # TODO verify user privilege to upload to this album
-        super(MediaViewSet).create(request, args, kwargs)
+        MediaViewSet.create(request, args, kwargs)
 
 
     # def get_queryset(self):
