@@ -1,36 +1,49 @@
 * Main TODO
 ** Priority 1 (urgent)
-*** chatlib
+*** Chatlib
 **** TODO allow more than 2 users to video chat at once
-*** media browser
 **** TODO 
-**** TODO 
-**** TODO
-* 
-**** TODO
+*** Media Browser
+**** TODO playSlideshow
+**** TODO applyEffects (low priority)
+**** TODO goForward/goBack
+**** TODO moveable modal with window controls
+*** Authentication
+**** TODO getActiveUser
+**** TODO getToken
+**** TODO refreshToken
+**** TODO getPrivileges
 **** TODO full test coverage
-*** 
+*** Login
+**** TODO login embed/header view
+**** TODO login page
+**** TODO full test coverage
+*** Register
+**** TODO register page
+**** TODO full test coverage
+*** Gallery
 **** TODO 
 **** TODO full test coverage
-** 
-**** TODO
-**** TODO
-**** TODO
+*** Album
+**** TODO CRUD
+**** TODO Uploading media items
 **** TODO full test coverage
 
 ** Priority 2 (necessary)
 *** chatlib
 **** TODO full test coverage
 *** TODO deployment to a VPS
-*** 
+**** 
 *** 
 ** Priority 3 (backlog)
 *** TODO activitylog
 *** 
-*** 
+** 
 ** Priority 4 (enhancements)
 *** TODO use TypeScript
-*** 
+*** Theming system
+**** Theme selection
+**** Theme explorer
 *** 
 *** 
 ** Priority 5 (wishlist)

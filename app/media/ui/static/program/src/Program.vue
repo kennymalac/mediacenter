@@ -13,6 +13,7 @@
 
 <script>
 import Header from './components/Header.vue'
+//import Pager from './pager.js'
 import 'pure-css'
 
 export default {
@@ -26,16 +27,15 @@ export default {
 <style lang="scss">
 $ionicons-font-path: "~ionicons/dist/fonts";
 @import "~ionicons/dist/scss/ionicons.scss";
+@import "classicTheme.scss";
 
 #program {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-align: center;
-    color: #2c3e50;
+    color: $subgray;
     margin-top: 60px;
 }
 
-.pure-button-error {
-    background: rgb(202, 60, 60); /* this is a maroon */
-}
+
 </style>

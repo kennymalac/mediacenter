@@ -24,6 +24,7 @@ module.exports = {
       'semi': ['error', 'never'],
       'indent': ['warn', 4],
       'quotes': 0,
+      'brace-style': 0,
       'no-trailing-spaces': 0,
       'spaced-comment': 0,
       'space-before-function-paren': ['warn', 'never'],

@@ -135,6 +135,7 @@ export default {
 }
 .gallery-horizontal-box {
     display: inline-block;
+    vertical-align: top;
     margin-right: .5rem;
     border-radius: 4px / 5px;
     border: 2px solid rgba(52, 73, 94,1.0);

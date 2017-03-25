@@ -3,6 +3,9 @@
         <router-link to="/" class="pure-menu-heading pure-menu-link">MEDIA SERVER</router-link>
         <ul class="pure-menu-list">
             <li class="pure-menu-item">
+                <router-link to="/register" class="pure-menu-link">Register</router-link>
+            </li>
+            <li class="pure-menu-item">
                 <router-link to="/feed" class="pure-menu-link">Feed</router-link>
             </li>
             <li class="pure-menu-item">
@@ -15,27 +18,18 @@
                 <router-link to="/album/list" class="pure-menu-link">Manage Albums</router-link>
             </li>
         </ul>
-        <!-- {% block userlogin %} -->
-        <form class="pure-form">
-            <fieldset>
-                <input type="text" placeholder="username">
-                <input type="password" placeholder="password">
 
-                <label for="remember">
-                    <input id="remember" type="checkbox"> Remember Me
-                </label>
-
-                <button type="submit" class="pure-button pure-button-primary">Sign in</button>
-            </fieldset>
-
-            <!-- {% csrf_token %} -->
-        </form>
+        <login :embed="true"/>
     </div>
 </template>
 
-<script>    
+<script>
+import Login from "./Login"
 export default {
     name: 'header-menu',
+    components: {
+        Login
+    },
     data() {
         return {
 

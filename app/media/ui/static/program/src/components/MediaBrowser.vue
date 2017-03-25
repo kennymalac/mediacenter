@@ -89,10 +89,10 @@ export default {
     methods: {
         nextPhoto() {
             //t
-            //this.currentPhoto = photo.next().value
+            //TODO this.currentPhoto = photo.next().value
         },
         prevPhoto() {
-            //why don't js iterators do previous???
+            //TODO why don't js iterators do previous???
         },
         playSlideshow() {
             //t
@@ -123,6 +123,7 @@ export default {
         },
         getAlbum(album) {
             // Returns a detailed graph for media items
+            // TODO repair cache by moving initialization parmeters to a Store
 
             return fetch("/api/album/" + album.id + "/", {
                 method: "GET"
@@ -149,6 +150,7 @@ export default {
             let cachedPage = this.pageCache[this.currentPage]
             if (cachedPage) {
                 this.currentRoster = cachedPage
+                // TODO: fix this to not rerun requests
             }
 
             fetch("/api/album/" + album.id + "/media/?page=" + this.currentPage, {
@@ -182,6 +184,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import "../classicTheme.scss";
+
 .media-modal-view {
     border-radius: 3px/2px;
     display: block;
@@ -218,7 +222,7 @@ export default {
 
     .go-back, .go-forward {
         &:active {
-            color: #26619C; /*#34497d;*/
+            color: $classicblue; /*#34497d;*/
             /*linear-gradient(18deg, #001f3f, rgba(52, 73, 94,1.0));*/
         }
 
@@ -261,9 +265,6 @@ export default {
 /*  /\* icon = camcorder *\/ */
 /* } */
 
-
-
-
 .media-modal-view {
     .modal-content {
         display: block;
@@ -298,6 +299,7 @@ export default {
     }
 }
 
+// This animation doesn't work
 @keyframes slideup {
     from {
         margin-bottom: 100%; 

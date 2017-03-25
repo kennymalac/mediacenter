@@ -1,0 +1,72 @@
+//Namespace: COLOR
+$maroonesque: rgb(202, 60, 60);
+$subgray: #2c3e50;
+
+//Classic theme color
+$classicblue: #26619C;
+$classiclightblue: #1F8DD6;
+$classicgreen: #4F8A10;
+
+//Pure CSS enhancements
+/* Button classes:
+ * Standard Error state button
+ * Standard Success state button
+ * Info
+ * Primary action
+ * Secondary action
+*/
+.pure-button-error {
+    background-color: $maroonesque;
+ }
+.pure-button-success {
+    background-color: $classicgreen;
+}
+.classic-primary-button {
+    background-color: $classicblue;
+}
+.classic-secondary-button {
+    background-color: $subgray;
+}
+.classic-info-button {
+    /* TODO */
+}
+
+.info, .success, .error {
+    border: 1px solid;
+    border-radius: 5px;
+    margin: 10px 10px;
+    padding: 10px 10px 10px 15px;
+}
+.info {
+    color: #fff;
+    background-color: $classiclightblue;
+}
+.error {
+    color: #D8000C;
+    background-color: #FFBABA;
+}
+.success {
+    color: $classicgreen;
+    background-color: #DFF2BF;
+}
+
+//Namespace:common layout patterns
+/* quad */
+/* triangle */
+/* column */
+/* line */
+
+.quad .grid-item {
+    /*pure mixin*/
+}
+.triangle .grid-item {
+
+}
+.column .grid-item {
+
+}
+.line .grid-item {
+
+}
+
+//CSS3 extensions and properties?

@@ -1,6 +1,6 @@
 <template>
     <div class="pure-u-1-1">
-        <h1 v-if="isManage">
+        <h1 v-if="action.manage">
             Edit Album: {{album.title }}
         </h1>
 
@@ -65,12 +65,18 @@ import FileUpload from "./FileUpload"
 import router from "../router/index.js"
 
 export default {
+    props: ['id', 'action'],
     components: {
         AlbumMediaItemUploadGridItem,
         FileUpload
     },
     data() {
         return {
+            actions: {
+                list: this.action === "list",
+                manage: this.action === "manage",
+                create: this.action === "create"
+            },
             mediaItems: [],
             album: {
                 id: null,
@@ -81,34 +87,93 @@ export default {
             }
         }
     },
-    computed: {
-        action() {
-            return {
-                list: router.action === "list",
-                manage: router.action === "manage",
-                create: router.action === "create"
-            }
+    // computed: {
+    //     actions() {
+    //         return {
+    //             list: this.action === "list",
+    //             manage: this.action === "manage",
+    //             create: this.action === "create"
+    //         }
+    //     }
+    // },
+    mounted() {
+        //router.replace('manage/:id')
+        if (this.id !== null) {
+            this.album.id = this.id
         }
     },
     methods: {
         createAlbum() {
-            //router.replace('manage/:id')
+            // this won't add mediaitems, and it defnitely will not
+            // work for created items
+            // createAtlbum does not upload mediaitems
+            return fetch("/api/album/create/", {
+                method: "POST",
+                data: this.album
+            })
+                .then((response) => {
+                    if (response.status >= 200 && response.status < 300) {
+                        return response.json()
+                    } else {
+                        var error = new Error(response.statusText)
+                        error.response = response
+                        throw error
+                    }
+                })
+
+                .then((data) => {
+                    this.album = data
+                    return this.album
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+        },
+        manageAlbum() {
+            return fetch("/api/album/" + this.album.id + "/", {
+                method: "PUT",
+                data: this.album
+            })
+                .then((response) => {
+                    if (response.status >= 200 && response.status < 300) {
+                        return response.json()
+                    } else {
+                        var error = new Error(response.statusText)
+                        error.response = response
+                        throw error
+                    }
+                })
+
+                .then((data) => {
+                    this.album = data
+                    return this.album
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
         },
         addNewMediaItem(item) {
             console.log('adding media item', this.mediaItems)
-            //this.$set(this.mediaItems, {id: this.mediaItems.length, file: item}, 0)
             this.mediaItems.push({id: this.mediaItems.length, file: item})
-            // if (this.action.manage) {
-            //     this.router.id
-            // }
-            // else if (this.action.create) {
-            // }
         },
         save() {
             for (let tag of this.album.tags_raw.split(',')) {
                 if (tag.length > 0) {
                     this.album.tags.push(tag)
                 }
+            }
+
+            if (this.actions.manage) {
+                this.manageAlbum().then((data) => {
+                    console.log(data)
+                })
+            }
+            else if (this.actions.create) {
+                this.createAlbum().then((data) => {
+                    console.log(data)
+                    router.replace('/album/' + data.id + '/manage')
+                    // Ready to upload media items
+                })
             }
         }
     }

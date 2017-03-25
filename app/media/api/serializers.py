@@ -16,7 +16,7 @@ class AccountSerializer(serializers.ModelSerializer):
         fields = ('first_name', 'last_name', 'username', 'country', 'email')
 
 class FullAccountSerializer(AccountSerializer):
-    """Requires full account view permissions (i.e. admin or current user privilege levels)"""
+    """Requires full account view permissions (i.e. admin or current user privilege levels) UNLESS it is from a CREATE request."""
     account_settings = serializers.JSONField(True)
 
     class Meta:

@@ -63,9 +63,10 @@ export default {
 <style scoped lang="scss">
 .media-upload-grid-item {
     display: inline-block;
-    margin: 10px;
+    vertical-align: top;
+    margin: 1rem;
     width: 340px;
-    height: 415px;
+    min-height: 415px;
     border: 2px solid #001f3f;
     border-radius: 3px/2px;
 
