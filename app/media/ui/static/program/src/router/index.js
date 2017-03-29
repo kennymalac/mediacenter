@@ -16,7 +16,13 @@ function restAction(route) {
     const validActions = ['create', 'list', 'manage']
 
     if (!route.params.action || !validActions.includes(route.params.action)) {
-        return {}
+        throw new Error()
+    }
+
+    if (route.params.action === 'manage' && !route.params.id) {
+        console.log(route.params.action)
+        console.log(route.params.id)
+        throw new Error()
     }
 
     return {
@@ -65,16 +71,18 @@ export default new Router({
             // ]
         },
         {
+            path: '/album/:id/:action',
+            name: 'Album',
+            component: Album,
+            props: restAction,
+            canReuse: false
+        },
+        {
             path: '/album/:action',
             name: 'Album',
             component: Album,
-            props: restAction
-        },
-        {
-            path: 'album/:id/:action',
-            name: 'Album',
-            component: Album,
-            props: restAction
+            props: restAction,
+            canReuse: false
         }
             // children: [
                 // {

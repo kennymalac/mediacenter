@@ -5,10 +5,12 @@ class Auth {
         // TODO manage session outside of Auth
         this.currentSession = {
             user: {
-                id: null,
-                username: ""
+                details: { id: 0, username: null, user_settings: {}, profile_details: {} },
+                token: ""
             }
         }
+
+        // TODO persist authentication
     }
 
     getActiveUser() {
@@ -27,7 +29,7 @@ class Auth {
 
         if (refresh) {
             //this.refreshToken(this.getActiveUser.username)
-            return localStorage.getItem(this.storageKey + this.currentSession.user.id)
+            return localStorage.getItem(this.storageKey + this.currentSession.user.username)
         }
 
         return this.currentSession.user.token
@@ -56,11 +58,42 @@ class Auth {
             .then((data) => {
                 let token = data.token
                 this.currentSession.user.token = token
-                localStorage.setItem(this.storageKey + this.currentSession.user.id, token)
+                this.currentSession.user.details.username = username
+                localStorage.setItem(this.storageKey + this.currentSession.user.details.username, token)
+                this.getProfile(errorCallback)
             })
             .catch((error) => {
                 errorCallback(error)
             })
+    }
+
+    getProfile(errorCallback) {
+        let headers = {}
+        this.authenticate(headers)
+        return fetch('/api/accounts/current-user/', {
+            method: 'GET',
+            // Get authentication headers
+            headers: headers
+        })
+            .then((response) => {
+                if (response.status >= 200 && response.status < 300) {
+                    return response.json()
+                } else {
+                    var error = new Error(response.statusText)
+                    error.response = response
+                    throw error
+                }
+            })
+            .then((data) => {
+                this.currentSession.user.details = data
+            })
+            .catch((error) => {
+                errorCallback(error)
+            })
+    }
+
+    authenticate(headers) {
+        headers["Authorization"] = 'JWT ' + this.currentSession.user.token
     }
 }
 

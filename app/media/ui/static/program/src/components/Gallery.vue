@@ -7,15 +7,15 @@
         </div>
 
         <div class="debug-controls pure-form">
-            <button class="pure-button" v-on:click="showAlbums">
+            <button class="pure-button" @click="showAlbums">
                 Show Albums
             </button>
-            <button class="pure-button" v-on:click="showCreateAlbum">
+            <button class="pure-button" @click="showCreateAlbum">
                 Create Album
             </button>
 
             <input type="text" v-model="album.id" />
-            <button class="pure-button" v-on:click="showAlbumDetails">
+            <button class="pure-button" @click="showAlbumDetails">
                 Album Details
             </button>
         </div>
@@ -28,6 +28,8 @@
 
 
 <script>
+import {AlbumCollection} from '../models/Album.js'
+
 import MediaGridItem from './MediaGridItem'
 import AlbumGridItem from './AlbumGridItem'
 import MediaBrowser from './MediaBrowser'
@@ -74,7 +76,7 @@ export default {
     },
     methods: {
         showAlbums() {
-            this.searchAlbums().then((data) => {
+            AlbumCollection.searchAlbums().then((data) => {
                 this.galleryAlbums = data
             })
         },
@@ -102,27 +104,6 @@ export default {
         showCreateAlbum() {
             // TODO verify privilege
             router.push('album/create')
-        },
-        searchAlbums() {
-            var params = {}
-            // Fetches available media
-            if (!this.auth.privilegeLevel === "guest") {
-                params.accessLevel = "public"
-            }
-            // TODO this is an authorized request
-            return fetch("/api/album/", {
-                method: "GET",
-                data: params
-            })
-                .then((response) => {
-                    if (response.status >= 200 && response.status < 300) {
-                        return response.json()
-                    } else {
-                        var error = new Error(response.statusText)
-                        error.response = response
-                        throw error
-                    }
-                })
         }
     }
 }

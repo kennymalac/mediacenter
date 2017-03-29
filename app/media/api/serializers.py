@@ -10,18 +10,29 @@ from api.models import *
 
 class AccountSerializer(serializers.ModelSerializer):
     country = CountryField()
+    profile_details = serializers.JSONField(read_only=True)
 
     class Meta:
         model = Account
-        fields = ('first_name', 'last_name', 'username', 'country', 'email')
+        fields = ('first_name', 'last_name', 'username', 'country', 'profile_details', 'email')
+
 
 class FullAccountSerializer(AccountSerializer):
     """Requires full account view permissions (i.e. admin or current user privilege levels) UNLESS it is from a CREATE request."""
-    account_settings = serializers.JSONField(True)
+    account_settings = serializers.JSONField(read_only=False)
 
     class Meta:
         model = Account
         fields = ('username', 'first_name', 'last_name', 'email', 'password', 'country', 'account_settings')
+
+
+class PrivateAccountProfileDetailsSerializer(serializers.ModelSerializer):
+    account_settings = serializers.JSONField(read_only=False)
+    profile_details = serializers.JSONField(read_only=False)
+
+    class Meta:
+        model = Account
+        fields = ('id', 'account_settings', 'profile_details')
 
 
 class LogSerializer(serializers.Serializer):
@@ -151,6 +162,22 @@ class AlbumInfoSerializer(serializers.ModelSerializer):
     owner = AccountSerializer(
         read_only=True
     )
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=MediaTag.objects.all(),
+        many=True,
+        required=False
+    )
     class Meta:
         model = Album
         fields = ('id', 'title', 'description', 'owner', 'tags')
+
+class AlbumCreateSerializer(serializers.ModelSerializer):
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=MediaTag.objects.all(),
+        many=True,
+        required=False
+    )
+    class Meta:
+        model = Album
+        fields = ('id', 'title', 'description', 'owner', 'tags')
+

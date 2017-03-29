@@ -64,7 +64,7 @@ export default {
             let that = this
             auth.login(this.user.username, this.user.password, (error) => {
                 that.infoBox.status = "error"
-                that.infoBox.message = 'The account could not be created for the following reason: ' + error
+                that.infoBox.message = 'The account could not be logged in for the following reason: ' + error
             }).then(() => {
                 that.infoBox.status = "success"
                 that.infoBox.message = "Your account was logged in successfully"

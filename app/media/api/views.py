@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.conf import settings
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
-from rest_framework.decorators import api_view, detail_route, parser_classes
+from rest_framework.decorators import api_view, list_route, detail_route, parser_classes
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
@@ -33,8 +33,29 @@ class AccountViewSet(MultipleSerializerMixin, ModelViewSet):
     serializer_classes = {
         'default': AccountSerializer,
         'create': FullAccountSerializer,
+        'profile': PrivateAccountProfileDetailsSerializer
     }
     # permission_classes
+
+    @detail_route(methods=['POST', 'GET'], url_path='profile')
+    @parser_classes((JSONParser,))
+    def profile(self, request, *args, **kwargs):
+        serializer = self.get_serializer(
+             instance=self.get_object()
+        )
+
+        if request.method == "POST":
+            if serializer.is_valid(request.data):
+                # TODO if method is POST, modify profile
+                pass
+
+        elif request.method == "GET":
+            return Response(serializer.data)
+
+    @list_route(methods=['GET'], url_path='current-user')
+    def current_user_profile(self, request):
+        serializer = PrivateAccountProfileDetailsSerializer(request.user)
+        return Response(serializer.data)
 
 
 class ActivityLogViewSet(ModelViewSet):
@@ -56,15 +77,16 @@ class MediaViewSet(ListModelMixin,
     pagination_class = AlbumMediaBrowserPagination
 
 
-class AlbumViewSet(NestedViewSetMixin, ModelViewSet):
+class AlbumViewSet(NestedViewSetMixin, MultipleSerializerMixin, ModelViewSet):
     queryset = Album.objects.all()
     """An API for viewing and uploading albums"""
-    serializer_class = AlbumInfoSerializer
-    # serializer_classes = {
-    #     'default': AlbumInfoSerializer,
-    #     # 'public': 
-    #     'details': MediaBrowserSerializer
-    # }
+    # serializer_class = AlbumInfoSerializer
+
+    serializer_classes = {
+        'default': AlbumInfoSerializer,
+        # 'public': 
+        'create': AlbumCreateSerializer
+    }
 
     # @api_view(['POST'])
     @detail_route(methods=['POST'], url_path='upload')

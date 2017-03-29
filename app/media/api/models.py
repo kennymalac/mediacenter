@@ -17,7 +17,7 @@ class Account(AbstractUser, GuardianUserMixin):
     email = models.EmailField()
     # Persist a hash of the user's UI display settings
     # Default settings are assigned on account creation
-    # profile = JSONField or hyperlinked profile
+    profile_details = JSONField(null=True, blank=True)
     account_settings = JSONField(null=True, blank=True)
     REQUIRED_FIELDS = ['first_name', 'last_name', 'email', 'password']
     accounts = api.managers.AccountManager
@@ -29,9 +29,11 @@ class Account(AbstractUser, GuardianUserMixin):
 
     def change_profile_details(self, details):
         '''Changes user account profile settings with provided details.'''
-        if details and self.has_perm('change_account'):
-            # self.profile.modify(details)
-            pass
+        self.profile_details = details
+        # TODO profile modification privilege check
+        # if details and self.has_perm('change_account'):
+        #     # self.profile.modify(details)
+        #     pass
 
     def change_account_settings(self, settings):
         self.account_settings = settings
@@ -107,7 +109,7 @@ class Media(models.Model):
     title = models.CharField(max_length=140, blank=True)
     description = models.TextField(blank=True)
     hidden = models.BooleanField(default=False)
-    tags = models.ManyToManyField("MediaTag")
+    tags = models.ManyToManyField("MediaTag", blank=True)
     media_type = models.CharField(
         max_length=2,
         choices=mediaChoices
