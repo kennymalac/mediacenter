@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.conf import settings
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin
 from rest_framework.decorators import api_view, list_route, detail_route, parser_classes
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -70,6 +70,7 @@ class BlogPostViewSet(ModelViewSet):
 
 class MediaViewSet(ListModelMixin,
                    RetrieveModelMixin,
+                   CreateModelMixin,
                    GenericViewSet):
     # TODO: make this more refined based on user privilege levels
     queryset = Media.objects.filter(hidden=False)
@@ -88,12 +89,18 @@ class AlbumViewSet(NestedViewSetMixin, MultipleSerializerMixin, ModelViewSet):
         'create': AlbumCreateSerializer
     }
 
-    # @api_view(['POST'])
     @detail_route(methods=['POST'], url_path='upload')
     @parser_classes((MultiPartParser, FormParser))
     def upload_media_items(self, request, *args, **kwargs):
         # TODO verify user privilege to upload to this album
-        MediaViewSet.create(request, args, kwargs)
+        viewfn = MediaViewSet.as_view({'post': 'create'})
+        response = viewfn(request, args, kwargs)
+
+        #Media.objects.get()
+
+        return response
+
+    # @api_view(['POST'])
 
 
     # def get_queryset(self):

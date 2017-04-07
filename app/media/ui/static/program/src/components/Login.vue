@@ -4,7 +4,7 @@
             {{ infoBox.message }}
         </div>
 
-        <form v-if="!loggedIn" v-on:submit.prevent="login" class="pure-form">
+        <form v-if="!loggedIn()" v-on:submit.prevent="login" class="pure-form">
             <fieldset>
                 <input v-model="user.username" type="text" placeholder="username">
                 <input v-model="user.password" type="password" placeholder="password">
@@ -19,8 +19,9 @@
             <!-- {% csrf_token %} -->
         </form>
 
-        <div v-if="loggedIn">
+        <div v-if="loggedIn()">
             Welcome {{user.username}}!
+            <button class="pure-button" @click="logout">Logout</button>
         </div>
     </div>
 </template>
@@ -34,7 +35,6 @@ export default {
     data() {
         return {
             embed: false,
-            loggedIn: false,
             infoBox: {
                 status: "",
                 message: ""
@@ -57,7 +57,19 @@ export default {
             }
         }
     },
+    // mounted() {
+        
+    // },
     methods: {
+        loggedIn() {
+            if (auth.hasActiveUser()) {
+                //TODO this.user=
+                return true
+            }
+            else {
+                return false
+            }
+        },
         login() {
             // TODO JWT token auth
 
@@ -68,9 +80,16 @@ export default {
             }).then(() => {
                 that.infoBox.status = "success"
                 that.infoBox.message = "Your account was logged in successfully"
-                this.loggedIn = true
                 router.replace('/')
+                this.$forceUpdate()
             })
+        },
+        logout() {
+            this.infoBox.status = "info"
+            this.infoBox.message = "You have been logged out"
+            console.log('logout')
+            auth.logout()
+            this.$forceUpdate()
         }
     }
 }

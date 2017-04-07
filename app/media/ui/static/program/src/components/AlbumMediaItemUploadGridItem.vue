@@ -33,23 +33,22 @@
 
 <script>
 export default {
-    props: ["file"],
+    props: ["media"],
     name: 'album-media-item-upload-grid-item',
-    data() {
-        return {
-            media: {
-                src: '',
-                owner: {name: ''},
-                title: '',
-                description: '',
-                tags: []
-            }
-        }
-    },
-    mounted() {
-        console.log('test')
-        this.media.src = this.file.file
-    },
+    // data() {
+    //     return {
+    //         media: {
+    //             src: '',
+    //             owner: {name: ''},
+    //             title: '',
+    //             description: '',
+    //             tags: []
+    //         }
+    //     }
+    // },
+    // mounted() {
+    //     this.media.src = this.media.src
+    // },
     methods: {
         parseInputType() {
             // if (this.) {

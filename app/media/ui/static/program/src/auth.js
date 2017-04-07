@@ -6,15 +6,53 @@ class Auth {
         this.currentSession = {
             user: {
                 details: { id: 0, username: null, user_settings: {}, profile_details: {} },
-                token: ""
+                token: null
             }
         }
 
         // TODO persist authentication
+        let [persistedToken, username] = this.getActiveUserSessionToken()
+        try {
+            if (persistedToken.length > 1 && username.length > 1) {
+                this.currentSession.user.username = username
+                this.currentSession.user.token = persistedToken
+                // TODO better error callback
+                this.getProfile((error) => {
+                    console.log(error)
+                })
+            }
+        }
+        catch (e) {
+            // Ignore error
+        }
     }
 
     getActiveUser() {
         return this.currentSession.user
+    }
+
+    getActiveUserSessionToken() {
+        let activeUser = localStorage.getItem(this.storageKey + "activeUser")
+        if (activeUser) {
+            console.log(activeUser)
+            // return the token that is being stored
+            return [localStorage.getItem(this.storageKey + activeUser), activeUser]
+        }
+        else {
+            return [null, null]
+        }
+    }
+
+    hasActiveUser() {
+        // TODO check privilege levels
+        console.log(this.currentSession.user.token)
+        if (this.currentSession.user.token) {
+            console.log('truttte')
+            return true
+        }
+        else {
+            return false
+        }
     }
 
     getToken(refresh = false) {
@@ -59,12 +97,30 @@ class Auth {
                 let token = data.token
                 this.currentSession.user.token = token
                 this.currentSession.user.details.username = username
-                localStorage.setItem(this.storageKey + this.currentSession.user.details.username, token)
+                console.log(username)
+                console.log(token)
+                localStorage.setItem(this.storageKey + "activeUser", username)
+                localStorage.setItem(this.storageKey + username, token)
                 this.getProfile(errorCallback)
             })
             .catch((error) => {
                 errorCallback(error)
             })
+    }
+
+    logout() {
+        // Expire the user session
+        localStorage.setItem(this.storageKey + "activeUser", "")
+
+        let username = this.currentSession.user.username
+        this.currentSession = {
+            user: {
+                details: { id: 0, username: null, user_settings: {}, profile_details: {} },
+                token: null
+            }
+        }
+        // Invalidate the user's token
+        localStorage.setItem(this.storageKey + username, null)
     }
 
     getProfile(errorCallback) {

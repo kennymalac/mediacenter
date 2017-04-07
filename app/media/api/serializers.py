@@ -2,6 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.paginator import Paginator
 from django_countries.serializer_fields import CountryField
+from drf_extra_fields.fields import Base64FileField
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 
@@ -73,8 +74,20 @@ class MediaListSerializer(serializers.ListSerializer):
         pass
 
 
-class MediaSrcField(serializers.FileField):
-    def infer_format(self, dataFile):
+class MediaAllowedFileTypeChecker(object):
+    ALLOWED_FILETYPES = settings.ACCEPT_FILETYPES
+
+    def __contains__(self, val):
+        for kind, types in settings.ACCEPT_MIMES.values():
+            if val in types:
+                return kind
+        raise ValidationError("Media type could not be determined.")
+
+
+class MediaSrcField(Base64FileField):
+    ALLOWED_TYPES = MediaAllowedFileTypeChecker()
+
+    def get_file_extension(self, filename, decoded_file):
         #
         # WARNING: this could be DDOSed!
         #
@@ -83,7 +96,7 @@ class MediaSrcField(serializers.FileField):
         from os.path import join
         import magic
         tmpfile = 'tmp/{}'.format(upload)
-        default_storage.save(tmpfile, ContentFile(dataFile.read()))
+        default_storage.save(tmpfile, ContentFile(decoded_file).read())
         path_to_tmpfile = join(settings.MEDIA_ROOT, tmpfile)
 
         file_mime = magic.from_file(path_to_tmpfile, mime=True)
@@ -91,11 +104,11 @@ class MediaSrcField(serializers.FileField):
         return file_mime
 
     def to_internal_value(self, data):
-        file_object = super(ImageField, self).to_internal_value(data)
+        file_object = super(MediaSrcField, self).to_internal_value(data)
         # TODO add virus protection
 
         try:
-            file_object['ext'] = file_object['name'].split('.')[1]
+            file_object['ext'] = file_object['name'].split('.')[1 ]
         except IndexError:
             # There is no explicit file extension
             file_object['ext'] = ''

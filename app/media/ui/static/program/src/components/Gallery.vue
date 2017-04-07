@@ -2,21 +2,13 @@
     <div class="pure-u-1-1">
         <loading v-if="loading"/>
 
-        <div v-if="info.error" class="info error">
+        <div v-if="authError" class="info error">
             {{authError}}
         </div>
 
         <div class="debug-controls pure-form">
             <button class="pure-button" @click="showAlbums">
                 Show Albums
-            </button>
-            <button class="pure-button" @click="showCreateAlbum">
-                Create Album
-            </button>
-
-            <input type="text" v-model="album.id" />
-            <button class="pure-button" @click="showAlbumDetails">
-                Album Details
             </button>
         </div>
 
@@ -34,9 +26,9 @@ import MediaGridItem from './MediaGridItem'
 import AlbumGridItem from './AlbumGridItem'
 import MediaBrowser from './MediaBrowser'
 import Loading from './Loading'
-import router from '../router/index.js'
+//import router from '../router/index.js'
+import auth from '../auth.js'
 // Dynamic gallery
-
 export default {
     components: {
         MediaGridItem,
@@ -50,16 +42,6 @@ export default {
             loading: false,
             currentAlbum: {},
             galleryAlbums: [],
-            authError: "Please sign in to view the media gallery.",
-            infoBox: {
-                status: "error"
-            },
-            auth: {
-                privilegeLevel: "guest",
-                user: {
-                    id: 0
-                }
-            },
             album: {
                 id: null,
                 title: "",
@@ -68,9 +50,17 @@ export default {
         }
     },
     computed: {
-        info() {
-            return {
-                error: (this.infoBox.status === "error")
+        // info() {
+        //     return {
+        //         error: (this.infoBox.status === "error")
+        //     }
+        // },
+        authError() {
+            if (auth.hasActiveUser()) {
+                return ""
+            }
+            else {
+                return "Please sign in to view the media gallery."
             }
         }
     },
@@ -91,19 +81,6 @@ export default {
             //         id: album.id
             //     }
             // })
-        },
-        showAlbumDetails() {
-            // TODO verify privilege
-            router.push({
-                path: 'album',
-                params: {
-                    id: this.album.id
-                }
-            })
-        },
-        showCreateAlbum() {
-            // TODO verify privilege
-            router.push('album/create')
         }
     }
 }

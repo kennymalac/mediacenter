@@ -55,7 +55,7 @@
 
         <form class="pure-form" v-if="actions.manage || actions.create">
             <legend>Media Items</legend>
-            <album-media-item-upload-grid-item v-for="file in mediaItems" :file="file" :key="file.id"/>
+            <album-media-item-upload-grid-item v-for="item in mediaItems" :media="item" :key="item.id"/>
         </form>
     </div>
 </template>
@@ -84,11 +84,12 @@ export default {
             //     create: this.action === "create"
             // },
             albums: [],
+            mediaItems: [],
+            album_tags_raw: '',
             album: {
                 id: null,
                 title: '',
                 description: '',
-                tags_raw: '',
                 tags: []
             }
         }
@@ -134,7 +135,7 @@ export default {
                 "Content-Type": "application/json"
             }
             auth.authenticate(headers)
-            // this won't add mediaitems, and it defnitely will not
+            // this won't add mediaitems, and it definetly will not
             // work for created items
             // createAtlbum does not upload mediaitems
             return fetch("/api/album/", {
@@ -198,12 +199,43 @@ export default {
             console.log(album.id)
             router.replace('/album/' + album.id + "/manage")
         },
+        uploadMediaItems() {
+            let headers = {}
+            auth.authenticate(headers)
+
+            // Encode the source file as a form
+            let form = new FormData()
+            for (let media of this.mediaItems) {
+                console.log(media.src)
+                console.log(media.title)
+                console.log(media.description)
+                console.log(media.tags)
+
+                form.append("src", media.src)
+                form.append("title", media.title)
+                form.append("description", media.description)
+                form.append("tags", media.tags)
+            }
+
+            return fetch("/api/album/" + this.album.id + "/upload/", {
+                method: "POST",
+                headers: headers,
+                body: form
+            })
+        },
         addNewMediaItem(item) {
-            console.log('adding media item', this.mediaItems)
-            this.mediaItems.push({id: this.mediaItems.length, file: item})
+            console.log('adding media item', item)
+            this.mediaItems.push({
+                id: this.mediaItems.length,
+                src: item,
+                owner: {name: ''},
+                title: '',
+                description: '',
+                tags: []
+            })
         },
         save() {
-            for (let tag of this.album.tags_raw.split(',')) {
+            for (let tag of this.album_tags_raw.split(',')) {
                 if (tag.length > 0) {
                     this.album.tags.push(tag)
                 }
@@ -211,6 +243,10 @@ export default {
 
             if (this.actions.manage) {
                 this.manageAlbum().then((data) => {
+                    console.log(data)
+                })
+                // Upload media items after updating album metadata
+                this.uploadMediaItems().then((data) => {
                     console.log(data)
                 })
             }

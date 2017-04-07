@@ -22,14 +22,14 @@ export default {
                 return
             }
 
-            var reader = new FileReader()
             var vm = this
             for (let file of files) {
-                console.log(file)
-
+                // TODO Use Web Worker
+                var reader = new FileReader()
                 reader.onload = (e) => {
                     vm.$emit('fileReady', e.target.result)
                 }
+
                 reader.readAsDataURL(file)
             }
         }
