@@ -2,7 +2,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.paginator import Paginator
 from django_countries.serializer_fields import CountryField
-from drf_extra_fields.fields import Base64FileField
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 
@@ -58,6 +57,26 @@ class BlogPostSerializer(serializers.Serializer):
     body = serializers.CharField()
 
 
+# class MediaSrcHyperlinkedField(serializers.HyperlinkedIdentityField):
+#     def to_representation(self, data):
+#         pass
+
+#     def to_internal_value(self, data):
+#         return
+
+#     def get_url(self, obj, view_name, request, format):
+#         return 'https:/i.imgur.com/5EMmiqE.png'
+#         # TODO do I need the album primary key here?
+#         # url_kwargs = {
+#         #     'album_pk': obj.pk,
+#         #     'media_pk': obj.pk
+#         # }
+#         # return reverse()
+
+#     def get_object():
+#         pass
+
+
 class MediaListSerializer(serializers.ListSerializer):
     def create(self, validated_data):
         # Batch upload is being performed
@@ -84,49 +103,66 @@ class MediaAllowedFileTypeChecker(object):
         raise ValidationError("Media type could not be determined.")
 
 
-class MediaSrcField(Base64FileField):
-    ALLOWED_TYPES = MediaAllowedFileTypeChecker()
+# class MediaSrcField(FileField):
+#     ALLOWED_TYPES = MediaAllowedFileTypeChecker()
 
-    def get_file_extension(self, filename, decoded_file):
-        #
-        # WARNING: this could be DDOSed!
-        #
-        from django.core.files.storage import default_storage
-        from django.core.files.base import ContentFile
-        from os.path import join
-        import magic
-        tmpfile = 'tmp/{}'.format(upload)
-        default_storage.save(tmpfile, ContentFile(decoded_file).read())
-        path_to_tmpfile = join(settings.MEDIA_ROOT, tmpfile)
+#     def get_file_extension(self, filename, decoded_file):
+#         #
+#         # WARNING: this could be DDOSed!
+#         #
+#         from django.core.files.storage import default_storage
+#         from django.core.files.base import ContentFile
+#         from os.path import join
+#         import magic
+#         tmpfile = 'tmp/{}'.format(upload)
+#         default_storage.save(tmpfile, ContentFile(decoded_file).read())
+#         path_to_tmpfile = join(settings.MEDIA_ROOT, tmpfile)
 
-        file_mime = magic.from_file(path_to_tmpfile, mime=True)
+#         file_mime = magic.from_file(path_to_tmpfile, mime=True)
 
-        return file_mime
+#         return file_mime
 
-    def to_internal_value(self, data):
-        file_object = super(MediaSrcField, self).to_internal_value(data)
-        # TODO add virus protection
+#     def to_internal_value(self, data):
+#         file_object = super(MediaSrcField, self).to_internal_value(data)
+#         # TODO add virus protection
 
-        try:
-            file_object['ext'] = file_object['name'].split('.')[1 ]
-        except IndexError:
-            # There is no explicit file extension
-            file_object['ext'] = ''
+#         try:
+#             file_object['ext'] = file_object['name'].split('.')[1 ]
+#         except IndexError:
+#             # There is no explicit file extension
+#             file_object['ext'] = ''
 
-        if 'mime' not in file_object:
-            # Try to figure out a file format from the associated mimetypes
-            file_object['mime'] = self.infer_format(data.file)
+#         if 'mime' not in file_object:
+#             # Try to figure out a file format from the associated mimetypes
+#             file_object['mime'] = self.infer_format(data.file)
 
-        return file_object
+#         return file_object
+
+
+# class MediaHyperlinkedSerializer(serializers.HyperlinkedModelSerializer):
+#     src = MediaSrcHyperlinkedField(
+#         read_only=False,
+#         many=True,
+#         required=False,
+#         view_name='media-image-src'
+#     )
+
+#     tags = serializers.PrimaryKeyRelatedField(
+#         queryset=MediaTag.objects.all(),
+#         many=True,
+#         required=False
+#     )
+
+#     class Meta:
+#         model = Media
+#         list_serializer_class = MediaListSerializer
+#         fields = ('album', 'title', 'description', 'tags', 'media_type', 'src')
 
 
 class MediaSerializer(serializers.ModelSerializer):
-    src = MediaSrcField()
-
     class Meta:
         model = Media
-        fields = ('id', 'title', 'description', 'tags', 'media_type', 'src')
-        list_serializer_class = MediaListSerializer
+        fields = ('id', 'title', 'description', 'tags', 'media_type')
 
     def determine_media_type(self, mime):
         for kind, types in settings.ACCEPT_MIMES.values():
@@ -134,16 +170,16 @@ class MediaSerializer(serializers.ModelSerializer):
                 return kind
         raise ValidationError("Media type could not be determined.")
 
-    def validate(self, data):
-        if data['media_type'] not in mediaChoices:
-            data['media_type'] = self.determine_media_type(data['src']['mime'])
+    # def validate(self, data):
+    #     if data['media_type'] not in mediaChoices:
+    #         data['media_type'] = self.determine_media_type(data['src']['mime'])
 
-        if data['src']['size'] > settings.MAX_FILE_SIZE[data['media_type']]:
-            raise ValidationError('File cannot be stored due to large size')
+        # if data['src']['size'] > settings.MAX_FILE_SIZE[data['media_type']]:
+        #     raise ValidationError('File cannot be stored due to large size')
 
-        acceptable_mimes = settings.ACCEPT_MIMES[data["media_type"]]
-        if data['src']['mime'] not in acceptable_mimes:
-            raise ValidationError('MIME type not valid for media_type')
+        # acceptable_mimes = settings.ACCEPT_MIMES[data["media_type"]]
+        # if data['src']['mime'] not in acceptable_mimes:
+        #     raise ValidationError('MIME type not valid for media_type')
 
 
 class AlbumMediaBrowserPagination(PageNumberPagination):
@@ -176,7 +212,7 @@ class AlbumInfoSerializer(serializers.ModelSerializer):
         read_only=True
     )
     tags = serializers.PrimaryKeyRelatedField(
-        queryset=MediaTag.objects.all(),
+        queryset=AlbumTag.objects.all(),
         many=True,
         required=False
     )
@@ -184,9 +220,10 @@ class AlbumInfoSerializer(serializers.ModelSerializer):
         model = Album
         fields = ('id', 'title', 'description', 'owner', 'tags')
 
+
 class AlbumCreateSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
-        queryset=MediaTag.objects.all(),
+        queryset=AlbumTag.objects.all(),
         many=True,
         required=False
     )

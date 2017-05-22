@@ -1,23 +1,36 @@
-* Main TODO
+* useful copypaste
+***** TODO Create
+***** TODO Read
+***** TODO Update
+***** TODO Delete
+
+* Frontend TODO
 ** Priority 1 (urgent)
 *** Chatlib
 **** TODO allow more than 2 users to video chat at once
-**** TODO 
 *** Media Browser
 **** TODO playSlideshow
 **** TODO applyEffects (low priority)
-**** TODO goForward/goBack
-**** TODO moveable modal with window controls
+**** DONE goForward/goBack
+     CLOSED: [2017-05-13 Sat 12:47]
+**** TODO closeModal
 *** Authentication
-**** TODO getActiveUser
-**** TODO getToken
+**** DONE getActiveUser
+     CLOSED: [2017-05-13 Sat 12:34]
+**** DONE getToken
+     CLOSED: [2017-05-13 Sat 12:30]
+**** DONE getActiveUserSessionToken
+     CLOSED: [2017-05-13 Sat 12:38]
+**** DONE login
+     CLOSED: [2017-05-13 Sat 12:39]
+***** DONE persistent
+      CLOSED: [2017-05-13 Sat 12:39]
 **** TODO refreshToken
 **** TODO getPrivileges
 **** TODO full test coverage
 *** Login
 **** TODO login embed/header view
 **** TODO login page
-**** TODO full test coverage
 *** Register
 **** TODO register page
 **** TODO full test coverage
@@ -26,27 +39,46 @@
 **** TODO full test coverage
 *** Album
 **** TODO CRUD
+***** TODO Create
+***** TODO Read
+***** TODO Update
+***** TODO Delete
 **** TODO Uploading media items
 **** TODO full test coverage
 
 ** Priority 2 (necessary)
 *** chatlib
 **** TODO full test coverage
+
 *** TODO deployment to a VPS
-**** 
+*** Authentication
+**** TODO better encryption (?)
+     can't trust js crypto,
+     maybe extend jwt, idk
+**** TODO full test coverage
+
 *** 
 ** Priority 3 (backlog)
 *** TODO activitylog
+*** Media Browser
+**** TODO moveable modal with window controls
+*** Feed
 *** 
-** 
 ** Priority 4 (enhancements)
 *** TODO use TypeScript
-*** Theming system
-**** Theme selection
-**** Theme explorer
-*** 
+*** httputil
+**** better API handling, fetch Promise constructor with API i.e. fetchREST, fetchResource??
+*** Model/Collection
+    don't make too many assumptions
+**** base class
+**** API handler using fetchResource
+**** default get/set
 *** 
 ** Priority 5 (wishlist)
+*** Theming system
+    10,000+ users
+**** Theme selection
+**** Theme explorer
 *** 
 *** 
 *** 
@@ -64,3 +96,5 @@
    CLOSED: [2017-03-13 Mon 19:35]
 ** DONE switch to ECMAScript 6 for all frontend code
    CLOSED: [2017-03-13 Mon 19:34]
+
+* read *messages*

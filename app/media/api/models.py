@@ -115,7 +115,8 @@ class Media(models.Model):
         choices=mediaChoices
     )
     # TODO configure this
-    src = models.FileField()
+    # content_id = models.CharField(max_length=255)
+
     # permissions = models.JSONField()
 
     # def can_change(self, user):

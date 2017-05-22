@@ -1,155 +1,171 @@
-export default {
-    ChatRoom: ChatRoom
-}
+import {RTCConnectionPool} from './connection'
+
+// Rename this file to Chat?
 
 // TODO: these need to be user settings
 // Defaults shouldn't always persist across page loads etc.
 var displayConfig = {
-    showInCorner: true
-};
+    showInCorner: true,
+    // Switch to a solo view peer video container based on if a user is talking
+    soloSwitch: false
+}
 
-let layoutMutators = {
-    [Symbol("solo")] (count) {
+const solo = Symbol("solo")
+const block = Symbol("block")
+const line = Symbol("line")
+const triangle = Symbol("triangle")
+
+const layoutBoxStructMethods = {
+    [solo](count, peerIdList) {
         // 1 on 1
         // makes lines for each peer
-
+        // raise Exception()
+        return
     },
-    [Symbol("block")] (count) {
+    [line](count, peerIdList) {
+        // TODO variable numRows
+        if (count === -1) {
+            // What this means there is colLength-1 left in the row
+        }
+        else if (count === -2) {
+            // What this means there is colLength-2 left in the row
+        }
+        else if (count !== 3) {
+            // raise Exception()
+            return
+        }
+    },
+    [block](count, peerIdList) {
+        // TODO variable numColumns
         // 2n^2 people
         // makes lines for each peer
+        if (count < 4) {
+            return new Error("Blocks are only allowed with 4+ active streams.")
+        }
 
+        // We are going to pop each peer id and use those
+        let activePeers = peerIdList
+
+        const layout = [] // [, null]
+        let leftoverLen = count
+        const numColumns = 3
+        const numRows = Math.ceil(count / numColumns)
+
+        // Loop over the amount over rows and create a line
+        for (let currLine = 0; currLine < numRows; currLine += numColumns) {
+            const currPeers = activePeers.splice(0, leftoverLen)
+            layout.push(layoutBoxStructMethods[line](leftoverLen, currPeers))
+            leftoverLen -= currLine
+        }
+
+        // leftline = count
     },
-    [Symbol("line")] (count) {
-        // 
-    },
-    [Symbol("triangle")] (count) {
-        // 
+    [triangle](count, peerIdList) {
+        // one line with 2, solo for bottom
     }
 }
 
 // Mediator and Observer object over the Chatroom
-class Chat {
-    constructor () {
-        this.connectionPool = new RTCConnectionPool;
-        this.socket = null;//= websocket
-        this.connection = null;//chat connection
-        this.peers = new Set();
+class ChatProvider {
+    constructor(options) {
+        this.connectionPool = new RTCConnectionPool()
+        this.socket = null // = websocket
+        this.connection = null // chat connection
+        this.myPeer = null
+        this.peers = new Set()
+        this.streams = new Set()
         // TODO: options configurable
         this.streamOptions = {
             offerToReceiveAudio: true,
             offerToReceiveVideo: true
-        };
+        }
+        this.onStreamAdded = options.onStreamAdded
+        this.onStreamRemoved = options.onStreamRemoved
     }
 
-    updatePeers () {
+    updatePeers() {
         // This function is called when the video chat list is updated
         // Peers are added and removed if they are present in the peer list
     }
 
-    onMessageReceived (event) {
+    onMessageReceived(event) {
         // Event handler for when a websocket message is received and what to parse.
-        var signal = JSON.parse(event.data);
-        if (signap.sdp) {
-            this._connection.setRemoteDescription(new RTCSessionDescription(signal.sdp));
+        var signal = JSON.parse(event.data)
+        if (signal.sdp) {
+            this._connection.setRemoteDescription(new RTCSessionDescription(signal.sdp))
         }
     }
 
-    onPeerOfferError (error) {
-        console.log(error);
-        console.log("error occurred with creating an offer to peer");
+    onPeerOfferError(error) {
+        console.log(error)
+        console.log("error occurred with creating an offer to peer")
     }
 
-    onPeerReceiveError (error) {
-        console.log(error);
-        console.log("error occurred with resolving an offer from a peer");
+    onPeerReceiveError(error) {
+        console.log(error)
+        console.log("error occurred with resolving an offer from a peer")
     }
 
-    offer (who) {
-        var pc = new RTCPeerConnection();
-        pc.createOffer(function(offer) {
-            pc.setLocalDescription(offer, function() {
-                send("offer", JSON.stringify(pc.localDescription));
-            }, this.onPeerOfferError);
-        }, onPeerOfferError, options);
+    offerMine(myPeer) {
+        this.myPeer = myPeer
+        this.offer(this.myPeer)
+    }
 
-        pc.onaddstream = () => {
-            //derp
-            console.log("peer connection stream added");
+    offer(who) {
+        var pc = new RTCPeerConnection()
+        const options = {}
+        pc.createOffer(options)
+            .then((offer) => {
+                return pc.setLocalDescription(offer)
+                    .then(() => {
+                        return pc.localDescription.toJSON() })
+                    .catch(this.onPeerOfferError)
+            })
+            .then((msg) => {
+                fetch() 
+            })
+            .catch(this.onPeerOfferError)
 
-            Chat.addVideoStream();
-            //document.getElementsByClassName("peer") = URL.createObjectURL(e.stream);
-        };
+        pc.ontrack = (e) => {
+            console.log("peer connection stream added")
+            this.receive(who).then((pid) => {
+                this.streams[pid] = e.stream[0]
+                this.onStreamAdded(pid)
+                // 
+            })
+        }
+
+        pc.onremovestream = (pc) => (pc) => {
+            const pid = who.id
+            // remove the stream on a remove stream event
+            this.streams[pid].remove()
+            this.peers[pid].remove()
+            this.onStreamRemoved(pid)
+        }
     }
 
     receive(peer) {
-        var pc = this.connectionPool.prepare(peer.id);
-        this.connectionPool.myConnection.createAnswer().then((answer) => {
-            console.log(answer);
-            if (pc.connectionState == "connecting") {
+        const pid = peer.id
+        var pc = this.connectionPool.prepare(pid)
+
+        return this.connectionPool.myConnection.createAnswer().then((answer) => {
+            console.log(answer)
+            if (pc.connectionState === "connecting") {
                 // dispatch an event to show a loading wheel
             }
-            return pc.setLocalDescription(answer);
+            return pc.setLocalDescription(answer)
         })
         .then((peerConn) => {
-            
+            this.peers[pid] = peerConn
+            return pid
         })
-        .catch(this.onPeerReceiveError);
-            // Promise(
-            //     this.connectionPool.prepare,
-            //     (success) => {
-            //         // perform action
-                    
-            //     },
-            //     (error) => {
-            //         // exception raised, fallback
-                    
-            //     })]);
+        .catch(this.onPeerReceiveError)
     }
-};
+}
 
-class ChatRoom {
-    constructor() {
-        this.displayOption = null;
-    }
-
-    show (layout) {
-        // User-facing response text
-        var message;
-        var canvases = null;
-
-        // If there is no layout, there is nothing to operate on.
-        // Return an empty list of canvases, and an error message.
-        if (layout == null) {
-            // deleted from a user event or no streams
-            return new Error("No user chats are available.");
-        }
-        else {
-            // Mutate the existing DOM-representation of the layout
-            document.elementByClass();
-        }
-        return canvases, message;
-    }
-
-    updateDisplay (numStreams) {
-        // The three layouts will show either as a block or as a shape as specified below
-        // TODO TypeScript, this is terrible
-        if (_.isNumber(numStreams)) {
-            // length of streams determines how many video connections are present
-            // if null is in the list, display black rectangle
-            if (streamCount) {
-                this.displayOption = Symbol("block");
-            }
-            // transform existing layout by animation
-            // for now just change the css, experiment with CSS3 animations later
-            else if (streamCount == 2) {
-                this.displayOption = Symbol("line");
-            }
-            else if (streamCount == 3) {
-                this.displayOption = Symbol("triangle");
-            }
-        }
-        else {
-            // raise Error
-        }
-    }
+export {
+    layoutBoxStructMethods,
+    ChatProvider,
+    solo,
+    displayConfig
 }

@@ -13,10 +13,11 @@ class MediaTagAdmin(admin.ModelAdmin):
     fields = ('name',)
     list_display = ('name',)
 
+
 class MediaAdmin(admin.ModelAdmin):
-    search_fields = ["title"]
+    search_fields = ('title', 'description', 'media_type', 'tags__name')
     list_display = ('title', 'media_type', 'hidden')
-    fields = ('title', 'description', 'media_type', 'hidden', 'tags')
+    fields = ('title', 'description', 'src', 'media_type', 'hidden', 'tags')
 
 
 class AlbumTagAdmin(admin.ModelAdmin):
@@ -24,10 +25,11 @@ class AlbumTagAdmin(admin.ModelAdmin):
     fields = ('name',)
     list_display = ('name',)
 
+
 class AlbumAdmin(admin.ModelAdmin):
-    search_fields = ["title"]
-    list_display = ('title',)
-    fields = ('title', 'description', 'owner', 'access_level', 'unlisted')
+    search_fields = ('title', 'description', 'owner', 'tags__name')
+    list_display = ('title', 'owner', 'access_level')
+    fields = ('title', 'description', 'owner', 'access_level', 'unlisted', 'tags__name')
 
 
 admin.site.register(Account, AccountAdmin)

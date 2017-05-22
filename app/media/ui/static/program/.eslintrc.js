@@ -19,6 +19,7 @@ module.exports = {
   'rules': {
     // allow paren-less arrow functions
     'arrow-parens': 0,
+    'eol-last': 0,
     // allow async-await
     'generator-star-spacing': 0,
       'semi': ['error', 'never'],
@@ -30,5 +31,9 @@ module.exports = {
       'space-before-function-paren': ['warn', 'never'],
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
+  },
+  'globals': {
+    'RTCPeerConnection': true,
+    'RTCSessionDescription': true
   }
 }

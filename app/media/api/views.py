@@ -68,20 +68,38 @@ class BlogPostViewSet(ModelViewSet):
     serializer_class = BlogPostSerializer
 
 
-class MediaViewSet(ListModelMixin,
+class MediaViewSet(MultipleSerializerMixin,
+                   ListModelMixin,
                    RetrieveModelMixin,
                    CreateModelMixin,
                    GenericViewSet):
     # TODO: make this more refined based on user privilege levels
     queryset = Media.objects.filter(hidden=False)
-    serializer_class = MediaSerializer
+    serializer_classes = {
+        'default': MediaSerializer,
+    }
     pagination_class = AlbumMediaBrowserPagination
 
 
+# @api_view
+# def media_image_src(request):
+#     # request.query_params[]
+#     # TODO CDN capabable?
+#     # Return the File as a Response
+
+#     media_item = Media.objects.get(album=album_pk, id=pk)
+#     if (hasattr(media_item, 'src')):
+#         return Response({
+#             "data": Media.objects.get(album=album_pk, id=pk).src
+#         })
+#     else:
+#         return Response({
+#             "data": ""
+#         })
+
 class AlbumViewSet(NestedViewSetMixin, MultipleSerializerMixin, ModelViewSet):
-    queryset = Album.objects.all()
     """An API for viewing and uploading albums"""
-    # serializer_class = AlbumInfoSerializer
+    queryset = Album.objects.all()
 
     serializer_classes = {
         'default': AlbumInfoSerializer,

@@ -1,6 +1,7 @@
 class Auth {
     constructor() {
         // Used for identifying local storage of user keys
+        // NOTE horrible!!
         this.storageKey = 'auth_'
         // TODO manage session outside of Auth
         this.currentSession = {
@@ -45,9 +46,7 @@ class Auth {
 
     hasActiveUser() {
         // TODO check privilege levels
-        console.log(this.currentSession.user.token)
         if (this.currentSession.user.token) {
-            console.log('truttte')
             return true
         }
         else {
@@ -97,8 +96,6 @@ class Auth {
                 let token = data.token
                 this.currentSession.user.token = token
                 this.currentSession.user.details.username = username
-                console.log(username)
-                console.log(token)
                 localStorage.setItem(this.storageKey + "activeUser", username)
                 localStorage.setItem(this.storageKey + username, token)
                 this.getProfile(errorCallback)

@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'channels',
     'guardian',
     'api',
-    'ui'
+    'ui',
+    'chat'
 ]
 
 MIDDLEWARE = [
@@ -150,6 +151,14 @@ REST_FRAMEWORK = {
 
 # Custom Media Center settings
 GUESTS_CAN_UPLOAD = False
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "ROUTING": "chat.routing.routing",
+    },
+}
+
 ACCEPT_FILETYPES = {
     'P': ['webp', 'gif', 'gifv', 'png', 'apng', 'jpg', 'jpeg', 'raw'],
     'A': ['wav', 'webm'],

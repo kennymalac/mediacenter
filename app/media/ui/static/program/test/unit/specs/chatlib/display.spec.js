@@ -23,7 +23,8 @@ describe('a Chat as a representation', () => {
             id: '',
             'STUN': ''
         };
-        chat.offer(peer);
+        let offer = chat.offer(peer);
+        expect()
     });
 
     it('can update peers on request', () => {
