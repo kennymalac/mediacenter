@@ -2,7 +2,7 @@
   <div v-if="!full" class="gallery-horizontal-box">
     <img :alt="media.title" :src="media.src" class="pure-img" />
   </div>
-  <div v-if="full" class="pure-u-1-4 l-box">
+  <div v-else-if="full" class="pure-u-1-4 l-box">
     <img :alt="media.title" :src="media.src" class="pure-img" />
   </div>
 </template>

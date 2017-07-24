@@ -33,6 +33,8 @@ import MediaGridItem from './MediaGridItem'
 import ModalToolbar from './Gui/Modal/ModalToolbar'
 import ModalToolbarItem from './Gui/Modal/ModalToolbarItem'
 
+// import SmartPager from '../pager'
+
 export default {
     name: 'media-browser',
     components: {
@@ -47,6 +49,7 @@ export default {
             album: {},
             mediaItems: [],
             pageCache: {},
+            gallery: {},
             currentMediaItem: {},
             currentRoster: [],
             atBeginningOfRoster: false,
@@ -87,11 +90,7 @@ export default {
         }
     },
     methods: {
-        nextPhoto() {
-            //t
-            //TODO this.currentPhoto = photo.next().value
-        },
-        prevPhoto() {
+        prevMedia() {
             //TODO why don't js iterators do previous???
         },
         playSlideshow() {
@@ -123,7 +122,7 @@ export default {
         },
         getAlbum(album) {
             // Returns a detailed graph for media items
-            // TODO repair cache by moving initialization parmeters to a Store
+            // TODO repair cache by moving initialization parameters to a Store
 
             return fetch("/api/album/" + album.id + "/", {
                 method: "GET"
@@ -167,6 +166,7 @@ export default {
                 })
 
                 .then((data) => {
+                    // NOTE insert Store here
                     this.pageCache[this.currentPage] = data.results
                     this.currentRoster = this.pageCache[this.currentPage]
                     this.atBeginningOfRoster = (data.previous === null)
@@ -195,7 +195,7 @@ export default {
     height: 50rem;
     margin-left: 7.5%;
     margin-right: 7.5%;
-    box-sizing: content-box; 
+    box-sizing: content-box;
     animation-name: slideup;
 
     .modal-title {

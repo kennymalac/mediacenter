@@ -1,5 +1,5 @@
 from channels.routing import route, include
-from .consumers import ws_connect, ws_message, ws_disconnect, msg_consumer
+from .consumers import ws_connect, ws_disconnect, msg_consumer
 
 chat_routing = [
     route("websocket.connect", ws_connect, path=r"^/(?P<room>[a-zA-Z0-9_]+)/$"),

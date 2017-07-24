@@ -1,6 +1,8 @@
 <template>
-    <input v-if="multiple" @change="uploadMediaItems" type="file" multiple />
-    <input @change="uploadMediaItems" type="file" />
+    <div>
+        <input v-if="multiple" @change="uploadMediaItems" type="file" multiple />
+        <input @change="uploadMediaItems" type="file" />
+    </div>
 </template>
 
 <script>

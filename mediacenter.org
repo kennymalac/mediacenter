@@ -3,18 +3,40 @@
 ***** TODO Read
 ***** TODO Update
 ***** TODO Delete
+**** TODO full test coverage
+
 
 * Frontend TODO
 ** Priority 1 (urgent)
 *** Chatlib
 **** TODO allow more than 2 users to video chat at once
+**** TODO layoutBoxStructMethods
+***** TODO solo
+***** TODO line
+***** TODO block
+***** TODO triangle
+**** TODO facilitation of Candidate transfers between clients (ICE/STUN)
+***** TODO automation for server creation (python script)
+***** TODO spin up ICE instance
+***** TODO spin up STUN instance
+**** TODO connecting peers
+**** TODO creation of chat layout
+***** TODO CSS
+***** TODO transition animations
+**** TODO user display object (video container within layout)
+***** TODO user display controls
+***** DONE box with <video> tag
+      CLOSED: [2017-07-23 Sun 17:40]
+**** TODO text chat
+***** TODO frontend
+***** TODO backend
 *** Media Browser
 **** TODO playSlideshow
-**** TODO applyEffects (low priority)
 **** DONE goForward/goBack
      CLOSED: [2017-05-13 Sat 12:47]
 **** TODO closeModal
 *** Authentication
+**** TODO connect with other media centers in some sort of Auth bridge
 **** DONE getActiveUser
      CLOSED: [2017-05-13 Sat 12:34]
 **** DONE getToken
@@ -29,10 +51,12 @@
 **** TODO getPrivileges
 **** TODO full test coverage
 *** Login
-**** TODO login embed/header view
+**** DONE login embed/header view
+     CLOSED: [2017-05-26 Fri 20:12]
 **** TODO login page
+**** Todo full test coverage
 *** Register
-**** TODO register page
+**** TODO Functional register page
 **** TODO full test coverage
 *** Gallery
 **** TODO 
@@ -59,9 +83,14 @@
 
 *** 
 ** Priority 3 (backlog)
+*** pager.js
+**** TODO SmartPager used in media gallery
+**** TODO SmartPager skiplist
+
 *** TODO activitylog
 *** Media Browser
 **** TODO moveable modal with window controls
+**** TODO applyEffects (low priority)
 *** Feed
 *** 
 ** Priority 4 (enhancements)

@@ -1,4 +1,4 @@
-import {RTCConnectionPool} from './connection'
+import {ChatConnectionManager} from './connection'
 
 // Rename this file to Chat?
 
@@ -10,20 +10,21 @@ var displayConfig = {
     soloSwitch: false
 }
 
-const solo = Symbol("solo")
-const block = Symbol("block")
-const line = Symbol("line")
-const triangle = Symbol("triangle")
+const solo = Symbol.for("solo")
+const block = Symbol.for("block")
+const line = Symbol.for("line")
+const triangle = Symbol.for("triangle")
 
 const layoutBoxStructMethods = {
     [solo](count, peerIdList) {
         // 1 on 1
-        // makes lines for each peer
         // raise Exception()
-        return
+        return []
     },
     [line](count, peerIdList) {
-        // TODO variable numRows
+        // TODO variable numCols
+        console.log('count ', count)
+        console.log('peerIdList ', count)
         if (count === -1) {
             // What this means there is colLength-1 left in the row
         }
@@ -67,20 +68,22 @@ const layoutBoxStructMethods = {
 
 // Mediator and Observer object over the Chatroom
 class ChatProvider {
-    constructor(options) {
-        this.connectionPool = new RTCConnectionPool()
-        this.socket = null // = websocket
-        this.connection = null // chat connection
-        this.myPeer = null
-        this.peers = new Set()
-        this.streams = new Set()
-        // TODO: options configurable
-        this.streamOptions = {
+    myPeer = null
+    peers = new Map()
+    streams = new Map()
+    // TODO: options configurable
+    options = {
+        stream: {
             offerToReceiveAudio: true,
             offerToReceiveVideo: true
         }
-        this.onStreamAdded = options.onStreamAdded
-        this.onStreamRemoved = options.onStreamRemoved
+    }
+
+    constructor(options) {
+        this.options = Object.assign({}, this.options, options)
+        this.options.connection.onPeerOfferError = this.onPeerOfferError
+        this.options.connection.onPeerReceiveError = this.onPeerReceiveError
+        this.options.connection.receive = this.receive
     }
 
     updatePeers() {
@@ -88,12 +91,17 @@ class ChatProvider {
         // Peers are added and removed if they are present in the peer list
     }
 
-    onMessageReceived(event) {
-        // Event handler for when a websocket message is received and what to parse.
-        var signal = JSON.parse(event.data)
-        if (signal.sdp) {
-            this._connection.setRemoteDescription(new RTCSessionDescription(signal.sdp))
+    createMyPeer(pid) {
+        this.myPeer = {
+            id: pid
         }
+
+        // NOTE we should be using the user account id rather than something random
+        this.peers.set(pid, this.connection.prepareMyConnection(pid))
+    }
+
+    connect() {
+        this.connection = new ChatConnectionManager(this.options.connection) // RAII
     }
 
     onPeerOfferError(error) {
@@ -106,60 +114,40 @@ class ChatProvider {
         console.log("error occurred with resolving an offer from a peer")
     }
 
-    offerMine(myPeer) {
-        this.myPeer = myPeer
-        this.offer(this.myPeer)
+    onPeerTrackAdded(who, e) {
+        console.log("peer connection stream added")
+        const pid = who.id
+        this.streams.set(pid, e.stream[0])
+        this.onStreamAdded(pid)
+    }
+
+    onPeerStreamRemoved(who, pc) {
+        const pid = who.id
+        // remove the stream on a remove stream event
+        this.streams.delete(pid)
+        this.peers.delete(pid)
+        this.onStreamRemoved(pid)
     }
 
     offer(who) {
-        var pc = new RTCPeerConnection()
-        const options = {}
-        pc.createOffer(options)
-            .then((offer) => {
-                return pc.setLocalDescription(offer)
-                    .then(() => {
-                        return pc.localDescription.toJSON() })
-                    .catch(this.onPeerOfferError)
-            })
-            .then((msg) => {
-                fetch() 
-            })
-            .catch(this.onPeerOfferError)
+        this.connection.createOffer(who)
+    }
 
-        pc.ontrack = (e) => {
-            console.log("peer connection stream added")
-            this.receive(who).then((pid) => {
-                this.streams[pid] = e.stream[0]
-                this.onStreamAdded(pid)
-                // 
-            })
-        }
-
-        pc.onremovestream = (pc) => (pc) => {
-            const pid = who.id
-            // remove the stream on a remove stream event
-            this.streams[pid].remove()
-            this.peers[pid].remove()
-            this.onStreamRemoved(pid)
-        }
+    receiveMyStream(stream) {
+        const pid = this.myPeer.id
+        this.streams.set(pid, stream)
+        console.log('this.streams', this.streams.size)
+        this.options.connection.onStreamAdded(pid)
     }
 
     receive(peer) {
         const pid = peer.id
-        var pc = this.connectionPool.prepare(pid)
 
-        return this.connectionPool.myConnection.createAnswer().then((answer) => {
-            console.log(answer)
-            if (pc.connectionState === "connecting") {
-                // dispatch an event to show a loading wheel
-            }
-            return pc.setLocalDescription(answer)
-        })
-        .then((peerConn) => {
-            this.peers[pid] = peerConn
-            return pid
-        })
-        .catch(this.onPeerReceiveError)
+        // NOTE we can ask the user if they want to chat with this peer
+        this.connection.prepareConnection(pid)
+            .then(() => {
+                this.connection.getAnswer()
+            })
     }
 }
 

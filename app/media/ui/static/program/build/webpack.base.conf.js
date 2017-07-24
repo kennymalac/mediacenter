@@ -8,6 +8,7 @@ function resolve (dir) {
 }
 
 module.exports = {
+  devtool: 'eval',
   entry: {
     app: './src/main.js'
   },

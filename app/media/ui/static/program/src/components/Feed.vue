@@ -3,7 +3,7 @@
     <div class="user-post">
       <div class="user-legend">
         <div class="user-img">
-          <img src="{{default_user_profile_pic}}" height="64" width="64"/>
+          <img :src="default_user_profile_pic" height="64" width="64"/>
           <span class="username">
             First name Surname
           </span>
@@ -29,7 +29,7 @@
     <div class="user-post pure-u-1-2">
       <div class="user-legend">
         <div class="user-img">
-          <img src="{{default_user_profile_pic}}" height="64" width="64"/>
+         <img :src="default_user_profile_pic" height="64" width="64"/>
           <span class="username">
             First name Surname
           </span>

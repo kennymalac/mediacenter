@@ -11,9 +11,9 @@ import {WSConnection, RTCConnectionPool} from 'src/chatlib/display'
 //     });
 // });
 
-describe('RTCPeerConnectionPool', () => {
+describe('RTCConnectionPool', () => {
     before(() => {
-        let pool = RTCConnectionPool()
+        let pool = new RTCConnectionPool()
         let peer = {id: 'p1'}
     })
 
