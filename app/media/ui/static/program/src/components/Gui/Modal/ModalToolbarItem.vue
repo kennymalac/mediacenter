@@ -20,7 +20,9 @@ export default {
     font-size: 1.5em;
     margin-right: .5em;
     text-align: center;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     cursor: pointer;
     color: rgb(127, 140, 141);

@@ -1,23 +1,22 @@
 <template>
-    <div class="pure-u-1-1">
-
+    <div>
         <album-grid-item v-if="actions.list" v-for="album in albums" @albumSelected="modifyAlbum" :album="album"/>
 
         <h1 v-if="actions.manage">
             Edit Album: {{album.title }}
         </h1>
 
-        <form class="pure-form pure-form-stacked" v-if="actions.manage || actions.create">
-           <legend>Settings</legend>
+        <form v-if="actions.manage || actions.create">
+            <fieldset>
+               <legend>Settings</legend>
 
-           <div class="pure-control-group">
                <label for="visibility">Visibility (not working)</label>
                <select name="visibility">
                    <option>Public</option>
                    <option>Private</option>
                    <option>Unlisted</option>
                </select>
-           </div>
+           </fieldset>
 
            <button v-if="actions.manage" class="pure-button-error pure-button">
                <i class="ion-md-close"></i>
@@ -25,25 +24,17 @@
            </button>
         </form>
 
-        <form v-on:submit.prevent="save" class="pure-form pure-form-aligned" v-if="actions.manage || actions.create">
+        <form v-on:submit.prevent="save" v-if="actions.manage || actions.create">
+          <fieldset>
             <legend>Details</legend>
-
-            <div class="pure-control-group">
                 <label for="title">Title</label>
                 <input name="title" v-model="album.title" type="text" />
-            </div>
-            <div class="pure-control-group">
                 <label for="description">Description</label>
                 <input name="description" v-model="album.description" type="text" />
-            </div>
-            <div class="pure-control-group">
                 <label for="">Tags</label>
                 <input name="tags" v-model="album.tags_raw" type="text" />
-            </div>
-
-            <div class="pure-control-group">
                 <input class="pure-button" type="submit" />
-            </div>
+          </fieldset>
             <!-- TODO drag and drop input -->
 
             <button class="pure-button" v-on:click="createMediaItem">
@@ -53,9 +44,11 @@
             <file-upload :multiple="true" @fileReady="addNewMediaItem" />
         </form>
 
-        <form class="pure-form" v-if="actions.manage || actions.create">
+        <form v-if="actions.manage || actions.create">
+          <fieldset>
             <legend>Media Items</legend>
             <album-media-item-upload-grid-item v-for="item in mediaItems" :media="item" :key="item.id"/>
+          </fieldset>
         </form>
     </div>
 </template>

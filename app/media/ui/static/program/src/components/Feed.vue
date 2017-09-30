@@ -11,7 +11,6 @@
       </div>
       <div class="post-content pure-u-1-3">
         Here is something I found funny online:
-        <img src="https://my.mixtape.moe/siuxun.jpg" class="pure-img" />
       </div>
       <div class="post-comment-thread pure-u-1-2">
         Comments:
@@ -36,7 +35,6 @@
         </div>
       </div>
       <div class="post-content">
-        <img src="https://my.mixtape.moe/hnwwqg.jpg" />
       </div>
     </div>
   </div>

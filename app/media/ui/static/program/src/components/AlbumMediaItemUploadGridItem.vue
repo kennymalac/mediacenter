@@ -1,10 +1,10 @@
 <template>
-    <div class="media-upload-grid-item pure-grid">
+    <div class="media-upload-grid-item flex">
         <div class="media-item-header">
             {{media.title}} by {{media.owner.name}}
         </div>
 
-        <div class="pure-u-1-2">
+        <div>
             <img width="230" height="230" :alt="media.title" :src="media.src" class="pure-img" />
         </div>
 
@@ -14,19 +14,15 @@
              <input name="file" type="file" />
              </div> -->
 
-        <form class="pure-u-1-2 pure-form pure-form-stacked">
-            <div class="pure-control-group">
+        <form>
+            <fieldset class="flex one">
                 <label for="title">Title</label>
-                <input class="pure-input" v-model="media.title" type="text" />
-            </div>
-            <div class="pure-control-group">
+                <input name="title" v-model="media.title" type="text" />
                 <label for="description">Description</label>
-                <input class="pure-input" v-model="media.description" type="text" />
-            </div>
-            <div class="pure-control-group">
+                <input name="description" v-model="media.description" type="text" />
                 <label for="tags">Tags</label>
-                <input class="pure-input" name="tags" v-model="media.tags_raw" type="text" />
-            </div>
+                <input name="tags" v-model="media.tags_raw" type="text" />
+            </fieldset>
         </form>
     </div>
 </template>
@@ -74,8 +70,9 @@ export default {
         display: block;
         font-size: 1.5em;
     }
-    .pure-input {
+    input {
         width: 230px;
+        margin: auto;
     }
 }
 </style>

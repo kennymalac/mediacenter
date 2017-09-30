@@ -1,35 +1,29 @@
 <template>
-    <div v-if="isModalOpen" class="media-modal-view">
-        <div class="modal-title">
-            <!-- position="left" -->
-
-            <modal-toolbar :buttons="leftToolbarButtons"/>
-
-            <label v-if="album.title">
+    <Modal :isOpen="isModalOpen" :onClose="closeModal"> <!-- position="left" -->
+        <div slot="title">
+            <modal-toolbar :buttons="leftToolbarButtons" />
+            <label>
                 {{album.title}}
             </label>
-
-            <modal-toolbar-item class="close-btn" :icon-class="'ion-md-close'" :action="closeModal" />
-            <hr/>
         </div>
-        <div class="modal-content" @play="playSlideshow" @nextPhoto="nextPhoto" @prevPhoto="prevPhoto">
-            <div class="gallery-photo-view">
-                <div v-if="photo">Nothing to show.</div>
-            </div>
 
-            <div class="gallery-preview">
-                <div v-on:click="goBack" v-bind:class="{ disabled: atBeginningOfRoster }" class="go-back ion-ios-arrow-back"></div>
-                <div class="preview-container">
-                    <media-grid-item v-for="mediaItem in currentRoster" :media="mediaItem"/>
-                </div>
-                <div v-on:click="goForward" v-bind:class="{ disabled: atEndOfRoster }" class="go-forward ion-ios-arrow-forward"></div>
-            </div>
+        <div class="gallery-photo-view">
+            <div v-if="photo">Nothing to show.</div>
         </div>
-    </div>
+
+        <div class="gallery-preview" @play="playSlideshow" @nextPhoto="nextPhoto" @prevPhoto="prevPhoto">
+            <div v-on:click="goBack" v-bind:class="{ disabled: atBeginningOfRoster }" class="go-back ion-ios-arrow-back"></div>
+            <div class="preview-container">
+                <media-grid-item v-for="mediaItem in currentRoster" :media="mediaItem"/>
+            </div>
+            <div v-on:click="goForward" v-bind:class="{ disabled: atEndOfRoster }" class="go-forward ion-ios-arrow-forward"></div>
+        </div>
+    </Modal>
 </template>
 
 <script>
 import MediaGridItem from './MediaGridItem'
+import Modal from './Gui/Modal/Modal'
 import ModalToolbar from './Gui/Modal/ModalToolbar'
 import ModalToolbarItem from './Gui/Modal/ModalToolbarItem'
 
@@ -39,6 +33,7 @@ export default {
     name: 'media-browser',
     components: {
         MediaGridItem,
+        Modal,
         ModalToolbar,
         ModalToolbarItem
     },
@@ -183,104 +178,9 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 @import "../classicTheme.scss";
 
-.media-modal-view {
-    border-radius: 3px/2px;
-    display: block;
-    position: absolute;
-    border: 2px solid #001f3f;
-    width: 85%;
-    height: 50rem;
-    margin-left: 7.5%;
-    margin-right: 7.5%;
-    box-sizing: content-box;
-    animation-name: slideup;
-
-    .modal-title {
-        width: 100%;
-        height: 2.75rem;
-        display: block;
-        text-align: center;
-        background: linear-gradient(180deg, #001f3f, rgba(52, 73, 94,1.0));
-        color: #DDDDDD;
-
-        .toolbar {
-            display: inline-block;
-            position: absolute;
-            left: 10rem;
-        }
-        /* &.label { */
-        /* } */
-        .close-btn {
-            position: absolute;
-            right: 0;
-        }
-    }
-    /* alternative color: rgba(52, 73, 94,1.0)*/
-
-    .go-back, .go-forward {
-        &:active {
-            color: $classicblue; /*#34497d;*/
-            /*linear-gradient(18deg, #001f3f, rgba(52, 73, 94,1.0));*/
-        }
-
-        &.disabled {
-            color: rgb(127, 140, 141);
-            cursor: default;
-        }
-
-        display: inline-block;
-        position: absolute;
-        text-align: center;
-        top: 20%;
-        width: 2.25rem;
-        font-size: 3.5rem;
-        cursor: pointer;
-        color: rgb(52, 73, 94);
-    }
-
-    .go-back {
-        /*margin-right: 4rem;*/
-        left: 2rem;
-    }
-
-    .go-forward {
-        /*margin-left: 4rem;*/
-        right: 2rem;
-    }
-}
-/* .media-modal-view .modal-title label { */
-/*     // silver */
-/*     // alternative color: rgba(236, 240, 241,1.0); */
-/* } */
-
-/* /\* pictogram.type *\/ */
-/* pictogram.photo { */
-/*  /\* icon = photo *\/ */
-/* } */
-
-/* pictogram.video { */
-/*  /\* icon = camcorder *\/ */
-/* } */
-
-.media-modal-view {
-    .modal-content {
-        display: block;
-        height: 94%;
-        background-color: rgb(236, 240, 241)/*rgba(149, 165, 166,1.0)*/;
-    }
-    hr {
-        width: 90%;
-        border: 0;
-        margin-left: 5%;
-        margin-top: 1rem;
-        height: 1px;
-        /* transparent gray to blueish light gray */
-        background: linear-gradient(135deg, rgba(221, 221, 221, 0), rgba(236, 240, 241,1.0), rgba(221, 221, 221, 0));
-    }
-}
 
 .gallery-preview {
     display: block;

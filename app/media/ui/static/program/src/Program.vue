@@ -14,7 +14,7 @@
 <script>
 import Header from './components/Header.vue'
 //import Pager from './pager.js'
-import 'pure-css'
+//import 'pure-css'
 
 export default {
     name: 'program',
@@ -27,6 +27,7 @@ export default {
 <style lang="scss">
 $ionicons-font-path: "~ionicons/dist/fonts";
 @import "~ionicons/dist/scss/ionicons.scss";
+@import "~picnic/picnic.css";
 @import "classicTheme.scss";
 
 #program {

@@ -1,40 +1,57 @@
 <template>
-    <div v-if="embed" class="">
-        <div v-bind:class="info">
-            {{ infoBox.message }}
+    <Modal :isOpen="isModalOpen" :onClose="closeModal">
+        <div slot="title">
+            <modal-toolbar />
+
+            <label>
+                Login
+            </label>
         </div>
 
-        <form v-if="!loggedIn()" v-on:submit.prevent="login" class="pure-form">
-            <fieldset>
-                <input v-model="user.username" type="text" placeholder="username">
-                <input v-model="user.password" type="password" placeholder="password">
+        <div v-bind:class="info">
+          {{ infoBox.message }}
+        </div>
 
-                <label for="remember">
-                    <input id="remember" type="checkbox"> Remember Me
-                </label>
-
-                <input type="submit" text="Sign in" class="pure-button pure-button-primary"/>
-            </fieldset>
-
-            <!-- {% csrf_token %} -->
+        <form v-if="!loggedIn()" v-on:submit.prevent="login">
+          <fieldset class="third">
+            <input v-model="user.username" class="stack" type="text" placeholder="username" />
+            <input v-model="user.password" class="stack" type="password" placeholder="password" />
+            
+            <input type="submit" class="stack" text="Sign in" />
+          </fieldset>
+          <label for="remember">
+            <input id="remember" type="checkbox">
+            <span class="checkable">Remember me</span>
+          </label>
+          <!-- {% csrf_token %} -->
         </form>
 
         <div v-if="loggedIn()">
-            Welcome {{user.username}}!
-            <button class="pure-button" @click="logout">Logout</button>
+          Welcome {{user.username}}!
+          <button @click="logout">Logout</button>
         </div>
-    </div>
+    </Modal>
 </template>
 
 <script>
 import auth from "../auth.js"
 import router from '../router/index.js'
 
+import Modal from './Gui/Modal/Modal'
+import ModalToolbar from './Gui/Modal/ModalToolbar'
+import ModalToolbarItem from './Gui/Modal/ModalToolbarItem'
+
 export default {
-    props: ["embed"],
+    //    props: ["embed"],
+    components: {
+        Modal,
+        ModalToolbar,
+        ModalToolbarItem
+    },
     data() {
         return {
             embed: false,
+            isModalOpen: true,
             infoBox: {
                 status: "",
                 message: ""
@@ -57,10 +74,13 @@ export default {
             }
         }
     },
-    // mounted() {
-        
-    // },
+    mounted() {
+        console.log('mounted')
+    },
     methods: {
+        closeModal() {
+            this.isModalOpen = false
+        },
         loggedIn() {
             if (auth.hasActiveUser()) {
                 //TODO this.user=

@@ -1,53 +1,41 @@
 <template>
-    <div class="pure-u-1-2">
-        <form v-on:submit.prevent="register" class="pure-form pure-form-aligned">
+    <div>
+        <form v-on:submit.prevent="register">
             <div v-bind:class="info">
                 {{ infoBox.message }}
             </div>
 
             <fieldset>
-                <div class="pure-control-group">
+              <legend>User details</legend>
                     <label for="name">Username</label>
                     <input v-model="username" type="text" placeholder="Username">
-                </div>
-
-                <div class="pure-control-group">
                     <label for="name">Display Name</label>
                     <input v-model="first_name" id="first-name" type="text" placeholder="First Name">
                     <input v-model="last_name" id="last-name" type="text" placeholder="Surname">
-                </div>
-
-                <div class="pure-control-group">
-                    <label for="country">Country of Residence</label>
-                    <!-- <select v-model="country" id="country"> -->
-                    <!--     <option v-for="country in countries" value="{country}">{{ country }}</option> -->
-                    <!-- </select> -->
-                </div>
-
-                <div class="pure-control-group">
+                <!-- <div class="pure-control-group"> -->
+                <!--     <labe
+                <!--     <\!-- <select v-model="country" id="country"> -\-> -->
+                <!--     <\!--     <option v-for="country in countries" value="{country}">{{ country }}</option> -\-> -->
+                <!--     <\!-- </select> -\-> -->
+                <!-- </div> -->
                     <label for="password">Password</label>
                     <input v-model="password" id="password" type="password" placeholder="Password">
-                </div>
-
-                <div class="pure-control-group">
                     <label for="retype-password">Re-type Password</label>
                     <input v-model="retype_password" id="retype-password" type="password" placeholder="Password">
-                </div>
-
-                <div class="pure-control-group">
                     <label for="email">Email Address</label>
                     <input v-model="email" id="email" type="email" placeholder="Email Address">
-                </div>
 
-                <div class="pure-control-group">
-                    <label for="subscribe">I wish to subscribe to the mailing list</label>
+                    <label>
+                        <input name="subscribe" type="checkbox" />
+                        <span class="checkable">I wish to subscribe to the mailing list</span>
+                    </label>
+                    
                     <input v-model="subscribe" id="subscribe" type="checkbox"> 
-                </div>
+                </fieldset>
 
-                <div class="pure-control-group">
-                    <input type="submit" class="pure-button pure-button-primary" text="Submit" />
-                </div>
 
+                <!-- TODO must be over 13 -->
+                    <input type="submit" text="Submit" />
             </fieldset>
         </form>
     </div>

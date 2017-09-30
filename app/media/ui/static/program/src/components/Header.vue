@@ -1,38 +1,27 @@
 <template>
-    <div class="pure-menu pure-menu-horizontal">
-        <router-link to="/" class="pure-menu-heading pure-menu-link">MEDIA SERVER</router-link>
-        <ul class="pure-menu-list">
-            <li class="pure-menu-item">
-                <router-link to="/register" class="pure-menu-link">Register</router-link>
-            </li>
-            <li class="pure-menu-item">
-                <router-link to="/feed" class="pure-menu-link">Feed</router-link>
-            </li>
-            <li class="pure-menu-item">
-                <router-link to="/chat" class="pure-menu-link">Chat</router-link>
-            </li>
-            <li class="pure-menu-item">
-                <router-link to="/gallery" class="pure-menu-link">Media Gallery</router-link>
-            </li>
-            <li class="pure-menu-item">
-                <router-link to="/album/create" class="pure-menu-link">Create Album</router-link>
-            </li>
-            <li class="pure-menu-item">
-                <router-link to="/album/list" class="pure-menu-link">Manage Albums</router-link>
-            </li>
-        </ul>
+    <nav>
+      <router-link class="brand" to="/">
+        <label>MEDIA SERVER</label>
+      </router-link>
+      <!-- responsive-->
+      <input id="bmenub" type="checkbox" class="show">
+      <label for="bmenub" class="burger pseudo button">menu</label>
 
-        <login :embed="true"/>
-    </div>
+      <div class="menu">
+        <router-link class="button pseudo" to="/login">Login</router-link>
+        <router-link class="button pseudo" to="/register">Register</router-link>
+        <router-link class="button pseudo" to="/feed">Feed</router-link>
+        <router-link class="button pseudo" to="/chat">Chat</router-link>
+        <router-link class="button pseudo" to="/gallery">Media Gallery</router-link>
+        <router-link class="button pseudo" to="/album/create">Create Album</router-link>
+        <router-link class="button pseudo" to="/album/list">Manage Albums</router-link>
+       </div>
+    </nav>
 </template>
 
 <script>
-import Login from "./Login"
 export default {
     name: 'header-menu',
-    components: {
-        Login
-    },
     data() {
         return {
 
