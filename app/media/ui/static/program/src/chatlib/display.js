@@ -100,7 +100,7 @@ class ChatProvider {
         console.log('my peer', this.myPeer)
 
         // NOTE we should be using the user account id rather than something random
-        this.peers.set(pid, this.connection.prepareMyConnection(pid))
+        this.peers.set(pid, this.myPeer)
 
         console.log(this.constraints)
         let shouldRequestMedia = false
@@ -169,7 +169,8 @@ class ChatProvider {
         const pid = who.id
         // remove the stream on a remove stream event
         this.streams.delete(pid)
-        this.peers.delete(pid)
+        // TODO remove peer!
+        // this.peers.delete(pid)
         this.onStreamRemoved(pid)
     }
 
@@ -181,7 +182,8 @@ class ChatProvider {
         const pid = this.myPeer.id
         this.streams.set(pid, stream)
         console.log('this.streams', this.streams.size)
-        stream.getTracks().forEach(track => this.connection.myConnection.addTrack(track, stream))
+        // NOTE We want to add it to the existant peer connections
+        stream.getTracks().forEach(track => this.connection.addTrack(track, stream))
         this.connection.onStreamAdded(pid)
     }
 
@@ -189,9 +191,10 @@ class ChatProvider {
         const pid = peer.id
 
         // NOTE we can ask the user if they want to chat with this peer
-        this.peers.set(pid, null)
         this.streams.set(pid, null)
-        this.options.connection.onStreamAdded(pid)
+        // Sooner or later account details will be in the peers Map...
+        this.peers.set(pid, peer)
+        this.connection.onStreamAdded(pid)
     }
 }
 
