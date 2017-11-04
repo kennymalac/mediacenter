@@ -17,9 +17,12 @@
 ***** TODO triangle
 **** TODO facilitation of Candidate transfers between clients (ICE/STUN)
 ***** TODO automation for server creation (python script)
-***** TODO spin up ICE instance
-***** TODO spin up STUN instance
-**** TODO connecting peers
+***** DONE spin up ICE instance
+      CLOSED: [2017-11-04 Sat 10:16]
+***** DONE spin up STUN instance
+      CLOSED: [2017-11-04 Sat 10:16]
+**** DONE connecting peers
+     CLOSED: [2017-11-04 Sat 10:16]
 **** TODO creation of chat layout
 ***** TODO CSS
 ***** TODO transition animations

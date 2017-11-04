@@ -74,16 +74,18 @@ class ChatProvider {
     // TODO: options configurable
     options = {
         stream: {
-            offerToReceiveAudio: true,
-            offerToReceiveVideo: true
+            offerToReceiveAudio: 1,
+            offerToReceiveVideo: 1
         }
     }
 
     constructor(options) {
         this.options = Object.assign({}, this.options, options)
-        this.options.connection.onPeerOfferError = this.onPeerOfferError
-        this.options.connection.onPeerReceiveError = this.onPeerReceiveError
-        this.options.connection.receive = this.receive
+        this.options.connection.onPeerOfferError = this.onPeerOfferError.bind(this)
+        this.options.connection.onPeerReceiveError = this.onPeerReceiveError.bind(this)
+        this.options.connection.onPeerAdded = this.onPeerAdded.bind(this)
+        this.options.connection.onPeerTrackAdded = this.onPeerTrackAdded.bind(this)
+        this.options.connection.createMyPeer = this.createMyPeer.bind(this)
     }
 
     updatePeers() {
@@ -95,13 +97,55 @@ class ChatProvider {
         this.myPeer = {
             id: pid
         }
+        console.log('my peer', this.myPeer)
 
         // NOTE we should be using the user account id rather than something random
         this.peers.set(pid, this.connection.prepareMyConnection(pid))
+
+        console.log(this.constraints)
+        let shouldRequestMedia = false
+        for (const constraint in this.constraints) {
+            if (this.constraints[constraint] === true) {
+                shouldRequestMedia = true
+                continue
+            }
+        }
+
+        if (shouldRequestMedia) {
+            // Request my streams
+            navigator.mediaDevices.getUserMedia(this.constraints)
+                .then((stream) => {
+                    this.receiveMyStream(stream)
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+        }
+        else {
+            this.streams.set(pid, null)
+            this.options.connection.onStreamAdded(pid)
+        }
     }
 
-    connect() {
-        this.connection = new ChatConnectionManager(this.options.connection) // RAII
+    connect(constraints) {
+        if (constraints.screenshare) {
+            // TODO fix this
+            this.constraints = {
+                audio: constraints.audio,
+                video: {
+                    mediaSource: 'screen',
+                    mozMediaSource: 'screen',
+                    mandatory: {chromeMediaSource: ['screen', 'window']},
+                    optional: []
+                }
+            }
+        }
+        else {
+            this.constraints = constraints
+        }
+
+        // RAII
+        this.connection = new ChatConnectionManager(this.options.connection, this.options.stream)
     }
 
     onPeerOfferError(error) {
@@ -137,17 +181,17 @@ class ChatProvider {
         const pid = this.myPeer.id
         this.streams.set(pid, stream)
         console.log('this.streams', this.streams.size)
-        this.options.connection.onStreamAdded(pid)
+        stream.getTracks().forEach(track => this.connection.myConnection.addTrack(track, stream))
+        this.connection.onStreamAdded(pid)
     }
 
-    receive(peer) {
+    onPeerAdded(peer) {
         const pid = peer.id
 
         // NOTE we can ask the user if they want to chat with this peer
-        this.connection.prepareConnection(pid)
-            .then(() => {
-                this.connection.getAnswer()
-            })
+        this.peers.set(pid, null)
+        this.streams.set(pid, null)
+        this.options.connection.onStreamAdded(pid)
     }
 }
 

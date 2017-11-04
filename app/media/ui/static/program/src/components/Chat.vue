@@ -87,9 +87,19 @@ export default {
             // TODO Separate the video object url source modification from the creation of the element
 
             peersDisplay = allParticipants.map((p) => {
+                if (p.stream === null) {
+                    return (
+                        <div ref={p.id} class="participant-container">
+                            <video class="participant-video" autoplay></video>
+
+                            <div class="controls">
+                            </div>
+                       </div>
+                    )
+                }
                 return (
                    <div ref={p.id} class="participant-container">
-                        <video src={URL.createObjectURL(p.stream)} class="participant-video" autoplay></video>
+                        <video src={URL.createObjectURL(p.stream)} muted class="participant-video" autoplay></video>
                         <div class="controls">
                         </div>
                    </div>
@@ -113,12 +123,11 @@ export default {
     },
     methods: {
         onJoinChatRoom(settings) {
-            this.chat.connect()
-            this.chat.createMyPeer('1')
-            this.prepareMyStreams({ video: settings.video, audio: settings.audio })
-
             if (settings.screenshare) {
-                alert('Not supported, try again later')
+                this.chat.connect({ screenshare: true, audio: settings.audio })
+            }
+            else {
+                this.chat.connect({ video: settings.video, audio: settings.audio })
             }
         },
         participants() {
@@ -145,20 +154,6 @@ export default {
         // selectLayout() {
         //     this.
         // },
-        prepareMyStreams(constraints, retry = true) {
-            navigator.mediaDevices.getUserMedia(constraints)
-                .then((stream) => {
-                    this.chat.receiveMyStream(stream)
-                })
-                .catch((error) => {
-                    console.log(error)
-                    if (retry) {
-                        // Retry audio only
-                        this.prepareMyStreams({ video: false, audio: true }, false)
-                    }
-                })
-        },
-
         onStreamAdded(pid) {
             console.log(pid, "added stream")
             this.$forceUpdate()

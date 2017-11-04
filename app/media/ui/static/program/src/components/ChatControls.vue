@@ -15,7 +15,7 @@
         <span class="checkable">Screenshare</span>
       </label>
     </fieldset>
-    <button @click="clickJoinChatRoom">Join chatroom</button>
+    <button @click="onClickJoinChatRoom">Join chatroom</button>
   </div>
 </template>
 

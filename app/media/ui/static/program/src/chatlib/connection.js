@@ -1,8 +1,9 @@
 import { WebSocketBridge } from 'django-channels'
+import { handleIceCandidate } from './ice.js'
 
 const RTCconfig = {
-    'iceServers': [
-        {'url': 'stun:stun.services.mozilla.com'} // ,
+    iceServers: [
+        {urls: ['turn:127.0.0.1'], username: 'mediacenter', credential: 'password'} // ,
     ]
 }
 
@@ -42,50 +43,84 @@ class ChatConnectionManager {
     connectionPool = new RTCConnectionPool()
     bridge = new WebSocketBridge()
 
-    constructor(options) {
-        const {onStreamAdded, onStreamRemoved, onPeerOfferError, onPeerReceiveError, receive} = options
+    constructor(connectionOptions, streamOptions) {
+        const {onPeerAdded, onPeerTrackAdded, onStreamRemoved, onPeerOfferError, onPeerReceiveError, createMyPeer} = connectionOptions
+        this.streamOptions = streamOptions
         // Assign stream callbacks
-        this.onStreamAdded = onStreamAdded
+        this.onPeerAdded = onPeerAdded
+        this.onPeerTrackAdded = onPeerTrackAdded
         this.onStreamRemoved = onStreamRemoved
         this.onPeerOfferError = onPeerOfferError
         this.onPeerReceiveError = onPeerReceiveError
-
-        this.receive = receive
+        this.createMyPeer = createMyPeer
 
         // Connect to the WebSocket bridge
         // TODO don't hard code room
 
-        this.bridge.connect(WSconfig.baseUrl + tempChatConfig.roomId)
-        this.bridge.listen(function(action, stream) {
-            // if (action in this.actions) {
-            //     (this.actions[action].bind(this))(stream)
-            // }
+        this.bridge.connect(WSconfig.baseUrl + tempChatConfig.roomId + '/')
+        this.bridge.socket.addEventListener('open', () => {
+            console.log("Connected to WebSocket")
+
+            this.bridge.stream('webrtc').send({
+                'id': ''
+            })
+        })
+        this.bridge.listen()
+        this.bridge.demultiplex('webrtc', (action, stream) => {
             console.log(action, stream)
+
+            switch (action.type) {
+            case "new-candidate":
+                this.myConnection.addIceCandidate(new RTCIceCandidate(action.candidate))
+                break
+            case "chat-offer":
+                if (action.myId === this.myPeerId) {
+                    return
+                }
+
+                this.myConnection.setRemoteDescription(action.sdp)
+
+                // give an answer
+                this.getAnswer().then((answer) => {
+                    this.bridge.stream('webrtc').send({
+                        myId: this.myPeerId,
+                        // targetId: action.myId,
+                        type: "chat-answer",
+                        sdp: answer
+                    })
+                })
+                break
+            case "chat-answer":
+                if (action.myId === this.myPeerId) {
+                    return
+                }
+                this.myConnection.setRemoteDescription(action.sdp)
+                break
+            case "user-joined":
+                this.handleAddedUser(action)
+                break
+            case "assigned-id":
+                this.myPeerId = action.userInfo.id
+                this.createMyPeer(action.userInfo.id)
+                break
+            }
         })
         console.log(this.bridge)
     }
 
     handleAddedUser(event) {
-        const data = JSON.parse(event.data)
-        const who = { id: data.pid }
-        const pc = this.connectionPool.prepare(who.id)
-        pc.setLocalDescription(event.sdp)
-        pc.ontrack = (who) => this.peerTrackAdded
-        pc.onremovestream = (who) => this.onPeerStreamRemoved
-    }
-
-    handleJoinedUser() {
-        // Create offer to joined user
-    }
-
-    onMessageReceived(event) {
-        if (!event || !event.candidate) return
-
-        // Event handler for when a websocket message is received and what to parse.
-        var signal = JSON.parse(event.data)
-        if (signal.sdp) {
-            
+        //const data = JSON.parse(event.data)
+        const data = event
+        const who = data.userInfo
+        // Ignore our own id
+        if (who.id === this.myPeerId) {
+            return
         }
+        const pc = this.connectionPool.prepare(who.id)
+        pc.ontrack = (event) => this.onPeerTrackAdded(who, event)
+        pc.onremovestream = (event) => this.onPeerStreamRemoved(who, event)
+
+        this.onPeerAdded({id: who.id})
     }
 
     prepareMyConnection(pid) {
@@ -93,39 +128,34 @@ class ChatConnectionManager {
 
         // this.myConnection.setRemoteDescription(new RTCSessionDescription(signal.sdp), this.offer)
 
-        this.myConnection.oniceconnection = this.onIceCandidateHandler
-        this.myConnection.onnegotiationneeded = this.onNegotiationNeeded
+        this.myConnection.onicecandidate = this.onIceCandidateHandler
+        this.myConnection.onnegotiationneeded = this.createOffer.bind(this)
 
         return this.myConnection
     }
 
     sendNegotiation(msg, pid) {
-        this.bridge.channel('offer').send({
+        this.bridge.stream('webrtc').send({
             myId: this.myPeerId,
             targetId: pid,
             type: "chat-offer",
-            sdp: this.myPeerConnection.localDescription
+            sdp: msg
         })
     }
 
-    onNegotiationNeeded() {
-        
-    }
-
-    createOffer(peer) {
+    createOffer() {
         const pc = this.myConnection
 
         pc.createOffer(this.streamOptions)
             .then((offer) => {
                 return pc.setLocalDescription(offer)
-                    .then(() => {
-                        return pc.localDescription.toJSON()
-                    })
-                    .catch(this.onPeerOfferError)
+            })
+            .then(() => {
+                return pc.localDescription
             })
             .then((msg) => {
                 // Send to negotiate server
-                this.sendNegotiation(msg, peer.id)
+                this.sendNegotiation(msg)
             })
             .catch(this.onPeerOfferError)
 
@@ -140,16 +170,20 @@ class ChatConnectionManager {
             }
             return this.myConnection.setLocalDescription(answer)
         })
-            .then((peerConn) => {
-                // this.connectionPool.peerConnections[Symbol(answer.pid)].set(Symbolpid, peerConn)
-                return peerConn
+            .then(() => {
+                return this.myConnection.localDescription
             })
             .catch(this.onPeerReceiveError)
     }
 
-    onIceCandidateHandler(event) {
-        if (!event || !event.candidate) return
-        this.bridge.send(JSON.stringify({ candidate: event.candidate }))
+    onIceCandidateLocal(event) {
+        console.log('handling local ICE Candidate')
+        handleIceCandidate(event.candidate, this.myPeerConnection)
+    }
+
+    onIceCandidateRemote(peerId, event) {
+        console.log('handling remote ICE Candidate')
+        handleIceCandidate(event.candidate, this.peerConnections.get(Symbol.for(peerId)))
     }
 }
 

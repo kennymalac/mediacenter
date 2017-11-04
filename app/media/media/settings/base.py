@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_countries',
+    'sslserver',
     'rest_framework',
     'rest_framework_extensions',
     'channels',
