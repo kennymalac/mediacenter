@@ -8,7 +8,7 @@ export function onIceCandidateFailure(error) {
 }
 
 export function handleIceCandidate(candidate, thisPeerConnection) {
-    thisPeerConnection.addIceCandidate.then(
+    thisPeerConnection.addIceCandidate(candidate).then(
         onIceCandidateSuccess,
         onIceCandidateFailure
     )

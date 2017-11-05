@@ -178,13 +178,27 @@ class ChatProvider {
         this.connection.createOffer(who)
     }
 
+    addTracksForPeer(pc, stream) {
+        console.log(pc)
+        stream.getTracks().forEach(track => {
+            console.log(track)
+            pc.addTrack(track)
+        })
+    }
+
     receiveMyStream(stream) {
         const pid = this.myPeer.id
         this.streams.set(pid, stream)
         console.log('this.streams', this.streams.size)
-        // NOTE We want to add it to the existant peer connections
-        stream.getTracks().forEach(track => this.connection.addTrack(track, stream))
-        this.connection.onStreamAdded(pid)
+        // NOTE We want to add it to the existent peer connections
+        for (const pc of this.connection.connectionPool.peerConnections.values()) {
+            this.addTracksForPeer(pc, stream)
+        }
+        // for (const pid of this.peers.keys()) {
+        //     this.connection.createOffer(pid)
+        // }
+
+        this.options.connection.onStreamAdded(pid)
     }
 
     onPeerAdded(peer) {
@@ -194,7 +208,7 @@ class ChatProvider {
         this.streams.set(pid, null)
         // Sooner or later account details will be in the peers Map...
         this.peers.set(pid, peer)
-        this.connection.onStreamAdded(pid)
+        this.options.connection.onStreamAdded(pid)
     }
 }
 

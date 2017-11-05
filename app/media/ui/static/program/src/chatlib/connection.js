@@ -3,7 +3,7 @@ import { handleIceCandidate } from './ice.js'
 
 const RTCconfig = {
     iceServers: [
-        {urls: ['turn:127.0.0.1'], username: 'mediacenter', credential: 'password'} // ,
+        {urls: ['turn:127.0.0.1:'], username: 'mediacenter', credential: 'password'} // ,
     ]
 }
 
@@ -18,19 +18,16 @@ const WSconfig = {
 }
 
 class RTCConnectionPool {
-    localPeerConnections = new Map()
-    remotePeerConnections = new Map()
+    peerConnections = new Map()
 
-    prepareLocal(peer) {
+    prepare(peer) {
         let conn = new RTCPeerConnection(RTCconfig)
-        this.localPeerConnections[Symbol.for(peer.id)] = conn
+        this.peerConnections.set(Symbol.for(peer.id), conn)
         return conn
     }
 
-    prepareRemote(peer) {
-        let conn = new RTCPeerConnection(RTCconfig)
-        this.remotePeerConnections[Symbol.for(peer.id)] = conn
-        return conn
+    getPeerConnection(pid) {
+        return this.peerConnections.get(Symbol.for(pid))
     }
 
     clear() {
@@ -76,38 +73,48 @@ class ChatConnectionManager {
             console.log(action, stream)
 
             switch (action.type) {
-            // case "new-candidate":
-            //     this.myConnection.addIceCandidate(new RTCIceCandidate(action.candidate))
-            //     break
+            case "new-candidate":
+                if (action.targetId !== this.myPeerId) {
+                    return
+                }
+
+                handleIceCandidate(action.candidate, this.getOrCreatePeerConnection(action.myId))
+                break
             case "chat-offer":
+                // TODO add check that this offer is for my peer
                 if (action.myId === this.myPeerId) {
                     return
                 }
 
-                this.connectionPool.localPeerConnections.get(Symbol.for(action.myId))
-                    .setRemoteDescription(action.sdp)
-                const remotePc = this.connectionPool.remotePeerConnections.get(Symbol.for(action.myId))
-                remotePc.setLocalDescription(action.sdp)
+                const pc = this.getOrCreatePeerConnection(action.myId)
+                pc.setRemoteDescription(action.sdp)
 
                 // give an answer
-                this.getAnswer(remotePc).then((answer) => {
+                this.getAnswer(pc).then((answer) => {
                     this.bridge.stream('webrtc').send({
                         myId: this.myPeerId,
-                        // targetId: action.myId,
+                        targetId: action.myId,
                         type: "chat-answer",
                         sdp: answer
                     })
                 })
                 break
             case "chat-answer":
-                if (action.myId === this.myPeerId) {
+                if (action.myId === this.myPeerId && action.targetId !== this.myPeerId) {
                     return
                 }
-                this.connectionPool.localPeerConnections.get(Symbol.for(action.myId))
+                this.getOrCreatePeerConnection(action.myId)
                     .setRemoteDescription(action.sdp)
                 break
             case "user-joined":
-                this.handleAddedUser(action)
+                // Ignore our own id
+                if (action.userInfo.id === this.myPeerId) {
+                    return
+                }
+
+                // NOTE we may not have to add the user here
+                // this.handleAddedUser(action)
+                this.createOffer(action.userInfo.id)
                 break
             case "assigned-id":
                 this.myPeerId = action.userInfo.id
@@ -118,32 +125,31 @@ class ChatConnectionManager {
         console.log(this.bridge)
     }
 
+    getOrCreatePeerConnection(pid) {
+        const maybeConn = this.connectionPool.getPeerConnection(pid)
+        return maybeConn || this.handleAddedUser({ userInfo: { id: pid } })
+    }
+
     handleAddedUser(event) {
         //const data = JSON.parse(event.data)
         const data = event
         const who = data.userInfo
-        // Ignore our own id
-        if (who.id === this.myPeerId) {
-            return
-        }
 
-        this.prepareConnections(who)
+        const pc = this.prepareConnection(who)
         // Call callback which adds peer to list of peers for display purposes
         this.onPeerAdded(who)
+        return pc
     }
 
-    prepareConnections(who) {
+    prepareConnection(who) {
         // Create remote peer connection for this peer
-        const remotePc = this.connectionPool.prepareRemote(who.id)
-        remotePc.ontrack = (event) => this.onPeerTrackAdded(who, event)
-        remotePc.onicecandidate = this.onIceCandidateHandler
+        const pc = this.connectionPool.prepare(who)
+        pc.ontrack = (event) => this.onPeerTrackAdded(who, event)
+        pc.onicecandidate = (event) => this.onIceCandidate.bind(this)(who.id, event)
+        pc.onnegotiationneeded = () => this.createOffer.bind(this)(who.id)
         // NOTE DEPRECATED pc.onremovestream = (event) => this.onPeerStreamRemoved(who, event)
-
-        // Also create local peer connection for this user
-        const localPc = this.connectionPool.prepare(who.id)
-        localPc.onicecandidate = this.onIceCandidateHandler
-        localPc.onnegotiationneeded = this.createOffer.bind(this)
         // this.myConnection.setRemoteDescription(new RTCSessionDescription(signal.sdp), this.offer)
+        return pc
     }
 
     sendNegotiation(msg, pid) {
@@ -155,7 +161,11 @@ class ChatConnectionManager {
         })
     }
 
-    createOffer(pc) {
+    createOffer(pid) {
+        console.log('creating offer with peer', pid)
+        // Get the local and remote peer connections from the pid
+        const pc = this.getOrCreatePeerConnection(pid)
+
         pc.createOffer(this.streamOptions)
             .then((offer) => {
                 return pc.setLocalDescription(offer)
@@ -168,17 +178,15 @@ class ChatConnectionManager {
                 this.sendNegotiation(msg)
             })
             .catch(this.onPeerOfferError)
-
-        return pc
     }
 
     getAnswer(pc) {
         return pc.createAnswer().then((answer) => {
             console.log("answer", answer)
-            if (this.myConnection.connectionState === "connecting") {
-                // dispatch an event to show a loading wheel
+            if (pc.connectionState === "connecting") {
+                // TODO dispatch an event to show a loading wheel
             }
-            return pc.setLocalDescription(answer)
+            pc.setLocalDescription(answer)
         })
             .then(() => {
                 return pc.localDescription
@@ -186,14 +194,14 @@ class ChatConnectionManager {
             .catch(this.onPeerReceiveError)
     }
 
-    onIceCandidateLocal(event) {
-        console.log('handling local ICE Candidate')
-        // handleIceCandidate(event.candidate, )
-    }
-
-    onIceCandidateRemote(peerId, event) {
+    onIceCandidate(pid, event) {
         console.log('handling remote ICE Candidate')
-        handleIceCandidate(event.candidate, this.peerConnections.get(Symbol.for(peerId)))
+        this.bridge.stream('webrtc').send({
+            myId: this.myPeerId,
+            targetId: pid,
+            type: "new-candidate",
+            candidate: event.candidate
+        })
     }
 }
 
