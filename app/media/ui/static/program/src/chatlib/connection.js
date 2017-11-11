@@ -3,7 +3,7 @@ import { handleIceCandidate } from './ice.js'
 
 const RTCconfig = {
     iceServers: [
-        {urls: ['turn:127.0.0.1:'], username: 'mediacenter', credential: 'password'} // ,
+        {urls: ['turn:127.0.0.1:3478'], username: 'mediacenter', credential: 'password'} // ,
     ]
 }
 
@@ -195,7 +195,11 @@ class ChatConnectionManager {
     }
 
     onIceCandidate(pid, event) {
-        console.log('handling remote ICE Candidate')
+        if (!event.candidate) {
+            console.log('no ICE candidate')
+            return
+        }
+        console.log('received ice candidate', pid, event)
         this.bridge.stream('webrtc').send({
             myId: this.myPeerId,
             targetId: pid,
