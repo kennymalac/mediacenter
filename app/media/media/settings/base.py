@@ -79,6 +79,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'media.wsgi.application'
+ASGI_APPLICATION = "chat.routing.routing"
 
 # Authentication
 AUTH_USER_MODEL = 'api.Account'

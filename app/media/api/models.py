@@ -72,8 +72,8 @@ class BlogPost(models.Model):
 USER_ACCESS_LEVELS = (
     ('0', "GUEST"),
     ('1', "USER"),
-    ('2', "FRIEND"),
-    ('4', "MODERATOR"),
+    ('4', "FRIEND"),
+    ('5', "MODERATOR"),
     ('9', "ADMIN")
 )
 

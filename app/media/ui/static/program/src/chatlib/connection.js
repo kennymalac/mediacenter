@@ -1,11 +1,5 @@
 import { WebSocketBridge } from 'django-channels'
-import { handleIceCandidate } from './ice.js'
-
-const RTCconfig = {
-    iceServers: [
-        {urls: ['turn:127.0.0.1:3478'], username: 'mediacenter', credential: 'password'} // ,
-    ]
-}
+import { RTCconfig, handleIceCandidate } from './ice.js'
 
 const tempChatConfig = {
     // TODO don't hard code room
@@ -37,17 +31,17 @@ class RTCConnectionPool {
 }
 
 class ChatConnectionManager {
-    actions = {
-        visit: this.handleJoinedUser,
-        answer: this.handleAddedUser
-    }
+    // actions = {
+    //     visit: this.handleJoinedUser,
+    //     answer: this.handleAddedUser
+    // }
     connection = null
     myPeerId = null
     connectionPool = new RTCConnectionPool()
     bridge = new WebSocketBridge()
 
     constructor(connectionOptions, streamOptions) {
-        const {onPeerAdded, onPeerTrackAdded, onStreamRemoved, onPeerOfferError, onPeerReceiveError, createMyPeer} = connectionOptions
+        const {onPeerAdded, onPeerTrackAdded, onStreamRemoved, onPeerOfferError, onPeerReceiveError, createMyPeer, addTracksForPeer, getStream} = connectionOptions
         this.streamOptions = streamOptions
         // Assign stream callbacks
         this.onPeerAdded = onPeerAdded
@@ -56,6 +50,8 @@ class ChatConnectionManager {
         this.onPeerOfferError = onPeerOfferError
         this.onPeerReceiveError = onPeerReceiveError
         this.createMyPeer = createMyPeer
+        this.addTracksForPeer = addTracksForPeer
+        this.getStream = getStream
 
         // Connect to the WebSocket bridge
         // TODO don't hard code room
@@ -105,6 +101,7 @@ class ChatConnectionManager {
                 }
                 this.getOrCreatePeerConnection(action.myId)
                     .setRemoteDescription(action.sdp)
+
                 break
             case "user-joined":
                 // Ignore our own id
@@ -119,6 +116,11 @@ class ChatConnectionManager {
             case "assigned-id":
                 this.myPeerId = action.userInfo.id
                 this.createMyPeer(action.userInfo.id)
+                break
+            case "turn-user":
+                // Assign temporary authentication for TURN
+                RTCconfig.iceServers[0].username = action.auth.user
+                RTCconfig.iceServers[0].credential = action.auth.password
                 break
             }
         })
@@ -146,9 +148,11 @@ class ChatConnectionManager {
         const pc = this.connectionPool.prepare(who)
         pc.ontrack = (event) => this.onPeerTrackAdded(who, event)
         pc.onicecandidate = (event) => this.onIceCandidate.bind(this)(who.id, event)
+        // LOL - no browser supports onicecandidateerror
+        // pc.onicecandidateerror = (event) => onIceCandidateFailure(event)
         pc.onnegotiationneeded = () => this.createOffer.bind(this)(who.id)
         // NOTE DEPRECATED pc.onremovestream = (event) => this.onPeerStreamRemoved(who, event)
-        // this.myConnection.setRemoteDescription(new RTCSessionDescription(signal.sdp), this.offer)
+        //pc.setRemoteDescription(new RTCSessionDescription(signal.sdp))
         return pc
     }
 
@@ -174,6 +178,8 @@ class ChatConnectionManager {
                 return pc.localDescription
             })
             .then((msg) => {
+                // TODO only send offer with added tracks once or if new tracks are added
+                this.addTracksForPeer(pc, this.getStream(this.myPeerId))
                 // Send to negotiate server
                 this.sendNegotiation(msg)
             })
@@ -186,7 +192,7 @@ class ChatConnectionManager {
             if (pc.connectionState === "connecting") {
                 // TODO dispatch an event to show a loading wheel
             }
-            pc.setLocalDescription(answer)
+            return pc.setLocalDescription(answer)
         })
             .then(() => {
                 return pc.localDescription
@@ -195,17 +201,19 @@ class ChatConnectionManager {
     }
 
     onIceCandidate(pid, event) {
+        console.log('received ice candidate', pid, event)
         if (!event.candidate) {
             console.log('no ICE candidate')
             return
         }
-        console.log('received ice candidate', pid, event)
-        this.bridge.stream('webrtc').send({
-            myId: this.myPeerId,
-            targetId: pid,
-            type: "new-candidate",
-            candidate: event.candidate
-        })
+        if (pid === this.myPeerId) {
+            this.bridge.stream('webrtc').send({
+                myId: this.myPeerId,
+                targetId: pid,
+                type: "new-candidate",
+                candidate: event.candidate
+            })
+        }
     }
 }
 

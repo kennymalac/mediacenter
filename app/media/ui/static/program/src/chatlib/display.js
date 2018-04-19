@@ -86,6 +86,12 @@ class ChatProvider {
         this.options.connection.onPeerAdded = this.onPeerAdded.bind(this)
         this.options.connection.onPeerTrackAdded = this.onPeerTrackAdded.bind(this)
         this.options.connection.createMyPeer = this.createMyPeer.bind(this)
+        this.options.connection.addTracksForPeer = this.addTracksForPeer.bind(this)
+        this.options.connection.getStream = this.getStream.bind(this)
+    }
+
+    getStream(pid) {
+        return this.streams.get(pid)
     }
 
     updatePeers() {
@@ -143,7 +149,6 @@ class ChatProvider {
         else {
             this.constraints = constraints
         }
-
         // RAII
         this.connection = new ChatConnectionManager(this.options.connection, this.options.stream)
     }
@@ -179,10 +184,14 @@ class ChatProvider {
     }
 
     addTracksForPeer(pc, stream) {
-        console.log(pc)
+        if (stream === null) {
+            console.log('peer has no stream')
+            return
+        }
+        console.log('adding tracks for peer', pc)
         stream.getTracks().forEach(track => {
-            console.log(track)
-            pc.addTrack(track)
+            console.log(track, stream)
+            pc.addTrack(track, stream)
         })
     }
 

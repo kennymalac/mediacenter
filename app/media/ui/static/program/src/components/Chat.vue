@@ -58,10 +58,10 @@ export default {
                 grid = layoutBoxStructMethods[Symbol.for("solo")](peerCount, peerIds)
             }
             else if (layouts.block) {
-                grid = layoutBoxStructMethods[Symbol.for("line")](peerCount, peerIds)
+                grid = layoutBoxStructMethods[Symbol.for("block")](peerCount, peerIds)
             }
             else if (layouts.line) {
-                grid = layoutBoxStructMethods[Symbol.for("block")](peerCount, peerIds)
+                grid = layoutBoxStructMethods[Symbol.for("line")](peerCount, peerIds)
             }
             else if (layouts.triangle) {
                 grid = layoutBoxStructMethods[Symbol.for("triangle")](peerCount, peerIds)

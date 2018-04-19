@@ -9,3 +9,5 @@ DATABASES = {
         'NAME': 'sqlite'
     }
 }
+
+TURN_SECRET = b'mediacenterSECRET'

@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from random import randrange
 
 from channels import Channel, Group
@@ -6,6 +7,8 @@ from channels.generic.websockets import WebsocketDemultiplexer, WebsocketConsume
 from channels.sessions import channel_session
 from channels.auth import channel_session_user, channel_session_user_from_http
 # from .models import ChatMessage
+
+from .turn import *
 
 # TODO add chatroom messages
 
@@ -59,7 +62,6 @@ class WebRTCConsumer(JsonWebsocketConsumer):
         message.reply_channel.send({"accept": True})
         print(datetime.now(), "Connection accepted.")
 
-
         ids = getOrCreateIds(message.channel_session)
 
         if message.user.is_anonymous:
@@ -73,6 +75,13 @@ class WebRTCConsumer(JsonWebsocketConsumer):
             "type": 'assigned-id',
             "userInfo": userInfo
         })
+
+        turnUser = {
+            "type": "turn-user",
+            "auth": createTurnAuth(userInfo['username'], userInfo['id'])
+        }
+        print(turnUser)
+        multiplexer.send(turnUser)
 
         # Send offer to all clients
 
