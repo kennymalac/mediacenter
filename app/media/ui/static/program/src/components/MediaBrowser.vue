@@ -1,22 +1,22 @@
 <template>
-    <Modal :isOpen="isModalOpen" :onClose="closeModal"> <!-- position="left" -->
-        <div slot="title">
+    <Modal :isOpen="isModalOpen" :onClose="closeModal" :titleProps="titleProps"> <!-- position="left" -->
+        <div slot="title" slot-scope="{ slotProps }">
             <modal-toolbar :buttons="leftToolbarButtons" />
-            <label>
-                {{album.title}}
+            <label class="modal-title-text">
+                {{slotProps.title}}
             </label>
         </div>
 
         <div class="gallery-photo-view">
-            <div v-if="photo">Nothing to show.</div>
+            <div v-if="!currentMediaItem.id">Nothing to show.</div>
         </div>
 
         <div class="gallery-preview" @play="playSlideshow" @nextPhoto="nextPhoto" @prevPhoto="prevPhoto">
-            <div v-on:click="goBack" v-bind:class="{ disabled: atBeginningOfRoster }" class="go-back ion-ios-arrow-back"></div>
+            <div @click="goBack" :class="{ disabled: atBeginningOfRoster }" class="go-back ion-ios-arrow-back"></div>
             <div class="preview-container">
                 <media-grid-item v-for="mediaItem in currentRoster" :media="mediaItem"/>
             </div>
-            <div v-on:click="goForward" v-bind:class="{ disabled: atEndOfRoster }" class="go-forward ion-ios-arrow-forward"></div>
+            <div @click="goForward" :class="{ disabled: atEndOfRoster }" class="go-forward ion-ios-arrow-forward"></div>
         </div>
     </Modal>
 </template>
@@ -26,6 +26,7 @@ import MediaGridItem from './MediaGridItem'
 import Modal from './Gui/Modal/Modal'
 import ModalToolbar from './Gui/Modal/ModalToolbar'
 import ModalToolbarItem from './Gui/Modal/ModalToolbarItem'
+import {AlbumCollection, AlbumModel} from '../models/Album.js'
 
 // import SmartPager from '../pager'
 
@@ -41,11 +42,15 @@ export default {
         return {
             //
             isActive: false,
-            album: {},
+            album: {
+                title: ""
+            },
             mediaItems: [],
             pageCache: {},
             gallery: {},
-            currentMediaItem: {},
+            currentMediaItem: {
+                id: null
+            },
             currentRoster: [],
             atBeginningOfRoster: false,
             atEndOfRoster: false,
@@ -84,7 +89,20 @@ export default {
             ]
         }
     },
+    computed: {
+        titleProps() {
+            return {
+                title: this.album.title
+            }
+        }
+    },
     methods: {
+        nextPhoto() {
+
+        },
+        prevPhoto() {
+
+        },
         prevMedia() {
             //TODO why don't js iterators do previous???
         },
@@ -96,14 +114,14 @@ export default {
             if (!this.atEndOfRoster && !this.isActive) {
                 this.isActive = true
                 this.currentPage++
-                this.listMediaItems(this.album)
+                this.listMediaItems()
             }
         },
         goBack() {
             if (!this.atBeginningOfRoster && !this.isActive) {
                 this.isActive = true
                 this.currentPage--
-                this.listMediaItems(this.album)
+                this.listMediaItems()
             }
         },
         closeModal() {
@@ -113,53 +131,27 @@ export default {
         // applyEffects
         selectAlbum(album) {
             this.getAlbum(album)
-                .then(this.listMediaItems)
+                .then(this.listMediaItems.bind(this))
         },
         getAlbum(album) {
             // Returns a detailed graph for media items
             // TODO repair cache by moving initialization parameters to a Store
-
-            return fetch("/api/album/" + album.id + "/", {
-                method: "GET"
-            })
-                .then((response) => {
-                    if (response.status >= 200 && response.status < 300) {
-                        return response.json()
-                    } else {
-                        var error = new Error(response.statusText)
-                        error.response = response
-                        throw error
-                    }
-                })
-
+            return AlbumCollection.get(album.id)
                 .then((data) => {
                     this.album = data
-                    return this.album
                 })
                 .catch((error) => {
                     console.log(error)
                 })
         },
-        listMediaItems(album) {
+        listMediaItems() {
             let cachedPage = this.pageCache[this.currentPage]
             if (cachedPage) {
                 this.currentRoster = cachedPage
                 // TODO: fix this to not rerun requests
             }
 
-            fetch("/api/album/" + album.id + "/media/?page=" + this.currentPage, {
-                method: "GET"
-            })
-                .then((response) => {
-                    if (response.status >= 200 && response.status < 300) {
-                        return response.json()
-                    } else {
-                        var error = new Error(response.statusText)
-                        error.response = response
-                        throw error
-                    }
-                })
-
+            AlbumModel.listItems(this.album.id, this.currentPage)
                 .then((data) => {
                     // NOTE insert Store here
                     this.pageCache[this.currentPage] = data.results
@@ -181,21 +173,20 @@ export default {
 <style lang="scss">
 @import "../classicTheme.scss";
 
+.gallery-photo-view {
+    height: 85%;
+}
 
 .gallery-preview {
-    display: block;
+    display: flex;
     position: relative;
-    width: 90%;
-    left: 5%;
-    top: 82%;
     margin: 0;
 
     .preview-container {
-        position: relative;
-        display: inline-block;
+        //position: relative;
+        display: flex;
         left: 5rem;
         right: 5rem;
-        top: 0;
     }
 }
 

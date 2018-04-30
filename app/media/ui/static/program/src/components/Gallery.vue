@@ -6,10 +6,8 @@
             {{authError}}
         </div>
 
-        <div class="debug-controls pure-form">
-            <button class="pure-button" @click="showAlbums">
-                Show Albums
-            </button>
+        <div class="debug-controls">
+            <ladda-button :isLoading="isLoadingAlbums" @click.native="showAlbums" text="Show Albums" />
         </div>
 
         <album-grid-item v-for="album in galleryAlbums" @albumSelected="showAlbumGallery" :album="album"/>
@@ -26,6 +24,7 @@ import MediaGridItem from './MediaGridItem'
 import AlbumGridItem from './AlbumGridItem'
 import MediaBrowser from './MediaBrowser'
 import Loading from './Loading'
+import LaddaButton from './Gui/LaddaButton'
 //import router from '../router/index.js'
 import auth from '../auth.js'
 // Dynamic gallery
@@ -34,12 +33,14 @@ export default {
         MediaGridItem,
         AlbumGridItem,
         MediaBrowser,
-        Loading
+        Loading,
+        LaddaButton
     },
     data() {
         return {
             full: false,
             loading: false,
+            isLoadingAlbums: false,
             currentAlbum: {},
             galleryAlbums: [],
             album: {
@@ -66,13 +67,14 @@ export default {
     },
     methods: {
         showAlbums() {
+            this.isLoadingAlbums = true
             AlbumCollection.searchAlbums().then((data) => {
                 this.galleryAlbums = data
+                this.isLoadingAlbums = false
             })
         },
         showAlbumGallery(album) {
             this.loading = true
-            console.log(album)
             this.$refs.browser.selectAlbum(album)
             this.loading = false
             // router.replace({

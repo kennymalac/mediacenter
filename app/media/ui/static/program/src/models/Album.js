@@ -1,10 +1,12 @@
-import {jsonResponse} from '../httputil.js'
+import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 
 class AlbumCollection {
+    // TODO make this a Store
+    // static list()
     static get(id) {
         // TODO verify id is integer (typescript)
         // TODO attach auth headers
-        return fetch("/api/album/" + id, {
+        return fetchAPI(`album/${id}`, {
             method: "GET"
         })
             .then(jsonResponse)
@@ -18,6 +20,16 @@ class AlbumCollection {
             })
     }
 
+    static create(data) {
+        return makeJsonRequest("album/", {
+            method: "POST",
+            body: {
+                ...data
+            }
+        })
+            .then(jsonResponse)
+    }
+
     static searchAlbums() {
         var params = {}
 
@@ -26,7 +38,7 @@ class AlbumCollection {
         //     params.accessLevel = "public"
         // }
         // TODO this is an authorized request
-        return fetch("/api/album/", {
+        return fetchAPI(`album/`, {
             method: "GET",
             data: params
         })
@@ -36,6 +48,34 @@ class AlbumCollection {
                 return data
             })
     }
+
 }
 
-export {AlbumCollection}
+class AlbumModel {
+    // TODO make this a Store
+    static manage(album) {
+        return makeJsonRequest(`album/${album.id}/`, {
+            method: "PUT",
+            body: {
+                ...album
+            }
+        })
+    }
+
+    static upload(albumId, form) {
+        return fetchAPI(`album/${albumId}/upload/`, {
+            method: "POST",
+            headers: makeHeaders({}),
+            body: form
+        })
+    }
+
+    static listItems(albumId, currentPage) {
+        return fetchAPI(`album/${albumId}/media/?page=${currentPage}`, {
+            method: "GET"
+        })
+            .then(jsonResponse)
+    }
+}
+
+export {AlbumCollection, AlbumModel}

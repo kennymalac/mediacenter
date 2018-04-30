@@ -1,36 +1,32 @@
 <template>
-    <Modal :isOpen="isModalOpen" :onClose="closeModal">
-        <div slot="title">
-            <modal-toolbar />
-
-            <label>
-                Login
-            </label>
-        </div>
-
+    <div>
         <div v-bind:class="info">
-          {{ infoBox.message }}
+            {{ infoBox.message }}
         </div>
-
-        <form v-if="!loggedIn()" v-on:submit.prevent="login">
-          <fieldset class="third">
-            <input v-model="user.username" class="stack" type="text" placeholder="username" />
-            <input v-model="user.password" class="stack" type="password" placeholder="password" />
+        
+        <Modal :isOpen="isModalOpen" :onClose="closeModal" justifyContent="center" :titleProps="{ title: 'Login' }">
             
-            <input type="submit" class="stack" text="Sign in" />
-          </fieldset>
-          <label for="remember">
-            <input id="remember" type="checkbox">
-            <span class="checkable">Remember me</span>
-          </label>
-          <!-- {% csrf_token %} -->
-        </form>
+            <form id="login-form" v-if="!loggedIn()" v-on:submit.prevent="login">
+                <fieldset>
+                    <input v-model="user.username" class="stack" type="text" placeholder="username" />
+                    <input v-model="user.password" class="stack" type="password" placeholder="password" />
+                    
+                    <label for="remember" class="stack" style="">
+                        <input id="remember" type="checkbox">
+                        <span class="checkable">Remember me</span>
+                    </label>
+                    
+                    <input type="submit" class="stack" value="Sign in" style="text-align: center;" />
+                </fieldset>
+                <!-- {% csrf_token %} -->
+            </form>
 
         <div v-if="loggedIn()">
           Welcome {{user.username}}!
           <button @click="logout">Logout</button>
         </div>
     </Modal>
+    </div>
 </template>
 
 <script>
@@ -114,3 +110,14 @@ export default {
     }
 }
 </script>
+
+<style lang="scss">
+#login-form {
+    display: flex;
+    align-self: center;
+    width: 320px;
+    fieldset {
+        width: 100%;
+    }
+}
+</style>

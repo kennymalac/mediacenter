@@ -1,3 +1,5 @@
+@import "~picnic/src/themes/default/_theme.scss";
+
 button,input[type="submit"],input[type="reset"],.button { margin:0 }
 
 //Namespace: COLOR
@@ -8,6 +10,28 @@ $subgray: #2c3e50;
 $classicblue: #26619C;
 $classiclightblue: #1F8DD6;
 $classicgreen: #4F8A10;
+
+
+input[type="submit"].stack  {
+    padding: 0.3em 0.6em;
+    border: 1px solid rgb(0, 116, 217);
+}
+
+input, textarea, select {
+    &:focus + label.stack {
+        border-top-color: $picnic-primary;
+    }
+}
+
+label.stack {
+    text-align: center;
+    display: block;
+    background-color: white;
+    width: 100%;
+    padding: 0.3em 0.6em;
+    border: $picnic-border;
+    border-bottom: 0;
+}
 
 // TODO remove Pure CSS by Yahoo
 //Pure CSS enhancements

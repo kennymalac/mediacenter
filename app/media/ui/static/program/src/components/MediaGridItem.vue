@@ -22,6 +22,7 @@ export default {
 <style scoped>
 .l-box {
     padding: .25em;
+
     border: 1.5px solid gray;
     border-radius: 2px;
 }

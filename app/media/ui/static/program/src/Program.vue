@@ -28,6 +28,7 @@ export default {
 $ionicons-font-path: "~ionicons/dist/fonts";
 @import "~ionicons/dist/scss/ionicons.scss";
 @import "~picnic/picnic.css";
+@import "~ladda/css/ladda.scss";
 @import "classicTheme.scss";
 
 #program {

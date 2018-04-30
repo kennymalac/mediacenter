@@ -8,32 +8,16 @@
 
 * Frontend TODO
 ** Priority 1 (urgent)
-*** Chatlib
-**** TODO allow more than 2 users to video chat at once
-**** TODO layoutBoxStructMethods
-***** TODO solo
-***** TODO line
-***** TODO block
-***** TODO triangle
-**** TODO facilitation of Candidate transfers between clients (ICE/STUN)
-***** TODO automation for server creation (python script)
-***** DONE spin up ICE instance
-      CLOSED: [2017-11-04 Sat 10:16]
-***** DONE spin up STUN instance
-      CLOSED: [2017-11-04 Sat 10:16]
-**** DONE connecting peers
-     CLOSED: [2017-11-04 Sat 10:16]
-**** TODO creation of chat layout
-***** TODO CSS
-***** TODO transition animations
-**** TODO user display object (video container within layout)
-***** TODO user display controls
-***** DONE box with <video> tag
-      CLOSED: [2017-07-23 Sun 17:40]
-**** TODO text chat
-***** TODO frontend
-***** TODO backend
+*** UI/UX fixes
+**** TODO convert Modal to flexbox
+**** TODO remove Pure CSS
+**** TODO make Register use Modal
+**** TODO Modal without title should have normal titlebar 
+
+
 *** Media Browser
+**** TODO Fix API
+**** TODO Fix media browser breaking entire app
 **** TODO playSlideshow
 **** DONE goForward/goBack
      CLOSED: [2017-05-13 Sat 12:47]
@@ -72,10 +56,13 @@
 ***** TODO Delete
 **** TODO Uploading media items
 **** TODO full test coverage
-
 ** Priority 2 (necessary)
-*** chatlib
-**** TODO full test coverage
+*** Model/Collection
+    don't make too many assumptions
+**** base class
+**** API handler using fetchResource
+**** default get/set
+
 
 *** TODO deployment to a VPS
 *** Authentication
@@ -98,14 +85,38 @@
 *** 
 ** Priority 4 (enhancements)
 *** TODO use TypeScript
+*** Chatlib
+**** TODO allow more than 2 users to video chat at once
+**** TODO layoutBoxStructMethods
+***** TODO solo
+***** TODO line
+***** TODO block
+***** TODO triangle
+**** TODO facilitation of Candidate transfers between clients (ICE/STUN)
+***** TODO automation for server creation (python script)
+***** DONE spin up ICE instance
+      CLOSED: [2017-11-04 Sat 10:16]
+***** DONE spin up STUN instance
+      CLOSED: [2017-11-04 Sat 10:16]
+**** DONE connecting peers
+     CLOSED: [2017-11-04 Sat 10:16]
+**** TODO creation of chat layout
+***** TODO CSS
+***** TODO transition animations
+**** TODO user display object (video container within layout)
+***** TODO user display controls
+***** DONE box with <video> tag
+      CLOSED: [2017-07-23 Sun 17:40]
+**** TODO text chat
+***** TODO frontend
+***** TODO backend
+
 *** httputil
 **** better API handling, fetch Promise constructor with API i.e. fetchREST, fetchResource??
-*** Model/Collection
-    don't make too many assumptions
-**** base class
-**** API handler using fetchResource
-**** default get/set
 *** 
+*** chatlib
+**** TODO full test coverage
+
 ** Priority 5 (wishlist)
 *** Theming system
     10,000+ users

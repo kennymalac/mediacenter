@@ -5,56 +5,56 @@
         <h1 v-if="actions.manage">
             Edit Album: {{album.title }}
         </h1>
-
+        
         <form v-if="actions.manage || actions.create">
-            <fieldset>
-               <legend>Settings</legend>
-
-               <label for="visibility">Visibility (not working)</label>
-               <select name="visibility">
-                   <option>Public</option>
-                   <option>Private</option>
-                   <option>Unlisted</option>
-               </select>
-           </fieldset>
-
-           <button v-if="actions.manage" class="pure-button-error pure-button">
-               <i class="ion-md-close"></i>
-               Delete Album
-           </button>
+            <fieldset class="third">
+                <legend class="stack">Settings</legend>
+                
+                <label class="stack" for="visibility">Visibility (not working)</label>
+                <select class="stack" name="visibility">
+                    <option>Public</option>
+                    <option>Private</option>
+                    <option>Unlisted</option>
+                </select>
+            </fieldset>
+            
+            <button v-if="actions.manage" class="error">
+                <i class="ion-md-close"></i>
+                Delete Album
+            </button>
         </form>
-
-        <form v-on:submit.prevent="save" v-if="actions.manage || actions.create">
-          <fieldset>
-            <legend>Details</legend>
-                <label for="title">Title</label>
-                <input name="title" v-model="album.title" type="text" />
-                <label for="description">Description</label>
-                <input name="description" v-model="album.description" type="text" />
-                <label for="">Tags</label>
-                <input name="tags" v-model="album.tags_raw" type="text" />
-                <input class="pure-button" type="submit" />
-          </fieldset>
+        
+        <form @submit.prevent="save" v-if="actions.manage || actions.create">
+            <fieldset class="third">
+                <legend>Details</legend>
+                <label class="stack" for="title">Title</label>
+                <input class="stack" name="title" v-model="album.title" type="text" />
+                <label class="stack" for="description">Description</label>
+                <textarea class="stack" name="description" v-model="album.description" />
+                <label class="stack" for="">Tags</label>
+                <input class="stack" name="tags" v-model="album.tags_raw" type="text" />
+                <input class="stack" type="submit" value="Create" />
+            </fieldset>
             <!-- TODO drag and drop input -->
-
-            <button class="pure-button" v-on:click="createMediaItem">
+            
+            <button @click="createMediaItem">
                 Add media
             </button>
             OR
             <file-upload :multiple="true" @fileReady="addNewMediaItem" />
         </form>
-
+        
         <form v-if="actions.manage || actions.create">
-          <fieldset>
-            <legend>Media Items</legend>
-            <album-media-item-upload-grid-item v-for="item in mediaItems" :media="item" :key="item.id"/>
-          </fieldset>
+            <fieldset>
+                <legend>Media Items</legend>
+                <album-media-item-upload-grid-item v-for="item in mediaItems" :media="item" :key="item.id"/>
+            </fieldset>
         </form>
     </div>
 </template>
 
 <script>
-import {AlbumCollection} from '../models/Album.js'
+import {AlbumCollection, AlbumModel} from '../models/Album.js'
 
 import AlbumGridItem from "./AlbumGridItem.vue"
 import AlbumMediaItemUploadGridItem from "./AlbumMediaItemUploadGridItem"
@@ -124,64 +124,25 @@ export default {
             }
         },
         createAlbum() {
-            let headers = {
-                "Content-Type": "application/json"
-            }
-            auth.authenticate(headers)
             // this won't add mediaitems, and it definetly will not
             // work for created items
-            // createAtlbum does not upload mediaitems
-            return fetch("/api/album/", {
-                method: "POST",
-                headers: headers,
-                body: JSON.stringify({
-                    title: this.album.title,
-                    description: this.album.description,
-                    owner: auth.getActiveUser().details.id
-                })
+            // createAlbum does not upload mediaitems
+            return AlbumCollection.create({
+                title: this.album.title,
+                description: this.album.description,
+                owner: auth.getActiveUser().details.id
             })
-                .then((response) => {
-                    if (response.status >= 200 && response.status < 300) {
-                        return response.json()
-                    } else {
-                        var error = new Error(response.statusText)
-                        error.response = response
-                        throw error
-                    }
-                })
-
                 .then((data) => {
                     this.album = data
-                    return this.album
                 })
                 .catch((error) => {
                     console.log(error)
                 })
         },
         manageAlbum() {
-            let headers = {
-                "Content-Type": "application/json"
-            }
-            auth.authenticate(headers)
-            return fetch("/api/album/" + this.album.id + "/", {
-                method: "PUT",
-                headers: headers,
-                body: JSON.stringify(this.album)
-            })
-                .then((response) => {
-                    if (response.status >= 200 && response.status < 300) {
-                        return response.json()
-                    }
-                    else {
-                        var error = new Error(response.statusText)
-                        error.response = response
-                        throw error
-                    }
-                })
-
+            return AlbumModel.manage(this.album)
                 .then((data) => {
                     this.album = data
-                    return this.album
                 })
                 .catch((error) => {
                     console.log(error)
@@ -210,11 +171,7 @@ export default {
                 form.append("tags", media.tags)
             }
 
-            return fetch("/api/album/" + this.album.id + "/upload/", {
-                method: "POST",
-                headers: headers,
-                body: form
-            })
+            return AlbumModel.upload(this.album.id, form)
         },
         addNewMediaItem(item) {
             console.log('adding media item', item)
@@ -244,11 +201,10 @@ export default {
                 })
             }
             else if (this.actions.create) {
-                this.createAlbum().then((data) => {
-                    console.log(data)
-                    router.replace('/album/' + data.id + '/manage')
+                this.createAlbum().then(this.$nextTick(() => {
+                    router.replace('/album/' + this.album.id + '/manage')
                     // Ready to upload media items
-                })
+                }))
             }
         }
     }
