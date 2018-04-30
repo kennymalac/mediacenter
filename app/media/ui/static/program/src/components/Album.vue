@@ -1,15 +1,22 @@
 <template>
-    <div>
-        <album-grid-item v-if="actions.list" v-for="album in albums" @albumSelected="modifyAlbum" :album="album"/>
-
+    <div class="album-interface">
+        <div class="album-item-list">
+            <album-grid-item v-if="actions.list" v-for="album in albums" @albumSelected="modifyAlbum" :album="album"/>
+        </div>
+        
         <h1 v-if="actions.manage">
             Edit Album: {{album.title }}
         </h1>
         
-        <form v-if="actions.manage || actions.create">
-            <fieldset class="third">
+        <form class="main-form" v-if="actions.manage || actions.create">
+            <button type="button" v-if="actions.manage" class="error">
+                <i class="ion-md-close"></i>
+                Delete Album
+            </button>
+            
+            <fieldset>
                 <legend class="stack">Settings</legend>
-                
+
                 <label class="stack" for="visibility">Visibility (not working)</label>
                 <select class="stack" name="visibility">
                     <option>Public</option>
@@ -17,37 +24,35 @@
                     <option>Unlisted</option>
                 </select>
             </fieldset>
-            
-            <button type="button" v-if="actions.manage" class="error">
-                <i class="ion-md-close"></i>
-                Delete Album
-            </button>
         </form>
         
-        <form @submit.prevent="save" v-if="actions.manage || actions.create">
-            <fieldset class="third">
-                <legend>Details</legend>
+        <form class="main-form" @submit.prevent="save" v-if="actions.manage || actions.create">
+            <fieldset>
+                <legend class="stack">Details</legend>
                 <label class="stack" for="title">Title</label>
                 <input class="stack" name="title" v-model="album.title" type="text" />
                 <label class="stack" for="description">Description</label>
                 <textarea class="stack" name="description" v-model="album.description" />
                 <label class="stack" for="">Tags</label>
                 <input class="stack" name="tags" v-model="album.tags_raw" type="text" />
-                <input class="stack" type="submit" value="Create" />
+                <input v-if="actions.create" class="stack" type="submit" value="Create" />
+                <input v-if="actions.manage" class="stack" type="submit" value="Save changes" />
             </fieldset>
             <!-- TODO drag and drop input -->
             
-            <button type="button" @click="addNewMediaItem">
+            <button type="button" @click="addMediaItem">
                 Add media
             </button>
             OR
-            <file-upload :multiple="true" @fileReady="addNewMediaItem" />
+            <file-upload :multiple="true" @fileReady="uploadMediaItem" />
         </form>
         
-        <form v-if="actions.manage || actions.create">
+        <form v-if="actions.manage || actions.create" class="album-item-editor">
             <fieldset>
                 <legend>Media Items</legend>
-                <album-media-item-upload-grid-item v-for="item in mediaItems" :media="item" :key="item.id"/>
+                <div class="album-item-list">
+                    <album-media-item-upload-grid-item v-for="item in mediaItems" :media="item" :key="item.id" />
+                </div>
             </fieldset>
         </form>
     </div>
@@ -154,17 +159,26 @@ export default {
                 console.log(media.title)
                 console.log(media.description)
                 console.log(media.tags)
-
+                
                 form.append("src", media.src)
                 form.append("title", media.title)
                 form.append("description", media.description)
                 form.append("tags", media.tags)
             }
-
+            
             return AlbumModel.upload(this.album.id, form)
         },
-        addNewMediaItem(item) {
+        addMediaItem() {
             // console.log('adding media item', item)
+            this.mediaItems.push({
+                id: this.mediaItems.length,
+                owner: {name: ''},
+                title: '',
+                description: '',
+                tags: []
+            })
+        },
+        uploadMediaItem(item) {
             this.mediaItems.push({
                 id: this.mediaItems.length,
                 src: item,
@@ -200,3 +214,30 @@ export default {
     }
 }
 </script>
+
+<style lang="scss">
+.album-interface {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    .main-form {
+        width: 480px;
+    }
+    
+    .album-item-list {
+        display: flex;
+        margin-top: 10px;
+    }
+    .album-item-editor {
+        width: auto;
+        max-width: 1024px;
+        fieldset {
+            width: 100%;
+        }
+        .album-item-list {
+            display: block;
+        }
+    }
+}
+</style>

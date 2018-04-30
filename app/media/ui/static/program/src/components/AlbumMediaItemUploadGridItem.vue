@@ -3,9 +3,12 @@
         <div class="media-item-header">
             {{media.title}} by {{media.owner.name}}
         </div>
-
+        
         <div>
-            <img width="230" height="230" :alt="media.title" :src="media.src" class="pure-img" />
+            <img v-if="media.src" width="230" height="230" :alt="media.title" :src="media.src" class="pure-img" />
+            <div class="default-preview" v-if="!media.src">
+                <i class="ion-ios-image"></i>
+            </div>
         </div>
 
         <!-- <div class="pure-control-group">
@@ -55,7 +58,7 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .media-upload-grid-item {
     display: inline-block;
     vertical-align: top;
@@ -73,6 +76,11 @@ export default {
     input {
         width: 230px;
         margin: auto;
+    }
+    .default-preview {
+        height: 230px;
+        height: 230px;
+        i { font-size: 10rem; }
     }
 }
 </style>

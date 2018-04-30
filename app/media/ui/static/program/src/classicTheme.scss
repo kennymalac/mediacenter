@@ -12,6 +12,15 @@ $classiclightblue: #1F8DD6;
 $classicgreen: #4F8A10;
 
 
+form {
+    fieldset {
+        input[type="submit"] {
+            text-align: center;
+        }
+        margin: 12px 0;
+    }
+}
+
 input[type="submit"].stack  {
     padding: 0.3em 0.6em;
     border: 1px solid rgb(0, 116, 217);
@@ -58,23 +67,25 @@ label.stack {
     /* TODO */
 }
 
-.info, .success, .error {
-    border: 1px solid;
-    border-radius: 5px;
-    margin: 10px 10px;
-    padding: 10px 10px 10px 15px;
-}
-.info {
-    color: #fff;
-    background-color: $classiclightblue;
-}
-.error {
-    color: #D8000C;
-    background-color: #FFBABA;
-}
-.success {
-    color: $classicgreen;
-    background-color: #DFF2BF;
+.alert {
+    &.info, &.success, &.error {
+        border: 1px solid;
+        border-radius: 5px;
+        margin: 10px 10px;
+        padding: 10px 10px 10px 15px;
+    }
+    &.info {
+        color: #fff;
+        background-color: $classiclightblue;
+    }
+    &.error {
+        color: #D8000C;
+        background-color: #FFBABA;
+    }
+    &.success {
+        color: $classicgreen;
+        background-color: #DFF2BF;
+    }
 }
 
 //Namespace:common layout patterns

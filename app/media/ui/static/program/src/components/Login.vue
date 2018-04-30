@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-bind:class="info">
+        <div :class="info">
             {{ infoBox.message }}
         </div>
         
@@ -16,7 +16,7 @@
                         <span class="checkable">Remember me</span>
                     </label>
                     
-                    <input type="submit" class="stack" value="Sign in" style="text-align: center;" />
+                    <input type="submit" class="stack" value="Sign in" />
                 </fieldset>
                 <!-- {% csrf_token %} -->
             </form>
@@ -63,6 +63,7 @@ export default {
             //return Your account was logged in successfully
             //return error, info
             return {
+                alert: true,
                 hidden: (this.infoBox.message.length < 1),
                 error: (this.infoBox.status === "error"),
                 info: (this.infoBox.status === "info"),

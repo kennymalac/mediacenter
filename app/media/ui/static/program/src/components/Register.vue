@@ -1,7 +1,7 @@
 <template>
     <div>
-        <form v-on:submit.prevent="register">
-            <div v-bind:class="info">
+        <form @submit.prevent="register">
+            <div :class="info">
                 {{ infoBox.message }}
             </div>
 
@@ -56,6 +56,7 @@ export default {
             //return Your account was created successfully
             //return error, info
             return {
+                alert: true,
                 hidden: (this.infoBox.message.length < 1),
                 error: (this.infoBox.status === "error"),
                 info: (this.infoBox.status === "info"),

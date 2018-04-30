@@ -2,7 +2,7 @@
     <div class="pure-u-1-1">
         <loading v-if="loading"/>
 
-        <div v-if="authError" class="info error">
+        <div v-if="authError" class="alert info error">
             {{authError}}
         </div>
 
