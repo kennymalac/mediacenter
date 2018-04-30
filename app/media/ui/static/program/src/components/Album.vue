@@ -18,7 +18,7 @@
                 </select>
             </fieldset>
             
-            <button v-if="actions.manage" class="error">
+            <button type="button" v-if="actions.manage" class="error">
                 <i class="ion-md-close"></i>
                 Delete Album
             </button>
@@ -37,7 +37,7 @@
             </fieldset>
             <!-- TODO drag and drop input -->
             
-            <button @click="createMediaItem">
+            <button type="button" @click="addNewMediaItem">
                 Add media
             </button>
             OR
@@ -71,20 +71,10 @@ export default {
     },
     data() {
         return {
-            // actions: {
-            //     list: this.action === "list",
-            //     manage: this.action === "manage",
-            //     create: this.action === "create"
-            // },
+            album: AlbumModel.initialState,
             albums: [],
             mediaItems: [],
-            album_tags_raw: '',
-            album: {
-                id: null,
-                title: '',
-                description: '',
-                tags: []
-            }
+            album_tags_raw: ''
         }
     },
     computed: {
@@ -105,7 +95,12 @@ export default {
         this.restAction()
     },
     methods: {
+        initialState() {
+            this.album = AlbumModel.initialState
+            this.mediaItems = []
+        },
         restAction(to) {
+            this.initialState()
             if (!to) {
                 to = {params: {action: this.action, id: this.id}}
             }
@@ -149,14 +144,9 @@ export default {
                 })
         },
         modifyAlbum(album) {
-            console.log(album)
-            console.log(album.id)
             router.replace('/album/' + album.id + "/manage")
         },
         uploadMediaItems() {
-            let headers = {}
-            auth.authenticate(headers)
-
             // Encode the source file as a form
             let form = new FormData()
             for (let media of this.mediaItems) {
@@ -174,7 +164,7 @@ export default {
             return AlbumModel.upload(this.album.id, form)
         },
         addNewMediaItem(item) {
-            console.log('adding media item', item)
+            // console.log('adding media item', item)
             this.mediaItems.push({
                 id: this.mediaItems.length,
                 src: item,

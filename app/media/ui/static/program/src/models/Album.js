@@ -52,6 +52,14 @@ class AlbumCollection {
 }
 
 class AlbumModel {
+
+    static initialState = {
+        id: null,
+        title: '',
+        description: '',
+        tags: []
+    }
+
     // TODO make this a Store
     static manage(album) {
         return makeJsonRequest(`album/${album.id}/`, {
