@@ -9,11 +9,15 @@
 * Frontend TODO
 ** Priority 1 (urgent)
 *** UI/UX fixes
-**** TODO convert Modal to flexbox
+**** DONE convert Modal to flexbox
+     CLOSED: [2018-04-30 Mon 18:30]
 **** TODO remove Pure CSS
-**** TODO make Register use Modal
-**** TODO Modal without title should have normal titlebar 
+**** DONE make Register use Modal
+     CLOSED: [2018-04-30 Mon 18:30]
+**** DONE Modal without title should have normal titlebar 
+     CLOSED: [2018-04-30 Mon 18:30]
 
+**** TODO Clean up Feed UI
 
 *** Media Browser
 **** TODO Fix API

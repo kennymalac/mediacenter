@@ -1,5 +1,11 @@
 <template>
-  <div class="pure-u">
+    <div>
+        <feed-image item="{}" />
+        <feed-image item="{}" />
+        <feed-image item="{}" />
+        <feed-image item="{}" />
+
+
     <div class="user-post">
       <div class="user-legend">
         <div class="user-img">
@@ -41,8 +47,13 @@
 </template>
 
 <script>
+import FeedImage from './FeedItems/Image'
+
 export default {
     name: 'feed',
+    components: {
+        FeedImage
+    },
     data() {
         return {}
     }
