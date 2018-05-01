@@ -6,6 +6,8 @@
 **** TODO full test coverage
 
 
+* August 1st - Early Access
+
 * Frontend TODO
 ** Priority 1 (urgent)
 *** UI/UX fixes
