@@ -11,7 +11,7 @@
             <router-link class="button pseudo" to="/login">Login</router-link>
             <router-link class="button pseudo" to="/register">Register</router-link>
             <router-link class="button pseudo" to="/feed">Feed</router-link>
-            <router-link class="button pseudo" to="/group/create">Group</router-link>
+            <router-link class="button pseudo" to="/group/list">Groups</router-link>
             <router-link class="button pseudo" to="/chat">Chat</router-link>
             <router-link class="button pseudo" to="/gallery">Media Gallery</router-link>
             <router-link class="button pseudo" to="/album/create">Create Album</router-link>

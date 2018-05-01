@@ -65,6 +65,7 @@
 ***** TODO Update
 ***** TODO Delete
 **** TODO Uploading media items
+**** TODO Merge Manage Album and Create Album into "Albums"
 **** TODO full test coverage
 ** Priority 2 (necessary)
 *** User Profiles
