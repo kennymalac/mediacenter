@@ -125,10 +125,10 @@ $modal-title-height: 2.75rem;
             cursor: default;
         }
         
-        display: inline-block;
-        position: absolute;
+        display: flex;
+        align-self: center;
+        position: relative;
         text-align: center;
-        top: 20%;
         width: 2.25rem;
         font-size: 3.5rem;
         cursor: pointer;
@@ -136,12 +136,12 @@ $modal-title-height: 2.75rem;
     }
     
     .go-back {
-        /*margin-right: 4rem;*/
+        margin-right: 4rem;
         left: 2rem;
     }
     
     .go-forward {
-        /*margin-left: 4rem;*/
+        margin-left: 4rem;
         right: 2rem;
     }
 }

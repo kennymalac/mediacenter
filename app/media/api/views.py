@@ -68,7 +68,8 @@ class BlogPostViewSet(ModelViewSet):
     serializer_class = BlogPostSerializer
 
 
-class MediaViewSet(MultipleSerializerMixin,
+class MediaViewSet(NestedViewSetMixin,
+                   MultipleSerializerMixin,
                    ListModelMixin,
                    RetrieveModelMixin,
                    CreateModelMixin,

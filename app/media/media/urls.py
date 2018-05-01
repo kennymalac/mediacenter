@@ -17,7 +17,7 @@ router.register(r'album', AlbumViewSet, base_name='album')\
           r'media',
           MediaViewSet,
           base_name='albums-media',
-          parents_query_lookups=['album__media']
+          parents_query_lookups=['album']
       )
 
 

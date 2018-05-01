@@ -46,6 +46,7 @@ export default {
                 title: ""
             },
             mediaItems: [],
+            // TODO put this in a Store
             pageCache: {},
             gallery: {},
             currentMediaItem: {
@@ -97,6 +98,11 @@ export default {
         }
     },
     methods: {
+        initialState() {
+            this.mediaItems = []
+            this.currentRoster = []
+            this.pageCache = {}
+        },
         nextPhoto() {
 
         },
@@ -131,7 +137,7 @@ export default {
         // applyEffects
         selectAlbum(album) {
             this.getAlbum(album)
-                .then(this.listMediaItems.bind(this))
+                .then(this.listMediaItems)
         },
         getAlbum(album) {
             // Returns a detailed graph for media items
@@ -181,12 +187,14 @@ export default {
     display: flex;
     position: relative;
     margin: 0;
+    min-height: 100px;
 
     .preview-container {
-        //position: relative;
+        position: relative;
         display: flex;
-        left: 5rem;
-        right: 5rem;
+        justify-content: space-between;
+        //left: 6rem;
+        width: calc(100% - 12rem);
     }
 }
 

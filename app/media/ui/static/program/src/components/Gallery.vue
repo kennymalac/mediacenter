@@ -75,6 +75,7 @@ export default {
         },
         showAlbumGallery(album) {
             this.loading = true
+            this.$refs.browser.initialState()
             this.$refs.browser.selectAlbum(album)
             this.loading = false
             // router.replace({
