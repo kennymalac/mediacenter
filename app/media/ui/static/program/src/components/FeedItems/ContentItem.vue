@@ -52,24 +52,24 @@ $title-height: 24px;
     border-radius: 4px / 5px;
     width: 333px;
     height: 280px;
-
+    
     .content-title {
         height: $title-height;
         font-size: 1.4rem;
         width: 100%;
         color: rgb(52, 73, 94);
     }
-
+    
     .actions {
         display: flex;
         align-self: flex-end;
         height: $actions-height;
         width: 100%;
         .action {
-            background-color: #dbe4ed;
+            background-color: #2c3e50;
+            color: white;
             user-select: none;
             width: 110px;
-            border: 1px solid rgba(52, 73, 94,1.0);
             padding: 2px 16px;
             height: 100%;
             i.icon {

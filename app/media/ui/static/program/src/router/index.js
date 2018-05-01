@@ -14,7 +14,7 @@ Vue.use(Router)
 function restAction(route) {
     // Validate action as valid action
     // TODO refine this later
-    const validActions = ['create', 'list', 'manage']
+    const validActions = ['create', 'list', 'manage', 'details']
 
     if (!route.params.action || !validActions.includes(route.params.action)) {
         throw new Error()
@@ -57,6 +57,13 @@ export default new Router({
         },
         {
             path: '/group/:action',
+            name: 'Group',
+            component: Group,
+            props: restAction,
+            canReuse: false
+        },
+        {
+            path: '/group/:id/:action',
             name: 'Group',
             component: Group,
             props: restAction,

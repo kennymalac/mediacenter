@@ -1,6 +1,6 @@
 <template>
     <div class="group-list">
-        <group-item v-for="group in items" :name="group.name" :image="group.image" />
+        <group-item v-for="group in items" :id="group.id" :name="group.name" :image="group.image" />
     </div>
 </template>
 

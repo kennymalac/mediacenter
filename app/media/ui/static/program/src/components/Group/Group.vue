@@ -20,26 +20,60 @@
                 <group-list :items="groupItems" />
             </section>
         </template>
+        <template v-if="actions.details && currentGroupItem.id">
+            <section class="sidebar">
+                <div class="group-info">
+                    <div class="icon-container">
+                        <img height="100%" width="100%" :src="currentGroupItem.image" />
+                    </div>
+                    <h2>{{ currentGroupItem.name }}</h2>
+                    <p class="description">{{ currentGroupItem.description }}</p>
+                    <div class="rules" v-if="currentGroupItem.rules.length > 0">
+                        <h3>Rules</h3>
+                        <ol>
+                            <li v-for="rule in currentGroupItem.rules">{{ rule }}</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+            <div class="group-contents">
+                <feed-image item="{}" />
+                <feed-image item="{}" />
+                <feed-image item="{}" />
+                <feed-image item="{}" />
+            </div>
+        </template>
     </div>
 </template>
 
 <script>
 import GroupList from './GroupList'
+import FeedImage from '../FeedItems/Image'
 
 export default {
     props: ['id', 'action'],
     components: {
-        GroupList
+        GroupList,
+        FeedImage
     },
     data() {
         return {
+            currentGroupItem: { id: null },
             groupItems: [
                 {
+                    id: 1,
                     name: "Tea Lovers",
+                    description: "A place for teaheads.",
+                    rules: [
+                        "No spam",
+                        "Coffee is evil!"
+                    ],
                     image: "https://www.sciencemediacentre.co.nz/wp-content/upload/2009/03/tea.jpg"
                 },
                 {
+                    id: 2,
                     name: "Philosophy",
+                    rules: [],
                     image: "https://c1.staticflickr.com/5/4101/4870567608_69fbf87121_b.jpg"
                 }
             ]
@@ -49,6 +83,7 @@ export default {
         actions() {
             return {
                 list: this.action === "list",
+                details: this.action === "details",
                 manage: this.action === "manage",
                 create: this.action === "create"
             }
@@ -64,7 +99,7 @@ export default {
     },
     methods: {
         initialState() {
-
+            this.currentGroupItem = { id: null }
         },
         restAction(to) {
             this.initialState()
@@ -75,7 +110,10 @@ export default {
             case "create":
                 // this.album = {}
                 break
-            case "manage":
+            case "details":
+                this.currentGroupItem = this.groupItems.find((item) => {
+                    return item.id === parseInt(to.params.id)
+                })
                 // AlbumCollection.get(to.params.id).then((data) => {
                 //     this.album = data
                 // })
@@ -104,9 +142,24 @@ export default {
     }
 }
 
+section.sidebar {
+    background: linear-gradient(135deg, white, rgb(236, 240, 241));
+    margin: 10px;
+    padding: 20px;
+    flex-direction: column;
+    justify-content: center;
+    border-width: 2px;
+    border-style: solid;
+    border-color: rgba(52, 73, 94,1.0);
+}
+
 .action-list {
     display: flex;
     flex-direction: column;
+}
+
+.group-info {
+    flex: 1;
 }
 
 .icon-container {
