@@ -79,7 +79,6 @@ export default {
     }
     .default-preview {
         height: 230px;
-        height: 230px;
         i { font-size: 10rem; }
     }
 }

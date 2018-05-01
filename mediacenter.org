@@ -65,6 +65,14 @@
 **** TODO Uploading media items
 **** TODO full test coverage
 ** Priority 2 (necessary)
+*** Feed
+**** TODO Filtering interface
+**** TODO FeedItem collection
+**** TODO Image styling
+**** TODO figure out sharing Albums
+**** TODO Hyperlink styling
+**** TODO Blogpost styling
+
 *** Model/Collection
     don't make too many assumptions
 **** base class
@@ -79,7 +87,9 @@
      maybe extend jwt, idk
 **** TODO full test coverage
 
-*** 
+*** Media Browser
+**** TODO rest URI for current open album
+
 ** Priority 3 (backlog)
 *** pager.js
 **** TODO SmartPager used in media gallery
@@ -89,9 +99,18 @@
 *** Media Browser
 **** TODO moveable modal with window controls
 **** TODO applyEffects (low priority)
-*** Feed
-*** 
+**** TODO multiple media item rows
+
+*** AlbumBrowser???
+
+*** Gallery
+**** TODO improve Show Albums look and feel
+
 ** Priority 4 (enhancements)
+*** Notification system
+*** Gallery
+**** 
+
 *** TODO use TypeScript
 *** Chatlib
 **** TODO allow more than 2 users to video chat at once
@@ -121,7 +140,7 @@
 
 *** httputil
 **** better API handling, fetch Promise constructor with API i.e. fetchREST, fetchResource??
-*** 
+*** TODO better error/info message styles
 *** chatlib
 **** TODO full test coverage
 
@@ -130,7 +149,7 @@
     10,000+ users
 **** Theme selection
 **** Theme explorer
-*** 
+**** 
 *** 
 *** 
 *** 
@@ -148,4 +167,3 @@
 ** DONE switch to ECMAScript 6 for all frontend code
    CLOSED: [2017-03-13 Mon 19:34]
 
-* read *messages*

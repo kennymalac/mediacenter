@@ -1,7 +1,10 @@
 <template>
     <content-item :embed="embedProps">
-        <div slot="embed" slot-scope="{ slotProps }">
-        </div>
+        <template slot="embed" slot-scope="{ slotProps }">
+            <div class="default-preview" v-if="!embedProps.src">
+                <i class="ion-ios-image"></i>
+            </div>
+        </template>
     </content-item>
 </template>
 
@@ -16,7 +19,9 @@ export default {
     },
     data() {
         return {
-            embedProps: {}
+            embedProps: {
+                src: null
+            }
         }
     }
 }
