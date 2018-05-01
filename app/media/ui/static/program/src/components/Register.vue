@@ -1,50 +1,49 @@
 <template>
     <div>
-        <form @submit.prevent="register">
-            <div :class="info">
-                {{ infoBox.message }}
-            </div>
-
-            <fieldset>
-              <legend>User details</legend>
-                    <label for="name">Username</label>
-                    <input v-model="username" type="text" placeholder="Username">
-                    <label for="name">Display Name</label>
-                    <input v-model="first_name" id="first-name" type="text" placeholder="First Name">
-                    <input v-model="last_name" id="last-name" type="text" placeholder="Surname">
-                <!-- <div class="pure-control-group"> -->
-                <!--     <labe
-                <!--     <\!-- <select v-model="country" id="country"> -\-> -->
-                <!--     <\!--     <option v-for="country in countries" value="{country}">{{ country }}</option> -\-> -->
-                <!--     <\!-- </select> -\-> -->
-                <!-- </div> -->
-                    <label for="password">Password</label>
-                    <input v-model="password" id="password" type="password" placeholder="Password">
-                    <label for="retype-password">Re-type Password</label>
-                    <input v-model="retype_password" id="retype-password" type="password" placeholder="Password">
-                    <label for="email">Email Address</label>
-                    <input v-model="email" id="email" type="email" placeholder="Email Address">
-
-                    <label>
+        <div :class="info">
+            {{ infoBox.message }}
+        </div>
+        
+        <Modal :isOpen="isModalOpen" :onClose="closeModal" justifyContent="center" :titleProps="{ title: 'Register' }">
+            <form id="register-form" @submit.prevent="register">
+                <fieldset>
+                    <legend>User details</legend>
+                    <label class="stack" for="name">Username</label>
+                    <input class="stack" v-model="username" type="text" placeholder="Username">
+                    <label class="stack" for="name">Display Name</label>
+                    <input class="stack" v-model="first_name" id="first-name" type="text" placeholder="First Name">
+                    <input class="stack" v-model="last_name" id="last-name" type="text" placeholder="Last Name">
+                    <label class="stack" for="password">Password</label>
+                    <input class="stack" v-model="password" id="password" type="password" placeholder="Password">
+                    <label class="stack" for="retype-password">Re-type Password</label>
+                    <input class="stack" v-model="retype_password" id="retype-password" type="password" placeholder="Password">
+                    <label class="stack" for="email">Email Address</label>
+                    <input class="stack" v-model="email" id="email" type="email" placeholder="Email Address">
+                    
+                    <label class="stack">
                         <input name="subscribe" type="checkbox" />
                         <span class="checkable">I wish to subscribe to the mailing list</span>
                     </label>
                     
-                    <input v-model="subscribe" id="subscribe" type="checkbox"> 
+                    <input class="stack" v-model="subscribe" id="subscribe" type="checkbox">
+                    <!-- TODO must be over 13 -->
+                    <input class="stack" type="submit" text="Submit" />
                 </fieldset>
-
-
-                <!-- TODO must be over 13 -->
-                    <input type="submit" text="Submit" />
-            </fieldset>
-        </form>
+            </form>
+        </Modal>
     </div>
 </template>
 
 <script>
+import Modal from './Gui/Modal/Modal'
+
 export default {
+    components: {
+        Modal
+    },
     data() {
         return {
+            isModalOpen: true,
             infoBox: {
                 status: "",
                 message: ""
@@ -65,6 +64,9 @@ export default {
         }
     },
     methods: {
+        closeModal() {
+            this.isModalOpen = false
+        },
         register(data) {
             //"Please enter the following information below."
             fetch('/api/accounts/create', {
@@ -91,3 +93,15 @@ export default {
     }
 }
 </script>
+
+<style lang="scss">
+#register-form {
+    display: flex;
+    align-self: center;
+    width: 640px;
+    fieldset {
+        width: 100%;
+    }
+}
+</style>
+

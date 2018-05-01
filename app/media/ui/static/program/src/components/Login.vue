@@ -6,12 +6,12 @@
         
         <Modal :isOpen="isModalOpen" :onClose="closeModal" justifyContent="center" :titleProps="{ title: 'Login' }">
             
-            <form id="login-form" v-if="!loggedIn()" v-on:submit.prevent="login">
+            <form id="login-form" v-if="!loggedIn()" @submit.prevent="login">
                 <fieldset>
                     <input v-model="user.username" class="stack" type="text" placeholder="username" />
                     <input v-model="user.password" class="stack" type="password" placeholder="password" />
                     
-                    <label for="remember" class="stack" style="">
+                    <label for="remember" class="stack">
                         <input id="remember" type="checkbox">
                         <span class="checkable">Remember me</span>
                     </label>
@@ -21,11 +21,11 @@
                 <!-- {% csrf_token %} -->
             </form>
 
-        <div v-if="loggedIn()">
-          Welcome {{user.username}}!
-          <button @click="logout">Logout</button>
-        </div>
-    </Modal>
+            <div v-if="loggedIn()">
+              Welcome {{user.username}}!
+              <button @click="logout">Logout</button>
+            </div>
+        </Modal>
     </div>
 </template>
 
@@ -34,15 +34,11 @@ import auth from "../auth.js"
 import router from '../router/index.js'
 
 import Modal from './Gui/Modal/Modal'
-import ModalToolbar from './Gui/Modal/ModalToolbar'
-import ModalToolbarItem from './Gui/Modal/ModalToolbarItem'
 
 export default {
     //    props: ["embed"],
     components: {
-        Modal,
-        ModalToolbar,
-        ModalToolbarItem
+        Modal
     },
     data() {
         return {
