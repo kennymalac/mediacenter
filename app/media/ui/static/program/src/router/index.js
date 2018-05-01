@@ -7,6 +7,7 @@ import Chat from 'components/Chat'
 import Home from 'components/Home'
 import Gallery from 'components/Gallery'
 import Album from 'components/Album'
+import Group from 'components/Group/Group'
 
 Vue.use(Router)
 
@@ -53,6 +54,13 @@ export default new Router({
             path: '/register',
             name: 'Register',
             component: Register
+        },
+        {
+            path: '/group/:action',
+            name: 'Group',
+            component: Group,
+            props: restAction,
+            canReuse: false
         },
         {
             path: '/chat',

@@ -109,18 +109,20 @@ export default {
             if (!to) {
                 to = {params: {action: this.action, id: this.id}}
             }
-            if (to.params.action === "create") {
+            switch (to.params.action) {
+            case "create":
                 this.album = {}
-            }
-            if (to.params.action === "manage") {
+                break
+            case "manage":
                 AlbumCollection.get(to.params.id).then((data) => {
                     this.album = data
                 })
-            }
-            else if (to.params.action === "list") {
+                break
+            case "list":
                 AlbumCollection.searchAlbums().then((data) => {
                     this.albums = data
                 })
+                break
             }
         },
         createAlbum() {
