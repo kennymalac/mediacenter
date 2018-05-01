@@ -20,12 +20,15 @@
 **** TODO Clean up Feed UI
 
 *** Media Browser
-**** TODO Fix API
-**** TODO Fix media browser breaking entire app
+**** DONE Fix broken media item API
+     CLOSED: [2018-04-30 Mon 18:43]
+**** DONE Fix media browser breaking entire app
+     CLOSED: [2018-04-30 Mon 18:41]
 **** TODO playSlideshow
 **** DONE goForward/goBack
      CLOSED: [2017-05-13 Sat 12:47]
-**** TODO closeModal
+**** DONE closeModal
+     CLOSED: [2018-04-30 Mon 18:43]
 *** Authentication
 **** TODO connect with other media centers in some sort of Auth bridge
 **** DONE getActiveUser
@@ -55,7 +58,8 @@
 *** Album
 **** TODO CRUD
 ***** TODO Create
-***** TODO Read
+***** DONE Read
+      CLOSED: [2018-04-30 Mon 18:42]
 ***** TODO Update
 ***** TODO Delete
 **** TODO Uploading media items
