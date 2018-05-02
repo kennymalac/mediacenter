@@ -18,8 +18,8 @@
      CLOSED: [2018-04-30 Mon 18:30]
 **** DONE Modal without title should have normal titlebar 
      CLOSED: [2018-04-30 Mon 18:30]
-
-**** TODO Clean up Feed UI
+**** DONE Clean up Feed UI
+     CLOSED: [2018-05-02 Wed 15:13]
 
 *** Media Browser
 **** DONE Fix broken media item API
@@ -50,10 +50,11 @@
 **** DONE login embed/header view
      CLOSED: [2017-05-26 Fri 20:12]
 **** TODO login page
-**** Todo full test coverage
+**** TODO full test coverage
 *** Register
 **** TODO Functional register page
 **** TODO full test coverage
+**** TODO hide if logged in
 *** Gallery
 **** TODO 
 **** TODO full test coverage
@@ -77,6 +78,8 @@
 **** TODO cross-network groups
 *** Feed
 **** TODO Filtering interface
+**** DONE Feed collection
+     CLOSED: [2018-05-02 Wed 15:14]
 **** TODO FeedItem collection
 **** DONE Topic styling
      CLOSED: [2018-05-01 Tue 18:07]

@@ -19,14 +19,20 @@
                     </div>
                     <h2>{{ instance.name }}</h2>
                     <p class="description">{{ instance.description }}</p>
+
+                    <h3>Filters</h3>
+                    <feed-filter :specifiers="filters.contentTypes" :filterToggled="toggle" />
+                    <feed-filter :specifiers="filters.subjects" :filterToggled="toggle" />
+                    <feed-filter :specifiers="filters.interests" :filterToggled="toggle" />
+                    <feed-filter :specifiers="filters.tags" :filterToggled="toggle" />
                 </div>
             </section>
             
             <section class="feeds">
-                <feed-discussion-topic item="{}" />
-                <feed-image item="{}" />
-                <feed-image item="{}" />
-                <feed-image item="{}" />
+                <feed-discussion-topic v-if="enabledContentTypes.includes('Topics')" item="{}" />
+                <feed-image v-if="enabledContentTypes.includes('Images')" item="{}" />
+                <feed-image v-if="enabledContentTypes.includes('Images')" item="{}" />
+                <feed-image v-if="enabledContentTypes.includes('Images')" item="{}" />
             </section>
         </template>
     </div>
@@ -38,6 +44,7 @@ import FeedItem from './FeedItem'
 import FeedImage from './FeedContentItems/Image'
 import FeedDiscussionTopic from './FeedContentItems/DiscussionTopic'
 import ActionList from './ActionList'
+import FeedFilter from './FeedFilter'
 
 export default {
     name: 'feed',
@@ -46,7 +53,15 @@ export default {
         FeedItem,
         FeedImage,
         FeedDiscussionTopic,
-        ActionList
+        ActionList,
+        FeedFilter
+    },
+    computed: {
+        enabledContentTypes() {
+            return this.filters.contentTypes.map((contentType) => {
+                return contentType.enabled ? contentType.name : false
+            })
+        }
     },
     data() {
         return {
@@ -54,7 +69,7 @@ export default {
                 {
                     id: 1,
                     icon: "ion-ios-flask",
-                    name: "Memes",
+                    name: "Dank Meme Lab",
                     description: ""
                 }
             ],
@@ -68,7 +83,30 @@ export default {
                 //     icon: "ion-md-search",
                 //     title: "Find a Feed"
                 // }
-            ]
+            ],
+            filters: {
+                contentTypes: [
+                    {
+                        name: "Images",
+                        enabled: true
+                    },
+                    {
+                        name: "Hyperlinks",
+                        enabled: true
+                    },
+                    {
+                        name: "Blog Posts",
+                        enabled: true
+                    },
+                    {
+                        name: "Topics",
+                        enabled: true
+                    }
+                ],
+                subjects: [],
+                interests: [],
+                tags: []
+            }
         }
     },
     methods: {
@@ -84,19 +122,24 @@ export default {
             this.instance = this.objects.find((item) => {
                 return item.id === parseInt(params.id)
             })
+        },
+
+        toggle(event) {
+            console.log(event)
         }
     }
 }
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .feed-container {
     display: flex;
     flex-basis: 3;
     section.feeds {
         margin: 10px;
-        text-align: left;
         flex: 2;
     }
+}
+section.sidebar {
 }
 </style>

@@ -8,9 +8,9 @@
         </template>
         <template slot="embed" slot-scope="{ slotProps }">
             <div class="default-preview topic">
-                <quote>
+                <blockquote>
                     What do you guys think?
-                </quote>
+                </blockquote>
             </div>
         </template>
     </content-item>
