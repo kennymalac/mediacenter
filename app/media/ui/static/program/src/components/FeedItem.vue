@@ -1,17 +1,17 @@
 <template>
-    <action-button :link="groupLink" :image="image" :title="name" />
+    <action-button :link="feedLink" :icon="icon" :title="name" />
 </template>
 
 <script>
-import ActionButton from '../ActionButton'
+import ActionButton from './ActionButton'
 
 export default {
-    props: ['id', 'image', 'name'],
+    props: ['id', 'icon', 'name'],
     components: {
         ActionButton
     },
     computed: {
-        groupLink() {
+        feedLink() {
             return `${this.id}/details`
         }
     }

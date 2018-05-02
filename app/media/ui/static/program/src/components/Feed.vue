@@ -8,26 +8,17 @@
             <section class="feeds">
                 <h1>Your Feeds</h1>
                 
-                <feed-image item="{}" />
+                <feed-item v-for="feed in objects" v-bind="feed" />
             </section>
         </template>
         <template v-if="actions.details && instance.id">
             <section class="sidebar">
                 <div class="group-info">
                     <div class="icon-container">
-                        <img height="100%" width="100%" :src="instance.image" />
+                        <i v-if="instance.icon" :class="instance.icon"></i>
                     </div>
                     <h2>{{ instance.name }}</h2>
                     <p class="description">{{ instance.description }}</p>
-                    <div class="rules" v-if="instance.rules.length > 0">
-                        <h3>Rules</h3>
-                        <ol>
-                            <li v-for="rule in instance.rules">{{ rule }}</li>
-                        </ol>
-                    </div>
-                    <div class="who-is-online">
-                        <h3><div class="online-circle"></div> {{ onlineMembers.length }} User(s) online now</h3>
-                    </div>
                 </div>
             </section>
             
@@ -43,6 +34,7 @@
 
 <script>
 import RestfulComponent from "./RestfulComponent"
+import FeedItem from './FeedItem'
 import FeedImage from './FeedContentItems/Image'
 import FeedDiscussionTopic from './FeedContentItems/DiscussionTopic'
 import ActionList from './ActionList'
@@ -51,12 +43,21 @@ export default {
     name: 'feed',
     mixins: [RestfulComponent],
     components: {
+        FeedItem,
         FeedImage,
         FeedDiscussionTopic,
         ActionList
     },
     data() {
         return {
+            objects: [
+                {
+                    id: 1,
+                    icon: "ion-ios-flask",
+                    name: "Memes",
+                    description: ""
+                }
+            ],
             feedActions: [
                 {
                     icon: "ion-ios-list-box",
@@ -68,6 +69,21 @@ export default {
                 //     title: "Find a Feed"
                 // }
             ]
+        }
+    },
+    methods: {
+        initialState() {
+            
+        },
+
+        list() {
+
+        },
+
+        details(params) {
+            this.instance = this.objects.find((item) => {
+                return item.id === parseInt(params.id)
+            })
         }
     }
 }

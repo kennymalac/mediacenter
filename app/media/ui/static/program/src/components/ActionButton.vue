@@ -2,6 +2,7 @@
     <router-link class="action-button" :to="link">
         <div class="icon-container">
             <i v-if="icon" :class="icon"></i>
+            <img v-if="image" height="100%" width="100%" :src="image" />
         </div>
         <h2><i v-if="extraIcon" :class="extraIcon"></i> {{ title }}</h2>
     </router-link>
@@ -43,6 +44,7 @@ $shadow-color: rgba(0, 0, 0, .2);
 
 .action-button {
     background: linear-gradient(135deg, white, rgb(236, 240, 241));
+    color: rgb(52, 73, 94);
     margin: 10px;
     padding: 20px;
     h2 i {
