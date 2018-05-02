@@ -34,6 +34,9 @@
                             <li v-for="rule in currentGroupItem.rules">{{ rule }}</li>
                         </ol>
                     </div>
+                    <div class="who-is-online">
+                        <h3><div class="online-circle"></div> {{ onlineMembers.length }} User(s) online now</h3>
+                    </div>
                 </div>
             </section>
             <div class="group-contents">
@@ -68,12 +71,17 @@ export default {
                         "No spam",
                         "Coffee is evil!"
                     ],
+                    members: [
+                        {}
+                    ],
                     image: "https://www.sciencemediacentre.co.nz/wp-content/upload/2009/03/tea.jpg"
                 },
                 {
                     id: 2,
                     name: "Philosophy",
                     rules: [],
+                    members: [
+                    ],
                     image: "https://c1.staticflickr.com/5/4101/4870567608_69fbf87121_b.jpg"
                 }
             ]
@@ -87,6 +95,10 @@ export default {
                 manage: this.action === "manage",
                 create: this.action === "create"
             }
+        },
+        onlineMembers() {
+            // TODO
+            return this.currentGroupItem.members
         }
     },
     watch: {
@@ -132,6 +144,10 @@ export default {
 <style lang="scss">
 @import "~picnic/src/themes/default/_theme.scss";
 
+$light-green: #47d378;
+$dark-green: #2b9f67;
+$shadow-color: rgba(0, 0, 0, .2);
+
 .group-container {
     display: flex;
     flex-basis: 3;
@@ -140,6 +156,15 @@ export default {
         text-align: left;
         flex: 2;
     }
+}
+
+.online-circle {
+    display: inline-flex;
+    height: 16px;
+    width: 16px;
+    align-self: center;
+    border-radius: 50%;
+    background: radial-gradient($light-green 50%, $dark-green);
 }
 
 section.sidebar {
@@ -179,14 +204,15 @@ section.sidebar {
     border: 2px solid rgba(52, 73, 94,1.0);
     border-radius: 50%;
     transition: $picnic-transition;
-    
+
+    box-shadow: 0 3px 8px 0px $shadow-color;
 }
 .action-button {
     background: linear-gradient(135deg, white, rgb(236, 240, 241));
     margin: 10px;
     padding: 20px;
     h2 i {
-        color: #47d378;
+        color: $light-green;
     }
     display: flex;
     flex-direction: column;
@@ -196,7 +222,7 @@ section.sidebar {
     
     width: 400px;
     border-width: 2px;
-    border-color: #2b9f67;
+    border-color: $dark-green;
     border-style: solid;
     border-radius: 6px;
     
@@ -205,7 +231,7 @@ section.sidebar {
     &:hover, &:focus {
         box-shadow: inset 0 0 0 99em rgba(255, 255, 255, 0.35);
         .icon-container {
-            box-shadow: inset 0 0 0 99em rgba(255, 255, 255, 0.1);
+            opacity: .9;
         }
         cursor: pointer;
     }
@@ -213,7 +239,7 @@ section.sidebar {
         box-shadow: inset 0 0 0 99em rgba(52, 73, 94, 0.02);
         border-style: inset;
         .icon-container {
-            box-shadow: inset 0 0 0 99em rgba(52, 73, 94, 0.05);
+            opacity: .8;
             border-style: inset;
             img {
                 opacity: .8;

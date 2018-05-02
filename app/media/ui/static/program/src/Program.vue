@@ -31,13 +31,4 @@ $ionicons-font-path: "~ionicons/dist/fonts";
 @import "~ladda/css/ladda.scss";
 @import "classicTheme.scss";
 
-#program {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    text-align: center;
-    color: $subgray;
-    margin-top: 60px;
-}
-
-
 </style>

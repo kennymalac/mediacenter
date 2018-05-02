@@ -55,7 +55,8 @@ $title-height: 24px;
     
     .content-title {
         height: $title-height;
-        font-size: 1.4rem;
+        font-size: 1.5rem;
+        font-weight: lighter;
         width: 100%;
         color: rgb(52, 73, 94);
     }

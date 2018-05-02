@@ -11,6 +11,13 @@ $classicblue: #26619C;
 $classiclightblue: #1F8DD6;
 $classicgreen: #4F8A10;
 
+#program {
+    font-family: 'Open Sans', 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-align: center;
+    color: $subgray;
+    margin-top: 60px;
+}
 
 form {
     fieldset {
