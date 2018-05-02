@@ -1,20 +1,8 @@
 <template>
     <div class="group-container">
         <template v-if="actions.list">
-            <div class="action-list">
-                <div class="action-button">
-                    <div class="icon-container">
-                        <i class="ion-ios-people"></i>
-                    </div>
-                    <h2><i class="ion-md-add-circle"></i> Create a Group</h2>
-                </div>
-                <div class="action-button">
-                    <div class="icon-container">
-                        <i class="ion-md-search"></i>
-                    </div>
-                    <h2>Find a Group</h2>
-                </div>
-            </div>
+            <action-list :actions="groupActions" />
+
             <section class="groups">
                 <h1>Your Groups</h1>
                 <group-list :items="objects" />
@@ -52,13 +40,15 @@
 <script>
 import RestfulComponent from "../RestfulComponent"
 import GroupList from './GroupList'
-import FeedImage from '../FeedItems/Image'
+import FeedImage from '../FeedContentItems/Image'
+import ActionList from '../ActionList'
 
 export default {
     mixins: [RestfulComponent],
     components: {
         GroupList,
-        FeedImage
+        FeedImage,
+        ActionList
     },
     data() {
         return {
@@ -84,6 +74,19 @@ export default {
                     members: [
                     ],
                     image: "https://c1.staticflickr.com/5/4101/4870567608_69fbf87121_b.jpg"
+                }
+            ],
+            groupActions: [
+                {
+                    icon: "ion-ios-people",
+                    link: "group/create",
+                    title: "Create a Group",
+                    extraIcon: "ion-md-add-circle"
+                },
+                {
+                    link: "",
+                    icon: "ion-md-search",
+                    title: "Find a Group"
                 }
             ]
         }
@@ -153,73 +156,7 @@ section.sidebar {
     border-color: rgba(52, 73, 94,1.0);
 }
 
-.action-list {
-    display: flex;
-    flex-direction: column;
-}
-
 .group-info {
     flex: 1;
-}
-
-.icon-container {
-    background: linear-gradient(150deg, white, rgba(0, 31, 63, 0.2));
-    display: inline-flex;
-    width: 140px;
-    height: 140px;
-    align-items: center;
-    justify-content: center;
-    i {
-        font-size: 6rem;
-    }
-    img {
-        transition: $picnic-transition;
-        border-radius: 50%;
-    }
-    border: 2px solid rgba(52, 73, 94,1.0);
-    border-radius: 50%;
-    transition: $picnic-transition;
-
-    box-shadow: 0 3px 8px 0px $shadow-color;
-}
-.action-button {
-    background: linear-gradient(135deg, white, rgb(236, 240, 241));
-    margin: 10px;
-    padding: 20px;
-    h2 i {
-        color: $light-green;
-    }
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    user-select: none;
-    
-    width: 400px;
-    border-width: 2px;
-    border-color: $dark-green;
-    border-style: solid;
-    border-radius: 6px;
-    
-    transition: $picnic-transition;
-    
-    &:hover, &:focus {
-        box-shadow: inset 0 0 0 99em rgba(255, 255, 255, 0.35);
-        .icon-container {
-            opacity: .9;
-        }
-        cursor: pointer;
-    }
-    &:active {
-        box-shadow: inset 0 0 0 99em rgba(52, 73, 94, 0.02);
-        border-style: inset;
-        .icon-container {
-            opacity: .8;
-            border-style: inset;
-            img {
-                opacity: .8;
-            }
-        }
-    }
 }
 </style>

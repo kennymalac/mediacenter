@@ -41,9 +41,18 @@ export default new Router({
             component: Home
         },
         {
-            path: '/feed',
+            path: '/feed/:action',
             name: 'Feed',
-            component: Feed
+            component: Feed,
+            props: restAction,
+            canReuse: false
+        },
+        {
+            path: '/feed/:id/:action',
+            name: 'Feed',
+            component: Feed,
+            props: restAction,
+            canReuse: false
         },
         {
             path: '/login',

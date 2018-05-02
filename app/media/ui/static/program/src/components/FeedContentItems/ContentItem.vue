@@ -25,11 +25,11 @@
 </template>
 
 <script>
-import FeedItem from './mixins/FeedItem'
+import FeedContentItem from './mixins/FeedContentItem'
 
 export default {
     name: 'content-item',
-    mixins: [FeedItem],
+    mixins: [FeedContentItem],
     props: {
         embedProps: [Object]
     },
