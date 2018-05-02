@@ -17,21 +17,21 @@
             </div>
             <section class="groups">
                 <h1>Your Groups</h1>
-                <group-list :items="groupItems" />
+                <group-list :items="objects" />
             </section>
         </template>
-        <template v-if="actions.details && currentGroupItem.id">
+        <template v-if="actions.details && instance.id">
             <section class="sidebar">
                 <div class="group-info">
                     <div class="icon-container">
-                        <img height="100%" width="100%" :src="currentGroupItem.image" />
+                        <img height="100%" width="100%" :src="instance.image" />
                     </div>
-                    <h2>{{ currentGroupItem.name }}</h2>
-                    <p class="description">{{ currentGroupItem.description }}</p>
-                    <div class="rules" v-if="currentGroupItem.rules.length > 0">
+                    <h2>{{ instance.name }}</h2>
+                    <p class="description">{{ instance.description }}</p>
+                    <div class="rules" v-if="instance.rules.length > 0">
                         <h3>Rules</h3>
                         <ol>
-                            <li v-for="rule in currentGroupItem.rules">{{ rule }}</li>
+                            <li v-for="rule in instance.rules">{{ rule }}</li>
                         </ol>
                     </div>
                     <div class="who-is-online">
@@ -50,19 +50,20 @@
 </template>
 
 <script>
+import RestfulComponent from "../RestfulComponent"
 import GroupList from './GroupList'
 import FeedImage from '../FeedItems/Image'
 
 export default {
-    props: ['id', 'action'],
+    mixins: [RestfulComponent],
     components: {
         GroupList,
         FeedImage
     },
     data() {
         return {
-            currentGroupItem: { id: null },
-            groupItems: [
+            instance: { id: null },
+            objects: [
                 {
                     id: 1,
                     name: "Tea Lovers",
@@ -88,54 +89,28 @@ export default {
         }
     },
     computed: {
-        actions() {
-            return {
-                list: this.action === "list",
-                details: this.action === "details",
-                manage: this.action === "manage",
-                create: this.action === "create"
-            }
-        },
         onlineMembers() {
             // TODO
-            return this.currentGroupItem.members
+            return this.instance.members
         }
-    },
-    watch: {
-        '$route'(to, from) {
-            this.restAction(to)
-        }
-    },
-    mounted() {
-        this.restAction()
     },
     methods: {
         initialState() {
-            this.currentGroupItem = { id: null }
+            this.instance = { id: null }
         },
-        restAction(to) {
-            this.initialState()
-            if (!to) {
-                to = {params: {action: this.action, id: this.id}}
-            }
-            switch (to.params.action) {
-            case "create":
-                // this.album = {}
-                break
-            case "details":
-                this.currentGroupItem = this.groupItems.find((item) => {
-                    return item.id === parseInt(to.params.id)
-                })
-                // AlbumCollection.get(to.params.id).then((data) => {
-                //     this.album = data
-                // })
-                break
-            case "list":
-                // AlbumCollection.searchAlbums().then((data) => {
-                //     this.albums = data
-                // })
-                break
-            }
+
+        create() {
+            // TODO
+        },
+
+        details(params) {
+            this.instance = this.objects.find((item) => {
+                return item.id === parseInt(params.id)
+            })
+        },
+
+        list() {
+            // TODO
         }
     }
 }
