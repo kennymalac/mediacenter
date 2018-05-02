@@ -35,6 +35,12 @@ export default {
 </script>
 
 <style lang="scss">
+@import "~picnic/src/themes/default/_theme.scss";
+
+$light-green: #47d378;
+$dark-green: #2b9f67;
+$shadow-color: rgba(0, 0, 0, .2);
+
 .action-button {
     background: linear-gradient(135deg, white, rgb(236, 240, 241));
     margin: 10px;
