@@ -1,6 +1,6 @@
 <template>
     <div>
-        <feed-image item="{}" />
+        <feed-discussion-topic item="{}" />
         <feed-image item="{}" />
         <feed-image item="{}" />
         <feed-image item="{}" />
@@ -9,11 +9,13 @@
 
 <script>
 import FeedImage from './FeedItems/Image'
+import FeedDiscussionTopic from './FeedItems/DiscussionTopic'
 
 export default {
     name: 'feed',
     components: {
-        FeedImage
+        FeedImage,
+        FeedDiscussionTopic
     },
     data() {
         return {}

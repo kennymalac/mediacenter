@@ -59,6 +59,15 @@ $title-height: 24px;
         font-weight: lighter;
         width: 100%;
         color: rgb(52, 73, 94);
+        .content-type {
+            display: inline-flex;
+            border-radius: 6px;
+            background-color: #1F8DD6;
+            color: white;
+            font-weight: normal;
+            padding: 4px;
+            font-size: 1rem;
+         }
     }
     
     .actions {

@@ -72,11 +72,14 @@
 **** TODO basic UI
 **** TODO cross-network profiles
 *** Groups
-**** TODO basic UI
+**** DONE basic UI
+     CLOSED: [2018-05-01 Tue 18:07]
 **** TODO cross-network groups
 *** Feed
 **** TODO Filtering interface
 **** TODO FeedItem collection
+**** DONE Topic styling
+     CLOSED: [2018-05-01 Tue 18:07]
 **** TODO Image styling
 **** TODO figure out sharing Albums
 **** TODO Hyperlink styling
