@@ -242,6 +242,7 @@ class FeedSerializer(serializers.ModelSerializer):
         model = Feed
         fields = ('id', 'name', 'description', 'owner', 'content_types')
 
+
 class FeedContentItemSerializer(serializers.ModelSerializer):
     content_type = serializers.StringRelatedField(
         required=False
@@ -250,3 +251,21 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = FeedContentItem
         fields = ('id', 'title', 'description', 'owner', 'content_type')
+
+
+class GroupForumSerializer(serializers.ModelSerializer):
+    feed = FeedSerializer(
+        read_only=False
+    )
+
+    def create(self, validated_data):
+       feed = Feed.objects.create(**validated_data.pop('feed'))
+       members = validated_data.pop('members')
+       group = GroupForum.objects.create(**validated_data, feed=feed)
+       group.members.add(*members)
+
+       return group
+
+    class Meta:
+        model = GroupForum
+        fields = ('id', 'name', 'image', 'description', 'feed', 'owner', 'is_restricted', 'members', 'rules')

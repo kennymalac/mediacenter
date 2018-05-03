@@ -6,7 +6,7 @@ class AlbumCollection {
     static get(id) {
         // TODO verify id is integer (typescript)
         // TODO attach auth headers
-        return fetchAPI(`album/${id}`, {
+        return fetchAPI(`album/${id}/`, {
             method: "GET"
         })
             .then(jsonResponse)

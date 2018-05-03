@@ -47,8 +47,11 @@ $shadow-color: rgba(0, 0, 0, .2);
     color: rgb(52, 73, 94);
     margin: 10px;
     padding: 20px;
-    h2 i {
-        color: $light-green;
+    h2 {
+        min-height: 2.7em;
+        i {
+            color: $light-green;
+        }
     }
     display: inline-flex;
     flex-direction: column;

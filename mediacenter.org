@@ -1,4 +1,6 @@
 * useful copypaste
+**** TODO model, serializer, viewset
+**** TODO CRUD
 ***** TODO Create
 ***** TODO Read
 ***** TODO Update
@@ -78,6 +80,16 @@
 **** DONE basic UI
      CLOSED: [2018-05-01 Tue 18:07]
 **** TODO cross-network groups
+**** DONE model, serializer, viewset
+     CLOSED: [2018-05-03 Thu 10:32]
+**** TODO CRUD
+***** DONE Create
+      CLOSED: [2018-05-03 Thu 13:16]
+***** DONE Read
+      CLOSED: [2018-05-03 Thu 13:16]
+***** TODO Update
+***** TODO Delete
+
 *** Feed
 **** TODO CRUD
 ***** DONE Create
@@ -87,6 +99,8 @@
 ***** TODO Update
 ***** TODO Delete
 
+**** DONE model, serializer, viewset
+     CLOSED: [2018-05-02 Wed 14:32]
 **** TODO Filtering interface
 **** DONE Feed collection
      CLOSED: [2018-05-02 Wed 15:14]

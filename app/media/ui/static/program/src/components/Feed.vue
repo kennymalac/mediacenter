@@ -28,13 +28,12 @@
                 </div>
             </section>
             
-            <section class="feeds">
-                <feed-discussion-topic v-for="topic in topics" v-if="enabledContentTypes.includes('Topics')" v-bind="topic" />
-                <feed-image v-for="image in images" v-if="enabledContentTypes.includes('Images')" v-bind="image" />
+            <section class="feed">
+                <feed-content-item-list :enabledContentTypes="enabledContentTypes" :items="contentItems" />
             </section>
         </template>
         <template v-if="actions.create || actions.manage">
-            <form class="main-form" @submit.prevent="save" v-if="actions.manage || actions.create">
+            <form class="main-form" @submit.prevent="save">
                 <fieldset>
                     <legend class="stack">Details</legend>
                     <label class="stack" for="name">Name</label>
@@ -56,8 +55,7 @@ import RestfulComponent from "./RestfulComponent"
 import {FeedCollection, FeedModel} from "../models/Feed.js"
 
 import FeedItem from './FeedItem'
-import FeedImage from './FeedContentItems/Image'
-import FeedDiscussionTopic from './FeedContentItems/DiscussionTopic'
+import FeedContentItemList from './FeedContentItemList'
 import ActionList from './ActionList'
 import FeedFilter from './FeedFilter'
 
@@ -68,8 +66,7 @@ export default {
     mixins: [RestfulComponent],
     components: {
         FeedItem,
-        FeedImage,
-        FeedDiscussionTopic,
+        FeedContentItemList,
         ActionList,
         FeedFilter
     },
@@ -78,21 +75,6 @@ export default {
             return this.filters.contentTypes.map((contentType) => {
                 return contentType.enabled ? contentType.name : false
             })
-        },
-        images() {
-            return this.listContent("img")
-        },
-        videos() {
-            return this.listContent("vid")
-        },
-        topics() {
-            return this.listContent("topic")
-        },
-        links() {
-            return this.listContent("link")
-        },
-        blogPosts() {
-            return this.listContent("blgpst")
         }
     },
     data() {
@@ -183,17 +165,10 @@ export default {
                 })
         },
         
-        listContent(contentType) {
-            return this.contentItems.filter((item) => {
-                return item.content_type === contentType ? item : false
-            })
-        },
-        
         save() {
             if (this.actions.create) {
                 this.createFeed().then(this.$nextTick(() => {
                     router.replace('/feed/' + this.instance.id + '/manage')
-                    // Ready to upload media items
                 }))
             }
         }
@@ -207,7 +182,7 @@ export default {
     flex-direction: row;
     justify-content: center;
     // flex-basis: 3;
-    section.feeds {
+    section.feed .feed-list {
         margin: 10px;
         flex: 2;
     }

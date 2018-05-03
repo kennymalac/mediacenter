@@ -27,6 +27,9 @@ router.register(r'feed', FeedViewSet, base_name='feed')\
           parents_query_lookups=['feed']
       )
 
+router.register(r'group', GroupForumViewSet, base_name='group')
+
+
 urlpatterns = [
     url(r'^$', VueView.as_view()),
     url(r'^admin/', admin.site.urls),

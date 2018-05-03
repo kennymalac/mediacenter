@@ -1,10 +1,11 @@
+import {Model} from './Model.js'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 
 class FeedCollection {
     static get(id) {
         // TODO verify id is integer (typescript)
         // TODO attach auth headers
-        return fetchAPI(`feed/${id}`, {
+        return fetchAPI(`feed/${id}/`, {
             method: "GET"
         })
             .then(jsonResponse)
@@ -42,10 +43,10 @@ class FeedCollection {
 
 }
 
-class FeedModel {
+class FeedModel extends Model {
 
     static initialState = {
-        id: null,
+        id: 0,
         name: '',
         description: '',
         tags: [],

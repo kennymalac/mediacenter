@@ -102,6 +102,17 @@ class FeedContentItemViewSet(NestedViewSetMixin,
     queryset = FeedContentItem.objects.all()
     serializer_class = FeedContentItemSerializer
 
+
+class GroupForumViewSet(NestedViewSetMixin,
+                        ListModelMixin,
+                        RetrieveModelMixin,
+                        CreateModelMixin,
+                        GenericViewSet):
+
+    queryset = GroupForum.objects.all()
+    serializer_class = GroupForumSerializer
+
+
 # @api_view
 # def media_image_src(request):
 #     # request.query_params[]

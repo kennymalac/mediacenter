@@ -1,9 +1,10 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.contrib.postgres.fields import JSONField
+from django.contrib.postgres.fields import JSONField, ArrayField
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+
 from django_countries.fields import CountryField
 from guardian.mixins import GuardianUserMixin
 
@@ -137,6 +138,21 @@ class FeedContentItem(models.Model):
     content_type = models.ForeignKey(FeedContentItemType, related_name="+")
     title = models.CharField(max_length=140, blank=True)
     description = models.TextField(blank=True)
+
+
+class GroupForum(models.Model):
+    owner = models.ForeignKey(Account, related_name="owned_groups")
+    name = models.CharField(max_length=140, blank=True)
+    description = models.TextField(blank=True)
+    rules = ArrayField(
+        models.TextField(blank=True),
+        default=[]
+    )
+    # interests = models.ManyToManyField(Interest, related_name='+')
+    feed = models.ForeignKey(Feed)
+    image = models.URLField(blank=True)
+    is_restricted = models.BooleanField(default=False)
+    members = models.ManyToManyField(Account)
 
 
 class Media(models.Model):

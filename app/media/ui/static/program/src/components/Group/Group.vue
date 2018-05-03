@@ -2,7 +2,7 @@
     <div class="group-container">
         <template v-if="actions.list">
             <action-list :actions="groupActions" />
-
+            
             <section class="groups">
                 <h1>Your Groups</h1>
                 <group-list :items="objects" />
@@ -28,58 +28,75 @@
                 </div>
             </section>
             <div class="group-contents">
-                <feed-image item="{}" />
-                <feed-image item="{}" />
-                <feed-image item="{}" />
-                <feed-image item="{}" />
+                <section class="feed">
+                    <feed-content-item-list :items="contentItems" />
+                </section>
             </div>
+        </template>
+        <template v-if="actions.create || actions.manage">
+            <form class="main-form" @submit.prevent="save">
+                <fieldset>
+                    <legend class="stack">Details</legend>
+                    <label class="stack" for="name">Name</label>
+                    <input class="stack" name="name" v-model="instance.name" type="text" />
+                    <label class="stack" for="description">Description</label>
+                    <textarea class="stack" name="description" v-model="instance.description" />
+                    <label class="stack" for="image">Image</label>
+                    <input class="stack" name="image" v-model="instance.image" type="text" />
+                    <!-- <label class="stack" for="rules">Rules</label>
+                         TODO rules -->
+                    <label class="stack" for="members"></label>
+                    <select class="stack" name="members" multiple v-model="instance.members">
+                        <option value="1">Ken</option>
+                    </select>
+
+                    <!-- <label class="stack" for="">Tags</label> -->
+                    <!-- <input class="stack" name="tags" v-model="instance.tags_raw" type="text" /> -->
+                    <input v-if="actions.create" class="stack" type="submit" value="Create" />
+                    <input v-if="actions.manage" class="stack" type="submit" value="Save changes" />
+                </fieldset>
+            </form>
         </template>
     </div>
 </template>
 
 <script>
 import RestfulComponent from "../RestfulComponent"
+import {GroupCollection, GroupModel} from '../../models/Group.js'
+import {FeedModel} from '../../models/Feed.js'
+
 import GroupList from './GroupList'
-import FeedImage from '../FeedContentItems/Image'
+import FeedContentItemList from '../FeedContentItemList'
+import FeedFilter from '../FeedFilter'
 import ActionList from '../ActionList'
+
+import router from "../../router/index.js"
+import auth from "../../auth.js"
 
 export default {
     mixins: [RestfulComponent],
     components: {
         GroupList,
-        FeedImage,
+        FeedContentItemList,
+        FeedFilter,
         ActionList
+    },
+    computed: {
+        onlineMembers() {
+            // TODO
+            return this.instance.members
+        },
+        enabledContentTypes() {
+            return []
+        }
     },
     data() {
         return {
             instance: { id: null },
-            objects: [
-                {
-                    id: 1,
-                    name: "Tea Lovers",
-                    description: "A place for teaheads.",
-                    rules: [
-                        "No spam",
-                        "Coffee is evil!"
-                    ],
-                    members: [
-                        {}
-                    ],
-                    image: "https://www.sciencemediacentre.co.nz/wp-content/upload/2009/03/tea.jpg"
-                },
-                {
-                    id: 2,
-                    name: "Philosophy",
-                    rules: [],
-                    members: [
-                    ],
-                    image: "https://c1.staticflickr.com/5/4101/4870567608_69fbf87121_b.jpg"
-                }
-            ],
             groupActions: [
                 {
                     icon: "ion-ios-people",
-                    link: "group/create",
+                    link: "create",
                     title: "Create a Group",
                     extraIcon: "ion-md-add-circle"
                 },
@@ -88,32 +105,66 @@ export default {
                     icon: "ion-md-search",
                     title: "Find a Group"
                 }
-            ]
-        }
-    },
-    computed: {
-        onlineMembers() {
-            // TODO
-            return this.instance.members
+            ],
+            feed: {},
+            contentItems: []
         }
     },
     methods: {
         initialState() {
-            this.instance = { id: null }
+            this.instance = GroupModel.initialState
+        },
+        
+        create() {
+            this.instance = GroupModel.getNewInstance()
+            this.instance.feed = FeedModel.getNewInstance()
+            this.instance.owner = auth.getActiveUser().details.id
         },
 
-        create() {
-            // TODO
+        manage() {
+            
+        },
+
+        list(params) {
+            return GroupCollection.searchGroups().then((data) => {
+                this.objects = data
+            })
         },
 
         details(params) {
             this.instance = this.objects.find((item) => {
                 return item.id === parseInt(params.id)
             })
+            GroupCollection.get(this.instance.id)
+                .then((data) => {
+                    this.instance = data
+                    // TODO filtering
+                    this.feed = data.feed
+                    FeedModel.listItems(data.feed.id, {})
+                        .then((contentData) => {
+                            this.contentItems = contentData
+                        })
+                })
         },
 
-        list() {
-            // TODO
+        createGroup() {
+            return GroupCollection.create(this.instance)
+                .then((data) => {
+                    this.instance = data
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+        },
+
+        save() {
+            if (this.actions.create) {
+                this.createGroup().then(this.$nextTick(() => {
+                    this.list().then(() => {
+                        router.replace('/group/' + this.instance.id + '/manage')
+                    })
+                }))
+            }
         }
     }
 }
@@ -137,12 +188,16 @@ $shadow-color: rgba(0, 0, 0, .2);
 }
 
 .online-circle {
-    display: inline-flex;
+   display: inline-flex;
     height: 16px;
     width: 16px;
     align-self: center;
     border-radius: 50%;
     background: radial-gradient($light-green 50%, $dark-green);
+}
+
+.main-form {
+    select { margin: 10px 0; }
 }
 
 section.sidebar {
