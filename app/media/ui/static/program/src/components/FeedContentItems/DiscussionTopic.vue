@@ -1,15 +1,15 @@
 <template>
-    <content-item :embed="embedProps">
+    <content-item :embed="embedProps" :title="title">
         <template slot="title" slot-scope="{ slotProps }">
             <div class="content-title">
                 <span class="content-type">Topic</span>
-                How do you like it?
+                {{ title }}
             </div>
         </template>
         <template slot="embed" slot-scope="{ slotProps }">
             <div class="default-preview topic">
                 <blockquote>
-                    What do you guys think?
+                    {{ description }}
                 </blockquote>
             </div>
         </template>
@@ -21,6 +21,19 @@ import ContentItem from './ContentItem'
 
 export default {
     name: 'feed-discussion-topic',
+    props: {
+        title: {
+            type: String,
+            default: ""
+        },
+        description: {
+            type: String,
+            default: ""
+        },
+        owner: {
+            type: Number
+        }
+    },
     components: {
         ContentItem
     },

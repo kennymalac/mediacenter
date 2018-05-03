@@ -1,5 +1,5 @@
 <template>
-    <content-item :embed="embedProps">
+    <content-item :embed="embedProps" :title="title">
         <template slot="embed" slot-scope="{ slotProps }">
             <div class="default-preview" v-if="!embedProps.src">
                 <i class="ion-ios-image"></i>
@@ -14,6 +14,19 @@ import ContentItem from './ContentItem'
 
 export default {
     name: 'feed-image',
+    props: {
+        title: {
+            type: String,
+            default: ""
+        },
+        description: {
+            type: String,
+            default: ""
+        },
+        owner: {
+            type: Number
+        }
+    },
     components: {
         ContentItem
     },

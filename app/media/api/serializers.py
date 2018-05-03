@@ -233,8 +233,7 @@ class AlbumCreateSerializer(serializers.ModelSerializer):
 
 
 class FeedSerializer(serializers.ModelSerializer):
-    content_types = serializers.PrimaryKeyRelatedField(
-        queryset=FeedContentItemType.objects.all(),
+    content_types = serializers.StringRelatedField(
         many=True,
         required=False
     )
@@ -244,6 +243,10 @@ class FeedSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'owner', 'content_types')
 
 class FeedContentItemSerializer(serializers.ModelSerializer):
+    content_type = serializers.StringRelatedField(
+        required=False
+    )
+
     class Meta:
         model = FeedContentItem
         fields = ('id', 'title', 'description', 'owner', 'content_type')

@@ -72,11 +72,9 @@ class FeedModel {
     }
 
     static listItems(feedId, params) {
+        console.log(params)
         return makeJsonRequest(`feed/${feedId}/content/`, {
-            method: "POST",
-            body: {
-                ...params
-            }
+            method: "GET"
         })
             .then(jsonResponse)
 

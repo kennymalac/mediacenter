@@ -2,7 +2,7 @@
     <div class="content-item">
         <slot name="title">
             <div class="content-title">
-                Test by <a href="#" @click.native="userProfile" class="author">@datboi</a>
+                {{ title }} <a href="#" @click.native="userProfile" class="author">@datboi</a>
             </div>
         </slot>
         <slot name="embed" :slotProps="embedProps">
@@ -31,6 +31,10 @@ export default {
     name: 'content-item',
     mixins: [FeedContentItem],
     props: {
+        title: {
+            type: String,
+            default: ""
+        },
         embedProps: [Object]
     },
     methods: {

@@ -1,7 +1,9 @@
 <script>
 export default {
     props: {
-        item: [Object],
+        id: {
+            type: Number
+        },
         created: {
             type: Object,
             default: {}

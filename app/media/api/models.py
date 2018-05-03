@@ -120,13 +120,16 @@ class FeedContentItemType(models.Model):
     )
     name = models.CharField(max_length=6, choices=CONTENT_TYPES)
 
+    def __str__(self):
+        return self.name
 
 class Feed(models.Model):
-    owner = models.ForeignKey(Account, blank=True)
+    owner = models.ForeignKey(Account, null=True)
     name = models.CharField(max_length=140, blank=True)
     description = models.TextField(blank=True)
     content_types = models.ManyToManyField(FeedContentItemType, related_name='+')
     # interests = models.ManyToManyField(Interest, related_name='+')
+    content = models.ManyToManyField('api.FeedContentItem')
 
 
 class FeedContentItem(models.Model):
