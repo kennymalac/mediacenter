@@ -104,6 +104,38 @@ mediaChoices = (
     # ('W', "PHOTO EMBED")
 )
 
+
+class FeedContentItemType(models.Model):
+    IMAGE = 'img'
+    VIDEO = 'vid'
+    LINK = 'link'
+    BLOGPOST = 'blgpst'
+    TOPIC = 'topic'
+    CONTENT_TYPES = (
+        ('image', IMAGE),
+        ('video', VIDEO),
+        ('link', LINK),
+        ('topic', TOPIC),
+        ('blogpost', BLOGPOST),
+    )
+    name = models.CharField(max_length=6, choices=CONTENT_TYPES)
+
+
+class Feed(models.Model):
+    owner = models.ForeignKey(Account, blank=True)
+    name = models.CharField(max_length=140, blank=True)
+    description = models.TextField(blank=True)
+    content_types = models.ManyToManyField(FeedContentItemType, related_name='+')
+    # interests = models.ManyToManyField(Interest, related_name='+')
+
+
+class FeedContentItem(models.Model):
+    owner = models.ForeignKey(Account, blank=True)
+    content_type = models.ForeignKey(FeedContentItemType, related_name="+")
+    title = models.CharField(max_length=140, blank=True)
+    description = models.TextField(blank=True)
+
+
 class Media(models.Model):
     album = models.ForeignKey(Album, blank=True)
     title = models.CharField(max_length=140, blank=True)

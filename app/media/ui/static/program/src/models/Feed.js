@@ -28,9 +28,7 @@ class FeedCollection {
             .then(jsonResponse)
     }
 
-    static searchFeeds() {
-        var params = {}
-
+    static searchFeeds(params) {
         return fetchAPI(`feed/`, {
             method: "GET",
             data: params
@@ -71,6 +69,20 @@ class FeedModel {
             headers: makeHeaders({}),
             body: form
         })
+    }
+
+    static listItems(feedId, params) {
+        return makeJsonRequest(`feed/${feedId}/content/`, {
+            method: "POST",
+            body: {
+                ...params
+            }
+        })
+            .then(jsonResponse)
+
+            .then((data) => {
+                return data
+            })
     }
 }
 

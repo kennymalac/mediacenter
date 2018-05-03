@@ -82,6 +82,26 @@ class MediaViewSet(NestedViewSetMixin,
     pagination_class = AlbumMediaBrowserPagination
 
 
+class FeedViewSet(NestedViewSetMixin,
+                  ListModelMixin,
+                  RetrieveModelMixin,
+                  CreateModelMixin,
+                  GenericViewSet):
+    # TODO Federated - users seize the means of feed production
+
+    queryset = Feed.objects.all()
+    serializer_class = FeedSerializer
+
+
+class FeedContentItemViewSet(NestedViewSetMixin,
+                             ListModelMixin,
+                             RetrieveModelMixin,
+                             CreateModelMixin,
+                             GenericViewSet):
+
+    queryset = FeedContentItem.objects.all()
+    serializer_class = FeedContentItemSerializer
+
 # @api_view
 # def media_image_src(request):
 #     # request.query_params[]

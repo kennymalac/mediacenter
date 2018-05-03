@@ -40,6 +40,8 @@
 
 <script>
 import RestfulComponent from "./RestfulComponent"
+import {FeedCollection, FeedModel} from "../models/Feed.js"
+
 import FeedItem from './FeedItem'
 import FeedImage from './FeedContentItems/Image'
 import FeedDiscussionTopic from './FeedContentItems/DiscussionTopic'
@@ -61,6 +63,21 @@ export default {
             return this.filters.contentTypes.map((contentType) => {
                 return contentType.enabled ? contentType.name : false
             })
+        },
+        images() {
+            return this.listContent("image")
+        },
+        videos() {
+            return this.listContent("video")
+        },
+        topics() {
+            return this.listContent("topic")
+        },
+        links() {
+            return this.listContent("link")
+        },
+        blogPosts() {
+            return this.listContent("blogpost")
         }
     },
     data() {
@@ -106,7 +123,8 @@ export default {
                 subjects: [],
                 interests: [],
                 tags: []
-            }
+            },
+            contentItems: []
         }
     },
     methods: {
@@ -115,17 +133,32 @@ export default {
         },
 
         list() {
-
+            
         },
 
         details(params) {
             this.instance = this.objects.find((item) => {
                 return item.id === parseInt(params.id)
             })
+            FeedCollection.get(this.instance.id)
+                .then((data) => {
+                    this.instance = data
+                    // TODO filtering
+                    FeedModel.listItems(data.id, {})
+                        .then((contentData) => {
+                            this.contentItems = contentData.results
+                        })
+                })
         },
 
         toggle(event) {
             console.log(event)
+        },
+
+        listContent(contentType) {
+            return this.contentItems.filter((item) => {
+                return item.content_type === contentType ? item : false
+            })
         }
     }
 }

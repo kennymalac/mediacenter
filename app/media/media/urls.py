@@ -19,7 +19,13 @@ router.register(r'album', AlbumViewSet, base_name='album')\
           base_name='albums-media',
           parents_query_lookups=['album']
       )
-
+router.register(r'feed', FeedViewSet, base_name='feed')\
+      .register(
+          r'content',
+          FeedContentItemViewSet,
+          base_name='content',
+          parents_query_lookups=['feed']
+      )
 
 urlpatterns = [
     url(r'^$', VueView.as_view()),
