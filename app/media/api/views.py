@@ -89,7 +89,7 @@ class FeedViewSet(NestedViewSetMixin,
                   GenericViewSet):
     # TODO Federated - users seize the means of feed production
 
-    queryset = Feed.objects.all()
+    queryset = Feed.objects.filter(groupforum__isnull=True)
     serializer_class = FeedSerializer
 
 

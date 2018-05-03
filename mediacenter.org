@@ -76,7 +76,17 @@
 *** User Profiles
 **** TODO basic UI
 **** TODO cross-network profiles
+
+*** FeedContentItems
+**** TODO CRUD
+***** TODO Create
+***** TODO Read
+***** TODO Update
+***** TODO Delete
+
+
 *** Groups
+**** TODO Creating FeedContentItems
 **** DONE basic UI
      CLOSED: [2018-05-01 Tue 18:07]
 **** TODO cross-network groups
@@ -89,6 +99,7 @@
       CLOSED: [2018-05-03 Thu 13:16]
 ***** TODO Update
 ***** TODO Delete
+
 
 *** Feed
 **** TODO CRUD

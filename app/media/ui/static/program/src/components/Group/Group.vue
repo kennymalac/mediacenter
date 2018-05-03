@@ -29,7 +29,7 @@
             </section>
             <div class="group-contents">
                 <section class="feed">
-                    <feed-content-item-list :items="contentItems" />
+                    <feed-content-item-list :items="contentItems" :enabledContentTypes="enabledContentTypes" />
                 </section>
             </div>
         </template>
@@ -87,7 +87,7 @@ export default {
             return this.instance.members
         },
         enabledContentTypes() {
-            return []
+            return ["Topics"]
         }
     },
     data() {
@@ -106,13 +106,13 @@ export default {
                     title: "Find a Group"
                 }
             ],
-            feed: {},
             contentItems: []
         }
     },
     methods: {
         initialState() {
             this.instance = GroupModel.initialState
+            this.contentItems = []
         },
         
         create() {
