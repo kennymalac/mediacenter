@@ -5,8 +5,12 @@ from media.settings.base import *
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'sqlite'
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'mediacenter',
+        'USER': 'mediacenter',
+        'PASSWORD': 'test123',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
