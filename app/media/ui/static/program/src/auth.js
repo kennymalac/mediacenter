@@ -1,3 +1,6 @@
+import {API_URL} from 'config.js'
+import {makeJsonRequest, jsonResponse, fetchAPI} from './httputil.js'
+
 class Auth {
     constructor() {
         // Used for identifying local storage of user keys
@@ -73,25 +76,14 @@ class Auth {
     }
 
     login(username, password, errorCallback) {
-        return fetch('/api-token-auth/', {
+        return makeJsonRequest('api-token-auth/', {
             method: 'POST',
-            headers: new Headers({
-                "Content-Type": "application/json"
-            }),
-            body: JSON.stringify({
+            body: {
                 username: username,
                 password: password
-            })
-        })
-            .then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json()
-                } else {
-                    var error = new Error(response.statusText)
-                    error.response = response
-                    throw error
-                }
-            })
+            }
+        }, `${API_URL}/`)
+            .then(jsonResponse)
             .then((data) => {
                 let token = data.token
                 this.currentSession.user.token = token
@@ -123,20 +115,12 @@ class Auth {
     getProfile(errorCallback) {
         let headers = {}
         this.authenticate(headers)
-        return fetch('/api/accounts/current-user/', {
+        return fetchAPI('accounts/current-user/', {
             method: 'GET',
             // Get authentication headers
             headers: headers
         })
-            .then((response) => {
-                if (response.status >= 200 && response.status < 300) {
-                    return response.json()
-                } else {
-                    var error = new Error(response.statusText)
-                    error.response = response
-                    throw error
-                }
-            })
+            .then(jsonResponse)
             .then((data) => {
                 this.currentSession.user.details = data
             })

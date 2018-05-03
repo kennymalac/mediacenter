@@ -45,6 +45,8 @@
       CLOSED: [2017-05-13 Sat 12:39]
 **** TODO refreshToken
 **** TODO getPrivileges
+**** DONE fix auth on dev server
+     CLOSED: [2018-05-03 Thu 09:34]
 **** TODO full test coverage
 *** Login
 **** DONE login embed/header view
@@ -77,6 +79,14 @@
      CLOSED: [2018-05-01 Tue 18:07]
 **** TODO cross-network groups
 *** Feed
+**** TODO CRUD
+***** DONE Create
+      CLOSED: [2018-05-02 Wed 20:34]
+***** DONE Read
+      CLOSED: [2018-05-02 Wed 20:34]
+***** TODO Update
+***** TODO Delete
+
 **** TODO Filtering interface
 **** DONE Feed collection
      CLOSED: [2018-05-02 Wed 15:14]

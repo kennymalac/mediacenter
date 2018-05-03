@@ -5,13 +5,13 @@ export const defaultJsonHeaders = {
     "Content-Type": "application/json"
 }
 
-export function makeJsonRequest(uri, params) {
+export function makeJsonRequest(uri, params, baseUrl) {
     const {method, body} = params
     return fetchAPI(uri, {
         method: method,
         headers: makeHeaders(defaultJsonHeaders),
         body: JSON.stringify(body)
-    })
+    }, baseUrl)
 }
 
 export function makeHeaders(headers, needsAuthentication = true) {
@@ -32,6 +32,6 @@ export function jsonResponse(response) {
     }
 }
 
-export function fetchAPI(uri, params) {
-    return fetch(`${API_URL}/api/${uri}`, params)
+export function fetchAPI(uri, params, baseUrl = `${API_URL}/api/`) {
+    return fetch(`${baseUrl}${uri}`, params)
 }

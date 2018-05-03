@@ -50,7 +50,7 @@ $shadow-color: rgba(0, 0, 0, .2);
     h2 i {
         color: $light-green;
     }
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
