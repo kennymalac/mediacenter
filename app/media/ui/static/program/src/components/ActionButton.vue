@@ -68,6 +68,7 @@ $shadow-color: rgba(0, 0, 0, .2);
         box-shadow: inset 0 0 0 99em rgba(255, 255, 255, 0.35);
         .icon-container {
             opacity: .9;
+            box-shadow: 0 3px 8px 0px rgba(0, 0, 0, .3);
         }
         cursor: pointer;
     }
