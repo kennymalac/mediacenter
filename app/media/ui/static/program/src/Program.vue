@@ -32,3 +32,4 @@ $ionicons-font-path: "~ionicons/dist/fonts";
 @import "classicTheme.scss";
 
 </style>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

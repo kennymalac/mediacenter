@@ -40,6 +40,8 @@
                     <input class="stack" name="name" v-model="instance.name" type="text" />
                     <label class="stack" for="description">Description</label>
                     <textarea class="stack" name="description" v-model="instance.description" />
+                    <feed-content-type-select v-model="instance.content_types" />
+
                     <!-- <label class="stack" for="">Tags</label> -->
                     <!-- <input class="stack" name="tags" v-model="instance.tags_raw" type="text" /> -->
                     <input v-if="actions.create" class="stack" type="submit" value="Create" />
@@ -56,6 +58,7 @@ import {FeedCollection, FeedModel} from "../models/Feed.js"
 
 import FeedItem from './FeedItem'
 import FeedContentItemList from './FeedContentItemList'
+import FeedContentTypeSelect from './FeedContentTypeSelect'
 import ActionList from './ActionList'
 import FeedFilter from './FeedFilter'
 
@@ -67,6 +70,7 @@ export default {
     components: {
         FeedItem,
         FeedContentItemList,
+        FeedContentTypeSelect,
         ActionList,
         FeedFilter
     },
@@ -122,9 +126,9 @@ export default {
             this.instance = { id: null }
             this.contentItems = []
         },
-        
+
         create() {
-            this.instance = {}
+            this.instance = { content_types: [] }
         },
         
         list(params) {

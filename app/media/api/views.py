@@ -82,6 +82,14 @@ class MediaViewSet(NestedViewSetMixin,
     pagination_class = AlbumMediaBrowserPagination
 
 
+
+class FeedContentTypeViewSet(ListModelMixin,
+                  RetrieveModelMixin,
+                  GenericViewSet):
+    queryset = FeedContentItemType.objects.all()
+    serializer_class = FeedContentItemTypeSerializer
+
+
 class FeedViewSet(NestedViewSetMixin,
                   ListModelMixin,
                   RetrieveModelMixin,

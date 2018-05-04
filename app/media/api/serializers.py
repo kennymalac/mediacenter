@@ -232,8 +232,15 @@ class AlbumCreateSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'description', 'owner', 'tags')
 
 
+class FeedContentItemTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FeedContentItemType
+        fields = ('id', 'name')
+
+
 class FeedSerializer(serializers.ModelSerializer):
-    content_types = serializers.StringRelatedField(
+    content_types = serializers.PrimaryKeyRelatedField(
+        queryset=FeedContentItemType.objects.all(),
         many=True,
         required=False
     )

@@ -10,7 +10,7 @@
 
 * August 1st - Early Access
 
-* Frontend TODO
+* TODOs
 ** Priority 1 (urgent)
 *** UI/UX fixes
 **** DONE convert Modal to flexbox
@@ -77,13 +77,18 @@
 **** TODO basic UI
 **** TODO cross-network profiles
 
+*** FeedContentTypes
+**** DONE Read
+     CLOSED: [2018-05-03 Thu 17:08]
+**** DONE selection box
+     CLOSED: [2018-05-03 Thu 17:08]
+
 *** FeedContentItems
 **** TODO CRUD
 ***** TODO Create
 ***** TODO Read
 ***** TODO Update
 ***** TODO Delete
-
 
 *** Groups
 **** TODO Creating FeedContentItems
