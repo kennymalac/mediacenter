@@ -72,8 +72,16 @@
 **** TODO Uploading media items
 **** TODO Merge Manage Album and Create Album into "Albums"
 **** TODO full test coverage
+*** Account
+**** DONE AccountCollection
+     CLOSED: [2018-05-04 Fri 13:31]
+**** DONE AccountSelect
+     CLOSED: [2018-05-04 Fri 13:31]
+
+
 ** Priority 2 (necessary)
-*** TODO Nested routes
+*** DONE Nested routes
+    CLOSED: [2018-05-04 Fri 12:31]
 
 
 *** User Profiles

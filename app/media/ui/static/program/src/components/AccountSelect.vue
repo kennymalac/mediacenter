@@ -1,18 +1,18 @@
 <script>
 import CollectionSelect from './CollectionSelect'
-import {FeedContentTypeCollection} from '../models/FeedContentType.js'
+import {AccountCollection} from '../models/Account.js'
 
 export default {
-    name: 'feed-content-type-select',
     mixins: [CollectionSelect],
     data() {
         return {
-            collection: FeedContentTypeCollection
+            collection: AccountCollection
         }
     },
     methods: {
         optionLabel(option) {
-            return this.collection.typeMapping[option.name]
+            const { username } = option
+            return username
         }
     }
 }

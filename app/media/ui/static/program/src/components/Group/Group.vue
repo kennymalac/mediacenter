@@ -48,9 +48,7 @@
                     <!-- <label class="stack" for="rules">Rules</label>
                          TODO rules -->
                     <label class="stack" for="members"></label>
-                    <select class="stack" name="members" multiple v-model="instance.members">
-                        <option value="1">Ken</option>
-                    </select>
+                    <account-select v-model="instance.members" />
 
                     <!-- <label class="stack" for="">Tags</label> -->
                     <!-- <input class="stack" name="tags" v-model="instance.tags_raw" type="text" /> -->
@@ -67,6 +65,7 @@ import RestfulComponent from "../RestfulComponent"
 import {GroupCollection, GroupModel} from '../../models/Group.js'
 import {FeedModel} from '../../models/Feed.js'
 
+import AccountSelect from '../AccountSelect'
 import GroupList from './GroupList'
 import FeedContentItemList from '../FeedContentItemList'
 import FeedFilter from '../FeedFilter'
@@ -79,6 +78,7 @@ import auth from "../../auth.js"
 export default {
     mixins: [RestfulComponent],
     components: {
+        AccountSelect,
         GroupList,
         FeedContentItemList,
         FeedFilter,
