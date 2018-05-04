@@ -8,6 +8,7 @@ import Home from 'components/Home'
 import Gallery from 'components/Gallery'
 import Album from 'components/Album'
 import Group from 'components/Group/Group'
+import Discussion from 'components/Discussion/Discussion'
 
 Vue.use(Router)
 
@@ -16,8 +17,23 @@ function restAction(route) {
     // TODO refine this later
     const validActions = ['create', 'list', 'manage', 'details']
 
-    if (!route.params.action || !validActions.includes(route.params.action)) {
-        throw new Error()
+    console.log(route)
+
+    let isNested = false
+    for (const match of route.matched) {
+        if (match.parent) {
+            isNested = true
+            break
+        }
+    }
+
+    // TODO better isNested detection
+    if (isNested || !route.params.action || !validActions.includes(route.params.action)) {
+        return {
+            params: {...route.params},
+            // objectName: route.meta.objectName,
+            isNested: true
+        }
     }
 
     if (route.params.action === 'manage' && !route.params.id) {
@@ -28,6 +44,7 @@ function restAction(route) {
 
     return {
         action: route.params.action,
+        isNested: isNested,
         id: route.params.id
     }
 }
@@ -65,6 +82,12 @@ export default new Router({
             component: Register
         },
         {
+            path: '/discussion/:id/:action',
+            name: 'Discussion',
+            props: restAction,
+            component: Discussion
+        },
+        {
             path: '/group/:action',
             name: 'Group',
             component: Group,
@@ -72,11 +95,20 @@ export default new Router({
             canReuse: false
         },
         {
-            path: '/group/:id/:action',
+            path: '/group/:groupId/:groupAction',
             name: 'Group',
             component: Group,
             props: restAction,
-            canReuse: false
+            canReuse: false,
+            // meta: { objectName: 'group' },
+            children: [
+                {
+                    path: 'discussion/:discussionAction',
+                    component: Discussion,
+                    props: restAction
+                    // meta: { objectName: 'discussion' }
+                }
+            ]
         },
         {
             path: '/chat',

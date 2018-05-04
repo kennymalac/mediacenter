@@ -1,15 +1,14 @@
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.paginator import Paginator
-from django_countries.serializer_fields import CountryField
+from django_countries.serializers import CountryFieldMixin
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 
 from api.models import *
 
 
-class AccountSerializer(serializers.ModelSerializer):
-    country = CountryField()
+class AccountSerializer(CountryFieldMixin, serializers.ModelSerializer):
     profile_details = serializers.JSONField(read_only=True)
 
     class Meta:
@@ -222,6 +221,12 @@ class AlbumInfoSerializer(serializers.ModelSerializer):
 
 
 class AlbumCreateSerializer(serializers.ModelSerializer):
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=Account.objects.all(),
+        many=True,
+        required=False
+    )
+
     tags = serializers.PrimaryKeyRelatedField(
         queryset=AlbumTag.objects.all(),
         many=True,
@@ -239,6 +244,10 @@ class FeedContentItemTypeSerializer(serializers.ModelSerializer):
 
 
 class FeedSerializer(serializers.ModelSerializer):
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=Account.objects.all(),
+        required=False
+    )
     content_types = serializers.PrimaryKeyRelatedField(
         queryset=FeedContentItemType.objects.all(),
         many=True,
@@ -251,6 +260,10 @@ class FeedSerializer(serializers.ModelSerializer):
 
 
 class FeedContentItemSerializer(serializers.ModelSerializer):
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=Account.objects.all(),
+        required=False
+    )
     content_type = serializers.StringRelatedField(
         required=False
     )
@@ -261,6 +274,11 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
 
 
 class GroupForumSerializer(serializers.ModelSerializer):
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=Account.objects.all(),
+        required=False
+    )
+
     feed = FeedSerializer(
         read_only=False
     )

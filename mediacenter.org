@@ -73,6 +73,9 @@
 **** TODO Merge Manage Album and Create Album into "Albums"
 **** TODO full test coverage
 ** Priority 2 (necessary)
+*** TODO Nested routes
+
+
 *** User Profiles
 **** TODO basic UI
 **** TODO cross-network profiles
@@ -107,6 +110,7 @@
 
 
 *** Feed
+**** TODO automatically create Feed for each content type
 **** TODO CRUD
 ***** DONE Create
       CLOSED: [2018-05-02 Wed 20:34]

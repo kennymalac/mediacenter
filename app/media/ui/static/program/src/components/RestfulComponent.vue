@@ -2,6 +2,14 @@
 export default {
     props: {
         id: [String],
+        params: {
+            type: Object,
+            required: false
+        },
+        isNested: {
+            type: Boolean,
+            default: false
+        },
         action: [String]
     },
     data() {
@@ -20,32 +28,41 @@ export default {
     },
     computed: {
         actions() {
+            const action = this.isNested ? this.params[`${this.objectName}Action`] : this.action
             return {
-                list: this.action === "list",
-                details: this.action === "details",
-                manage: this.action === "manage",
-                create: this.action === "create"
+                list: action === "list",
+                details: action === "details",
+                manage: action === "manage",
+                create: action === "create"
             }
         }
     },
     methods: {
         restAction(to) {
             this.initialState()
+            let link = {}
             if (!to) {
-                to = {params: {action: this.action, id: this.id}}
+                const id = this.isNested ? this.params[`${this.objectName}Id`] : this.id
+                const action = this.isNested ? this.params[`${this.objectName}Action`] : this.action
+                link = {action: action, id: id}
             }
-            switch (to.params.action) {
+            else {
+                const id = this.isNested ? to.params[`${this.objectName}Id`] : to.params.id
+                const action = this.isNested ? to.params[`${this.objectName}Action`] : to.params.action
+                link = {action: action, id: id}
+            }
+            switch (link.action) {
             case "create":
                 this.create()
                 break
             case "details":
-                this.details(to.params)
+                this.details(link)
                 break
             case "manage":
-                this.manage(to.params)
+                this.manage(link)
                 break
             case "list":
-                this.list(to.params)
+                this.list(link)
                 break
             }
         }

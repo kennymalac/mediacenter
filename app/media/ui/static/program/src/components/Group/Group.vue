@@ -29,9 +29,11 @@
             </section>
             <div class="group-contents">
                 <section class="feed">
+                    <action-button v-bind="createPostAction" />
                     <feed-content-item-list :items="contentItems" :enabledContentTypes="enabledContentTypes" />
                 </section>
             </div>
+            <router-view></router-view>
         </template>
         <template v-if="actions.create || actions.manage">
             <form class="main-form" @submit.prevent="save">
@@ -68,6 +70,7 @@ import {FeedModel} from '../../models/Feed.js'
 import GroupList from './GroupList'
 import FeedContentItemList from '../FeedContentItemList'
 import FeedFilter from '../FeedFilter'
+import ActionButton from '../ActionButton'
 import ActionList from '../ActionList'
 
 import router from "../../router/index.js"
@@ -79,6 +82,7 @@ export default {
         GroupList,
         FeedContentItemList,
         FeedFilter,
+        ActionButton,
         ActionList
     },
     computed: {
@@ -93,6 +97,7 @@ export default {
     data() {
         return {
             instance: { id: null },
+            objectName: 'group',
             groupActions: [
                 {
                     icon: "ion-ios-people",
@@ -106,6 +111,13 @@ export default {
                     title: "Find a Group"
                 }
             ],
+            createPostAction: {
+                icon: "ion-md-list-box",
+                // link: "post",
+                link: "details/discussion/create",
+                title: "New Post",
+                extraIcon: "ion-md-add-circle"
+            },
             contentItems: []
         }
     },
