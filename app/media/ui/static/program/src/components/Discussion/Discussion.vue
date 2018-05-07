@@ -20,9 +20,12 @@
                 <fieldset>
                     <legend class="stack">Details</legend>
                     <label class="stack" for="title">Title</label>
-                    <input class="stack" name="title" v-model="instance.title" type="text" />
+                    <input class="stack" name="title" v-model="instanceForm.content_item.title" type="text" />
                     <label class="stack" for="description">Description</label>
-                    <textarea class="stack" name="description" v-model="instance.description" />
+                    <textarea class="stack" name="description" v-model="instanceForm.content_item.description" />
+
+                    <label class="stack" for="contents">Contents</label>
+                    <textarea class="stack" name="contents" v-model="instanceForm.contents" />
 
                     <!-- <label class="stack" for="">Tags</label> -->
                     <!-- <input class="stack" name="tags" v-model="instance.tags_raw" type="text" /> -->
@@ -37,11 +40,14 @@
 
 <script>
 import RestfulComponent from "../RestfulComponent"
+import {discussions} from "../../store.js"
 import {DiscussionCollection} from "../../models/Discussion.js"
 import router from "../../router/index.js"
+import auth from "../../auth.js"
 
 export default {
     mixins: [RestfulComponent],
+    props: ['feedId'],
     components: {
     },
     computed: {
@@ -51,43 +57,35 @@ export default {
     data() {
         return {
             objectName: 'discussion',
-            objects: [
-                {
-                    id: 1,
-                    title: "I like salads",
-                    order: "",
-                    description: "Discuss."
-                }
-            ]
+            instanceForm: {}
         }
     },
     methods: {
         initialState() {
-            this.instance = { id: null }
-            this.contentItems = []
+            this.instance = { id: null, content_item: {} }
+            this.instanceForm = { content_item: {} }
         },
         
         create() {
-            this.instance = { content_types: [] }
         },
         
         details(params) {
-            this.instance = this.objects.find((item) => {
-                return item.id === parseInt(params.id)
+        },
+
+        list(params) {
+            discussions().then((store) => {
+                this.objects = store.values
             })
-            DiscussionCollection.get(this.instance.id)
-                .then((data) => {
-                    this.instance = data
-                })
         },
         
         createDiscussion() {
-            return DiscussionCollection.create({
-                name: this.instance.name,
-                description: this.instance.description
-            })
-                .then((data) => {
-                    this.instance = data
+            this.instanceForm.content_item.owner = auth.getActiveUser().details.id
+            this.instanceForm.content_item.feeds = [this.feedId]
+
+            return DiscussionCollection.create(this.instanceForm)
+                .then((instance) => {
+                    this.objects.push(instance)
+                    return instance
                 })
                 .catch((error) => {
                     console.log(error)
@@ -96,8 +94,8 @@ export default {
         
         save() {
             if (this.actions.create) {
-                this.createDiscussion().then(this.$nextTick(() => {
-                    router.replace('/discussion/' + this.instance.id + '/manage')
+                this.createDiscussion().then(data => this.$nextTick(() => {
+                    router.replace('/discussion/' + data.id + '/manage')
                 }))
             }
         }

@@ -25,8 +25,10 @@ router.register(r'feed', FeedViewSet, base_name='feed')\
           r'content',
           FeedContentItemViewSet,
           base_name='content',
-          parents_query_lookups=['feed']
+          parents_query_lookups=['feeds']
       )
+
+router.register(r'discussion', DiscussionViewSet, base_name='discussion')
 
 router.register(r'group', GroupForumViewSet, base_name='group')
 

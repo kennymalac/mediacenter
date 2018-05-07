@@ -113,6 +113,16 @@ class FeedContentItemViewSet(NestedViewSetMixin,
     serializer_class = FeedContentItemSerializer
 
 
+class DiscussionViewSet(NestedViewSetMixin,
+                        ListModelMixin,
+                        RetrieveModelMixin,
+                        CreateModelMixin,
+                        GenericViewSet):
+
+    queryset = Discussion.objects.all()
+    serializer_class = DiscussionSerializer
+
+
 class GroupForumViewSet(NestedViewSetMixin,
                         ListModelMixin,
                         RetrieveModelMixin,

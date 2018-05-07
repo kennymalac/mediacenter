@@ -23,6 +23,7 @@ class FeedContentTypeCollection extends Collection {
         vid: "Video",
         link: "Link",
         topic: "Topic",
+        post: "Post",
         blgpst: "Blog post"
     }
 

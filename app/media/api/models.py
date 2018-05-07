@@ -112,11 +112,13 @@ class FeedContentItemType(models.Model):
     LINK = 'link'
     BLOGPOST = 'blgpst'
     TOPIC = 'topic'
+    POST = 'post'
     CONTENT_TYPES = (
         ('image', IMAGE),
         ('video', VIDEO),
         ('link', LINK),
         ('topic', TOPIC),
+        ('post', POST),
         ('blogpost', BLOGPOST),
     )
     name = models.CharField(max_length=6, choices=CONTENT_TYPES)
@@ -130,7 +132,7 @@ class Feed(models.Model):
     description = models.TextField(blank=True)
     content_types = models.ManyToManyField(FeedContentItemType, related_name='+')
     # interests = models.ManyToManyField(Interest, related_name='+')
-    content = models.ManyToManyField('api.FeedContentItem')
+    content = models.ManyToManyField('api.FeedContentItem', related_name='feeds')
 
 
 class FeedContentItem(models.Model):
@@ -138,6 +140,13 @@ class FeedContentItem(models.Model):
     content_type = models.ForeignKey(FeedContentItemType, related_name="+")
     title = models.CharField(max_length=140, blank=True)
     description = models.TextField(blank=True)
+
+
+class Discussion(models.Model):
+    content_item = models.ForeignKey(FeedContentItem, related_name="+")
+    parent = models.ForeignKey('self', null=True)
+    order = models.IntegerField(default=0)
+    text = models.TextField(blank=True)
 
 
 class GroupForum(models.Model):

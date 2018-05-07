@@ -33,7 +33,7 @@
                     <feed-content-item-list :items="contentItems" :enabledContentTypes="enabledContentTypes" />
                 </section>
             </div>
-            <router-view></router-view>
+            <router-view :feedId="instance.feed.id"></router-view>
         </template>
         <template v-if="actions.create || actions.manage">
             <form class="main-form" @submit.prevent="save">

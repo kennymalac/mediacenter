@@ -135,7 +135,7 @@ export default {
 
         create() {
         },
-        
+
         manage(params) {
             this.instance = this.objects.find((item) => {
                 return item.id === parseInt(params.id)

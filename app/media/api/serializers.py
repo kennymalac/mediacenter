@@ -288,6 +288,49 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'description', 'owner', 'content_type')
 
 
+class FeedContentItemCreateUpdateSerializer(serializers.ModelSerializer):
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=Account.objects.all(),
+        required=False
+    )
+    content_type = serializers.StringRelatedField(
+        required=False
+    )
+
+    class Meta:
+        model = FeedContentItem
+        fields = ('id', 'feeds', 'title', 'description', 'owner', 'content_type')
+
+
+class DiscussionSerializer(serializers.ModelSerializer):
+    content_item = FeedContentItemCreateUpdateSerializer(
+        many=False,
+        required=False
+    )
+
+    def create(self, validated_data):
+        content_item_data = validated_data.pop('content_item')
+        feed = content_item_data.pop('feeds')[0]
+
+        if validated_data.get('parent', 0):
+            content_type = FeedContentItemType.objects.get(name=FeedContentItemType.POST)
+        else:
+            content_type = FeedContentItemType.objects.get(name=FeedContentItemType.TOPIC)
+
+        content_item = FeedContentItem.objects.create(**content_item_data, content_type=content_type)
+        feed.content.add(content_item)
+        feed.save()
+
+        discussion = Discussion.objects.create(**validated_data, content_item=content_item)
+        # discussion.members.add(*members)
+
+        return discussion
+
+    class Meta:
+        model = Discussion
+        fields = ('id', 'parent', 'order', 'content_item')
+
+
 class GroupForumSerializer(serializers.ModelSerializer):
     owner = serializers.PrimaryKeyRelatedField(
         queryset=Account.objects.all(),
