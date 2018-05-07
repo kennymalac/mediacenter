@@ -1,6 +1,22 @@
+import {Model, Collection} from './Model.js'
 import {fetchAPI, jsonResponse} from '../httputil.js'
 
-class FeedContentTypeCollection {
+class FeedContentTypeModel extends Model {
+    static initialState = {
+        id: '',
+        name: ''
+    }
+}
+
+export function makeFeedContentTypeCollection() {
+    return FeedContentTypeCollection.fetch().then((data) => {
+        return new FeedContentTypeCollection(data)
+    })
+}
+
+class FeedContentTypeCollection extends Collection {
+
+    static Model = FeedContentTypeModel
 
     static typeMapping = {
         img: "Image",
@@ -10,7 +26,7 @@ class FeedContentTypeCollection {
         blgpst: "Blog post"
     }
 
-    static all() {
+    static fetch() {
         return fetchAPI(`feed-content-type/`, {
             method: "GET"
         })
@@ -18,4 +34,4 @@ class FeedContentTypeCollection {
     }
 }
 
-export {FeedContentTypeCollection}
+export {FeedContentTypeModel, FeedContentTypeCollection}

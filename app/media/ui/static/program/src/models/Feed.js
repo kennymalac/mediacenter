@@ -1,49 +1,21 @@
-import {Model} from './Model.js'
+import {Model, Collection, serializeIds} from './Model.js'
+import {FeedContentTypeCollection} from './FeedContentType'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 
-class FeedCollection {
-    static get(id) {
-        // TODO verify id is integer (typescript)
-        // TODO attach auth headers
-        return fetchAPI(`feed/${id}/`, {
-            method: "GET"
-        })
-            .then(jsonResponse)
-
-            .then((data) => {
-                return data
+export function makeFeedCollection(feedContentTypes) {
+    return Promise.all([feedContentTypes(), FeedCollection.searchFeeds()])
+        .then(results => {
+            return new FeedCollection(results[1], {
+                content_types: results[0]
             })
-            .catch((error) => {
-                // TODO better error handling
-                console.log(error)
-            })
-    }
-
-    static create(data) {
-        return makeJsonRequest("feed/", {
-            method: "POST",
-            body: {
-                ...data
-            }
         })
-            .then(jsonResponse)
-    }
-
-    static searchFeeds(params) {
-        return fetchAPI(`feed/`, {
-            method: "GET",
-            data: params
-        })
-            .then(jsonResponse)
-
-            .then((data) => {
-                return data
-            })
-    }
-
 }
 
 class FeedModel extends Model {
+
+    static fields = {
+        content_types: FeedContentTypeCollection
+    }
 
     static initialState = {
         id: 0,
@@ -51,7 +23,8 @@ class FeedModel extends Model {
         description: '',
         tags: [],
         interests: [],
-        subjects: []
+        subjects: [],
+        content_types: []
     }
 
     // TODO make this a Store
@@ -59,9 +32,18 @@ class FeedModel extends Model {
         return makeJsonRequest(`feed/${feed.id}/`, {
             method: "PUT",
             body: {
-                ...feed
+                ...feed, content_types: serializeIds(feed.content_types)
             }
         })
+            .then(jsonResponse)
+
+            .then((data) => {
+                // NOTE faking instance for now
+                const instance = {...data}
+                instance.content_types = feed.content_types
+                console.log(instance)
+                return instance
+            })
     }
 
     static upload(feedId, form) {
@@ -83,6 +65,56 @@ class FeedModel extends Model {
                 return data
             })
     }
+}
+
+class FeedCollection extends Collection {
+
+    static Model = FeedModel
+
+    static get(id) {
+        // TODO verify id is integer (typescript)
+        return fetchAPI(`feed/${id}/`, {
+            method: "GET"
+        })
+            .then(jsonResponse)
+
+            .then((data) => {
+                return data
+            })
+            .catch((error) => {
+                // TODO better error handling
+                console.log(error)
+            })
+    }
+
+    static create(data, store) {
+        return makeJsonRequest("feed/", {
+            method: "POST",
+            body: {
+                ...data, content_types: serializeIds(data.content_types)
+            }
+        })
+            .then(jsonResponse)
+            .then((created) => {
+                const instance = new FeedModel({...created, content_types: data.content_types})
+
+                console.log(instance)
+                return instance
+            })
+    }
+
+    static searchFeeds(params) {
+        return fetchAPI(`feed/`, {
+            method: "GET",
+            data: params
+        })
+            .then(jsonResponse)
+
+            .then((data) => {
+                return data
+            })
+    }
+
 }
 
 export {FeedCollection, FeedModel}

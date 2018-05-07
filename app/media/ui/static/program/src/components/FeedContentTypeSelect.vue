@@ -1,18 +1,19 @@
 <script>
 import CollectionSelect from './CollectionSelect'
 import {FeedContentTypeCollection} from '../models/FeedContentType.js'
+import {feedContentTypes} from '../store.js'
 
 export default {
     name: 'feed-content-type-select',
     mixins: [CollectionSelect],
     data() {
         return {
-            collection: FeedContentTypeCollection
+            collection: feedContentTypes
         }
     },
     methods: {
         optionLabel(option) {
-            return this.collection.typeMapping[option.name]
+            return FeedContentTypeCollection.typeMapping[option.name]
         }
     }
 }

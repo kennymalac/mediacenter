@@ -243,13 +243,28 @@ class FeedContentItemTypeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 
-class FeedSerializer(serializers.ModelSerializer):
+class FeedCreateUpdateSerializer(serializers.ModelSerializer):
     owner = serializers.PrimaryKeyRelatedField(
         queryset=Account.objects.all(),
         required=False
     )
     content_types = serializers.PrimaryKeyRelatedField(
         queryset=FeedContentItemType.objects.all(),
+        many=True,
+        required=False
+    )
+
+    class Meta:
+        model = Feed
+        fields = ('id', 'name', 'description', 'owner', 'content_types')
+
+
+class FeedSerializer(serializers.ModelSerializer):
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=Account.objects.all(),
+        required=False
+    )
+    content_types = FeedContentItemTypeSerializer(
         many=True,
         required=False
     )

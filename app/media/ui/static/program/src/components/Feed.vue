@@ -8,7 +8,7 @@
             <section class="feeds">
                 <h1>Your Feeds</h1>
                 
-                <feed-item v-for="feed in objects" v-bind="feed" />
+                <feed-item v-for="feed in objects" :id="feed.id" :name="feed.name" />
             </section>
         </template>
         <template v-if="actions.details && instance.id">
@@ -37,10 +37,10 @@
                 <fieldset>
                     <legend class="stack">Details</legend>
                     <label class="stack" for="name">Name</label>
-                    <input class="stack" name="name" v-model="instance.name" type="text" />
+                    <input class="stack" name="name" v-model="instanceForm.name" type="text" />
                     <label class="stack" for="description">Description</label>
-                    <textarea class="stack" name="description" v-model="instance.description" />
-                    <feed-content-type-select v-model="instance.content_types" />
+                    <textarea class="stack" name="description" v-model="instanceForm.description" />
+                    <feed-content-type-select v-model="instanceForm.content_types" />
 
                     <!-- <label class="stack" for="">Tags</label> -->
                     <!-- <input class="stack" name="tags" v-model="instance.tags_raw" type="text" /> -->
@@ -55,6 +55,7 @@
 <script>
 import RestfulComponent from "./RestfulComponent"
 import {FeedCollection, FeedModel} from "../models/Feed.js"
+import {feeds} from '../store.js'
 
 import FeedItem from './FeedItem'
 import FeedContentItemList from './FeedContentItemList'
@@ -83,6 +84,10 @@ export default {
     },
     data() {
         return {
+            instanceForm: { content_types: [] },
+            instance: {
+                content_types: []
+            },
             feedActions: [
                 {
                     icon: "ion-ios-list-box",
@@ -123,20 +128,27 @@ export default {
     },
     methods: {
         initialState() {
-            this.instance = { id: null }
+            this.instance = { id: null, content_types: [] }
             this.contentItems = []
+            this.instanceForm = { content_types: [] }
         },
 
         create() {
-            this.instance = { content_types: [] }
         },
         
+        manage(params) {
+            this.instance = this.objects.find((item) => {
+                return item.id === parseInt(params.id)
+            })
+            this.instanceForm = this.instance.instance
+        },
+
         list(params) {
-            FeedCollection.searchFeeds().then((data) => {
-                this.objects = data
+            feeds().then((store) => {
+                this.objects = store.values
             })
         },
-        
+
         details(params) {
             this.instance = this.objects.find((item) => {
                 return item.id === parseInt(params.id)
@@ -151,29 +163,46 @@ export default {
                         })
                 })
         },
-        
+
         toggle(event) {
             console.log(event)
         },
-        
+
         createFeed() {
-            return FeedCollection.create({
-                name: this.instance.name,
-                description: this.instance.description
-            })
+            return FeedCollection.create(this.instanceForm)
+                .then((data) => {
+                    console.log(data)
+                    this.objects.push(data)
+                    return data
+                })
+        },
+
+        manageAlbum() {
+            return FeedModel.manage(this.instance)
                 .then((data) => {
                     this.instance = data
+                    return data
                 })
                 .catch((error) => {
                     console.log(error)
                 })
         },
-        
+
         save() {
-            if (this.actions.create) {
-                this.createFeed().then(this.$nextTick(() => {
-                    router.replace('/feed/' + this.instance.id + '/manage')
-                }))
+            if (this.actions.manage) {
+                this.manageAlbum().then((data) => {
+                    console.log(data)
+                })
+            }
+            else if (this.actions.create) {
+                this.createFeed()
+                    .then(data => this.$nextTick(() => {
+                        console.log(this.objects)
+                        router.replace('/feed/' + data.id + '/manage')
+                    }))
+                    .catch((error) => {
+                        console.log(error)
+                    })
             }
         }
     }

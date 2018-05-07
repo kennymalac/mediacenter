@@ -91,14 +91,16 @@ class FeedContentTypeViewSet(ListModelMixin,
 
 
 class FeedViewSet(NestedViewSetMixin,
-                  ListModelMixin,
-                  RetrieveModelMixin,
-                  CreateModelMixin,
-                  GenericViewSet):
+                  MultipleSerializerMixin,
+                  ModelViewSet):
     # TODO Federated - users seize the means of feed production
 
     queryset = Feed.objects.filter(groupforum__isnull=True)
-    serializer_class = FeedSerializer
+    serializer_classes = {
+        'default': FeedSerializer,
+        'update': FeedCreateUpdateSerializer,
+        'create': FeedCreateUpdateSerializer
+    }
 
 
 class FeedContentItemViewSet(NestedViewSetMixin,

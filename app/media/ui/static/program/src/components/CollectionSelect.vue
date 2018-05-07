@@ -30,10 +30,9 @@ export default {
     },
     mounted() {
         this.selected = this.value
-        this.collection.all()
-            .then((options) => {
-                this.options = options
-            })
+        this.collection().then((store) => {
+            this.options = store.values
+        })
     }
 }
 </script>
