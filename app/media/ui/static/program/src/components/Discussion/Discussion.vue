@@ -6,13 +6,14 @@
                     <div class="icon-container">
                         <i v-if="instance.icon" :class="instance.icon"></i>
                     </div>
-                    <h2>{{ instance.title }}</h2>
-                    <p class="description">{{ instance.description }}</p>
+                    <h2>{{ instance.content_item.title }}</h2>
                 </div>
             </section>
             
             <section class="posts">
-                No posts here
+                <p class="contents">{{ instance.text }}</p>
+                <h3>Reply</h3>
+                <discussion action="create" />
             </section>
         </template>
         <template v-if="actions.create || actions.manage">
@@ -24,8 +25,8 @@
                     <label class="stack" for="description">Description</label>
                     <textarea class="stack" name="description" v-model="instanceForm.content_item.description" />
 
-                    <label class="stack" for="contents">Contents</label>
-                    <textarea class="stack" name="contents" v-model="instanceForm.contents" />
+                    <label class="stack" for="text">Contents</label>
+                    <textarea class="stack" name="text" v-model="instanceForm.text" />
 
                     <!-- <label class="stack" for="">Tags</label> -->
                     <!-- <input class="stack" name="tags" v-model="instance.tags_raw" type="text" /> -->
@@ -46,6 +47,7 @@ import router from "../../router/index.js"
 import auth from "../../auth.js"
 
 export default {
+    name: 'discussion',
     mixins: [RestfulComponent],
     props: ['feedId'],
     components: {
@@ -70,10 +72,15 @@ export default {
         },
         
         details(params) {
+            this.list().then(this.$nextTick(() => {
+                this.instance = this.objects.find((item) => {
+                    return item.id === parseInt(params.id)
+                })
+            }))
         },
 
         list(params) {
-            discussions().then((store) => {
+            return discussions().then((store) => {
                 this.objects = store.values
             })
         },

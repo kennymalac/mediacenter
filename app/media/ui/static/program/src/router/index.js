@@ -82,6 +82,12 @@ export default new Router({
             component: Register
         },
         {
+            path: '/discussion/:action',
+            name: 'Discussion',
+            props: restAction,
+            component: Discussion
+        },
+        {
             path: '/discussion/:id/:action',
             name: 'Discussion',
             props: restAction,

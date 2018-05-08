@@ -328,7 +328,7 @@ class DiscussionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Discussion
-        fields = ('id', 'parent', 'order', 'content_item')
+        fields = ('id', 'parent', 'order', 'content_item', 'text')
 
 
 class GroupForumSerializer(serializers.ModelSerializer):
