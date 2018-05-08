@@ -11,6 +11,7 @@
             </section>
             
             <section class="posts">
+                <span class="date">{{ instance.content_item.created.format('LLLL') }}</span>
                 <p class="contents">{{ instance.text }}</p>
                 <h3>Reply</h3>
                 <discussion action="create" />

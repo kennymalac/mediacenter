@@ -4,6 +4,7 @@
             <div class="content-title">
                 {{ title }} <a href="#" @click.native="userProfile" class="author">@datboi</a>
             </div>
+            <span class="date">{{ created.fromNow() }}</span>
         </slot>
         <slot name="embed" :slotProps="embedProps">
         </slot>
@@ -72,6 +73,13 @@ $title-height: 24px;
             padding: 4px;
             font-size: 1rem;
          }
+    }
+    .date {
+        display: inline-flex;
+        position: relative;
+        padding-top: 1em;
+        align-self: center;
+        color: grey;
     }
     
     .actions {

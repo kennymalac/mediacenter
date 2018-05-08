@@ -5,6 +5,7 @@
                 <span class="content-type">Topic</span>
                 <a @click="details"> {{ item.title }}</a>
             </div>
+            <span class="date">{{ item.created.fromNow() }}</span>
         </template>
         <template slot="embed" slot-scope="{ slotProps }">
             <div class="default-preview topic">
