@@ -1,15 +1,15 @@
 <template>
-    <content-item :embed="embedProps" :title="title" :id="id">
+    <content-item :embed="embedProps" v-bind="item">
         <template slot="title" slot-scope="{ slotProps }">
             <div class="content-title">
                 <span class="content-type">Topic</span>
-                <a @click="details"> {{ title }}</a>
+                <a @click="details"> {{ item.title }}</a>
             </div>
         </template>
         <template slot="embed" slot-scope="{ slotProps }">
             <div class="default-preview topic">
                 <blockquote>
-                    {{ description }}
+                    {{ item.description }}
                 </blockquote>
             </div>
         </template>
@@ -24,19 +24,8 @@ import router from "../../router/index.js"
 export default {
     name: 'feed-discussion-topic',
     props: {
-        id: {
-            type: Number
-        },
-        title: {
-            type: String,
-            default: ""
-        },
-        description: {
-            type: String,
-            default: ""
-        },
-        owner: {
-            type: Number
+        item: {
+            type: Object
         }
     },
     components: {
@@ -54,10 +43,10 @@ export default {
             discussions().then((store) => {
                 const discussion = store.values.find((item) => {
                     console.log(item)
-                    return item.content_item.id === this.id
+                    return item.content_item.id === this.item.id
                 })
                 console.log(discussion)
-                router.replace(`/discussion/` + discussion.id + "/details")
+                router.push(`/discussion/` + discussion.id + "/details")
             })
         }
     }

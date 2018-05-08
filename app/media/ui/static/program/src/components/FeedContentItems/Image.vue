@@ -1,5 +1,5 @@
 <template>
-    <content-item :embed="embedProps" :title="title">
+    <content-item :embed="embedProps" :title="title" :created="created">
         <template slot="embed" slot-scope="{ slotProps }">
             <div class="default-preview" v-if="!embedProps.src">
                 <i class="ion-ios-image"></i>

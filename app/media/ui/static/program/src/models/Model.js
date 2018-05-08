@@ -13,7 +13,8 @@ export class Collection {
     }
 }
 
-export function collectionFactory(getStore, storeVal, collection, makeCollection) {
+// Returns a Singleton for a Collection
+export function makeCollection(getStore, storeVal, collection, makeCollection) {
     return new Promise((resolve, reject) => {
         const store = getStore()
 

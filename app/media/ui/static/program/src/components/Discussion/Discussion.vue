@@ -59,7 +59,7 @@ export default {
     data() {
         return {
             objectName: 'discussion',
-            instanceForm: {}
+            instanceForm: { content_item: {} }
         }
     },
     methods: {
@@ -69,6 +69,7 @@ export default {
         },
         
         create() {
+            this.list()
         },
         
         details(params) {
@@ -102,7 +103,7 @@ export default {
         save() {
             if (this.actions.create) {
                 this.createDiscussion().then(data => this.$nextTick(() => {
-                    router.replace('/discussion/' + data.id + '/manage')
+                    router.replace('/discussion/' + data.id + '/details')
                 }))
             }
         }

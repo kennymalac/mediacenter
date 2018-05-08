@@ -5,8 +5,7 @@ export default {
             type: Number
         },
         created: {
-            type: Object,
-            default: {}
+            type: Object
         }
         // collection: {
         //     type: Object

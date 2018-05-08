@@ -64,6 +64,7 @@
 import RestfulComponent from "../RestfulComponent"
 import {GroupCollection, GroupModel} from '../../models/Group.js'
 import {FeedModel} from '../../models/Feed.js'
+import {groups} from '../../store.js'
 
 import AccountSelect from '../AccountSelect'
 import GroupList from './GroupList'
@@ -126,7 +127,7 @@ export default {
             this.instance = GroupModel.initialState
             this.contentItems = []
         },
-        
+
         create() {
             this.instance = GroupModel.getNewInstance()
             this.instance.feed = FeedModel.getNewInstance()
@@ -138,31 +139,27 @@ export default {
         },
 
         list(params) {
-            return GroupCollection.searchGroups().then((data) => {
-                this.objects = data
+            return groups().then((store) => {
+                this.objects = store.values
             })
         },
 
         details(params) {
-            this.instance = this.objects.find((item) => {
-                return item.id === parseInt(params.id)
+            this.showInstance(params.id, '/group/list', (instance) => {
+                this.instance = instance
+                this.feed = instance.feed
+                FeedModel.listItems(instance.feed.id, {})
+                    .then((contentData) => {
+                        this.contentItems = contentData
+                    })
             })
-            GroupCollection.get(this.instance.id)
-                .then((data) => {
-                    this.instance = data
-                    // TODO filtering
-                    this.feed = data.feed
-                    FeedModel.listItems(data.feed.id, {})
-                        .then((contentData) => {
-                            this.contentItems = contentData
-                        })
-                })
         },
 
         createGroup() {
             return GroupCollection.create(this.instance)
                 .then((data) => {
-                    this.instance = data
+                    this.objects.push(data)
+                    return data
                 })
                 .catch((error) => {
                     console.log(error)
@@ -172,9 +169,7 @@ export default {
         save() {
             if (this.actions.create) {
                 this.createGroup().then(this.$nextTick(() => {
-                    this.list().then(() => {
-                        router.replace('/group/' + this.instance.id + '/manage')
-                    })
+                    router.replace('/group/' + this.instance.id + '/manage')
                 }))
             }
         }

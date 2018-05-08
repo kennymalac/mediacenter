@@ -126,6 +126,7 @@ class FeedContentItemType(models.Model):
     def __str__(self):
         return self.name
 
+
 class Feed(models.Model):
     owner = models.ForeignKey(Account, null=True)
     name = models.CharField(max_length=140, blank=True)
@@ -133,6 +134,7 @@ class Feed(models.Model):
     content_types = models.ManyToManyField(FeedContentItemType, related_name='+')
     # interests = models.ManyToManyField(Interest, related_name='+')
     content = models.ManyToManyField('api.FeedContentItem', related_name='feeds')
+    created = models.DateTimeField(auto_now_add=True)
 
 
 class FeedContentItem(models.Model):
@@ -140,6 +142,7 @@ class FeedContentItem(models.Model):
     content_type = models.ForeignKey(FeedContentItemType, related_name="+")
     title = models.CharField(max_length=140, blank=True)
     description = models.TextField(blank=True)
+    created = models.DateTimeField(auto_now_add=True)
 
 
 class Discussion(models.Model):

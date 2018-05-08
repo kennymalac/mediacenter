@@ -1,7 +1,44 @@
-import {Model} from './Model.js'
+import {Model, Collection} from './Model.js'
+// import {FeedModel} from './models.js'
 import {makeJsonRequest, jsonResponse, fetchAPI} from '../httputil.js'
 
-class GroupCollection {
+export function makeGroupCollection() {
+    return GroupCollection.searchGroups().then((items) => {
+        return new GroupCollection(items)
+    })
+}
+
+class GroupModel extends Model {
+
+    static fields = {
+        // TODO nested feed model
+        // fields only works for lists, not a single item
+    }
+
+    static initialState = {
+        id: 0,
+        feed: {},
+        name: "",
+        description: "",
+        rules: [],
+        members: [],
+        image: ""
+    }
+
+    // TODO make this a Store
+    static manage(group) {
+        return makeJsonRequest(`group/${group.id}/`, {
+            method: "PUT",
+            body: {
+                ...group
+            }
+        })
+    }
+}
+
+class GroupCollection extends Collection {
+    static Model = GroupModel
+
     static get(id) {
         // TODO verify id is integer (typescript)
         // TODO attach auth headers
@@ -27,6 +64,12 @@ class GroupCollection {
             }
         })
             .then(jsonResponse)
+            .then((created) => {
+                const instance = new GroupModel(created)
+
+                console.log(instance)
+                return instance
+            })
     }
 
     static searchGroups(params) {
@@ -41,28 +84,6 @@ class GroupCollection {
             })
     }
 
-}
-
-class GroupModel extends Model {
-
-    static initialState = {
-        id: 0,
-        name: "",
-        description: "",
-        rules: [],
-        members: [],
-        image: ""
-    }
-
-    // TODO make this a Store
-    static manage(group) {
-        return makeJsonRequest(`group/${group.id}/`, {
-            method: "PUT",
-            body: {
-                ...group
-            }
-        })
-    }
 }
 
 export {GroupCollection, GroupModel}

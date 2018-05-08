@@ -1,4 +1,6 @@
 <script>
+import router from "../router/index.js"
+
 export default {
     props: {
         id: [String],
@@ -38,6 +40,24 @@ export default {
         }
     },
     methods: {
+        findInstance(id, fallthrough) {
+            // NOTE/TODO we don't need the entire list of objects for each instance
+            const instance = this.objects.find((item) => {
+                return item.id === parseInt(id)
+            })
+            if (instance === undefined) {
+                router.replace(fallthrough)
+            }
+            return instance
+        },
+        showInstance(id, fallthrough, callback) {
+            if (this.objects.length === 0) {
+                this.list().then(() => callback(this.findInstance(id, fallthrough)))
+            }
+            else {
+                callback(this.findInstance(id, fallthrough))
+            }
+        },
         restAction(to) {
             this.initialState()
             let link = {}

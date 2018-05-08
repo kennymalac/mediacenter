@@ -132,36 +132,31 @@ export default {
             this.contentItems = []
             this.instanceForm = { content_types: [] }
         },
-
+        
         create() {
         },
-
+        
         manage(params) {
             this.instance = this.objects.find((item) => {
                 return item.id === parseInt(params.id)
             })
             this.instanceForm = this.instance.instance
         },
-
+        
         list(params) {
-            feeds().then((store) => {
+            return feeds().then((store) => {
                 this.objects = store.values
             })
         },
-
+        
         details(params) {
-            this.instance = this.objects.find((item) => {
-                return item.id === parseInt(params.id)
+            this.showInstance(params.id, 'feed/list', (instance) => {
+                this.instance = instance
+                FeedModel.listItems(instance.id, {})
+                    .then((contentData) => {
+                        this.contentItems = contentData
+                    })
             })
-            FeedCollection.get(this.instance.id)
-                .then((data) => {
-                    this.instance = data
-                    // TODO filtering
-                    FeedModel.listItems(data.id, {})
-                        .then((contentData) => {
-                            this.contentItems = contentData
-                        })
-                })
         },
 
         toggle(event) {

@@ -1,12 +1,14 @@
-import {collectionFactory} from './models/Model.js'
+import {makeCollection} from './models/Model.js'
 import {FeedCollection, makeFeedCollection} from './models/Feed.js'
 import {FeedContentTypeCollection, makeFeedContentTypeCollection} from './models/FeedContentType.js'
 import {DiscussionCollection, makeDiscussionCollection} from './models/Discussion.js'
+import {GroupCollection, makeGroupCollection} from './models/Group.js'
 
 const store = {
     feeds: {},
     feedContentTypes: {},
-    discussions: {}
+    discussions: {},
+    groups: {}
 }
 
 const proxiedStore = new Proxy(store, {})
@@ -16,7 +18,7 @@ const getStore = () => {
 }
 
 export const feedContentTypes = () => {
-    return collectionFactory(
+    return makeCollection(
         getStore,
         'feedContentTypes',
         FeedContentTypeCollection,
@@ -25,7 +27,7 @@ export const feedContentTypes = () => {
 }
 
 export const feeds = () => {
-    return collectionFactory(
+    return makeCollection(
         getStore,
         'feeds',
         FeedCollection,
@@ -34,10 +36,19 @@ export const feeds = () => {
 }
 
 export const discussions = () => {
-    return collectionFactory(
+    return makeCollection(
         getStore,
         'discussion',
         DiscussionCollection,
         makeDiscussionCollection
+    )
+}
+
+export const groups = () => {
+    return makeCollection(
+        getStore,
+        'group',
+        GroupCollection,
+        makeGroupCollection
     )
 }

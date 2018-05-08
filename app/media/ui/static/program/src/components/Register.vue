@@ -9,23 +9,23 @@
                 <fieldset>
                     <legend>User details</legend>
                     <label class="stack" for="name">Username</label>
-                    <input class="stack" v-model="username" type="text" placeholder="Username">
+                    <input class="stack" v-model="instanceForm.username" type="text" placeholder="Username">
                     <label class="stack" for="name">Display Name</label>
-                    <input class="stack" v-model="first_name" id="first-name" type="text" placeholder="First Name">
-                    <input class="stack" v-model="last_name" id="last-name" type="text" placeholder="Last Name">
+                    <input class="stack" v-model="instanceForm.first_name" id="first-name" type="text" placeholder="First Name">
+                    <input class="stack" v-model="instanceForm.last_name" id="last-name" type="text" placeholder="Last Name">
                     <label class="stack" for="password">Password</label>
-                    <input class="stack" v-model="password" id="password" type="password" placeholder="Password">
+                    <input class="stack" v-model="instanceForm.password" id="password" type="password" placeholder="Password">
                     <label class="stack" for="retype-password">Re-type Password</label>
-                    <input class="stack" v-model="retype_password" id="retype-password" type="password" placeholder="Password">
+                    <input class="stack" v-model="instanceForm.retype_password" id="retype-password" type="password" placeholder="Password">
                     <label class="stack" for="email">Email Address</label>
-                    <input class="stack" v-model="email" id="email" type="email" placeholder="Email Address">
+                    <input class="stack" v-model="instanceForm.email" id="email" type="email" placeholder="Email Address">
                     
                     <label class="stack">
                         <input name="subscribe" type="checkbox" />
                         <span class="checkable">I wish to subscribe to the mailing list</span>
                     </label>
                     
-                    <input class="stack" v-model="subscribe" id="subscribe" type="checkbox">
+                    <input class="stack" v-model="instanceForm.subscribe" id="subscribe" type="checkbox">
                     <!-- TODO must be over 13 -->
                     <input class="stack" type="submit" text="Submit" />
                 </fieldset>
@@ -47,6 +47,15 @@ export default {
             infoBox: {
                 status: "",
                 message: ""
+            },
+            instanceForm: {
+                username: "",
+                first_name: "",
+                last_name: "",
+                password: "",
+                retype_password: "",
+                email: "",
+                subscribe: ""
             }
         }
     },

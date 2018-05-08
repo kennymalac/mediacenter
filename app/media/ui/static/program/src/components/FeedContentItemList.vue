@@ -1,7 +1,7 @@
 <template>
     <div class="feed-list">
-        <feed-discussion-topic v-for="topic in topics" v-if="enabledContentTypes.includes('Topics')" v-bind="topic" />
-        <feed-discussion-topic v-for="post in posts" v-if="enabledContentTypes.includes('Posts')" v-bind="post" />
+        <feed-discussion-topic v-for="topic in topics" v-if="enabledContentTypes.includes('Topics')" :item="topic" />
+        <feed-discussion-topic v-for="post in posts" v-if="enabledContentTypes.includes('Posts')" :item="post" />
         <feed-image v-for="image in images" v-if="enabledContentTypes.includes('Images')" v-bind="image" />
     </div>
 </template>
