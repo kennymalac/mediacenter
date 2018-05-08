@@ -1,5 +1,5 @@
 <template>
-    <content-item :embed="embedProps" v-bind="item">
+    <content-item :embed="embedProps" v-bind="item.instance">
         <template slot="title" slot-scope="{ slotProps }">
             <div class="content-title">
                 <span class="content-type">Topic</span>

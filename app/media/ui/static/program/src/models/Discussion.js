@@ -1,5 +1,7 @@
 import {Model, Collection} from './Model.js'
+import {modelInstance} from './converters.js'
 import {makeJsonRequest, jsonResponse, fetchAPI} from '../httputil.js'
+import {FeedContentItemModel} from './FeedContentItem'
 
 export function makeDiscussionCollection() {
     return DiscussionCollection.searchDiscussions().then((items) => {
@@ -15,6 +17,10 @@ class DiscussionModel extends Model {
         text: "",
         order: 0,
         parent: 0
+    }
+
+    static fieldConverters = {
+        content_item: (input) => modelInstance(FeedContentItemModel, input)
     }
 }
 

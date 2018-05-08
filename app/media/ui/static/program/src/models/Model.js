@@ -30,7 +30,9 @@ export function makeCollection(getStore, storeVal, collection, makeCollection) {
 
 export class Model {
 
+    static initialState = {}
     static fields = {}
+    static fieldConverters = {}
 
     constructor(instance, collections = {}) {
         this.instance = instance
@@ -50,6 +52,10 @@ export class Model {
                     throw new Error('invalid model')
                 }
             }
+            // Convert the field if there is a conversion function specified for this field
+            else if (field in this.constructor.fieldConverters) {
+                this.instance[field] = this.constructor.fieldConverters[field](this.instance[field])
+            }
 
             Object.defineProperty(this, field, {
                 get: () => { return this.instance[field] },
@@ -59,6 +65,7 @@ export class Model {
     }
 
     static getNewInstance() {
+        // TODO confusing, remove this
         return Object.keys(this.initialState)
             .filter(key => key !== 'id')
             .reduce((obj, key) => {

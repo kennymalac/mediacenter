@@ -1,6 +1,8 @@
+import {momentDate, modelInstance} from './converters.js'
 import {Model, Collection, serializeIds} from './Model.js'
 import {FeedContentTypeCollection} from './FeedContentType'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
+import {FeedContentItemModel} from './FeedContentItem'
 
 export function makeFeedCollection(feedContentTypes) {
     return Promise.all([feedContentTypes(), FeedCollection.searchFeeds()])
@@ -17,8 +19,13 @@ class FeedModel extends Model {
         content_types: FeedContentTypeCollection
     }
 
+    static fieldConverters = {
+        created: momentDate
+    }
+
     static initialState = {
         id: 0,
+        created: {},
         name: '',
         description: '',
         tags: [],
@@ -62,7 +69,8 @@ class FeedModel extends Model {
             .then(jsonResponse)
 
             .then((data) => {
-                return data
+                // Returns a list of ContentItem model instances
+                return data.map((input) => modelInstance(FeedContentItemModel, input))
             })
     }
 }
@@ -95,8 +103,8 @@ class FeedCollection extends Collection {
             }
         })
             .then(jsonResponse)
-            .then((created) => {
-                const instance = new FeedModel({...created, content_types: data.content_types})
+            .then((createdData) => {
+                const instance = new FeedModel({...createdData, content_types: data.content_types})
 
                 console.log(instance)
                 return instance
