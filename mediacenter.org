@@ -80,12 +80,22 @@
 
 
 ** Priority 2 (necessary)
+*** TODO slugs instead of ids in routes
+
 *** DONE Nested routes
     CLOSED: [2018-05-04 Fri 12:31]
 
+*** Interests
+**** TODO model, serializer, viewset
+**** TODO CRUD
+***** TODO Create
+***** TODO Read
+***** TODO Update
+***** TODO Delete
 
 *** User Profiles
-**** TODO basic UI
+**** DONE basic UI
+     CLOSED: [2018-05-08 Tue 16:56]
 **** TODO cross-network profiles
 
 *** FeedContentTypes
@@ -95,6 +105,10 @@
      CLOSED: [2018-05-03 Thu 17:08]
 
 *** FeedContentItems
+**** TODO consider performance implication of backreference to Feeds
+**** TODO FeedContentItems outside of Feeds
+**** TODO sharing Feeds outside of just inside Groups?
+
 **** DONE show created date below item title
      CLOSED: [2018-05-08 Tue 14:35]
 **** TODO CRUD
@@ -121,6 +135,8 @@
 
 *** Discussion
 **** TODO last edited date
+**** TODO anchor links for individual posts
+**** TODO Pagination
 **** DONE model, serializer, viewset
      CLOSED: [2018-05-08 Tue 14:31]
 **** TODO CRUD
@@ -157,9 +173,13 @@
 
 *** Model/Collection
     don't make too many assumptions
-**** base class
-**** API handler using fetchResource
-**** default get/set
+**** TODO don't get ALL discussions for a simple details/manage request
+**** DONE base classes
+     CLOSED: [2018-05-08 Tue 18:04]
+**** DONE API handler using fetchAPI
+     CLOSED: [2018-05-08 Tue 18:04]
+**** DONE default get/set
+     CLOSED: [2018-05-08 Tue 18:04]
 
 
 *** TODO deployment to a VPS

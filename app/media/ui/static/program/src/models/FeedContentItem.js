@@ -7,6 +7,7 @@ class FeedContentItemModel extends Model {
         id: 0,
         content_type: "",
         created: {},
+        feeds: [],
         description: "",
         owner: 0,
         title: ""

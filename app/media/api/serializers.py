@@ -299,7 +299,7 @@ class FeedContentItemCreateUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'feeds', 'title', 'description', 'owner', 'content_type')
+        fields = ('id', 'feeds', 'title', 'description', 'owner', 'content_type', 'created')
 
 
 class DiscussionSerializer(serializers.ModelSerializer):
