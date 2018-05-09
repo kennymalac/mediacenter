@@ -3,8 +3,8 @@
         <template v-if="actions.details && instance.id">
             <section class="posts">
 
-                <post v-bind="instance.instance" />
-                <post v-for="post in posts" v-bind="post.instance" />
+                <post v-bind="instance.instance" @editPost="editPost(instance.id)" />
+                <post v-for="post in posts" v-bind="post.instance" @editPost="editPost(post.id)" />
 
                 <h3>Quick Reply</h3>
                 <discussion :feedId="getFeedId" :parentId="instance.id" :parentTitle="instance.content_item.title" action="create" />
@@ -15,8 +15,8 @@
                 <fieldset>
                     <label class="stack" for="title">Title</label>
                     <input class="stack" name="title" v-model="instanceForm.content_item.title" type="text" />
-                    <label v-if="!parentId" class="stack" for="description">Description</label>
-                    <textarea v-if="!parentId" class="stack" name="description" v-model="instanceForm.content_item.description" />
+                    <label v-if="!parentId && !instance.parent" class="stack" for="description">Description</label>
+                    <textarea v-if="!parentId && !instance.parent" class="stack" name="description" v-model="instanceForm.content_item.description" />
 
                     <label class="stack" for="text">Contents</label>
                     <textarea class="stack" name="text" v-model="instanceForm.text" />
@@ -36,7 +36,7 @@
 <script>
 import RestfulComponent from "../RestfulComponent"
 import {discussions} from "../../store.js"
-import {DiscussionCollection} from "../../models/Discussion.js"
+import {DiscussionModel, DiscussionCollection} from "../../models/Discussion.js"
 import Post from './Post'
 
 import router from "../../router/index.js"
@@ -73,6 +73,10 @@ export default {
             this.instanceForm = { content_item: {} }
         },
         
+        editPost(id) {
+            router.push(`/discussion/${id}/manage`)
+        },
+
         create() {
             this.list()
             if (this.parentTitle) {
@@ -80,18 +84,34 @@ export default {
             }
         },
         
+        manage(params) {
+            const fallthrough = this.parentId ? `/discussion/${this.parentId}/detail` : `feed/list`
+
+            this.showInstance(params.id, fallthrough, (instance) => {
+                this.instance = instance
+                this.instanceForm = this.instance.instance
+            })
+        },
+
         details(params) {
             this.showInstance(params.id, 'feed/list', (instance) => {
                 this.instance = instance
             })
         },
-
+        
         list(params) {
             return discussions().then((store) => {
                 this.objects = store.values
             })
         },
         
+        manageDiscussion() {
+            return DiscussionModel.manage(this.instance)
+                .catch((error) => {
+                    console.log(error)
+                })
+        },
+
         createDiscussion() {
             this.instanceForm.content_item.owner = auth.getActiveUser().details.id
             if (this.parentId) {
@@ -110,7 +130,12 @@ export default {
         },
         
         save() {
-            if (this.actions.create) {
+            if (this.actions.manage) {
+                this.manageDiscussion().then(() => {
+                    router.go(-1)
+                })
+            }
+            else if (this.actions.create) {
                 this.createDiscussion().then(data => this.$nextTick(() => {
                     if (!this.parentId) {
                         router.replace('/discussion/' + data.id + '/details')

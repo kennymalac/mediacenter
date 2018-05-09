@@ -137,10 +137,10 @@ export default {
         },
         
         manage(params) {
-            this.instance = this.objects.find((item) => {
-                return item.id === parseInt(params.id)
+            this.showInstance(params.id, 'feed/list', (instance) => {
+                this.instance = instance
+                this.instanceForm = this.instance.instance
             })
-            this.instanceForm = this.instance.instance
         },
         
         list(params) {
@@ -172,7 +172,7 @@ export default {
                 })
         },
 
-        manageAlbum() {
+        manageFeed() {
             return FeedModel.manage(this.instance)
                 .then((data) => {
                     this.instance = data
@@ -185,7 +185,7 @@ export default {
 
         save() {
             if (this.actions.manage) {
-                this.manageAlbum().then((data) => {
+                this.manageFeed().then((data) => {
                     console.log(data)
                 })
             }

@@ -22,6 +22,22 @@ class DiscussionModel extends Model {
     static fieldConverters = {
         content_item: (input) => modelInstance(FeedContentItemModel, input)
     }
+
+    static manage(discussion) {
+        return makeJsonRequest(`discussion/${discussion.id}/`, {
+            method: "PUT",
+            body: {
+                ...discussion
+            }
+        })
+            .then(jsonResponse)
+            .then((data) => {
+                for (const [key, val] of Object.entries(data)) {
+                    // TODO this has to work properly with model fields
+                    discussion[key] = val
+                }
+            })
+    }
 }
 
 class DiscussionCollection extends Collection {

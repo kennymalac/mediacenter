@@ -13,6 +13,7 @@
 * TODOs
 ** Priority 1 (urgent)
 *** UI/UX fixes
+**** TODO some sort of grid system & layout
 **** DONE convert Modal to flexbox
      CLOSED: [2018-04-30 Mon 18:30]
 **** TODO remove Pure CSS
@@ -105,7 +106,8 @@
      CLOSED: [2018-05-03 Thu 17:08]
 
 *** FeedContentItems
-**** TODO consider performance implication of backreference to Feeds
+**** DONE consider performance implication of backreference to Feeds
+     CLOSED: [2018-05-09 Wed 10:59]
 **** TODO FeedContentItems outside of Feeds
 **** TODO sharing Feeds outside of just inside Groups?
 
@@ -135,6 +137,8 @@
 
 *** Discussion
 **** TODO last edited date
+**** DONE edit interface for Replies should have no description field
+     CLOSED: [2018-05-09 Wed 11:13]
 **** TODO anchor links for individual posts
 **** TODO Pagination
 **** DONE model, serializer, viewset
@@ -149,6 +153,7 @@
 
 
 *** Feed
+**** TODO remove "content" manytomany - feed content should be dynamic
 **** TODO automatically create Feed for each content type
 **** TODO CRUD
 ***** DONE Create

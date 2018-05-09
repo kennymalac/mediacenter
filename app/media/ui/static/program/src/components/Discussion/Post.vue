@@ -5,7 +5,7 @@
                 <div class="profile-pic">
                     <img src="https://c1.staticflickr.com/5/4101/4870567608_69fbf87121_b.jpg" />
                 </div>
-
+                
                 <div class="author-details">
                     <span class="display-name">Kenster</span>
                     <span class="post-count">Posts: 370</span>
@@ -17,6 +17,14 @@
             </div>
         </div>
         <p class="text">{{ text }}</p>
+        <div class="actions">
+            <button type="button" @click="$emit('editPost')">
+                <i class="ion-md-create"></i> Edit
+            </button>
+            <button type="button" class="error">
+                <i class="ion-md-close"></i> Delete
+            </button>
+        </div>
     </div>
 </template>
 
@@ -84,6 +92,10 @@ export default {
     }
     p.text {
         padding: 10px 20px;
-    }        
+    }
+    .actions {
+        text-align: right;
+        padding: 10px;
+    }
 }
 </style>
