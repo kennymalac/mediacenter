@@ -1,5 +1,6 @@
 import {momentDate, modelInstance} from './converters.js'
 import {Model, Collection, serializeIds} from './Model.js'
+import {AccountModel} from './Account'
 import {FeedContentTypeCollection} from './FeedContentType'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 import {FeedContentItemModel} from './FeedContentItem'
@@ -20,10 +21,12 @@ class FeedModel extends Model {
     }
 
     static fieldConverters = {
-        created: momentDate
+        created: momentDate,
+        owner: (input) => modelInstance(AccountModel, input)
     }
 
     static initialState = {
+        owner: {},
         id: 0,
         created: {},
         name: '',

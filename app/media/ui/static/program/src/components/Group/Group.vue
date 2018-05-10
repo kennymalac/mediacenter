@@ -40,18 +40,18 @@
                 <fieldset>
                     <legend class="stack">Details</legend>
                     <label class="stack" for="name">Name</label>
-                    <input class="stack" name="name" v-model="instance.name" type="text" />
+                    <input class="stack" name="name" v-model="instanceForm.name" type="text" />
                     <label class="stack" for="description">Description</label>
-                    <textarea class="stack" name="description" v-model="instance.description" />
+                    <textarea class="stack" name="description" v-model="instanceForm.description" />
                     <label class="stack" for="image">Image</label>
-                    <input class="stack" name="image" v-model="instance.image" type="text" />
+                    <input class="stack" name="image" v-model="instanceForm.image" type="text" />
                     <!-- <label class="stack" for="rules">Rules</label>
                          TODO rules -->
                     <label class="stack" for="members"></label>
-                    <account-select v-model="instance.members" />
+                    <account-select v-model="instanceForm.members" />
 
                     <!-- <label class="stack" for="">Tags</label> -->
-                    <!-- <input class="stack" name="tags" v-model="instance.tags_raw" type="text" /> -->
+                    <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->
                     <input v-if="actions.create" class="stack" type="submit" value="Create" />
                     <input v-if="actions.manage" class="stack" type="submit" value="Save changes" />
                 </fieldset>
@@ -98,6 +98,7 @@ export default {
     data() {
         return {
             instance: { id: null },
+            instanceForm: { members: [], feed: {} },
             objectName: 'group',
             groupActions: [
                 {
@@ -125,6 +126,7 @@ export default {
     methods: {
         initialState() {
             this.instance = GroupModel.initialState
+            this.instanceForm = { members: [], feed: {} }
             this.contentItems = []
         },
 
@@ -137,7 +139,7 @@ export default {
         manage(params) {
             this.showInstance(params.id, 'group/list', (instance) => {
                 this.instance = instance
-                this.instanceForm = this.instance.instance
+                this.instanceForm = instance.getForm()
             })
         },
 
@@ -159,11 +161,7 @@ export default {
         },
 
         manageGroup() {
-            return GroupModel.manage(this.instance)
-                .then((data) => {
-                    this.instance = data
-                    return data
-                })
+            return GroupModel.manage(this.instance, this.instanceForm)
                 .catch((error) => {
                     console.log(error)
                 })
@@ -182,8 +180,8 @@ export default {
 
         save() {
             if (this.actions.manage) {
-                this.manageGroup().then((data) => {
-                    console.log(data)
+                this.manageGroup().then(() => {
+                    router.go(-1)
                 })
             }
             else if (this.actions.create) {

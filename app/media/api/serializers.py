@@ -309,9 +309,10 @@ class DiscussionSerializer(serializers.ModelSerializer):
     )
 
     def update(self, instance, validated_data):
-        for k,v in validated_data.pop('content_item').items():
-            setattr(instance.content_item, k, v)
-        instance.content_item.save()
+        if 'content_item' in validated_data:
+            for k,v in validated_data.pop('content_item').items():
+                setattr(instance.content_item, k, v)
+                instance.content_item.save()
 
         return super(DiscussionSerializer, self).update(instance, validated_data)
 
@@ -347,6 +348,13 @@ class GroupForumSerializer(serializers.ModelSerializer):
     feed = FeedCreateUpdateSerializer(
         read_only=False
     )
+
+    def update(self, instance, validated_data):
+        if 'feed' in validated_data:
+            for k,v in validated_data.pop('feed').items():
+                setattr(instance.feed, k, v)
+
+        return super(GroupForumSerializer, self).update(instance, validated_data)
 
     def create(self, validated_data):
         feed = Feed.objects.create(**validated_data.pop('feed'))

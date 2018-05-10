@@ -38,6 +38,12 @@ export class Model {
         this.instance = instance
 
         for (const field of Object.keys(this.constructor.initialState)) {
+            // No null members!
+            if (this.instance[field] === null || this.instance[field] === undefined) {
+                delete this.instance[field]
+                continue
+            }
+
             if (field in this.constructor.fields && collections[field] !== undefined) {
                 // NOTE assumes that Collection is up-to-date
                 // Initialize an array of model instances
@@ -121,7 +127,8 @@ export class Model {
         for (const key of Object.keys(this.constructor.initialState)) {
             // Get the model's serialized form
             // NOTE: we retain arrays as list of Model instances for now
-            console.log(key, this[key])
+            console.log(key, this[key], this[key] instanceof Model)
+
             form[key] = this[key] instanceof Model
                 ? this[key].getForm()
                 : form[key] = this[key]

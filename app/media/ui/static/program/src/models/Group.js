@@ -1,5 +1,6 @@
+import {modelInstance} from './converters.js'
 import {Model, Collection, serializeIds} from './Model.js'
-// import {FeedModel} from './models.js'
+import {FeedModel} from './Feed'
 import {AccountCollection} from './Account.js'
 
 import {makeJsonRequest, jsonResponse, fetchAPI} from '../httputil.js'
@@ -21,6 +22,10 @@ class GroupModel extends Model {
         members: AccountCollection
     }
 
+    static fieldConverters = {
+        feed: (input) => modelInstance(FeedModel, input)
+    }
+
     static initialState = {
         id: 0,
         feed: {},
@@ -32,13 +37,17 @@ class GroupModel extends Model {
     }
 
     // TODO make this a Store
-    static manage(group) {
-        return makeJsonRequest(`group/${group.id}/`, {
-            method: "PUT",
+    static manage(instance, form) {
+        return makeJsonRequest(`group/${instance.id}/`, {
+            method: "PATCH",
             body: {
-                ...group, members: serializeIds(group.members)
+                ...form, members: serializeIds(form.members)
             }
         })
+            .then(jsonResponse)
+            .then((data) => {
+                instance.sync(data, form)
+            })
     }
 }
 

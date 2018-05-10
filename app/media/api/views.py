@@ -121,10 +121,7 @@ class DiscussionViewSet(NestedViewSetMixin,
 
 
 class GroupForumViewSet(NestedViewSetMixin,
-                        ListModelMixin,
-                        RetrieveModelMixin,
-                        CreateModelMixin,
-                        GenericViewSet):
+                        ModelViewSet):
 
     queryset = GroupForum.objects.all()
     serializer_class = GroupForumSerializer
