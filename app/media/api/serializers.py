@@ -387,12 +387,17 @@ class GroupForumCreateUpdateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         feed_data = validated_data.pop('feed')
         interests = None
+        content_types = None
         if 'interests' in feed_data:
             interests = feed_data.pop('interests')
+        if 'content_types' in feed_data:
+            content_types = feed_data.pop('content_types')
 
         feed = Feed.objects.create(**feed_data)
         if interests:
-            feed.interests.add(interests)
+            feed.interests.add(*interests)
+        if content_types:
+            feed.content_types.add(*content_types)
 
         members = validated_data.pop('members')
         group = GroupForum.objects.create(**validated_data, feed=feed)

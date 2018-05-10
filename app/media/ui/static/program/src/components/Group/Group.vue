@@ -137,9 +137,10 @@ export default {
         },
 
         create() {
-            this.instance = GroupModel.getNewInstance()
-            this.instance.feed = FeedModel.getNewInstance()
-            this.instance.owner = auth.getActiveUser().details.id
+            this.instanceForm = GroupModel.getNewInstance()
+            this.instanceForm.feed = { interests: [], content_types: [] }
+            this.instanceForm.owner = auth.getActiveUser().details.id
+            this.instanceForm.feed.owner = this.instance.owner
         },
 
         manage(params) {
@@ -174,7 +175,7 @@ export default {
         },
 
         createGroup() {
-            return GroupCollection.create(this.instance)
+            return GroupCollection.create(this.instanceForm)
                 .then((data) => {
                     this.objects.push(data)
                     return data

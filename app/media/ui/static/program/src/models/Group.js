@@ -73,16 +73,18 @@ class GroupCollection extends Collection {
             })
     }
 
-    static create(data) {
+    static create(form) {
         return makeJsonRequest("group/", {
             method: "POST",
             body: {
-                ...data, members: serializeIds(data.members)
+                ...form,
+                members: serializeIds(form.members),
+                feed: {...form.feed, interests: serializeIds(form.feed.interests)}
             }
         })
             .then(jsonResponse)
             .then((createdData) => {
-                const instance = new GroupModel({...createdData, members: data.members})
+                const instance = new GroupModel({...createdData, members: form.members, feed: {...createdData.feed, ...form.feed}})
 
                 console.log(instance)
                 return instance
