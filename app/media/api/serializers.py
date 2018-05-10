@@ -243,11 +243,18 @@ class FeedContentItemTypeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 
+class InterestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Interest
+        fields = ('id', 'name')
+
+
 class FeedCreateUpdateSerializer(serializers.ModelSerializer):
     owner = serializers.PrimaryKeyRelatedField(
         queryset=Account.objects.all(),
         required=False
     )
+
     content_types = serializers.PrimaryKeyRelatedField(
         queryset=FeedContentItemType.objects.all(),
         many=True,
@@ -256,7 +263,7 @@ class FeedCreateUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Feed
-        fields = ('id', 'name', 'description', 'owner', 'content_types')
+        fields = ('id', 'name', 'description', 'owner', 'content_types', 'interests')
 
 
 class FeedSerializer(serializers.ModelSerializer):
@@ -264,6 +271,11 @@ class FeedSerializer(serializers.ModelSerializer):
         queryset=Account.objects.all(),
         required=False
     )
+
+    interests = InterestSerializer(
+        many=True
+    )
+
     content_types = FeedContentItemTypeSerializer(
         many=True,
         required=False
@@ -271,7 +283,7 @@ class FeedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Feed
-        fields = ('id', 'name', 'description', 'owner', 'content_types', 'created')
+        fields = ('id', 'name', 'description', 'owner', 'content_types', 'created', 'interests')
 
 
 class FeedContentItemSerializer(serializers.ModelSerializer):
@@ -345,19 +357,43 @@ class GroupForumSerializer(serializers.ModelSerializer):
         required=False
     )
 
+    feed = FeedSerializer(
+        read_only=False
+    )
+
+    class Meta:
+        model = GroupForum
+        fields = ('id', 'name', 'image', 'description', 'feed', 'owner', 'is_restricted', 'members', 'rules')
+
+
+class GroupForumCreateUpdateSerializer(serializers.ModelSerializer):
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=Account.objects.all(),
+        required=False
+    )
+
     feed = FeedCreateUpdateSerializer(
         read_only=False
     )
 
     def update(self, instance, validated_data):
         if 'feed' in validated_data:
+            print(validated_data)
             for k,v in validated_data.pop('feed').items():
                 setattr(instance.feed, k, v)
 
-        return super(GroupForumSerializer, self).update(instance, validated_data)
+        return super(GroupForumCreateUpdateSerializer, self).update(instance, validated_data)
 
     def create(self, validated_data):
-        feed = Feed.objects.create(**validated_data.pop('feed'))
+        feed_data = validated_data.pop('feed')
+        interests = None
+        if 'interests' in feed_data:
+            interests = feed_data.pop('interests')
+
+        feed = Feed.objects.create(**feed_data)
+        if interests:
+            feed.interests.add(interests)
+
         members = validated_data.pop('members')
         group = GroupForum.objects.create(**validated_data, feed=feed)
         group.members.add(*members)

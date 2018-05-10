@@ -2,14 +2,16 @@ import {momentDate, modelInstance} from './converters.js'
 import {Model, Collection, serializeIds} from './Model.js'
 import {AccountModel} from './Account'
 import {FeedContentTypeCollection} from './FeedContentType'
+import {InterestCollection} from './Interest'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 import {FeedContentItemModel} from './FeedContentItem'
 
-export function makeFeedCollection(feedContentTypes) {
-    return Promise.all([feedContentTypes(), FeedCollection.searchFeeds()])
+export function makeFeedCollection(feedContentTypes, interests) {
+    return Promise.all([feedContentTypes(), interests(), FeedCollection.searchFeeds()])
         .then(results => {
-            return new FeedCollection(results[1], {
-                content_types: results[0]
+            return new FeedCollection(results[2], {
+                content_types: results[0],
+                interests: results[1]
             })
         })
 }
@@ -17,7 +19,8 @@ export function makeFeedCollection(feedContentTypes) {
 class FeedModel extends Model {
 
     static fields = {
-        content_types: FeedContentTypeCollection
+        content_types: FeedContentTypeCollection,
+        interests: InterestCollection
     }
 
     static fieldConverters = {
@@ -31,9 +34,7 @@ class FeedModel extends Model {
         created: {},
         name: '',
         description: '',
-        tags: [],
         interests: [],
-        subjects: [],
         content_types: []
     }
 

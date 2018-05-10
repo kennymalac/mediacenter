@@ -82,12 +82,19 @@ class MediaViewSet(NestedViewSetMixin,
     pagination_class = AlbumMediaBrowserPagination
 
 
-
 class FeedContentTypeViewSet(ListModelMixin,
                   RetrieveModelMixin,
                   GenericViewSet):
     queryset = FeedContentItemType.objects.all()
     serializer_class = FeedContentItemTypeSerializer
+
+
+class InterestViewSet(ListModelMixin,
+                      RetrieveModelMixin,
+                      CreateModelMixin,
+                      GenericViewSet):
+    queryset = Interest.objects.all()
+    serializer_class = InterestSerializer
 
 
 class FeedViewSet(NestedViewSetMixin,
@@ -121,10 +128,16 @@ class DiscussionViewSet(NestedViewSetMixin,
 
 
 class GroupForumViewSet(NestedViewSetMixin,
+                        MultipleSerializerMixin,
                         ModelViewSet):
 
     queryset = GroupForum.objects.all()
-    serializer_class = GroupForumSerializer
+    serializer_classes = {
+        'default': GroupForumSerializer,
+        'partial_update': GroupForumCreateUpdateSerializer,
+        'update': GroupForumCreateUpdateSerializer,
+        'create': GroupForumCreateUpdateSerializer
+    }
 
 
 # @api_view

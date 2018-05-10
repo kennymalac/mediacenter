@@ -2,9 +2,11 @@
     <multiselect
         :value="value"
         @input="$emit('input', $event)"
+        @tag="addTag"
         :options="options"
         :multiple="true"
         :custom-label="optionLabel"
+        :taggable="taggable"
         track-by="id"
         />
 </template>
@@ -17,7 +19,11 @@ export default {
     props: {
         // name: [String],
         // 
-        value: [Array]
+        value: [Array],
+        taggable: {
+            type: Boolean,
+            default: false
+        }
     },
     components: {
         Multiselect
@@ -33,6 +39,11 @@ export default {
         this.collection().then((store) => {
             this.options = store.values
         })
+    },
+    methods: {
+        addTag(tag) {
+            // noop
+        }
     }
 }
 </script>

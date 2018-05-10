@@ -2,6 +2,10 @@ export function serializeIds(values) {
     return values.map((val) => { return val.instance.id })
 }
 
+export function serializeForms(values) {
+    return values.map((val) => { return val.getForm() })
+}
+
 export class Collection {
 
     constructor(values, collections = {}) {
@@ -38,7 +42,7 @@ export class Model {
         this.instance = instance
 
         for (const field of Object.keys(this.constructor.initialState)) {
-            // No null members!
+            // No empty members!
             if (this.instance[field] === null || this.instance[field] === undefined) {
                 delete this.instance[field]
                 continue
@@ -94,7 +98,7 @@ export class Model {
                 else {
                     // NOTE only handles nested relations 2 levels deep
                     // TODO fix?
-                    this[field].sync(val, this[field])
+                    this[field].sync(val, form[field])
                 }
                 continue
             }
@@ -124,14 +128,19 @@ export class Model {
     getForm() {
         const form = {}
         // Deep copy
-        for (const key of Object.keys(this.constructor.initialState)) {
+        for (const field of Object.keys(this.constructor.initialState)) {
+            // No empty members!
+            if (this[field] === null || this[field] === undefined) {
+                continue
+            }
+
             // Get the model's serialized form
             // NOTE: we retain arrays as list of Model instances for now
-            console.log(key, this[key], this[key] instanceof Model)
+            console.log(field, this[field], this[field] instanceof Model)
 
-            form[key] = this[key] instanceof Model
-                ? this[key].getForm()
-                : form[key] = this[key]
+            form[field] = this[field] instanceof Model
+                ? this[field].getForm()
+                : form[field] = this[field]
         }
         return form
     }

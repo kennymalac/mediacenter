@@ -87,9 +87,11 @@
     CLOSED: [2018-05-04 Fri 12:31]
 
 *** Interests
-**** TODO system to vote on new InterestGroups
+**** TODO maximum number of interests per Group, Feed
+**** TODO system to vote on consolidation & removal of Interest groups?
 **** TODO determine how to deal with content spam with many interests tagged
-**** TODO model, serializer, viewset
+**** DONE model, serializer, viewset
+     CLOSED: [2018-05-10 Thu 13:03]
 **** TODO CRUD
 ***** TODO Create
 ***** TODO Read
@@ -123,7 +125,10 @@
 ***** TODO Delete
 
 *** Groups
+**** TODO should adding interests to groups make any content items default to those interests?
 **** TODO Creating FeedContentItems
+**** DONE interests tagged
+     CLOSED: [2018-05-10 Thu 13:04]
 **** DONE basic UI
      CLOSED: [2018-05-01 Tue 18:07]
 **** TODO cross-network groups
@@ -155,6 +160,12 @@
 
 
 *** Feed
+**** Feeds have a certain quota - maximum of 100 content items per feed?
+content items are recycled?
+payment plan for archiving more content items per feed
+Favoriting a content item permanently occupies a slot in the content feed item quota
+Your feed has "content decay"
+
 **** TODO remove "content" manytomany - feed content should be dynamic
 **** TODO automatically create Feed for each content type
 **** TODO CRUD

@@ -25,6 +25,8 @@
                     <div class="who-is-online">
                         <h3><div class="online-circle"></div> {{ onlineMembers.length }} User(s) online now</h3>
                     </div>
+                    
+                    <span v-for="interest in instance.feed.interests" class="category-tag">{{ interest.name }}</span>
                 </div>
             </section>
             <div class="group-contents">
@@ -47,8 +49,10 @@
                     <input class="stack" name="image" v-model="instanceForm.image" type="text" />
                     <!-- <label class="stack" for="rules">Rules</label>
                          TODO rules -->
-                    <label class="stack" for="members"></label>
+                    <label class="stack" for="members">Members</label>
                     <account-select v-model="instanceForm.members" />
+                    <label class="stack" for="interests">Interests</label>
+                    <interest-select v-model="instanceForm.feed.interests" />
 
                     <!-- <label class="stack" for="">Tags</label> -->
                     <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->
@@ -67,6 +71,7 @@ import {FeedModel} from '../../models/Feed.js'
 import {groups} from '../../store.js'
 
 import AccountSelect from '../AccountSelect'
+import InterestSelect from '../InterestSelect'
 import GroupList from './GroupList'
 import FeedContentItemList from '../FeedContentItemList'
 import FeedFilter from '../FeedFilter'
@@ -80,6 +85,7 @@ export default {
     mixins: [RestfulComponent],
     components: {
         AccountSelect,
+        InterestSelect,
         GroupList,
         FeedContentItemList,
         FeedFilter,

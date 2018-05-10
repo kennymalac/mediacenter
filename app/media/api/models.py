@@ -127,17 +127,44 @@ class FeedContentItemType(models.Model):
         return self.name
 
 
-class Feed(models.Model):
+class ContentTag(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        abstract = True
+
+
+class Interest(ContentTag):
+    parents = models.ManyToManyField('self')
+    children = models.ManyToManyField('self')
+    # Art, Computers, Design > Digital Art > Anime
+
+
+class TaggedItem(models.Model):
+    # Associated tags
+    interests = models.ManyToManyField(Interest, blank=True)
+    # places = models.ManyToManyField(Place)
+    # people (people without accounts most likely)
+    # organizations
+    # 
+
+    class Meta:
+        abstract = True
+
+
+class Feed(TaggedItem):
     owner = models.ForeignKey(Account, null=True)
     name = models.CharField(max_length=140, blank=True)
     description = models.TextField(blank=True)
     content_types = models.ManyToManyField(FeedContentItemType, related_name='+')
-    # interests = models.ManyToManyField(Interest, related_name='+')
     content = models.ManyToManyField('api.FeedContentItem', related_name='feeds')
     created = models.DateTimeField(auto_now_add=True)
 
 
-class FeedContentItem(models.Model):
+class FeedContentItem(TaggedItem):
     owner = models.ForeignKey(Account, blank=True)
     content_type = models.ForeignKey(FeedContentItemType, related_name="+")
     title = models.CharField(max_length=140, blank=True)

@@ -41,7 +41,9 @@ class GroupModel extends Model {
         return makeJsonRequest(`group/${instance.id}/`, {
             method: "PATCH",
             body: {
-                ...form, members: serializeIds(form.members)
+                ...form,
+                members: serializeIds(form.members),
+                feed: {...form.feed, interests: serializeIds(form.feed.interests)}
             }
         })
             .then(jsonResponse)
