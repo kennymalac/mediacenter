@@ -23,19 +23,14 @@ class DiscussionModel extends Model {
         content_item: (input) => modelInstance(FeedContentItemModel, input)
     }
 
-    static manage(discussion) {
-        return makeJsonRequest(`discussion/${discussion.id}/`, {
-            method: "PUT",
-            body: {
-                ...discussion
-            }
+    static manage(instance, form) {
+        return makeJsonRequest(`discussion/${instance.id}/`, {
+            method: "PATCH",
+            body: form
         })
             .then(jsonResponse)
             .then((data) => {
-                for (const [key, val] of Object.entries(data)) {
-                    // TODO this has to work properly with model fields
-                    discussion[key] = val
-                }
+                instance.sync(data, form)
             })
     }
 }

@@ -72,7 +72,7 @@ export default {
             this.instance = { id: null, content_item: { feeds: [] } }
             this.instanceForm = { content_item: {} }
         },
-        
+
         editPost(id) {
             router.push(`/discussion/${id}/manage`)
         },
@@ -83,13 +83,13 @@ export default {
                 this.instanceForm.content_item.title = `Re: ${this.parentTitle}`
             }
         },
-        
+
         manage(params) {
             const fallthrough = this.parentId ? `/discussion/${this.parentId}/detail` : `feed/list`
 
             this.showInstance(params.id, fallthrough, (instance) => {
                 this.instance = instance
-                this.instanceForm = this.instance.instance
+                this.instanceForm = instance.getForm()
             })
         },
 
@@ -98,15 +98,15 @@ export default {
                 this.instance = instance
             })
         },
-        
+
         list(params) {
             return discussions().then((store) => {
                 this.objects = store.values
             })
         },
-        
+
         manageDiscussion() {
-            return DiscussionModel.manage(this.instance)
+            return DiscussionModel.manage(this.instance, this.instanceForm)
                 .catch((error) => {
                     console.log(error)
                 })
@@ -128,7 +128,7 @@ export default {
                     console.log(error)
                 })
         },
-        
+
         save() {
             if (this.actions.manage) {
                 this.manageDiscussion().then(() => {

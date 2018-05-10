@@ -1,10 +1,13 @@
 import {makeCollection} from './models/Model.js'
+
+import {AccountCollection, makeAccountCollection} from './models/Account.js'
 import {FeedCollection, makeFeedCollection} from './models/Feed.js'
 import {FeedContentTypeCollection, makeFeedContentTypeCollection} from './models/FeedContentType.js'
 import {DiscussionCollection, makeDiscussionCollection} from './models/Discussion.js'
 import {GroupCollection, makeGroupCollection} from './models/Group.js'
 
 const store = {
+    accounts: {},
     feeds: {},
     feedContentTypes: {},
     discussions: {},
@@ -15,6 +18,15 @@ const proxiedStore = new Proxy(store, {})
 
 const getStore = () => {
     return proxiedStore
+}
+
+export const accounts = () => {
+    return makeCollection(
+        getStore,
+        'accounts',
+        AccountCollection,
+        makeAccountCollection
+    )
 }
 
 export const feedContentTypes = () => {
@@ -49,6 +61,6 @@ export const groups = () => {
         getStore,
         'group',
         GroupCollection,
-        makeGroupCollection
+        () => makeGroupCollection(accounts)
     )
 }

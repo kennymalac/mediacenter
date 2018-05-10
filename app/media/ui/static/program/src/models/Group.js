@@ -1,11 +1,16 @@
-import {Model, Collection} from './Model.js'
+import {Model, Collection, serializeIds} from './Model.js'
 // import {FeedModel} from './models.js'
+import {AccountCollection} from './Account.js'
+
 import {makeJsonRequest, jsonResponse, fetchAPI} from '../httputil.js'
 
-export function makeGroupCollection() {
-    return GroupCollection.searchGroups().then((items) => {
-        return new GroupCollection(items)
-    })
+export function makeGroupCollection(accounts) {
+    return Promise.all([accounts(), GroupCollection.searchGroups()])
+        .then((results) => {
+            return new GroupCollection(results[1], {
+                members: results[0]
+            })
+        })
 }
 
 class GroupModel extends Model {
@@ -13,6 +18,7 @@ class GroupModel extends Model {
     static fields = {
         // TODO nested feed model
         // fields only works for lists, not a single item
+        members: AccountCollection
     }
 
     static initialState = {
@@ -30,7 +36,7 @@ class GroupModel extends Model {
         return makeJsonRequest(`group/${group.id}/`, {
             method: "PUT",
             body: {
-                ...group
+                ...group, members: serializeIds(group.members)
             }
         })
     }
@@ -60,12 +66,12 @@ class GroupCollection extends Collection {
         return makeJsonRequest("group/", {
             method: "POST",
             body: {
-                ...data
+                ...data, members: serializeIds(data.members)
             }
         })
             .then(jsonResponse)
-            .then((created) => {
-                const instance = new GroupModel(created)
+            .then((createdData) => {
+                const instance = new GroupModel({...createdData, members: data.members})
 
                 console.log(instance)
                 return instance

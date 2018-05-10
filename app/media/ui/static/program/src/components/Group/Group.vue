@@ -134,8 +134,11 @@ export default {
             this.instance.owner = auth.getActiveUser().details.id
         },
 
-        manage() {
-            
+        manage(params) {
+            this.showInstance(params.id, 'group/list', (instance) => {
+                this.instance = instance
+                this.instanceForm = this.instance.instance
+            })
         },
 
         list(params) {
@@ -155,6 +158,17 @@ export default {
             })
         },
 
+        manageGroup() {
+            return GroupModel.manage(this.instance)
+                .then((data) => {
+                    this.instance = data
+                    return data
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+        },
+
         createGroup() {
             return GroupCollection.create(this.instance)
                 .then((data) => {
@@ -167,9 +181,14 @@ export default {
         },
 
         save() {
-            if (this.actions.create) {
-                this.createGroup().then(this.$nextTick(() => {
-                    router.replace('/group/' + this.instance.id + '/manage')
+            if (this.actions.manage) {
+                this.manageGroup().then((data) => {
+                    console.log(data)
+                })
+            }
+            else if (this.actions.create) {
+                this.createGroup().then(data => this.$nextTick(() => {
+                    router.replace('/group/' + data.id + '/manage')
                 }))
             }
         }

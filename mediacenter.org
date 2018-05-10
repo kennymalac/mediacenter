@@ -87,6 +87,8 @@
     CLOSED: [2018-05-04 Fri 12:31]
 
 *** Interests
+**** TODO system to vote on new InterestGroups
+**** TODO determine how to deal with content spam with many interests tagged
 **** TODO model, serializer, viewset
 **** TODO CRUD
 ***** TODO Create

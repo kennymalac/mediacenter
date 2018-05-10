@@ -1,12 +1,13 @@
 <script>
 import CollectionSelect from './CollectionSelect'
-import {AccountCollection} from '../models/Account.js'
+import {accounts} from '../store.js'
 
 export default {
+    name: 'account-select',
     mixins: [CollectionSelect],
     data() {
         return {
-            collection: AccountCollection
+            collection: accounts
         }
     },
     methods: {

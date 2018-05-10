@@ -132,23 +132,23 @@ export default {
             this.contentItems = []
             this.instanceForm = { content_types: [] }
         },
-        
+
         create() {
         },
-        
+
         manage(params) {
             this.showInstance(params.id, 'feed/list', (instance) => {
                 this.instance = instance
                 this.instanceForm = this.instance.instance
             })
         },
-        
+
         list(params) {
             return feeds().then((store) => {
                 this.objects = store.values
             })
         },
-        
+
         details(params) {
             this.showInstance(params.id, 'feed/list', (instance) => {
                 this.instance = instance
