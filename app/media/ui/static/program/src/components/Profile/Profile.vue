@@ -20,10 +20,12 @@
                 <p class="description">{{ instance.description }}</p>
                 
                 <div class="category">
-                    <span>Interests:</span> <span v-for="interest in instance.interests" class="category-tag" @click="clickInterestTag(interest.id)">{{ interest.name }}</span>
+                    <span>Interests:</span>
+                    <tag-list :tags="instance.interests" tagType="interest" />
                 </div>
                 <div class="category">
-                    <span>Groups:</span> <span v-for="group in groups" class="category-tag group-tag" @click="clickGroupTag(group.id)">{{ group.name }}</span>
+                    <span>Groups:</span>
+                    <tag-list :tags="groups" tagType="group" />
                 </div>
             </section>
             <!-- <section class="comments"> -->
@@ -35,8 +37,8 @@
 
 <script>
 import RestfulComponent from "../RestfulComponent"
-import router from "../../router/index.js"
 import ProfileList from './ProfileList'
+import TagList from '../TagList'
 
 import {profiles} from '../../store.js'
 
@@ -46,7 +48,8 @@ import {profiles} from '../../store.js'
 export default {
     mixins: [RestfulComponent],
     components: {
-        ProfileList
+        ProfileList,
+        TagList
     },
     data() {
         return {
@@ -68,14 +71,6 @@ export default {
         initialState() {
             this.instance = { id: null, interests: [] }
             this.instanceForm = { interests: [] }
-        },
-
-        clickGroupTag(groupId) {
-            router.push(`/group/${groupId}/details`)
-        },
-
-        clickInterestTag(interestId) {
-            router.push(`/interest/${interestId}/details`)
         },
 
         async list(params) {

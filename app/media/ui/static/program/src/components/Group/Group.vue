@@ -26,7 +26,7 @@
                         <h3><div class="online-circle"></div> {{ onlineMembers.length }} User(s) online now</h3>
                     </div>
                     
-                    <span v-for="interest in instance.feed.interests" class="category-tag">{{ interest.name }}</span>
+                    <tag-list :tags="instance.feed.interests" tagType="interest" />
                 </div>
             </section>
             <div class="group-contents">
@@ -77,6 +77,7 @@ import FeedContentItemList from '../FeedContentItemList'
 import FeedFilter from '../FeedFilter'
 import ActionButton from '../ActionButton'
 import ActionList from '../ActionList'
+import TagList from '../TagList'
 
 import router from "../../router/index.js"
 
@@ -89,7 +90,8 @@ export default {
         FeedContentItemList,
         FeedFilter,
         ActionButton,
-        ActionList
+        ActionList,
+        TagList
     },
     computed: {
         onlineMembers() {
