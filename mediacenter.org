@@ -102,6 +102,14 @@
 **** DONE basic UI
      CLOSED: [2018-05-08 Tue 16:56]
 **** TODO cross-network profiles
+**** DONE model, serializer, viewset
+     CLOSED: [2018-05-11 Fri 13:05]
+**** TODO CRUD
+***** TODO Create
+***** TODO Read
+***** TODO Update
+***** TODO Delete
+
 
 *** FeedContentTypes
 **** DONE Read

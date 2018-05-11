@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Feed from 'components/Feed'
 import Register from 'components/Register'
 import Login from 'components/Login'
-import Profile from 'components/Profile'
+import Profile from 'components/Profile/Profile'
 import Chat from 'components/Chat'
 import Home from 'components/Home'
 import Gallery from 'components/Gallery'
@@ -81,6 +81,13 @@ export default new Router({
             path: '/register',
             name: 'Register',
             component: Register
+        },
+        {
+            path: '/profile/:action',
+            name: 'Profile',
+            component: Profile,
+            props: restAction,
+            canReuse: false
         },
         {
             path: '/profile/:id/:action',

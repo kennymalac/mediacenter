@@ -12,15 +12,16 @@ import api.managers
 
 # Create your models here.
 
-
 class Account(AbstractUser, GuardianUserMixin):
     country = CountryField()
     email = models.EmailField()
     # Persist a hash of the user's UI display settings
     # Default settings are assigned on account creation
-    profile_details = JSONField(null=True, blank=True)
+    profile = models.OneToOneField('api.Profile', null=True)
+    friends = models.ManyToManyField('self', blank=True)
+
     account_settings = JSONField(null=True, blank=True)
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'email', 'password']
+    REQUIRED_FIELDS = ['display_name', 'email', 'password']
     accounts = api.managers.AccountManager
 
     class Meta:
@@ -153,6 +154,12 @@ class TaggedItem(models.Model):
 
     class Meta:
         abstract = True
+
+
+class Profile(TaggedItem):
+    display_name = models.CharField(max_length=60, blank=True)
+    title = models.CharField(max_length=140, default="Welcome to my profile!")
+    description = models.TextField(blank=True)
 
 
 class Feed(TaggedItem):

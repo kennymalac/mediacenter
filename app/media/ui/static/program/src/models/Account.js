@@ -6,11 +6,12 @@ class AccountModel extends Model {
     static initialState = {
         id: 0,
         username: "",
-        first_name: "",
-        last_name: "",
         email: "",
         country: "",
-        account_settings: {}
+        account_settings: {},
+        groups: [],
+        friends: [],
+        profile: {}
     }
 }
 
@@ -22,6 +23,13 @@ export function makeAccountCollection() {
 
 class AccountCollection extends Collection {
     static Model = AccountModel
+
+    static get(id) {
+        return fetchAPI(`accounts/${id}`, {
+            method: "GET"
+        })
+            .then(jsonResponse)
+    }
 
     static all() {
         return fetchAPI(`accounts/`, {

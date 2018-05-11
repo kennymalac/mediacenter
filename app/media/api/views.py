@@ -98,6 +98,13 @@ class InterestViewSet(ListModelMixin,
     serializer_class = InterestSerializer
 
 
+class ProfileViewSet(ListModelMixin,
+                     RetrieveModelMixin,
+                     GenericViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+
 class FeedViewSet(NestedViewSetMixin,
                   MultipleSerializerMixin,
                   ModelViewSet):

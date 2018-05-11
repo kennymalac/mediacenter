@@ -40,21 +40,36 @@ export default {
         }
     },
     methods: {
-        async findInstance(id, fallthrough) {
+        async findInstance(id) {
             // NOTE/TODO we don't need the entire list of objects for each instance
             const instance = this.objects.find((item) => {
                 return item.id === parseInt(id)
             })
-            if (instance === undefined) {
-                router.replace(fallthrough)
-            }
             return instance
         },
-        async showInstance(id, fallthrough) {
+        async showInstance(id, fallthrough, collection) {
             if (this.objects.length === 0) {
+                // TODO no need to try this each time for details
+                // just try getting the instance directly
                 await this.list()
             }
-            return this.findInstance(id, fallthrough)
+            let instance = this.findInstance(id, fallthrough)
+            if (instance) {
+                return instance
+            }
+
+            // Try getting instance directly
+            if (collection) {
+                try {
+                    instance = await collection.get(id)
+                    return instance
+                }
+                catch (error) {
+                    console.log(error)
+                }
+            }
+
+            router.replace(fallthrough)
         },
         restAction(to, from) {
             let link = {}

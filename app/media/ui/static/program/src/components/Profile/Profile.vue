@@ -1,20 +1,26 @@
 <template>
     <div class="feed-container">
+        <template v-if="actions.list">
+            <h1>User list</h1>
+            <profile-list :items="objects" />
+        </template>
+
         <template v-if="actions.details && instance.id">
             <section class="sidebar">
                 <div class="group-info">
                     <div class="icon-container">
-                        <i v-if="instance.icon" :class="instance.icon"></i>
+                        <img v-if="instance.picture" />
+                        <i v-if="!instance.picture" class="ion-md-person"></i>
                     </div>
-                    <h2>{{ instance.first_name }} {{ instance.last_name }}</h2>
+                    <h2>{{ instance.display_name }}</h2>
                 </div>
             </section>
             <section class="main-profile">
-                <h2>{{ instance.profile.title }}</h2>
-                <p class="description">{{ instance.profile.description }}</p>
+                <h2>{{ instance.title }}</h2>
+                <p class="description">{{ instance.description }}</p>
                 
                 <div class="category">
-                    <span>Interests:</span> <span v-for="interest in interests" class="category-tag">{{ interest.name }}</span>
+                    <span>Interests:</span> <span v-for="interest in instance.interests" class="category-tag" @click="clickInterestTag(interest.id)">{{ interest.name }}</span>
                 </div>
                 <div class="category">
                     <span>Groups:</span> <span v-for="group in groups" class="category-tag group-tag" @click="clickGroupTag(group.id)">{{ group.name }}</span>
@@ -28,59 +34,57 @@
 </template>
 
 <script>
-import RestfulComponent from "./RestfulComponent"
-import router from "../router/index.js"
+import RestfulComponent from "../RestfulComponent"
+import router from "../../router/index.js"
+import ProfileList from './ProfileList'
+
+import {profiles} from '../../store.js'
+
 // import {AccountCollection} from '../models/Account.js'
 // import {auth} from "../../auth.js"
 
 export default {
     mixins: [RestfulComponent],
+    components: {
+        ProfileList
+    },
     data() {
         return {
+            instanceForm: { interests: [] },
             instance: {
-                id: 1,
-                icon: "ion-md-person",
-                profile: {
-                    title: "Welcome to my profile!",
-                    description: "I like this this this this , etc."
-                },
-                first_name: "King",
-                last_name: "Herring"
-            },
-            interests: [
-                {
-                    name: "Programming"
-                },
-                {
-                    name: "Reading"
-                },
-                {
-                    name: "Philosophy"
-                }
-            ],
-            groups: [
-                {
-                    id: 4,
-                    name: "Tea"
-                },
-                {
-                    id: 5,
-                    name: "Philosophers"
-                }
-            ]
+                interests: []
+            }
+        }
+    },
+    computed: {
+        groups() {
+            if (this.instance.id) {
+                //
+            }
+            return []
         }
     },
     methods: {
         initialState() {
-            
+            this.instance = { id: null, interests: [] }
+            this.instanceForm = { interests: [] }
         },
 
         clickGroupTag(groupId) {
             router.push(`/group/${groupId}/details`)
         },
 
-        details(params) {
-            
+        clickInterestTag(interestId) {
+            router.push(`/interest/${interestId}/details`)
+        },
+
+        async list(params) {
+            const store = await profiles()
+            this.objects = store.values
+        },
+
+        async details(params) {
+            this.instance = await this.showInstance(params.id, '/profile/list')
         }
     }
 }

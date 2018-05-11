@@ -2,7 +2,7 @@
     <div class="post">
         <div class="post-header">
             <div class="author">
-                <div class="profile-pic">
+                <div class="profile-picture">
                     <img src="https://c1.staticflickr.com/5/4101/4870567608_69fbf87121_b.jpg" />
                 </div>
                 
@@ -62,11 +62,11 @@ export default {
             display: flex;
             width: 45%;
             
-            .profile-pic {
+            .profile-picture {
                 display: inline-flex;
                 width: 64px;
                 height: 64px;
-                img {
+                img, i {
                     height: 100%;
                     border-radius: 50%;
                     width: 100%;

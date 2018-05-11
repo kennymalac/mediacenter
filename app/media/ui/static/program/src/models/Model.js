@@ -39,8 +39,8 @@ export class Model {
                 const store = collections[field]
                 if (store instanceof this.constructor.fields[field]) {
                     const ids = Number.isInteger(this.instance[field])
-                          ? this.instance[field].map((val) => { return val.id })
-                          : this.instance[field]
+                          ? this.instance[field]
+                          : this.instance[field].map((val) => { return val.id })
                     this.instance[field] = store.values.filter((data) => {
                         return ids.includes(data.id)
                     })

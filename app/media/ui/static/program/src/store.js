@@ -2,6 +2,7 @@ import {makeActiveUser} from './auth.js'
 import makeSingleton from './singleton.js'
 
 import {AccountCollection, makeAccountCollection} from './models/Account.js'
+import {ProfileCollection, makeProfileCollection} from './models/Profile.js'
 import {FeedContentTypeCollection, makeFeedContentTypeCollection} from './models/FeedContentType.js'
 import {InterestCollection, makeInterestCollection} from './models/Interest.js'
 import {FeedCollection, makeFeedCollection} from './models/Feed.js'
@@ -11,6 +12,7 @@ import {GroupCollection, makeGroupCollection} from './models/Group.js'
 const store = {
     activeUser: {},
     accounts: {},
+    profiles: {},
     feeds: {},
     feedContentTypes: {},
     interests: {},
@@ -55,6 +57,14 @@ export const interests = () => {
         'interests',
         (value) => value instanceof InterestCollection,
         makeInterestCollection
+    )
+}
+
+export const profiles = () => {
+    return singleton(
+        'profiles',
+        (value) => value instanceof ProfileCollection,
+        () => makeProfileCollection(interests)
     )
 }
 

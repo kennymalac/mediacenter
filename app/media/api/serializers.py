@@ -9,11 +9,10 @@ from api.models import *
 
 
 class AccountSerializer(CountryFieldMixin, serializers.ModelSerializer):
-    profile_details = serializers.JSONField(read_only=True)
 
     class Meta:
         model = Account
-        fields = ('id', 'first_name', 'last_name', 'username', 'country', 'profile_details', 'email')
+        fields = ('id', 'username', 'country', 'email')
 
 
 class FullAccountSerializer(AccountSerializer):
@@ -22,16 +21,15 @@ class FullAccountSerializer(AccountSerializer):
 
     class Meta:
         model = Account
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'password', 'country', 'account_settings')
+        fields = ('id', 'username', 'email', 'password', 'country', 'account_settings')
 
 
 class PrivateAccountProfileDetailsSerializer(serializers.ModelSerializer):
     account_settings = serializers.JSONField(read_only=False)
-    profile_details = serializers.JSONField(read_only=False)
 
     class Meta:
         model = Account
-        fields = ('id', 'account_settings', 'profile_details')
+        fields = ('id', 'account_settings')
 
 
 class LogSerializer(serializers.Serializer):
@@ -247,6 +245,16 @@ class InterestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interest
         fields = ('id', 'name')
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    interests = InterestSerializer(
+        many=True
+    )
+
+    class Meta:
+        model = Profile
+        fields = ('id', 'display_name', 'title', 'description', 'interests')
 
 
 class FeedCreateUpdateSerializer(serializers.ModelSerializer):
