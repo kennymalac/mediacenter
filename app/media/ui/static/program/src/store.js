@@ -8,6 +8,7 @@ import {InterestCollection, makeInterestCollection} from './models/Interest.js'
 import {FeedCollection, makeFeedCollection} from './models/Feed.js'
 import {DiscussionCollection, makeDiscussionCollection} from './models/Discussion.js'
 import {GroupCollection, makeGroupCollection} from './models/Group.js'
+import {AlbumCollection, makeAlbumCollection} from './models/Album.js'
 
 const store = {
     activeUser: {},
@@ -16,6 +17,7 @@ const store = {
     interestedUsers: {},
     interestId: 0,
     feeds: {},
+    albums: {},
     feedContentTypes: {},
     interests: {},
     discussions: {},
@@ -96,6 +98,14 @@ export const feeds = () => {
         'feeds',
         (value) => value instanceof FeedCollection,
         () => makeFeedCollection(feedContentTypes, interests)
+    )
+}
+
+export const albums = () => {
+    return singleton(
+        'albums',
+        (value) => value instanceof AlbumCollection,
+        makeAlbumCollection
     )
 }
 

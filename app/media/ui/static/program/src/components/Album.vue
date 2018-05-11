@@ -1,7 +1,10 @@
 <template>
     <div class="album-interface">
-        <div class="album-item-list">
-            <album-grid-item v-if="actions.list" v-for="album in objects" @albumSelected="modifyAlbum" :album="album"/>
+        <div class="album-list" v-if="actions.list">
+            <action-button link="/album/create" icon="ion-ios-albums" extraIcon="ion-md-add-circle" title="Create an Album" />
+            <div class="album-item-list">
+                <album-grid-item v-for="album in objects" @albumSelected="modifyAlbum" :album="album.instance" btnText="Edit" />
+            </div>
         </div>
         
         <h1 v-if="actions.manage">
@@ -59,12 +62,14 @@
 </template>
 
 <script>
-import {AlbumCollection, AlbumModel} from '../models/Album.js'
+import {AlbumCollection, AlbumModel} from "../models/Album.js"
+import {albums} from "../store.js"
 
 import RestfulComponent from "./RestfulComponent"
 import AlbumGridItem from "./AlbumGridItem"
 import AlbumMediaItemUploadGridItem from "./AlbumMediaItemUploadGridItem"
 import FileUpload from "./FileUpload"
+import ActionButton from "./ActionButton"
 import router from "../router/index.js"
 import {auth} from "../auth.js"
 
@@ -73,7 +78,8 @@ export default {
     components: {
         AlbumGridItem,
         AlbumMediaItemUploadGridItem,
-        FileUpload
+        FileUpload,
+        ActionButton
     },
     data() {
         return {
@@ -93,16 +99,14 @@ export default {
             this.instance = {}
         },
 
-        manage(params) {
-            AlbumCollection.get(params.id).then((data) => {
-                this.instance = data
-            })
+        async manage(params) {
+            this.instance = await this.showInstance(params.id, 'album/list')
+            // this.instanceForm = 
         },
 
-        list(params) {
-            AlbumCollection.searchAlbums().then((data) => {
-                this.objects = data
-            })
+        async list(params) {
+            const store = await albums()
+            this.objects = store.values
         },
 
         createAlbum() {
@@ -131,7 +135,7 @@ export default {
                 })
         },
         modifyAlbum(album) {
-            router.replace('/album/' + album.id + "/manage")
+            router.push('/album/' + album.id + "/manage")
         },
         uploadMediaItems() {
             // Encode the source file as a form
@@ -141,13 +145,13 @@ export default {
                 console.log(media.title)
                 console.log(media.description)
                 console.log(media.tags)
-                
+
                 form.append("src", media.src)
                 form.append("title", media.title)
                 form.append("description", media.description)
                 form.append("tags", media.tags)
             }
-            
+
             return AlbumModel.upload(this.instance.id, form)
         },
         addMediaItem() {

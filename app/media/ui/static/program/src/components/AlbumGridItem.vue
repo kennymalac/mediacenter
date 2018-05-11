@@ -2,10 +2,10 @@
     <div class="album gallery-horizontal-box">
         <img v-if="album.thumbnail" :src="album.thumbnail.src" :alt="album.thumbnail.alt" class="pure-img"/>
         <label v-if="album.title && album.owner">
-            {{album.title}} by {{album.owner.first_name}} {{album.owner.last_name}}
+            {{album.title}} by {{album.owner.username}}
         </label>
         <div>
-            <button v-on:click="selectAlbum()" class="btn">Show</button>
+            <button @click="selectAlbum()" class="btn">{{ btnText }}</button>
         </div>
     </div>
 </template>
@@ -16,7 +16,13 @@
 // src: ''
 // },
 export default {
-    props: ['album'],
+    props: {
+        album: [Object],
+        btnText: {
+            type: String,
+            default: "Show"
+        }
+    },
     data() {
         return {
         }

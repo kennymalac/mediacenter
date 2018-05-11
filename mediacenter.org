@@ -71,7 +71,8 @@
 ***** TODO Update
 ***** TODO Delete
 **** TODO Uploading media items
-**** TODO Merge Manage Album and Create Album into "Albums"
+**** DONE Merge Manage Album and Create Album into "Albums"
+     CLOSED: [2018-05-11 Fri 16:47]
 **** TODO full test coverage
 *** Account
 **** DONE AccountCollection
@@ -83,11 +84,16 @@
 ** Priority 2 (necessary)
 *** TODO slugs instead of ids in routes
 
+*** Online Now
+**** TODO websocket implementation
+**** TODO component
+
 *** DONE Nested routes
     CLOSED: [2018-05-04 Fri 12:31]
 
 *** Interests
 **** TODO maximum number of interests per Group, Feed
+**** TODO get list of Group tags working
 **** TODO determine if view should list both Groups and Users?
 **** TODO system to vote on consolidation & removal of Interest groups?
 **** TODO determine how to deal with content spam with many interests tagged
@@ -137,7 +143,11 @@
 ***** TODO Delete
 
 *** Groups
-**** TODO group list should only show authenticated user's groups by default
+**** TODO moderation system
+**** TODO invite only groups
+**** TODO Find Group interface
+**** DONE group list should only show authenticated user's groups by default
+     CLOSED: [2018-05-11 Fri 16:03]
 **** TODO should adding interests to groups make any content items default to those interests?
 **** TODO Creating FeedContentItems
 **** DONE interests tagged
@@ -206,7 +216,8 @@ Your feed has "content decay"
 *** Model/Collection
     don't make too many assumptions
 **** TODO maybe don't recompute - don't have objects in this.objects ?
-**** TODO inject store into base Vue Program so all vues can do this.$store
+**** DONE inject store into base Vue Program so all vues can do this.$store
+     CLOSED: [2018-05-11 Fri 16:04]
 
 **** TODO don't get ALL discussions for a simple details/manage request
 **** DONE base classes

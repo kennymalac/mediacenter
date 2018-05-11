@@ -15,8 +15,7 @@
             <router-link class="button pseudo" to="/profile/list">Users</router-link>
             <router-link class="button pseudo" to="/chat">Chat</router-link>
             <router-link class="button pseudo" to="/gallery">Media Gallery</router-link>
-            <router-link class="button pseudo" to="/album/create">Create Album</router-link>
-            <router-link class="button pseudo" to="/album/list">Manage Albums</router-link>
+            <router-link class="button pseudo" to="/album/list">Albums</router-link>
         </div>
     </nav>
 </template>
