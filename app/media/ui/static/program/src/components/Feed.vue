@@ -143,20 +143,19 @@ export default {
             })
         },
 
-        list(params) {
-            return feeds().then((store) => {
-                this.objects = store.values
-            })
+        async list(params) {
+            const store = await feeds()
+            this.objects = store.values
         },
 
-        details(params) {
-            this.showInstance(params.id, 'feed/list', (instance) => {
-                this.instance = instance
-                FeedModel.listItems(instance.id, {})
-                    .then((contentData) => {
-                        this.contentItems = contentData
-                    })
-            })
+        async details(params) {
+            this.instance = await this.showInstance(params.id, 'feed/list')
+            try {
+                this.contentItems = await FeedModel.listItems(this.instance.id, {})
+            }
+            catch (error) {
+                console.log(error)
+            }
         },
 
         toggle(event) {

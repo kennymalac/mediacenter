@@ -83,25 +83,20 @@ export default {
             }
         },
 
-        manage(params) {
+        async manage(params) {
             const fallthrough = this.parentId ? `/discussion/${this.parentId}/detail` : `feed/list`
 
-            this.showInstance(params.id, fallthrough, (instance) => {
-                this.instance = instance
-                this.instanceForm = instance.getForm()
-            })
+            this.instance = await this.showInstance(params.id, fallthrough)
+            this.instanceForm = this.instance.getForm()
         },
 
-        details(params) {
-            this.showInstance(params.id, 'feed/list', (instance) => {
-                this.instance = instance
-            })
+        async details(params) {
+            this.instance = await this.showInstance(params.id, 'feed/list')
         },
 
-        list(params) {
-            return discussions().then((store) => {
-                this.objects = store.values
-            })
+        async list(params) {
+            const store = await discussions()
+            this.objects = store.values
         },
 
         manageDiscussion() {
@@ -119,14 +114,14 @@ export default {
             }
             this.instanceForm.content_item.feeds = [this.feedId]
 
-            return DiscussionCollection.create(this.instanceForm)
-                .then((instance) => {
-                    this.objects.push(instance)
-                    return instance
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
+            try {
+                const instance = await DiscussionCollection.create(this.instanceForm)
+                this.objects.push(instance)
+                return instance
+            }
+            catch (error) {
+                console.log(error)
+            }
         },
 
         save() {

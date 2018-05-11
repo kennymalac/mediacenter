@@ -144,6 +144,7 @@
 ***** TODO Delete
 
 *** Discussion
+**** TODO clicking new post twice breaks view
 **** TODO last edited date
 **** DONE edit interface for Replies should have no description field
      CLOSED: [2018-05-09 Wed 11:13]
@@ -192,6 +193,7 @@ Your feed has "content decay"
 
 *** Model/Collection
     don't make too many assumptions
+**** TODO maybe don't recompute - don't have objects in this.objects ?
 **** TODO inject store into base Vue Program so all vues can do this.$store
 
 **** TODO don't get ALL discussions for a simple details/manage request

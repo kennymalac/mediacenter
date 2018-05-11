@@ -144,11 +144,9 @@ export default {
             this.instanceForm.feed.owner = this.instanceForm.owner
         },
 
-        manage(params) {
-            this.showInstance(params.id, 'group/list', (instance) => {
-                this.instance = instance
-                this.instanceForm = instance.getForm()
-            })
+        async manage(params) {
+            this.instance = await this.showInstance(params.id, 'group/list')
+            this.instanceForm = this.instance.getForm()
         },
 
         async list(params) {
@@ -156,15 +154,16 @@ export default {
             this.objects = store.values
         },
 
-        details(params) {
-            this.showInstance(params.id, '/group/list', (instance) => {
-                this.instance = instance
-                this.feed = instance.feed
-                FeedModel.listItems(instance.feed.id, {})
-                    .then((contentData) => {
-                        this.contentItems = contentData
-                    })
-            })
+        async details(params) {
+            this.instance = await this.showInstance(params.id, 'group/list')
+            this.feed = this.instance.feed
+
+            try {
+                this.contentItems = await FeedModel.listItems(this.instance.feed.id, {})
+            }
+            catch (error) {
+                console.log(error)
+            }
         },
 
         manageGroup() {

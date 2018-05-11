@@ -40,7 +40,7 @@ export default {
         }
     },
     methods: {
-        findInstance(id, fallthrough) {
+        async findInstance(id, fallthrough) {
             // NOTE/TODO we don't need the entire list of objects for each instance
             const instance = this.objects.find((item) => {
                 return item.id === parseInt(id)
@@ -50,13 +50,11 @@ export default {
             }
             return instance
         },
-        showInstance(id, fallthrough, callback) {
+        async showInstance(id, fallthrough) {
             if (this.objects.length === 0) {
-                this.list().then(() => callback(this.findInstance(id, fallthrough)))
+                await this.list()
             }
-            else {
-                callback(this.findInstance(id, fallthrough))
-            }
+            return this.findInstance(id, fallthrough)
         },
         restAction(to) {
             this.initialState()
