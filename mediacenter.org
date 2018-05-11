@@ -125,6 +125,7 @@
 ***** TODO Delete
 
 *** Groups
+**** TODO group list should only show authenticated user's groups by default
 **** TODO should adding interests to groups make any content items default to those interests?
 **** TODO Creating FeedContentItems
 **** DONE interests tagged
@@ -191,6 +192,8 @@ Your feed has "content decay"
 
 *** Model/Collection
     don't make too many assumptions
+**** TODO inject store into base Vue Program so all vues can do this.$store
+
 **** TODO don't get ALL discussions for a simple details/manage request
 **** DONE base classes
      CLOSED: [2018-05-08 Tue 18:04]

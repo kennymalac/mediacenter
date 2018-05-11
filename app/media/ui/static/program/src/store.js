@@ -1,4 +1,5 @@
-import {makeCollection} from './models/Model.js'
+import {makeActiveUser} from './auth.js'
+import makeSingleton from './singleton.js'
 
 import {AccountCollection, makeAccountCollection} from './models/Account.js'
 import {FeedContentTypeCollection, makeFeedContentTypeCollection} from './models/FeedContentType.js'
@@ -8,6 +9,7 @@ import {DiscussionCollection, makeDiscussionCollection} from './models/Discussio
 import {GroupCollection, makeGroupCollection} from './models/Group.js'
 
 const store = {
+    activeUser: {},
     accounts: {},
     feeds: {},
     feedContentTypes: {},
@@ -22,56 +24,60 @@ const getStore = () => {
     return proxiedStore
 }
 
+const singleton = (field, typeCheck, create) => makeSingleton(getStore, field, typeCheck, create)
+
+export const activeUser = () => {
+    return singleton(
+        'activeUser',
+        (value) => value.id !== undefined && value.id !== 0,
+        makeActiveUser
+    )
+}
+
 export const accounts = () => {
-    return makeCollection(
-        getStore,
+    return singleton(
         'accounts',
-        AccountCollection,
+        (value) => value instanceof AccountCollection,
         makeAccountCollection
     )
 }
 
 export const feedContentTypes = () => {
-    return makeCollection(
-        getStore,
+    return singleton(
         'feedContentTypes',
-        FeedContentTypeCollection,
+        (value) => value instanceof FeedContentTypeCollection,
         makeFeedContentTypeCollection
     )
 }
 
 export const interests = () => {
-    return makeCollection(
-        getStore,
+    return singleton(
         'interests',
-        InterestCollection,
+        (value) => value instanceof InterestCollection,
         makeInterestCollection
     )
 }
 
 export const feeds = () => {
-    return makeCollection(
-        getStore,
+    return singleton(
         'feeds',
-        FeedCollection,
+        (value) => value instanceof FeedCollection,
         () => makeFeedCollection(feedContentTypes, interests)
     )
 }
 
 export const discussions = () => {
-    return makeCollection(
-        getStore,
+    return singleton(
         'discussion',
-        DiscussionCollection,
+        (value) => value instanceof DiscussionCollection,
         makeDiscussionCollection
     )
 }
 
 export const groups = () => {
-    return makeCollection(
-        getStore,
+    return singleton(
         'group',
-        GroupCollection,
-        () => makeGroupCollection(accounts)
+        (value) => value instanceof GroupCollection,
+        () => makeGroupCollection(accounts, activeUser)
     )
 }

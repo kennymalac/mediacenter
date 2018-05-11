@@ -1,7 +1,8 @@
 {
   "presets": [
-    ["es2015", { "modules": false }],
-    "stage-2"
+      ["env", {"targets": { "browsers": ["defaults"]}}],
+      ["stage-2"],
+      ["stage-3"]
   ],
   "plugins": ["transform-runtime", "transform-vue-jsx"],
   "comments": false,

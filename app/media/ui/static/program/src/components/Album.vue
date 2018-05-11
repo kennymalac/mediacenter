@@ -66,7 +66,7 @@ import AlbumGridItem from "./AlbumGridItem"
 import AlbumMediaItemUploadGridItem from "./AlbumMediaItemUploadGridItem"
 import FileUpload from "./FileUpload"
 import router from "../router/index.js"
-import auth from "../auth.js"
+import {auth} from "../auth.js"
 
 export default {
     mixins: [RestfulComponent],

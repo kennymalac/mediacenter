@@ -5,13 +5,16 @@ import {AccountCollection} from './Account.js'
 
 import {makeJsonRequest, jsonResponse, fetchAPI} from '../httputil.js'
 
-export function makeGroupCollection(accounts) {
-    return Promise.all([accounts(), GroupCollection.searchGroups()])
-        .then((results) => {
-            return new GroupCollection(results[1], {
-                members: results[0]
-            })
-        })
+export async function makeGroupCollection(accounts, activeUser) {
+    const user = await activeUser()
+    let results = await Promise.all([
+        accounts(),
+        GroupCollection.searchGroups({ members: user.details.id })
+    ])
+
+    return new GroupCollection(results[1], {
+        members: results[0]
+    })
 }
 
 class GroupModel extends Model {
@@ -94,7 +97,7 @@ class GroupCollection extends Collection {
     static searchGroups(params) {
         return fetchAPI(`group/`, {
             method: "GET",
-            data: params
+            queryParams: params
         })
             .then(jsonResponse)
 

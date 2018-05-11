@@ -1,7 +1,7 @@
 import {API_URL} from 'config.js'
 import {makeJsonRequest, jsonResponse, fetchAPI} from './httputil.js'
 
-class Auth {
+export class Auth {
     constructor() {
         // Used for identifying local storage of user keys
         // NOTE horrible!!
@@ -14,16 +14,11 @@ class Auth {
             }
         }
 
-        // TODO persist authentication
         let [persistedToken, username] = this.getActiveUserSessionToken()
         try {
             if (persistedToken.length > 1 && username.length > 1) {
                 this.currentSession.user.username = username
                 this.currentSession.user.token = persistedToken
-                // TODO better error callback
-                this.getProfile((error) => {
-                    console.log(error)
-                })
             }
         }
         catch (e) {
@@ -134,5 +129,13 @@ class Auth {
     }
 }
 
-const auth = new Auth()
-export default auth
+export const auth = new Auth()
+
+export function makeActiveUser() {
+    return auth.getProfile((error) => {
+        // TODO better error callback
+        console.log(error)
+    }).then(() => {
+        return auth.getActiveUser()
+    })
+}

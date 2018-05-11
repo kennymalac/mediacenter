@@ -401,7 +401,7 @@ class GroupForumCreateUpdateSerializer(serializers.ModelSerializer):
 
         members = validated_data.pop('members')
         group = GroupForum.objects.create(**validated_data, feed=feed)
-        group.members.add(*members)
+        group.members.add(*members, group.owner)
 
         return group
 

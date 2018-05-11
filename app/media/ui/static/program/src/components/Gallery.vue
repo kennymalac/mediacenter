@@ -26,7 +26,7 @@ import MediaBrowser from './MediaBrowser'
 import Loading from './Loading'
 import LaddaButton from './Gui/LaddaButton'
 //import router from '../router/index.js'
-import auth from '../auth.js'
+import {auth} from '../auth.js'
 // Dynamic gallery
 export default {
     components: {

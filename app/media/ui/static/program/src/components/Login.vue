@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import auth from "../auth.js"
+import {auth} from "../auth.js"
 import router from '../router/index.js'
 
 import Modal from './Gui/Modal/Modal'

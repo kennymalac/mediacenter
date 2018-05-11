@@ -3,7 +3,7 @@ import {ChatRoom} from 'ChatLib';
 <script>
 import ChatControls from './ChatControls'
 import {ChatProvider, displayConfig, layoutBoxStructMethods} from '../chatlib/display'
-// import auth from "../auth.js"
+// import {auth} from "../auth.js"
 
 export default {
     name: "ChatRoom",

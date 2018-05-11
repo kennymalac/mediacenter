@@ -35,12 +35,11 @@
 
 <script>
 import RestfulComponent from "../RestfulComponent"
-import {discussions} from "../../store.js"
+import {activeUser, discussions} from "../../store.js"
 import {DiscussionModel, DiscussionCollection} from "../../models/Discussion.js"
 import Post from './Post'
 
 import router from "../../router/index.js"
-import auth from "../../auth.js"
 
 export default {
     name: 'discussion',
@@ -112,8 +111,9 @@ export default {
                 })
         },
 
-        createDiscussion() {
-            this.instanceForm.content_item.owner = auth.getActiveUser().details.id
+        async createDiscussion() {
+            const user = await activeUser()
+            this.instanceForm.content_item.owner = user.details.id
             if (this.parentId) {
                 this.instanceForm.parent = this.parentId
             }

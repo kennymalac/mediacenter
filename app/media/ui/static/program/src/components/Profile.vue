@@ -31,7 +31,7 @@
 import RestfulComponent from "./RestfulComponent"
 import router from "../router/index.js"
 // import {AccountCollection} from '../models/Account.js'
-// import auth from "../../auth.js"
+// import {auth} from "../../auth.js"
 
 export default {
     mixins: [RestfulComponent],

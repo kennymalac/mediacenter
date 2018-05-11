@@ -40,15 +40,14 @@ export default {
         }
     },
     methods: {
-        details() {
-            discussions().then((store) => {
-                const discussion = store.values.find((item) => {
-                    console.log(item)
-                    return item.content_item.id === this.item.id
-                })
-                console.log(discussion)
-                router.push(`/discussion/` + discussion.id + "/details")
+        async details() {
+            const store = await discussions()
+            const discussion = store.values.find((item) => {
+                console.log(item)
+                return item.content_item.id === this.item.id
             })
+            console.log(discussion)
+            router.push(`/discussion/` + discussion.id + "/details")
         }
     }
 }

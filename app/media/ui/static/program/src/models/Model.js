@@ -17,21 +17,6 @@ export class Collection {
     }
 }
 
-// Returns a Singleton for a Collection
-export function makeCollection(getStore, storeVal, collection, makeCollection) {
-    return new Promise((resolve, reject) => {
-        const store = getStore()
-
-        if (store[storeVal] instanceof Collection) {
-            return resolve(store[storeVal])
-        }
-        makeCollection().then((collection) => {
-            store[storeVal] = collection
-            resolve(collection)
-        })
-    })
-}
-
 export class Model {
 
     static initialState = {}

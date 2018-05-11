@@ -9,6 +9,7 @@ from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from api.models import *
 from api.serializers import *
+from api.filters import *
 
 class MultipleSerializerMixin(object):
     def get_serializer_class(self):
@@ -138,6 +139,7 @@ class GroupForumViewSet(NestedViewSetMixin,
         'update': GroupForumCreateUpdateSerializer,
         'create': GroupForumCreateUpdateSerializer
     }
+    filter_class = GroupForumFilter
 
 
 # @api_view

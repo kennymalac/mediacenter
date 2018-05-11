@@ -68,7 +68,7 @@
 import RestfulComponent from "../RestfulComponent"
 import {GroupCollection, GroupModel} from '../../models/Group.js'
 import {FeedModel} from '../../models/Feed.js'
-import {groups} from '../../store.js'
+import {groups, activeUser} from '../../store.js'
 
 import AccountSelect from '../AccountSelect'
 import InterestSelect from '../InterestSelect'
@@ -79,7 +79,6 @@ import ActionButton from '../ActionButton'
 import ActionList from '../ActionList'
 
 import router from "../../router/index.js"
-import auth from "../../auth.js"
 
 export default {
     mixins: [RestfulComponent],
@@ -136,11 +135,13 @@ export default {
             this.contentItems = []
         },
 
-        create() {
+        async create() {
             this.instanceForm = GroupModel.getNewInstance()
             this.instanceForm.feed = { interests: [], content_types: [] }
-            this.instanceForm.owner = auth.getActiveUser().details.id
-            this.instanceForm.feed.owner = this.instance.owner
+
+            const owner = await activeUser()
+            this.instanceForm.owner = owner.details.id
+            this.instanceForm.feed.owner = this.instanceForm.owner
         },
 
         manage(params) {
@@ -150,10 +151,9 @@ export default {
             })
         },
 
-        list(params) {
-            return groups().then((store) => {
-                this.objects = store.values
-            })
+        async list(params) {
+            const store = await groups()
+            this.objects = store.values
         },
 
         details(params) {
