@@ -25,7 +25,7 @@ export default {
     },
     watch: {
         '$route'(to, from) {
-            this.restAction(to)
+            this.restAction(to, from)
         }
     },
     computed: {
@@ -56,9 +56,16 @@ export default {
             }
             return this.findInstance(id, fallthrough)
         },
-        restAction(to) {
-            this.initialState()
+        restAction(to, from) {
             let link = {}
+
+            if (from && to.fullPath.indexOf(from.fullPath) > -1) {
+                // Do not rerender a component, this is a nested action
+                // that was redirected from the same route
+                return
+            }
+            this.initialState()
+
             if (!to) {
                 const id = this.isNested ? this.params[`${this.objectName}Id`] : this.id
                 const action = this.isNested ? this.params[`${this.objectName}Action`] : this.action

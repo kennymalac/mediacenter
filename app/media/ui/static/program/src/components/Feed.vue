@@ -136,11 +136,9 @@ export default {
         create() {
         },
 
-        manage(params) {
-            this.showInstance(params.id, 'feed/list', (instance) => {
-                this.instance = instance
-                this.instanceForm = this.instance.instance
-            })
+        async manage(params) {
+            this.instance = await this.showInstance(params.id, 'feed/list')
+            this.instanceForm = this.instance.instance
         },
 
         async list(params) {
