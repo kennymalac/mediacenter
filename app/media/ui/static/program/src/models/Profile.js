@@ -17,10 +17,10 @@ class ProfileModel extends Model {
     }
 }
 
-export async function makeProfileCollection(interests) {
+export async function makeProfileCollection(queryset, interests) {
     let results = await Promise.all([
         interests(),
-        ProfileCollection.all()
+        queryset()
     ])
 
     return new ProfileCollection(results[1], {
@@ -41,6 +41,15 @@ class ProfileCollection extends Collection {
     static all() {
         return fetchAPI(`profile/`, {
             method: "GET"
+        })
+            .then(jsonResponse)
+    }
+
+    static searchProfiles(params) {
+        console.log(params)
+        return fetchAPI(`profile/`, {
+            method: "GET",
+            queryParams: params
         })
             .then(jsonResponse)
     }

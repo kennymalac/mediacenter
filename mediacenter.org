@@ -88,13 +88,17 @@
 
 *** Interests
 **** TODO maximum number of interests per Group, Feed
+**** TODO determine if view should list both Groups and Users?
 **** TODO system to vote on consolidation & removal of Interest groups?
 **** TODO determine how to deal with content spam with many interests tagged
+**** TODO determine how to limit creation of interests
 **** DONE model, serializer, viewset
      CLOSED: [2018-05-10 Thu 13:03]
 **** TODO CRUD
-***** TODO Create
-***** TODO Read
+***** DONE Create
+      CLOSED: [2018-05-11 Fri 15:57]
+***** DONE Read
+      CLOSED: [2018-05-11 Fri 15:57]
 ***** TODO Update
 ***** TODO Delete
 

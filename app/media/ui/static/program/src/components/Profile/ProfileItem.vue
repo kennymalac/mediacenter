@@ -12,7 +12,7 @@ export default {
     },
     computed: {
         profileLink() {
-            return `${this.id}/details`
+            return `/profile/${this.id}/details`
         }
     }
 }

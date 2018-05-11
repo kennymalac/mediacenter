@@ -3,8 +3,11 @@
 import Vue from 'vue'
 import Program from './Program'
 import router from './router'
+import {storePlugin} from './store.js'
 
 /* eslint-disable no-new */
+Vue.use(storePlugin)
+
 new Vue({
     el: '#program',
     router,

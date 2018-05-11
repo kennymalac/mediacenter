@@ -6,6 +6,7 @@ import Login from 'components/Login'
 import Profile from 'components/Profile/Profile'
 import Chat from 'components/Chat'
 import Home from 'components/Home'
+import Interest from 'components/Interest'
 import Gallery from 'components/Gallery'
 import Album from 'components/Album'
 import Group from 'components/Group/Group'
@@ -107,6 +108,13 @@ export default new Router({
             name: 'Discussion',
             props: restAction,
             component: Discussion
+        },
+        {
+            path: '/interest/:id/:action',
+            name: 'Interest',
+            component: Interest,
+            props: restAction,
+            canReuse: false
         },
         {
             path: '/group/:action',

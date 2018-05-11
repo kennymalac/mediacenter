@@ -13,6 +13,8 @@ const store = {
     activeUser: {},
     accounts: {},
     profiles: {},
+    interestedUsers: {},
+    interestId: 0,
     feeds: {},
     feedContentTypes: {},
     interests: {},
@@ -21,6 +23,12 @@ const store = {
 }
 
 const proxiedStore = new Proxy(store, {})
+
+export const storePlugin = {
+    install(Vue) {
+        Vue.prototype.$store = proxiedStore
+    }
+}
 
 const getStore = () => {
     return proxiedStore
@@ -64,7 +72,22 @@ export const profiles = () => {
     return singleton(
         'profiles',
         (value) => value instanceof ProfileCollection,
-        () => makeProfileCollection(interests)
+        () => makeProfileCollection(ProfileCollection.all, interests)
+    )
+}
+
+export const interestedUsers = (interestId) => {
+    return singleton(
+        'interestedUsers',
+        (value) => value instanceof ProfileCollection,
+        () => {
+            return makeProfileCollection(
+                () => ProfileCollection.searchProfiles({
+                    interests: [interestId]
+                }),
+                interests
+            )
+        }
     )
 }
 

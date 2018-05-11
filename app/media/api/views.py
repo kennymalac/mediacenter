@@ -103,6 +103,7 @@ class ProfileViewSet(ListModelMixin,
                      GenericViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+    filter_fields = ('interests',)
 
 
 class FeedViewSet(NestedViewSetMixin,
