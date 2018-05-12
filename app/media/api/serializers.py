@@ -221,7 +221,6 @@ class AlbumInfoSerializer(serializers.ModelSerializer):
 class AlbumCreateSerializer(serializers.ModelSerializer):
     owner = serializers.PrimaryKeyRelatedField(
         queryset=Account.objects.all(),
-        many=True,
         required=False
     )
 

@@ -64,6 +64,7 @@
 **** TODO 
 **** TODO full test coverage
 *** Album
+**** TODO owner should be Account
 **** TODO CRUD
 ***** TODO Create
 ***** DONE Read
@@ -215,6 +216,7 @@ Your feed has "content decay"
 
 *** Model/Collection
     don't make too many assumptions
+**** TODO modelInstance should fetch from Collection
 **** TODO maybe don't recompute - don't have objects in this.objects ?
 **** DONE inject store into base Vue Program so all vues can do this.$store
      CLOSED: [2018-05-11 Fri 16:04]

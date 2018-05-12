@@ -1,4 +1,6 @@
 import {Model, Collection} from './Model.js'
+import {modelInstance} from './converters.js'
+import {AccountModel} from './Account.js'
 
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 
@@ -15,6 +17,10 @@ class AlbumModel extends Model {
         description: '',
         tags: [],
         owner: {}
+    }
+
+    static fieldConverters = {
+        owner: (input) => modelInstance(AccountModel, input)
     }
 
     // TODO make this a Store
@@ -72,6 +78,12 @@ class AlbumCollection extends Collection {
             }
         })
             .then(jsonResponse)
+            .then((createdData) => {
+                const instance = new AlbumModel(createdData)
+
+                console.log(instance)
+                return instance
+            })
     }
 
     static searchAlbums() {

@@ -63,7 +63,7 @@
 
 <script>
 import {AlbumCollection, AlbumModel} from "../models/Album.js"
-import {albums} from "../store.js"
+import {albums, activeUser} from "../store.js"
 
 import RestfulComponent from "./RestfulComponent"
 import AlbumGridItem from "./AlbumGridItem"
@@ -71,7 +71,6 @@ import AlbumMediaItemUploadGridItem from "./AlbumMediaItemUploadGridItem"
 import FileUpload from "./FileUpload"
 import ActionButton from "./ActionButton"
 import router from "../router/index.js"
-import {auth} from "../auth.js"
 
 export default {
     mixins: [RestfulComponent],
@@ -109,21 +108,23 @@ export default {
             this.objects = store.values
         },
 
-        createAlbum() {
+        async createAlbum() {
             // this won't add mediaitems, and it definetly will not
             // work for created items
             // createAlbum does not upload mediaitems
-            return AlbumCollection.create({
-                title: this.instance.title,
-                description: this.instance.description,
-                owner: auth.getActiveUser().details.id
-            })
-                .then((data) => {
-                    this.instance = data
+            const user = await activeUser()
+
+            try {
+                this.instance = await AlbumCollection.create({
+                    title: this.instance.title,
+                    description: this.instance.description,
+                    owner: user.details.id
                 })
-                .catch((error) => {
-                    console.log(error)
-                })
+                this.objects.push(this.instance)
+            }
+            catch (error) {
+                console.log(error)
+            }
         },
         manageAlbum() {
             return AlbumModel.manage(this.instance)
@@ -191,7 +192,7 @@ export default {
                 })
             }
             else if (this.actions.create) {
-                this.createAlbum().then(this.$nextTick(() => {
+                this.createAlbum().then(() => this.$nextTick(() => {
                     router.replace('/album/' + this.instance.id + '/manage')
                     // Ready to upload media items
                 }))
