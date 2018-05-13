@@ -1,4 +1,5 @@
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import Max
 from django.conf import settings
 from django.core.paginator import Paginator
 from django_countries.serializers import CountryFieldMixin
@@ -362,9 +363,15 @@ class DiscussionCreateUpdateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         content_item_data = validated_data.pop('content_item')
         feed = content_item_data.pop('feeds')[0]
+        order = 0
 
         if validated_data.get('parent', 0):
             content_type = FeedContentItemType.objects.get(name=FeedContentItemType.POST)
+            posts = Discussion.objects.filter(parent=validated_data['parent'])
+            if posts.count() >= 1:
+                order = posts.aggregate(Max('order'))['order__max'] + 1
+            else:
+                order = 1
         else:
             content_type = FeedContentItemType.objects.get(name=FeedContentItemType.TOPIC)
 
@@ -372,7 +379,7 @@ class DiscussionCreateUpdateSerializer(serializers.ModelSerializer):
         feed.content.add(content_item)
         feed.save()
 
-        discussion = Discussion.objects.create(**validated_data, content_item=content_item)
+        discussion = Discussion.objects.create(**validated_data, content_item=content_item, order=order)
         # discussion.members.add(*members)
 
         return discussion

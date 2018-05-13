@@ -133,7 +133,7 @@ class DiscussionViewSet(NestedViewSetMixin,
                         MultipleSerializerMixin,
                         ModelViewSet):
 
-    queryset = Discussion.objects.all()
+    queryset = Discussion.objects.all().order_by('order')
     serializer_classes = {
         'default': DiscussionSerializer,
         'partial_update': DiscussionCreateUpdateSerializer,

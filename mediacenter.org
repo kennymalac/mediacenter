@@ -167,6 +167,8 @@
 ***** TODO Delete
 
 *** Discussion
+**** DONE Posts should have order
+     CLOSED: [2018-05-12 Sat 17:41]
 **** TODO clicking new post twice breaks view
 **** TODO should post count show number of Posts in current group?
 **** TODO last edited date
