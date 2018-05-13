@@ -146,6 +146,8 @@
 *** Groups
 **** TODO moderation system
 **** TODO invite only groups
+**** DONE Finding Groups by Interest
+     CLOSED: [2018-05-12 Sat 19:54]
 **** TODO Find Group interface
 **** DONE group list should only show authenticated user's groups by default
      CLOSED: [2018-05-11 Fri 16:03]

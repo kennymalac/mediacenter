@@ -5,11 +5,10 @@ import {AccountCollection} from './Account.js'
 
 import {makeJsonRequest, jsonResponse, fetchAPI} from '../httputil.js'
 
-export async function makeGroupCollection(accounts, activeUser) {
-    const user = await activeUser()
+export async function makeGroupCollection(queryset, accounts) {
     let results = await Promise.all([
         accounts(),
-        GroupCollection.searchGroups({ members: user.details.id })
+        queryset()
     ])
 
     return new GroupCollection(results[1], {
@@ -94,10 +93,23 @@ class GroupCollection extends Collection {
             })
     }
 
-    static searchGroups(params) {
+    static all(params) {
         return fetchAPI(`group/`, {
             method: "GET",
             queryParams: params
+        })
+            .then(jsonResponse)
+
+            .then((data) => {
+                return data
+            })
+    }
+
+    static searchGroups(data) {
+        console.log(data)
+        return makeJsonRequest(`group/search/`, {
+            method: "POST",
+            body: {interests: serializeIds(data.interests)}
         })
             .then(jsonResponse)
 

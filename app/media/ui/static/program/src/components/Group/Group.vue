@@ -53,13 +53,24 @@
                     <account-select v-model="instanceForm.members" />
                     <label class="stack" for="interests">Interests</label>
                     <interest-select v-model="instanceForm.feed.interests" />
-
+                    
                     <!-- <label class="stack" for="">Tags</label> -->
                     <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->
                     <input v-if="actions.create" class="stack" type="submit" value="Create" />
                     <input v-if="actions.manage" class="stack" type="submit" value="Save changes" />
                 </fieldset>
             </form>
+        </template>
+        <template v-if="actions.search">
+            <section class="groups">
+                <h1>Find Groups</h1>
+                <group-list :items="filteredObjects" />
+                <label class="stack" for="interests">Interests</label>
+                <interest-select v-model="filteredInterests" />
+                <button type="button" @click="searchGroups">
+                    Search
+                </button>
+            </section>
         </template>
     </div>
 </template>
@@ -68,7 +79,7 @@
 import RestfulComponent from "../RestfulComponent"
 import {GroupCollection, GroupModel} from '../../models/Group.js'
 import {FeedModel} from '../../models/Feed.js'
-import {groups, activeUser} from '../../store.js'
+import {groups, activeUser, filteredGroups} from '../../store.js'
 
 import AccountSelect from '../AccountSelect'
 import InterestSelect from '../InterestSelect'
@@ -106,6 +117,8 @@ export default {
         return {
             instance: { id: null },
             instanceForm: { members: [], feed: {} },
+            filteredInterests: [],
+            filteredObjects: [],
             objectName: 'group',
             groupActions: [
                 {
@@ -115,7 +128,7 @@ export default {
                     extraIcon: "ion-md-add-circle"
                 },
                 {
-                    link: "",
+                    link: "search",
                     icon: "ion-md-search",
                     title: "Find a Group"
                 }
@@ -166,6 +179,18 @@ export default {
             catch (error) {
                 console.log(error)
             }
+        },
+
+        async searchGroups() {
+            this.$store.filteredGroups = {}
+            const store = await filteredGroups({
+                interests: this.filteredInterests
+            })
+            this.filteredObjects = store.values
+        },
+
+        search(params) {
+            
         },
 
         manageGroup() {

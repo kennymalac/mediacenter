@@ -21,7 +21,8 @@ const store = {
     feedContentTypes: {},
     interests: {},
     discussions: {},
-    groups: {}
+    groups: {},
+    filteredGroups: {}
 }
 
 const proxiedStore = new Proxy(store, {})
@@ -37,6 +38,14 @@ const getStore = () => {
 }
 
 const singleton = (field, typeCheck, create) => makeSingleton(getStore, field, typeCheck, create)
+
+const singletonFactory = (field, FieldType, reducer) => {
+    return singleton(
+        field,
+        (value) => value instanceof FieldType,
+        reducer
+    )
+}
 
 export const activeUser = () => {
     return singleton(
@@ -97,7 +106,7 @@ export const feeds = () => {
     return singleton(
         'feeds',
         (value) => value instanceof FeedCollection,
-        () => makeFeedCollection(feedContentTypes, interests)
+        () => makeFeedCollection(FeedCollection.all, feedContentTypes, interests)
     )
 }
 
@@ -117,10 +126,26 @@ export const discussions = () => {
     )
 }
 
-export const groups = () => {
-    return singleton(
-        'group',
-        (value) => value instanceof GroupCollection,
-        () => makeGroupCollection(accounts, activeUser)
+const groupStore = (field, reducer) => (params) => {
+    return singletonFactory(field, GroupCollection, () => reducer(params))
+}
+
+const activeUserGroups = () => {
+    return activeUser().then((user) => {
+        return makeGroupCollection(
+            () => GroupCollection.all({ members: user.details.id }),
+            accounts
+        )
+    })
+}
+
+const filterGroups = (params) => {
+    console.log(params)
+    return makeGroupCollection(
+        () => GroupCollection.searchGroups(params),
+        accounts
     )
 }
+
+export const groups = groupStore('groups', activeUserGroups)
+export const filteredGroups = groupStore('filteredGroups', filterGroups)

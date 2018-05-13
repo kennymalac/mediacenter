@@ -6,8 +6,8 @@ import {InterestCollection} from './Interest'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 import {FeedContentItemModel} from './FeedContentItem'
 
-export function makeFeedCollection(feedContentTypes, interests) {
-    return Promise.all([feedContentTypes(), interests(), FeedCollection.searchFeeds()])
+export function makeFeedCollection(queryset, feedContentTypes, interests) {
+    return Promise.all([feedContentTypes(), interests(), queryset()])
         .then(results => {
             return new FeedCollection(results[2], {
                 content_types: results[0],
@@ -116,6 +116,18 @@ class FeedCollection extends Collection {
 
                 console.log(instance)
                 return instance
+            })
+    }
+
+    static all(params) {
+        return fetchAPI(`feed/`, {
+            method: "GET",
+            data: params
+        })
+            .then(jsonResponse)
+
+            .then((data) => {
+                return data
             })
     }
 

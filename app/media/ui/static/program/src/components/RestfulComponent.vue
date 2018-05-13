@@ -35,7 +35,8 @@ export default {
                 list: action === "list",
                 details: action === "details",
                 manage: action === "manage",
-                create: action === "create"
+                create: action === "create",
+                search: action === "search"
             }
         }
     },
@@ -103,6 +104,9 @@ export default {
                 break
             case "list":
                 this.list(link)
+                break
+            case "search":
+                this.search(link)
                 break
             }
         }

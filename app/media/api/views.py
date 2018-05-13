@@ -155,6 +155,13 @@ class GroupForumViewSet(NestedViewSetMixin,
     }
     filter_class = GroupForumFilter
 
+    @list_route(methods=['POST'], url_path='search')
+    def search(self, request):
+        interests = Interest.objects.filter(id__in=request.data.get('interests', []))
+
+        serializer = GroupForumSerializer(self.get_queryset().filter(feed__interests__in=interests), many=True)
+        return Response(serializer.data)
+
 
 # @api_view
 # def media_image_src(request):

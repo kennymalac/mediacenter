@@ -17,7 +17,7 @@ Vue.use(Router)
 function restAction(route) {
     // Validate action as valid action
     // TODO refine this later
-    const validActions = ['create', 'list', 'manage', 'details']
+    const validActions = ['create', 'list', 'manage', 'details', 'search']
 
     console.log(route)
 
