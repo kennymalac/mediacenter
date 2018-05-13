@@ -43,7 +43,9 @@ class FeedModel extends Model {
         return makeJsonRequest(`feed/${feed.id}/`, {
             method: "PUT",
             body: {
-                ...feed, content_types: serializeIds(feed.content_types)
+                ...feed,
+                content_types: serializeIds(feed.content_types),
+                interests: serializeIds(feed.interests)
             }
         })
             .then(jsonResponse)
@@ -103,12 +105,14 @@ class FeedCollection extends Collection {
         return makeJsonRequest("feed/", {
             method: "POST",
             body: {
-                ...data, content_types: serializeIds(data.content_types)
+                ...data,
+                content_types: serializeIds(data.content_types),
+                interests: serializeIds(data.interests)
             }
         })
             .then(jsonResponse)
             .then((createdData) => {
-                const instance = new FeedModel({...createdData, content_types: data.content_types})
+                const instance = new FeedModel({...createdData, content_types: data.content_types, interests: data.interests})
 
                 console.log(instance)
                 return instance

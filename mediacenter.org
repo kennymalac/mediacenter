@@ -194,6 +194,8 @@ payment plan for archiving more content items per feed
 Favoriting a content item permanently occupies a slot in the content feed item quota
 Your feed has "content decay"
 
+**** DONE add InterestSelect
+     CLOSED: [2018-05-12 Sat 17:55]
 **** TODO backend filtering
 **** TODO remove "content" manytomany - feed content should be dynamic
 **** TODO automatically create Feed for each content type

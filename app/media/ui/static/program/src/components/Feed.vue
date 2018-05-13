@@ -40,7 +40,10 @@
                     <input class="stack" name="name" v-model="instanceForm.name" type="text" />
                     <label class="stack" for="description">Description</label>
                     <textarea class="stack" name="description" v-model="instanceForm.description" />
+                    <label class="stack" for="content-types">Content Types</label>
                     <feed-content-type-select v-model="instanceForm.content_types" />
+                    <label class="stack" for="interests">Interests</label>
+                    <interest-select v-model="instanceForm.interests" />
 
                     <!-- <label class="stack" for="">Tags</label> -->
                     <!-- <input class="stack" name="tags" v-model="instance.tags_raw" type="text" /> -->
@@ -60,6 +63,7 @@ import {feeds} from '../store.js'
 import FeedItem from './FeedItem'
 import FeedContentItemList from './FeedContentItemList'
 import FeedContentTypeSelect from './FeedContentTypeSelect'
+import InterestSelect from './InterestSelect'
 import ActionList from './ActionList'
 import FeedFilter from './FeedFilter'
 
@@ -72,6 +76,7 @@ export default {
         FeedItem,
         FeedContentItemList,
         FeedContentTypeSelect,
+        InterestSelect,
         ActionList,
         FeedFilter
     },
