@@ -130,10 +130,16 @@ class FeedContentItemViewSet(NestedViewSetMixin,
 
 
 class DiscussionViewSet(NestedViewSetMixin,
+                        MultipleSerializerMixin,
                         ModelViewSet):
 
     queryset = Discussion.objects.all()
-    serializer_class = DiscussionSerializer
+    serializer_classes = {
+        'default': DiscussionSerializer,
+        'partial_update': DiscussionCreateUpdateSerializer,
+        'update': DiscussionCreateUpdateSerializer,
+        'create': DiscussionCreateUpdateSerializer
+    }
 
 
 class GroupForumViewSet(NestedViewSetMixin,

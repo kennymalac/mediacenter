@@ -9,7 +9,7 @@
             <section class="sidebar">
                 <div class="group-info">
                     <div class="icon-container">
-                        <img v-if="instance.picture" />
+                        <img v-if="instance.picture" :src="instance.picture" />
                         <i v-if="!instance.picture" class="ion-md-person"></i>
                     </div>
                     <h2>{{ instance.display_name }}</h2>

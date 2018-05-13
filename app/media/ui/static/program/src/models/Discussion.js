@@ -14,6 +14,7 @@ class DiscussionModel extends Model {
     static initialState = {
         id: 0,
         content_item: {},
+        owner: {},
         text: "",
         order: 0,
         parent: 0
@@ -26,7 +27,7 @@ class DiscussionModel extends Model {
     static manage(instance, form) {
         return makeJsonRequest(`discussion/${instance.id}/`, {
             method: "PATCH",
-            body: form
+            body: {...form, content_item: {...form.content_item, owner: form.content_item.owner.id}}
         })
             .then(jsonResponse)
             .then((data) => {

@@ -8,11 +8,18 @@ from rest_framework.pagination import PageNumberPagination
 from api.models import *
 
 
+class BasicProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ('id', 'display_name', 'picture')
+
+
 class AccountSerializer(CountryFieldMixin, serializers.ModelSerializer):
+    profile = BasicProfileSerializer()
 
     class Meta:
         model = Account
-        fields = ('id', 'username', 'country', 'email')
+        fields = ('id', 'username', 'country', 'email', 'profile')
 
 
 class FullAccountSerializer(AccountSerializer):
@@ -26,10 +33,11 @@ class FullAccountSerializer(AccountSerializer):
 
 class PrivateAccountProfileDetailsSerializer(serializers.ModelSerializer):
     account_settings = serializers.JSONField(read_only=False)
+    profile = BasicProfileSerializer()
 
     class Meta:
         model = Account
-        fields = ('id', 'account_settings')
+        fields = ('id', 'account_settings', 'profile')
 
 
 class LogSerializer(serializers.Serializer):
@@ -253,7 +261,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'display_name', 'title', 'description', 'interests')
+        fields = ('id', 'display_name', 'picture', 'title', 'description', 'interests')
 
 
 class FeedCreateUpdateSerializer(serializers.ModelSerializer):
@@ -321,7 +329,23 @@ class FeedContentItemCreateUpdateSerializer(serializers.ModelSerializer):
         fields = ('id', 'feeds', 'title', 'description', 'owner', 'content_type', 'created')
 
 
+class FeedContentItemProfileSerializer(serializers.ModelSerializer):
+    owner = AccountSerializer()
+
+    class Meta:
+        model = FeedContentItem
+        fields = ('id', 'feeds', 'title', 'description', 'owner', 'content_type', 'created')
+
+
 class DiscussionSerializer(serializers.ModelSerializer):
+    content_item = FeedContentItemProfileSerializer()
+
+    class Meta:
+        model = Discussion
+        fields = ('id', 'parent', 'order', 'content_item', 'text')
+
+
+class DiscussionCreateUpdateSerializer(serializers.ModelSerializer):
     content_item = FeedContentItemCreateUpdateSerializer(
         many=False,
         required=False
@@ -333,7 +357,7 @@ class DiscussionSerializer(serializers.ModelSerializer):
                 setattr(instance.content_item, k, v)
                 instance.content_item.save()
 
-        return super(DiscussionSerializer, self).update(instance, validated_data)
+        return super(DiscussionCreateUpdateSerializer, self).update(instance, validated_data)
 
     def create(self, validated_data):
         content_item_data = validated_data.pop('content_item')

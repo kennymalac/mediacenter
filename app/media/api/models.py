@@ -160,6 +160,8 @@ class Profile(TaggedItem):
     display_name = models.CharField(max_length=60, blank=True)
     title = models.CharField(max_length=140, default="Welcome to my profile!")
     description = models.TextField(blank=True)
+    picture = models.URLField(blank=True)
+    # created = models.DateTimeField(auto_now_add=True)
 
 
 class Feed(TaggedItem):

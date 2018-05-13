@@ -76,8 +76,12 @@ export class Model {
             if (this[field] instanceof Model) {
                 // handle single primary key case
                 if (Number.isInteger(val)) {
+                    if (val === this[field].id) {
+                        // The entry has not changed, so retain the current field model instance in place
+                        continue
+                    }
                     // TODO - form does not have the instance
-                    throw new Error('Improper Data model as serialized! Expected object, not pk')
+                    throw new Error('Improper Data model as serialized! No matching Model instance for pk found. Expected object, not pk')
                 }
                 // this must be a value
                 else {

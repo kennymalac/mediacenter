@@ -9,6 +9,7 @@ class ProfileModel extends Model {
         display_name: "",
         title: "",
         description: "",
+        picture: "",
         interests: []
     }
 

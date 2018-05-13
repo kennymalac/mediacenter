@@ -44,6 +44,8 @@ $shadow-color: rgba(0, 0, 0, .2);
     img {
         transition: $picnic-transition;
         border-radius: 50%;
+        height: 100%;
+        width: 100%;
     }
     border: 2px solid rgba(52, 73, 94,1.0);
     border-radius: 50%;

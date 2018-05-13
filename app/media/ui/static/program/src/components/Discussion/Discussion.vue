@@ -3,8 +3,8 @@
         <template v-if="actions.details && instance.id">
             <section class="posts">
 
-                <post v-bind="instance.instance" @editPost="editPost(instance.id)" />
-                <post v-for="post in posts" v-bind="post.instance" @editPost="editPost(post.id)" />
+                <post v-bind="instance.instance" @editPost="editPost(instance.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" />
+                <post v-for="post in posts" v-bind="post.instance" @editPost="editPost(post.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" />
 
                 <h3>Quick Reply</h3>
                 <discussion :feedId="getFeedId" :parentId="instance.id" :parentTitle="instance.content_item.title" action="create" />
@@ -76,6 +76,10 @@ export default {
             router.push(`/discussion/${id}/manage`)
         },
 
+        showUserProfile(id) {
+            router.push(`/profile/${id}/details`)
+        },
+
         create() {
             this.list()
             if (this.parentTitle) {
@@ -116,6 +120,7 @@ export default {
 
             try {
                 const instance = await DiscussionCollection.create(this.instanceForm)
+                instance.content_item.owner = user.details
                 this.objects.push(instance)
                 return instance
             }

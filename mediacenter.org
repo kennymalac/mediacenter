@@ -168,6 +168,7 @@
 
 *** Discussion
 **** TODO clicking new post twice breaks view
+**** TODO should post count show number of Posts in current group?
 **** TODO last edited date
 **** DONE edit interface for Replies should have no description field
      CLOSED: [2018-05-09 Wed 11:13]
@@ -191,6 +192,7 @@ payment plan for archiving more content items per feed
 Favoriting a content item permanently occupies a slot in the content feed item quota
 Your feed has "content decay"
 
+**** TODO backend filtering
 **** TODO remove "content" manytomany - feed content should be dynamic
 **** TODO automatically create Feed for each content type
 **** TODO CRUD
@@ -216,6 +218,7 @@ Your feed has "content decay"
 
 *** Model/Collection
     don't make too many assumptions
+**** TODO better filtering mechanism
 **** TODO modelInstance should fetch from Collection
 **** TODO maybe don't recompute - don't have objects in this.objects ?
 **** DONE inject store into base Vue Program so all vues can do this.$store

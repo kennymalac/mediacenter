@@ -1,5 +1,6 @@
 import {Model} from './Model.js'
-import {momentDate} from './converters.js'
+import {AccountModel} from './Account'
+import {momentDate, modelInstance} from './converters.js'
 
 class FeedContentItemModel extends Model {
 
@@ -9,12 +10,13 @@ class FeedContentItemModel extends Model {
         created: {},
         feeds: [],
         description: "",
-        owner: 0,
+        owner: {},
         title: ""
     }
 
     static fieldConverters = {
-        created: momentDate
+        created: momentDate,
+        owner: (input) => modelInstance(AccountModel, input)
     }
 }
 

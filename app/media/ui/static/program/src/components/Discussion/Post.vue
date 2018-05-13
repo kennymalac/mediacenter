@@ -1,14 +1,15 @@
 <template>
     <div class="post">
         <div class="post-header">
-            <div class="author">
-                <div class="profile-picture">
-                    <img src="https://c1.staticflickr.com/5/4101/4870567608_69fbf87121_b.jpg" />
+            <div @click="$emit('userProfile')"  class="author">
+                <div class="profile-picture icon-container">
+                    <img v-if="content_item.owner.profile.picture" :src="content_item.owner.profile.picture" />
+                    <i v-if="!content_item.owner.profile.picture" class="ion-md-person"></i>
                 </div>
                 
                 <div class="author-details">
-                    <span class="display-name">Kenster</span>
-                    <span class="post-count">Posts: 370</span>
+                    <span class="display-name">{{ content_item.owner.profile.display_name }}</span>
+                    <span class="post-count">Posts: 300</span>
                 </div>
             </div>
             <div class="post-details">
@@ -62,14 +63,39 @@ export default {
             display: flex;
             width: 45%;
             
-            .profile-picture {
+            &:hover, &:focus {
+                .icon-container {
+                    box-shadow: 1px 1px 20px 0px rgba(255, 255, 255, 0.25);
+                }
+                .author-details {
+                    text-shadow: 1px 1px 2px black;
+                }
+
+                cursor: pointer;
+            }
+            &:active {
+                color: #eee;
+                .icon-container {
+                    opacity: .9;
+                    border-style: inset;
+                    img {
+                        opacity: .8;
+                    }
+                }
+            }
+
+            .profile-picture.icon-container {
                 display: inline-flex;
                 width: 64px;
                 height: 64px;
-                img, i {
+                color: rgb(52, 73, 94);
+                img {
                     height: 100%;
                     border-radius: 50%;
                     width: 100%;
+                }
+                i {
+                    font-size: 2.25em;
                 }
                 border-radius: 50%;
                 background-color: white;
