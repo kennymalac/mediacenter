@@ -1,5 +1,5 @@
 import {Model, Collection} from './Model.js'
-import {fetchAPI, jsonResponse} from '../httputil.js'
+import {fetchAPI, makeJsonRequest, jsonResponse} from '../httputil.js'
 
 class AccountModel extends Model {
 
@@ -27,6 +27,15 @@ class AccountCollection extends Collection {
     static get(id) {
         return fetchAPI(`accounts/${id}`, {
             method: "GET"
+        })
+            .then(jsonResponse)
+    }
+
+    static create(data) {
+        return makeJsonRequest('accounts/', {
+            method: "POST",
+            body: data,
+            authenticated: false
         })
             .then(jsonResponse)
     }

@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.conf import settings
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin
+from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view, list_route, detail_route, parser_classes
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -37,6 +38,12 @@ class AccountViewSet(MultipleSerializerMixin, ModelViewSet):
         'profile': PrivateAccountProfileDetailsSerializer
     }
     # permission_classes
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return [AllowAny()]
+
+        return super(AccountViewSet, self).get_permissions()
 
     @detail_route(methods=['POST', 'GET'], url_path='profile')
     @parser_classes((JSONParser,))

@@ -27,9 +27,23 @@ class FullAccountSerializer(AccountSerializer):
     """Requires full account view permissions (i.e. admin or current user privilege levels) UNLESS it is from a CREATE request."""
     account_settings = serializers.JSONField(read_only=False)
 
+    def create(self, validated_data):
+        profile_data = {}
+        if 'profile' in validated_data:
+            profile_data = validated_data.pop('profile')
+
+        password = validated_data.pop('password')
+        account = Account.objects.create(**validated_data)
+        account.set_password(password)
+        account.save()
+
+        Profile.objects.create(**profile_data, account=account)
+
+        return account
+
     class Meta:
         model = Account
-        fields = ('id', 'username', 'email', 'password', 'country', 'account_settings')
+        fields = ('id', 'username', 'email', 'password', 'country', 'account_settings', 'profile')
 
 
 class PrivateAccountProfileDetailsSerializer(serializers.ModelSerializer):

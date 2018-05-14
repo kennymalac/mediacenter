@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField, ArrayField
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -11,13 +13,12 @@ from guardian.mixins import GuardianUserMixin
 import api.managers
 
 # Create your models here.
-
 class Account(AbstractUser, GuardianUserMixin):
-    country = CountryField()
+    country = CountryField(null=True)
     email = models.EmailField()
     # Persist a hash of the user's UI display settings
     # Default settings are assigned on account creation
-    profile = models.OneToOneField('api.Profile', null=True)
+    profile = models.OneToOneField('api.Profile', null=True, on_delete=models.CASCADE)
     friends = models.ManyToManyField('self', blank=True)
 
     account_settings = JSONField(null=True, blank=True)
@@ -39,6 +40,14 @@ class Account(AbstractUser, GuardianUserMixin):
 
     def change_account_settings(self, settings):
         self.account_settings = settings
+
+
+@receiver(pre_delete, sender=Account)
+def pre_delete_user(sender, **kwargs):
+    instance = kwargs.get('instance')
+
+    if instance.profile:
+        instance.profile.delete()
 
 
 class Log(models.Model):

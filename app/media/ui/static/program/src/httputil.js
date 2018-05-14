@@ -12,10 +12,11 @@ function queryParams(params) {
 }
 
 export function makeJsonRequest(uri, params, baseUrl) {
-    const {method, body} = params
+    const {method, body, authenticated} = params
+    const needsAuth = authenticated === undefined ? true : authenticated
     return fetchAPI(uri, {
         method: method,
-        headers: makeHeaders(defaultJsonHeaders),
+        headers: makeHeaders(defaultJsonHeaders, needsAuth),
         body: JSON.stringify(body)
     }, baseUrl)
 }

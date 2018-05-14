@@ -11,8 +11,7 @@
                     <label class="stack" for="name">Username</label>
                     <input class="stack" v-model="instanceForm.username" type="text" placeholder="Username">
                     <label class="stack" for="name">Display Name</label>
-                    <input class="stack" v-model="instanceForm.first_name" id="first-name" type="text" placeholder="First Name">
-                    <input class="stack" v-model="instanceForm.last_name" id="last-name" type="text" placeholder="Last Name">
+                    <input class="stack" v-model="instanceForm.display_name" type="text" placeholder="Display Name">
                     <label class="stack" for="password">Password</label>
                     <input class="stack" v-model="instanceForm.password" id="password" type="password" placeholder="Password">
                     <label class="stack" for="retype-password">Re-type Password</label>
@@ -21,13 +20,12 @@
                     <input class="stack" v-model="instanceForm.email" id="email" type="email" placeholder="Email Address">
                     
                     <label class="stack">
-                        <input name="subscribe" type="checkbox" />
+                        <input name="subscribe" class="stack" v-model="instanceForm.subscribe" id="subscribe" type="checkbox">
                         <span class="checkable">I wish to subscribe to the mailing list</span>
                     </label>
                     
-                    <input class="stack" v-model="instanceForm.subscribe" id="subscribe" type="checkbox">
                     <!-- TODO must be over 13 -->
-                    <input class="stack" type="submit" text="Submit" />
+                    <input type="submit" class="stack" value="Submit" />
                 </fieldset>
             </form>
         </Modal>
@@ -35,6 +33,7 @@
 </template>
 
 <script>
+import {AccountCollection} from '../models/Account.js'
 import Modal from './Gui/Modal/Modal'
 
 export default {
@@ -50,8 +49,7 @@ export default {
             },
             instanceForm: {
                 username: "",
-                first_name: "",
-                last_name: "",
+                display_name: "",
                 password: "",
                 retype_password: "",
                 email: "",
@@ -76,28 +74,28 @@ export default {
         closeModal() {
             this.isModalOpen = false
         },
-        register(data) {
-            //"Please enter the following information below."
-            fetch('/api/accounts/create', {
-                method: 'POST',
-                data: {
-                    username: data.username,
-                    email: data.email,
-                    country: data.country,
-                    first_name: data.firstName,
-                    last_name: data.lastName,
-                    password: data.password,
-                    user_settings: {}
-                }
+        register() {
+            AccountCollection.create({
+                username: this.instanceForm.username,
+                email: this.instanceForm.email,
+                country: this.instanceForm.country,
+                // display_name: this.instanceForm.display_name,
+                password: this.instanceForm.password,
+                profile: {
+                    display_name: this.instanceForm.display_name
+                },
+                account_settings: {}
             })
                 .then(() => {
                     this.infoBox.status = "success"
+                    this.infoBox.message = 'Your account was successfully created. Please login.'
                     //this.router.navigate home
                 })
                 .catch((error) => {
                     this.infoBox.status = "error"
                     this.infoBox.message = 'The account could not be created for the following reason: ' + error
                 })
+            //"Please enter the following information below."
         }
     }
 }
