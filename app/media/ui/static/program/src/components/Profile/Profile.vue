@@ -40,6 +40,7 @@ import RestfulComponent from "../RestfulComponent"
 import ProfileList from './ProfileList'
 import TagList from '../TagList'
 
+import {ProfileCollection} from '../../models/Profile.js'
 import {profiles} from '../../store.js'
 
 // import {AccountCollection} from '../models/Account.js'
@@ -79,7 +80,7 @@ export default {
         },
 
         async details(params) {
-            this.instance = await this.showInstance(params.id, '/profile/list')
+            this.instance = await this.showInstance(params.id, '/profile/list', ProfileCollection, 'profiles')
         }
     }
 }

@@ -28,6 +28,22 @@ class InterestCollection extends Collection {
 
     static Model = InterestModel
 
+    static get(id) {
+        return fetchAPI(`interest/${id}/`, {
+            method: "GET"
+        })
+            .then(jsonResponse)
+
+            .then((data) => {
+                const instance = new InterestModel({...data})
+                return instance
+            })
+            .catch((error) => {
+                // TODO better error handling
+                console.log(error)
+            })
+    }
+
     static create(data) {
         return makeJsonRequest("interest/", {
             method: "POST",

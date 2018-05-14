@@ -15,6 +15,7 @@
 
 <script>
 import RestfulComponent from "./RestfulComponent"
+import {InterestCollection} from '../models/Interest.js'
 import {interests, interestedUsers} from '../store.js'
 import ProfileList from './Profile/ProfileList'
 
@@ -47,7 +48,7 @@ export default {
                 this.$store.interestId = params.id
             }
 
-            this.instance = await this.showInstance(params.id, '/feed/list')
+            this.instance = await this.showInstance(params.id, '/feed/list', InterestCollection, 'interests')
             const interested = await interestedUsers(params.id)
             this.interestedUsers = interested.values
         }

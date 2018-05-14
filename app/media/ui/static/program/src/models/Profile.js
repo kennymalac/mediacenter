@@ -37,6 +37,9 @@ class ProfileCollection extends Collection {
             method: "GET"
         })
             .then(jsonResponse)
+            .then((data) => {
+                return new ProfileModel({...data})
+            })
     }
 
     static all() {

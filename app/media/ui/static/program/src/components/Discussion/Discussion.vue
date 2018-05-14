@@ -88,14 +88,14 @@ export default {
         },
 
         async manage(params) {
-            const fallthrough = this.parentId ? `/discussion/${this.parentId}/detail` : `feed/list`
+            const fallthrough = this.parentId ? `/discussion/${this.parentId}/detail` : `/feed/list`
 
-            this.instance = await this.showInstance(params.id, fallthrough)
+            this.instance = await this.showInstance(params.id, fallthrough, DiscussionCollection, 'discussions')
             this.instanceForm = this.instance.getForm()
         },
 
         async details(params) {
-            this.instance = await this.showInstance(params.id, 'feed/list', DiscussionCollection, 'discussions')
+            this.instance = await this.showInstance(params.id, '/feed/list', DiscussionCollection, 'discussions')
         },
 
         async list(params) {

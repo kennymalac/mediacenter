@@ -171,7 +171,7 @@ export default {
         },
 
         async manage(params) {
-            this.instance = await this.showInstance(params.id, 'group/list')
+            this.instance = await this.showInstance(params.id, `/group/${params.id}/details`)
             this.instanceForm = this.instance.getForm()
         },
 
@@ -184,7 +184,7 @@ export default {
             const user = await activeUser()
             this.isActiveUserMember = user.details.groupforum_set.includes(parseInt(params.id))
 
-            this.instance = await this.showInstance(params.id, 'group/list', GroupCollection)
+            this.instance = await this.showInstance(params.id, '/group/list', GroupCollection, 'groups')
             this.feed = this.instance.feed
 
             try {

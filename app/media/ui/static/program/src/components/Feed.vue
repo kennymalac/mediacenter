@@ -142,7 +142,7 @@ export default {
         },
 
         async manage(params) {
-            this.instance = await this.showInstance(params.id, 'feed/list')
+            this.instance = await this.showInstance(params.id, 'feed/list', FeedCollection, 'feeds')
             this.instanceForm = this.instance.instance
         },
 
@@ -152,7 +152,7 @@ export default {
         },
 
         async details(params) {
-            this.instance = await this.showInstance(params.id, 'feed/list')
+            this.instance = await this.showInstance(params.id, 'feed/list', FeedCollection, 'feeds')
             try {
                 this.contentItems = await FeedModel.listItems(this.instance.id, {})
             }
