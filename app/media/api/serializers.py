@@ -35,9 +35,10 @@ class FullAccountSerializer(AccountSerializer):
         password = validated_data.pop('password')
         account = Account.objects.create(**validated_data)
         account.set_password(password)
-        account.save()
 
-        Profile.objects.create(**profile_data, account=account)
+        profile = Profile.objects.create(**profile_data, account=account)
+        account.profile = profile
+        account.save()
 
         return account
 

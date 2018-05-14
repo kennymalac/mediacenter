@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.conf import settings
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, list_route, detail_route, parser_classes
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -162,14 +162,14 @@ class GroupForumViewSet(NestedViewSetMixin,
     }
     filter_class = GroupForumFilter
 
-    @list_route(methods=['POST'], url_path='search')
+    @list_route(methods=['POST'], url_path='search', permission_classes=[IsAuthenticated])
     def search(self, request):
         interests = Interest.objects.filter(id__in=request.data.get('interests', []))
 
         serializer = GroupForumSerializer(self.get_queryset().filter(feed__interests__in=interests), many=True)
         return Response(serializer.data)
 
-    @detail_route(methods=['POST'], url_path='join')
+    @detail_route(methods=['POST'], url_path='join', permission_classes=[IsAuthenticated])
     def join(self, request, pk=None):
         instance = self.queryset.get(pk=pk)
 
@@ -182,7 +182,7 @@ class GroupForumViewSet(NestedViewSetMixin,
 
         return Response({})
 
-    @detail_route(methods=['POST'], url_path='leave')
+    @detail_route(methods=['POST'], url_path='leave', permission_classes=[IsAuthenticated])
     def leave(self, request, pk=None):
         instance = self.queryset.get(pk=pk)
         instance.members.remove(request.user.id)

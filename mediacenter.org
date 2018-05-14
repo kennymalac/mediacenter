@@ -57,7 +57,8 @@
 **** TODO login page
 **** TODO full test coverage
 *** Register
-**** TODO Functional register page
+**** DONE Functional register page
+     CLOSED: [2018-05-14 Mon 16:14]
 **** TODO full test coverage
 **** TODO hide if logged in
 *** Gallery
@@ -116,8 +117,10 @@
 **** DONE model, serializer, viewset
      CLOSED: [2018-05-11 Fri 13:05]
 **** TODO CRUD
-***** TODO Create
-***** TODO Read
+***** DONE Create
+      CLOSED: [2018-05-14 Mon 16:40]
+***** DONE Read
+      CLOSED: [2018-05-14 Mon 16:40]
 ***** TODO Update
 ***** TODO Delete
 
