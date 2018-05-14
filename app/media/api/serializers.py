@@ -38,7 +38,7 @@ class PrivateAccountProfileDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ('id', 'account_settings', 'profile')
+        fields = ('id', 'account_settings', 'profile', 'groupforum_set')
 
 
 class LogSerializer(serializers.Serializer):

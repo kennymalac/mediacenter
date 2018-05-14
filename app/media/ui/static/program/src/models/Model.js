@@ -38,9 +38,20 @@ export class Model {
                 // Initialize an array of model instances
                 const store = collections[field]
                 if (store instanceof this.constructor.fields[field]) {
-                    const ids = Number.isInteger(this.instance[field])
-                          ? this.instance[field]
-                          : this.instance[field].map((val) => { return val.id })
+                    console.log(store)
+
+                    let ids = []
+                    if (Number.isInteger(this.instance[field])) {
+                        ids = this.instance[field]
+                    }
+
+                    else if (Array.isArray(this.instance[field]) && this.instance[field].length > 0) {
+                        ids = Number.isInteger(this.instance[field][0])
+                              ? this.instance[field]
+                              : this.instance[field].map((val) => { return val.id })
+                    }
+
+                    console.log(ids)
                     this.instance[field] = store.values.filter((data) => {
                         return ids.includes(data.id)
                     })

@@ -22,6 +22,10 @@
                             <li v-for="rule in instance.rules">{{ rule }}</li>
                         </ol>
                     </div>
+
+                    <button type="button" v-if="!isActiveUserMember" @click="joinGroup">Join group</button>
+                    <button type="button" v-if="isActiveUserMember" class="warning" @click="leaveGroup">Leave group</button>
+
                     <div class="who-is-online">
                         <h3><div class="online-circle"></div> {{ onlineMembers.length }} User(s) online now</h3>
                     </div>
@@ -62,14 +66,20 @@
             </form>
         </template>
         <template v-if="actions.search">
+            <section class="sidebar" style="height: 300px;">
+                <form class="search-form">
+                    <fieldset>
+                        <label class="stack" for="interests">Interests</label>
+                        <interest-select v-model="filteredInterests" />
+                        <button class="stack" type="button" @click="searchGroups">
+                            Search
+                        </button>
+                    </fieldset>
+                </form>
+            </section>
             <section class="groups">
                 <h1>Find Groups</h1>
                 <group-list :items="filteredObjects" />
-                <label class="stack" for="interests">Interests</label>
-                <interest-select v-model="filteredInterests" />
-                <button type="button" @click="searchGroups">
-                    Search
-                </button>
             </section>
         </template>
     </div>
@@ -79,7 +89,7 @@
 import RestfulComponent from "../RestfulComponent"
 import {GroupCollection, GroupModel} from '../../models/Group.js'
 import {FeedModel} from '../../models/Feed.js'
-import {groups, activeUser, filteredGroups} from '../../store.js'
+import {groups, accounts, activeUser, filteredGroups} from '../../store.js'
 
 import AccountSelect from '../AccountSelect'
 import InterestSelect from '../InterestSelect'
@@ -119,6 +129,7 @@ export default {
             instanceForm: { members: [], feed: {} },
             filteredInterests: [],
             filteredObjects: [],
+            isActiveUserMember: false,
             objectName: 'group',
             groupActions: [
                 {
@@ -172,6 +183,8 @@ export default {
         async details(params) {
             this.instance = await this.showInstance(params.id, 'group/list')
             this.feed = this.instance.feed
+            const user = await activeUser()
+            this.isActiveUserMember = user.details.groupforum_set.includes(this.instance.id)
 
             try {
                 this.contentItems = await FeedModel.listItems(this.instance.feed.id, {})
@@ -211,6 +224,34 @@ export default {
                 })
         },
 
+        async joinGroup() {
+            const user = await activeUser()
+            const accountSet = await accounts()
+            const newMember = accountSet.values.find((account) => {
+                return account.id === user.details.id
+            })
+            GroupModel.join(this.instance, newMember)
+                .then(() => {
+                    user.details.groupforum_set.push(this.instance.id)
+                    this.isActiveUserMember = true
+                })
+        },
+
+        async leaveGroup() {
+            const user = await activeUser()
+            const accountSet = await accounts()
+            const newMember = accountSet.values.find((account) => {
+                return account.id === user.details.id
+            })
+            GroupModel.leave(this.instance, newMember)
+                .then(() => {
+                    user.details.groupforum_set = user.details.groupforum_set.filter((groupId) => {
+                        return this.instance.id !== groupId
+                    })
+                    this.isActiveUserMember = false
+                })
+        },
+
         save() {
             if (this.actions.manage) {
                 this.manageGroup().then(() => {
@@ -245,7 +286,7 @@ $shadow-color: rgba(0, 0, 0, .2);
 }
 
 .online-circle {
-   display: inline-flex;
+    display: inline-flex;
     height: 16px;
     width: 16px;
     align-self: center;
@@ -253,11 +294,16 @@ $shadow-color: rgba(0, 0, 0, .2);
     background: radial-gradient($light-green 50%, $dark-green);
 }
 
-.main-form {
+.main-form, .search-form {
     select { margin: 10px 0; }
 }
 
+.search-form {
+    width: 300px;
+}
+
 section.sidebar {
+    display: flex;
     background: linear-gradient(135deg, white, rgb(236, 240, 241));
     margin: 10px;
     padding: 20px;

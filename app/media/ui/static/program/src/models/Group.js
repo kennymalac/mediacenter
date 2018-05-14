@@ -53,6 +53,32 @@ class GroupModel extends Model {
                 instance.sync(data, form)
             })
     }
+
+    static join(instance, activeAccount) {
+        return makeJsonRequest(`group/${instance.id}/join/`, {
+            method: "POST",
+            body: {}
+        })
+            .then(jsonResponse)
+            .then((data) => {
+                // Add the user to the group member list
+                instance.members.push(activeAccount)
+            })
+    }
+
+    static leave(instance, activeAccount) {
+        return makeJsonRequest(`group/${instance.id}/leave/`, {
+            method: "POST",
+            body: {}
+        })
+            .then(jsonResponse)
+            .then((data) => {
+                // Remove the user from this group
+                instance.members = instance.members.filter((account) => {
+                    return activeAccount.id !== account.id
+                })
+            })
+    }
 }
 
 class GroupCollection extends Collection {

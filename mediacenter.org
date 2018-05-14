@@ -145,10 +145,14 @@
 
 *** Groups
 **** TODO moderation system
+**** TODO what happens when owner of a group leaves?
+**** DONE joining public groups
+     CLOSED: [2018-05-14 Mon 12:14]
 **** TODO invite only groups
 **** DONE Finding Groups by Interest
      CLOSED: [2018-05-12 Sat 19:54]
-**** TODO Find Group interface
+**** DONE Find Group interface
+     CLOSED: [2018-05-14 Mon 11:07]
 **** DONE group list should only show authenticated user's groups by default
      CLOSED: [2018-05-11 Fri 16:03]
 **** TODO should adding interests to groups make any content items default to those interests?
@@ -226,6 +230,7 @@ Your feed has "content decay"
     don't make too many assumptions
 **** TODO better filtering mechanism
 **** TODO modelInstance should fetch from Collection
+**** TODO details views shouldn't fetch from entire Collection
 **** TODO maybe don't recompute - don't have objects in this.objects ?
 **** DONE inject store into base Vue Program so all vues can do this.$store
      CLOSED: [2018-05-11 Fri 16:04]

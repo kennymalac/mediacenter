@@ -162,6 +162,25 @@ class GroupForumViewSet(NestedViewSetMixin,
         serializer = GroupForumSerializer(self.get_queryset().filter(feed__interests__in=interests), many=True)
         return Response(serializer.data)
 
+    @detail_route(methods=['POST'], url_path='join')
+    def join(self, request, pk=None):
+        instance = self.queryset.get(pk=pk)
+
+        if instance.is_restricted:
+            return Response({
+                'error': 'Joining this group is by invitation only'
+            }, status=400)
+
+        instance.members.add(request.user.id)
+
+        return Response({})
+
+    @detail_route(methods=['POST'], url_path='leave')
+    def leave(self, request, pk=None):
+        instance = self.queryset.get(pk=pk)
+        instance.members.remove(request.user.id)
+
+        return Response({})
 
 # @api_view
 # def media_image_src(request):
