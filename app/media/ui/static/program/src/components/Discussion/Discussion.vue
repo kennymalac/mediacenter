@@ -95,7 +95,7 @@ export default {
         },
 
         async details(params) {
-            this.instance = await this.showInstance(params.id, 'feed/list')
+            this.instance = await this.showInstance(params.id, 'feed/list', DiscussionCollection, 'discussions')
         },
 
         async list(params) {

@@ -181,10 +181,11 @@ export default {
         },
 
         async details(params) {
-            this.instance = await this.showInstance(params.id, 'group/list')
-            this.feed = this.instance.feed
             const user = await activeUser()
-            this.isActiveUserMember = user.details.groupforum_set.includes(this.instance.id)
+            this.isActiveUserMember = user.details.groupforum_set.includes(parseInt(params.id))
+
+            this.instance = await this.showInstance(params.id, 'group/list', GroupCollection)
+            this.feed = this.instance.feed
 
             try {
                 this.contentItems = await FeedModel.listItems(this.instance.feed.id, {})

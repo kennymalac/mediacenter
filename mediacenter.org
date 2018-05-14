@@ -144,6 +144,7 @@
 ***** TODO Delete
 
 *** Groups
+**** TODO only members can create new Posts
 **** TODO moderation system
 **** TODO what happens when owner of a group leaves?
 **** DONE joining public groups
@@ -230,7 +231,8 @@ Your feed has "content decay"
     don't make too many assumptions
 **** TODO better filtering mechanism
 **** TODO modelInstance should fetch from Collection
-**** TODO details views shouldn't fetch from entire Collection
+**** DONE details views shouldn't fetch from entire Collection
+     CLOSED: [2018-05-14 Mon 12:53]
 **** TODO maybe don't recompute - don't have objects in this.objects ?
 **** DONE inject store into base Vue Program so all vues can do this.$store
      CLOSED: [2018-05-11 Fri 16:04]

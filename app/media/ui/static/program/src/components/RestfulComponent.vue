@@ -48,21 +48,28 @@ export default {
             })
             return instance
         },
-        async showInstance(id, fallthrough, collection) {
-            if (this.objects.length === 0) {
+        async showInstance(id, fallthrough, collection, storeField) {
+            let instance
+
+            if (this.objects.length === 0 && storeField && this.$store[storeField].values) {
+                this.objects = this.$store[storeField].values
+            }
+
+            if (this.objects.length !== 0) {
                 // TODO no need to try this each time for details
                 // just try getting the instance directly
-                await this.list()
-            }
-            let instance = this.findInstance(id, fallthrough)
-            if (instance) {
-                return instance
+                instance = this.findInstance(id)
+                if (instance) {
+                    return instance
+                }
             }
 
             // Try getting instance directly
+            console.log(collection)
             if (collection) {
                 try {
                     instance = await collection.get(id)
+                    this.objects.push(instance)
                     return instance
                 }
                 catch (error) {

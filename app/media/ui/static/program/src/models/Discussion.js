@@ -49,7 +49,7 @@ class DiscussionCollection extends Collection {
             .then(jsonResponse)
 
             .then((data) => {
-                return data
+                return new DiscussionModel(data)
             })
             .catch((error) => {
                 // TODO better error handling

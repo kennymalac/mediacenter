@@ -93,7 +93,8 @@ class GroupCollection extends Collection {
             .then(jsonResponse)
 
             .then((data) => {
-                return data
+                const instance = new GroupModel({...data})
+                return instance
             })
             .catch((error) => {
                 // TODO better error handling
