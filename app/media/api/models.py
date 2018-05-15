@@ -178,8 +178,8 @@ class Feed(TaggedItem):
     name = models.CharField(max_length=140, blank=True)
     description = models.TextField(blank=True)
     content_types = models.ManyToManyField(FeedContentItemType, related_name='+')
-    content = models.ManyToManyField('api.FeedContentItem', related_name='feeds')
     created = models.DateTimeField(auto_now_add=True)
+    content = models.ManyToManyField('api.FeedContentItem', related_name='feeds')
 
 
 class FeedContentItem(TaggedItem):
@@ -191,6 +191,7 @@ class FeedContentItem(TaggedItem):
 
 
 class Discussion(models.Model):
+    group = models.ForeignKey('api.GroupForum')
     content_item = models.ForeignKey(FeedContentItem, related_name="+")
     parent = models.ForeignKey('self', null=True)
     order = models.IntegerField(default=0)
