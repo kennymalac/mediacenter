@@ -1,6 +1,6 @@
-import {Model, Collection} from './Model.js'
+import {Model, Collection, serializeIds} from './Model.js'
 import {InterestCollection} from './Interest.js'
-import {fetchAPI, jsonResponse} from '../httputil.js'
+import {makeJsonRequest, fetchAPI, jsonResponse} from '../httputil.js'
 
 class ProfileModel extends Model {
 
@@ -15,6 +15,20 @@ class ProfileModel extends Model {
 
     static fields = {
         interests: InterestCollection
+    }
+
+    static manage(instance, form) {
+        return makeJsonRequest(`profile/${instance.id}/`, {
+            method: "PATCH",
+            body: {
+                ...form,
+                interests: serializeIds(form.interests)
+            }
+        })
+            .then(jsonResponse)
+            .then((data) => {
+                instance.sync(data, form)
+            })
     }
 }
 

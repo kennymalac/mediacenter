@@ -121,7 +121,8 @@
       CLOSED: [2018-05-14 Mon 16:40]
 ***** DONE Read
       CLOSED: [2018-05-14 Mon 16:40]
-***** TODO Update
+***** DONE Update
+      CLOSED: [2018-05-14 Mon 17:17]
 ***** TODO Delete
 
 
@@ -233,6 +234,7 @@ Your feed has "content decay"
 *** Model/Collection
     don't make too many assumptions
 **** TODO better filtering mechanism
+**** TODO better nested Models behavior
 **** TODO modelInstance should fetch from Collection
 **** DONE details views shouldn't fetch from entire Collection
      CLOSED: [2018-05-14 Mon 12:53]

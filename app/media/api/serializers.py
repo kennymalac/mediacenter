@@ -280,6 +280,12 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ('id', 'display_name', 'picture', 'title', 'description', 'interests')
 
 
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ('id', 'display_name', 'picture', 'title', 'description', 'interests')
+
+
 class FeedCreateUpdateSerializer(serializers.ModelSerializer):
     owner = serializers.PrimaryKeyRelatedField(
         queryset=Account.objects.all(),

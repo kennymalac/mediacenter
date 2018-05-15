@@ -4,7 +4,7 @@
             <h1>User list</h1>
             <profile-list :items="objects" />
         </template>
-
+        
         <template v-if="actions.details && instance.id">
             <section class="sidebar">
                 <div class="group-info">
@@ -13,6 +13,10 @@
                         <i v-if="!instance.picture" class="ion-md-person"></i>
                     </div>
                     <h2>{{ instance.display_name }}</h2>
+
+                    <button type="button" v-if="isActiveUser" @click="editProfile">
+                        Edit profile
+                    </button>
                 </div>
             </section>
             <section class="main-profile">
@@ -32,24 +36,51 @@
             <!--     Comments go here... -->
             <!-- </section> -->
         </template>
+        
+        <template v-if="actions.manage && instance.id">
+            <form class="main-form" @submit.prevent="save">
+                <fieldset>
+                    <legend class="stack">Details</legend>
+                    <label class="stack" for="name">Display name</label>
+                    <input class="stack" name="name" v-model="instanceForm.display_name" type="text" />
+                    <label class="stack" for="title">Title</label>
+                    <input class="stack" name="title" v-model="instanceForm.title" type="text" />
+                    <label class="stack" for="description">Description</label>
+                    <textarea class="stack" name="description" v-model="instanceForm.description" />
+                    <label class="stack" for="profile_picture">Profile picture</label>
+                    <input class="stack" name="profile_picture" v-model="instanceForm.profile_picture" type="text" />
+                    <!-- <label class="stack" for="rules">Rules</label>
+                         TODO rules -->
+                    <label class="stack" for="interests">Interests</label>
+                    <interest-select v-model="instanceForm.interests" />
+                    
+                    <!-- <label class="stack" for="">Tags</label> -->
+                    <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->
+                    <input class="stack" type="submit" value="Save changes" />
+                </fieldset>
+            </form>
+        </template>
     </div>
 </template>
 
 <script>
 import RestfulComponent from "../RestfulComponent"
 import ProfileList from './ProfileList'
+import InterestSelect from '../InterestSelect'
 import TagList from '../TagList'
 
-import {ProfileCollection} from '../../models/Profile.js'
-import {profiles} from '../../store.js'
+import {ProfileModel, ProfileCollection} from '../../models/Profile.js'
+import {profiles, activeUser} from '../../store.js'
 
 // import {AccountCollection} from '../models/Account.js'
 // import {auth} from "../../auth.js"
+import router from "../../router/index.js"
 
 export default {
     mixins: [RestfulComponent],
     components: {
         ProfileList,
+        InterestSelect,
         TagList
     },
     data() {
@@ -57,7 +88,8 @@ export default {
             instanceForm: { interests: [] },
             instance: {
                 interests: []
-            }
+            },
+            isActiveUser: false
         }
     },
     computed: {
@@ -81,6 +113,36 @@ export default {
 
         async details(params) {
             this.instance = await this.showInstance(params.id, '/profile/list', ProfileCollection, 'profiles')
+            const user = await activeUser()
+            this.isActiveUser = this.instance.id === user.details.profile.id
+        },
+
+        async manage(params) {
+            if (!this.isActiveUser) {
+                return
+            }
+
+            this.instance = await this.showInstance(params.id, '/profile/list', ProfileCollection, 'profiles')
+            this.instanceForm = this.instance.getForm()
+        },
+
+        editProfile() {
+            router.push(`/profile/${this.instance.id}/manage`)
+        },
+
+        manageProfile() {
+            return ProfileModel.manage(this.instance, this.instanceForm)
+                .catch((error) => {
+                    console.log(error)
+                })
+        },
+
+        save() {
+            if (this.actions.manage) {
+                this.manageProfile().then(() => {
+                    router.push(`/profile/${this.instanceForm.id}/details`)
+                })
+            }
         }
     }
 }

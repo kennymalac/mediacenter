@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.conf import settings
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, list_route, detail_route, parser_classes
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
@@ -105,11 +105,17 @@ class InterestViewSet(ListModelMixin,
     serializer_class = InterestSerializer
 
 
-class ProfileViewSet(ListModelMixin,
+class ProfileViewSet(MultipleSerializerMixin,
+                     ListModelMixin,
                      RetrieveModelMixin,
+                     UpdateModelMixin,
                      GenericViewSet):
     queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+    serializer_classes = {
+        'default': ProfileSerializer,
+        'update': ProfileUpdateSerializer,
+        'partial_update': ProfileUpdateSerializer,
+    }
     filter_fields = ('interests',)
 
 
