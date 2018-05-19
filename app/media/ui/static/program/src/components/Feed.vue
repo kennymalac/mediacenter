@@ -27,7 +27,7 @@
                     <feed-filter :specifiers="filters.tags" :filterToggled="toggle" />
                 </div>
             </section>
-            
+
             <section class="feed">
                 <feed-content-item-list :enabledContentTypes="enabledContentTypes" :items="contentItems" />
             </section>

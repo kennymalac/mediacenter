@@ -179,7 +179,7 @@ class Feed(TaggedItem):
     description = models.TextField(blank=True)
     content_types = models.ManyToManyField(FeedContentItemType, related_name='+')
     created = models.DateTimeField(auto_now_add=True)
-    content = models.ManyToManyField('api.FeedContentItem', related_name='feeds')
+    stashes = models.ManyToManyField('api.FeedContentStash', related_name='feeds')
 
 
 class FeedContentItem(TaggedItem):
@@ -190,6 +190,15 @@ class FeedContentItem(TaggedItem):
     created = models.DateTimeField(auto_now_add=True)
 
 
+class FeedContentStash(models.Model):
+    # TODO "sticky" content - maybe add order?
+    name = models.CharField(max_length=140, blank=True)
+    description = models.TextField(blank=True)
+    max_content = models.IntegerField(default=1000)
+    content = models.ManyToManyField(FeedContentItem, related_name="+")
+    created = models.DateTimeField(auto_now_add=True)
+
+
 class Discussion(models.Model):
     group = models.ForeignKey('api.GroupForum')
     content_item = models.ForeignKey(FeedContentItem, related_name="+")
@@ -197,6 +206,8 @@ class Discussion(models.Model):
     order = models.IntegerField(default=0)
     text = models.TextField(blank=True)
 
+# class ContentShare(models.Model):
+#     pass
 
 class GroupForum(models.Model):
     owner = models.ForeignKey(Account, related_name="owned_groups")
@@ -208,6 +219,7 @@ class GroupForum(models.Model):
     )
     # interests = models.ManyToManyField(Interest, related_name='+')
     feed = models.ForeignKey(Feed)
+    # TODO fixed set of content_items ?
     image = models.URLField(blank=True)
     is_restricted = models.BooleanField(default=False)
     members = models.ManyToManyField(Account)

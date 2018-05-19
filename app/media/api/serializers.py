@@ -348,7 +348,7 @@ class FeedContentItemCreateUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'feeds', 'title', 'description', 'owner', 'content_type', 'created')
+        fields = ('id', 'title', 'description', 'owner', 'content_type', 'created')
 
 
 class FeedContentItemProfileSerializer(serializers.ModelSerializer):
@@ -356,7 +356,42 @@ class FeedContentItemProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'feeds', 'title', 'description', 'owner', 'content_type', 'created')
+        fields = ('id', 'title', 'description', 'owner', 'content_type', 'created')
+
+
+class FeedContentStashSerializer(serializers.ModelSerializer):
+    content = serializers.SerializerMethodField('paginated_content')
+
+    class Meta:
+        model = FeedContentStash
+        fields = ('id', 'name', 'description', 'content')
+
+    def paginated_content(self, instance):
+        request = self.context['request']
+
+        content_queryset = instance.content.all()
+        _content_types = request.data.get('content_types', None)
+        if _content_types:
+            content_queryset = content_queryset.filter(content_type__in=FeedContentType.objects.filter(id__in=_content_types))
+
+        _interests = request.data.get('interests', None)
+        if _interests:
+            content_queryset = content_queryset.filter(interests__in=Interest.objects.filter(id__in=_interests))
+
+        paginator = PageNumberPagination()
+        page = paginator.paginate_queryset(content_queryset, self.context['request'])
+        serializer = FeedContentItemSerializer(
+            page,
+            many=True,
+            context={'request': self.context['request']}
+        )
+        return serializer.data
+
+
+class FeedContentStashCreateUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FeedContentStash
+        fields = ('id', 'name', 'description', 'content')
 
 
 class DiscussionSerializer(serializers.ModelSerializer):
@@ -364,7 +399,7 @@ class DiscussionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Discussion
-        fields = ('id', 'parent', 'order', 'content_item', 'text')
+        fields = ('id', 'parent', 'order', 'content_item', 'group', 'text')
 
 
 class DiscussionCreateUpdateSerializer(serializers.ModelSerializer):
@@ -383,7 +418,7 @@ class DiscussionCreateUpdateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         content_item_data = validated_data.pop('content_item')
-        feed = content_item_data.pop('feeds')[0]
+        group = content_item_data.pop('group')
         order = 0
 
         if validated_data.get('parent', 0):
@@ -397,17 +432,15 @@ class DiscussionCreateUpdateSerializer(serializers.ModelSerializer):
             content_type = FeedContentItemType.objects.get(name=FeedContentItemType.TOPIC)
 
         content_item = FeedContentItem.objects.create(**content_item_data, content_type=content_type)
-        feed.content.add(content_item)
-        feed.save()
 
-        discussion = Discussion.objects.create(**validated_data, content_item=content_item, order=order)
+        discussion = Discussion.objects.create(**validated_data, content_item=content_item, group=group, order=order)
         # discussion.members.add(*members)
 
         return discussion
 
     class Meta:
         model = Discussion
-        fields = ('id', 'parent', 'order', 'content_item', 'text')
+        fields = ('id', 'parent', 'order', 'group', 'content_item', 'text')
 
 
 class GroupForumSerializer(serializers.ModelSerializer):
@@ -457,6 +490,9 @@ class GroupForumCreateUpdateSerializer(serializers.ModelSerializer):
             feed.interests.add(*interests)
         if content_types:
             feed.content_types.add(*content_types)
+
+        stash = FeedContentStash.objects.create(name="Default", description="Stored content for this group")
+        feed.stashes.add(stash)
 
         members = validated_data.pop('members')
         group = GroupForum.objects.create(**validated_data, feed=feed)

@@ -15,7 +15,7 @@
                     <h2>{{ instance.display_name }}</h2>
 
                     <button type="button" v-if="isActiveUser" @click="editProfile">
-                        Edit profile
+                        <i class="ion-md-create"></i> Edit
                     </button>
                 </div>
             </section>
@@ -69,8 +69,8 @@ import ProfileList from './ProfileList'
 import InterestSelect from '../InterestSelect'
 import TagList from '../TagList'
 
-import {ProfileModel, ProfileCollection} from '../../models/Profile.js'
-import {profiles, activeUser} from '../../store.js'
+import {ProfileModel} from '../../models/Profile.js'
+import {profiles, activeUser, interests} from '../../store.js'
 
 // import {AccountCollection} from '../models/Account.js'
 // import {auth} from "../../auth.js"
@@ -85,6 +85,7 @@ export default {
     },
     data() {
         return {
+            page: 1,
             instanceForm: { interests: [] },
             instance: {
                 interests: []
@@ -107,12 +108,20 @@ export default {
         },
 
         async list(params) {
-            const store = await profiles()
-            this.objects = store.values
+            const interestsCollection = await interests()
+            const profilesCollection = await profiles()
+            this.objects = await profilesCollection.list(
+                this.page,
+                { interests: interestsCollection }
+            )
         },
 
         async details(params) {
-            this.instance = await this.showInstance(params.id, '/profile/list', ProfileCollection, 'profiles')
+            this.isActiveUser = false
+            const interestsCollection = await interests()
+            this.instance = await this.showInstance(params.id, '/profile/list', profiles, {
+                interests: interestsCollection
+            })
             const user = await activeUser()
             this.isActiveUser = this.instance.id === user.details.profile.id
         },
@@ -122,7 +131,10 @@ export default {
                 return
             }
 
-            this.instance = await this.showInstance(params.id, '/profile/list', ProfileCollection, 'profiles')
+            const interestsCollection = await interests()
+            this.instance = await this.showInstance(params.id, '/profile/list', profiles, {
+                interests: interestsCollection
+            })
             this.instanceForm = this.instance.getForm()
         },
 
@@ -130,11 +142,16 @@ export default {
             router.push(`/profile/${this.instance.id}/manage`)
         },
 
-        manageProfile() {
-            return ProfileModel.manage(this.instance, this.instanceForm)
-                .catch((error) => {
-                    console.log(error)
+        async manageProfile() {
+            const interestsCollection = await interests()
+            try {
+                return await ProfileModel.manage(this.instance, this.instanceForm, {
+                    interests: interestsCollection
                 })
+            }
+            catch (error) {
+                console.log(error)
+            }
         },
 
         save() {

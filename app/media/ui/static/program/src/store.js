@@ -2,12 +2,12 @@ import {makeActiveUser} from './auth.js'
 import makeSingleton from './singleton.js'
 
 import {AccountCollection, makeAccountCollection} from './models/Account.js'
-import {ProfileCollection, makeProfileCollection} from './models/Profile.js'
+import {ProfileCollection, makeProfileCollection, makeFilteredProfileCollection} from './models/Profile.js'
 import {FeedContentTypeCollection, makeFeedContentTypeCollection} from './models/FeedContentType.js'
 import {InterestCollection, makeInterestCollection} from './models/Interest.js'
 import {FeedCollection, makeFeedCollection} from './models/Feed.js'
 import {DiscussionCollection, makeDiscussionCollection} from './models/Discussion.js'
-import {GroupCollection, makeGroupCollection} from './models/Group.js'
+import {GroupCollection, makeFilteredGroupCollection} from './models/Group.js'
 import {AlbumCollection, makeAlbumCollection} from './models/Album.js'
 
 const store = {
@@ -83,7 +83,7 @@ export const profiles = () => {
     return singleton(
         'profiles',
         (value) => value instanceof ProfileCollection,
-        () => makeProfileCollection(ProfileCollection.all, interests)
+        () => makeProfileCollection()
     )
 }
 
@@ -92,7 +92,7 @@ export const interestedUsers = (interestId) => {
         'interestedUsers',
         (value) => value instanceof ProfileCollection,
         () => {
-            return makeProfileCollection(
+            return makeFilteredProfileCollection(
                 () => ProfileCollection.searchProfiles({
                     interests: [interestId]
                 }),
@@ -106,7 +106,7 @@ export const feeds = () => {
     return singleton(
         'feeds',
         (value) => value instanceof FeedCollection,
-        () => makeFeedCollection(FeedCollection.all, feedContentTypes, interests)
+        () => makeFeedCollection(FeedCollection.list, feedContentTypes, interests)
     )
 }
 
@@ -132,8 +132,8 @@ const groupStore = (field, reducer) => (params) => {
 
 const activeUserGroups = () => {
     return activeUser().then((user) => {
-        return makeGroupCollection(
-            () => GroupCollection.all({ members: user.details.id }),
+        return makeFilteredGroupCollection(
+            () => GroupCollection.list({ members: user.details.id }),
             accounts
         )
     })
@@ -141,9 +141,10 @@ const activeUserGroups = () => {
 
 const filterGroups = (params) => {
     console.log(params)
-    return makeGroupCollection(
+    return makeFilteredGroupCollection(
         () => GroupCollection.searchGroups(params),
-        accounts
+        accounts,
+        feeds
     )
 }
 

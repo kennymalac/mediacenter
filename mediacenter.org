@@ -198,6 +198,10 @@
 ***** TODO Delete
 
 
+*** Dashboard
+**** TODO activity Summary
+**** TODO 
+
 *** Feed
 **** Feeds have a certain quota - maximum of 100 content items per feed?
 content items are recycled?
@@ -233,9 +237,16 @@ Your feed has "content decay"
 
 *** Model/Collection
     don't make too many assumptions
+**** TODO how to handle if Collection this.collections references a 
+collection that references that same collection? 
+**** TODO separate sync procedure from model instances?
+**** DONE lazy nested model instances
+     CLOSED: [2018-05-18 Fri 13:57]
 **** TODO better filtering mechanism
-**** TODO better nested Models behavior
-**** TODO modelInstance should fetch from Collection
+**** DONE better nested Models behavior
+     CLOSED: [2018-05-18 Fri 13:57]
+**** DONE get rid of modelInstance
+     CLOSED: [2018-05-18 Fri 13:57]
 **** DONE details views shouldn't fetch from entire Collection
      CLOSED: [2018-05-14 Mon 12:53]
 **** TODO maybe don't recompute - don't have objects in this.objects ?

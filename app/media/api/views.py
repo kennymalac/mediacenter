@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.conf import settings
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, list_route, detail_route, parser_classes
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
@@ -132,14 +133,58 @@ class FeedViewSet(NestedViewSetMixin,
     }
 
 
-class FeedContentItemViewSet(NestedViewSetMixin,
-                             ListModelMixin,
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
+
+class FeedContentItemViewSet(ListModelMixin,
                              RetrieveModelMixin,
                              CreateModelMixin,
                              GenericViewSet):
 
     queryset = FeedContentItem.objects.all()
     serializer_class = FeedContentItemSerializer
+    pagination_class = StandardResultsSetPagination
+
+
+    @list_route(methods=['POST'], url_path='search', permission_classes=[IsAuthenticated])
+    def search(self, request):
+        content_queryset = self.get_queryset()
+
+        _feed_id = request.data.get('feed', None)
+        if _feed_id:
+            feed = get_object_or_404(Feed, pk=_feed_id)
+            content_queryset = content_queryset.filter(content_type__in=feed.content_types.all(), interests__in=feed.interests.all())
+
+        else:
+            _content_types = request.data.get('content_types', None)
+            if _content_types:
+                content_queryset = content_queryset.filter(content_type__in=FeedContentType.objects.filter(id__in=_content_types))
+
+            _interests = request.data.get('interests', None)
+            if _interests:
+                content_queryset = content_queryset.filter(interests__in=Interest.objects.filter(id__in=_interests))
+
+        serializer = self.get_serializer(self.paginate_queryset(content_queryset), many=True)
+
+        return self.get_paginated_response(serializer.data)
+
+
+class FeedContentStashViewSet(NestedViewSetMixin,
+                              MultipleSerializerMixin,
+                              ModelViewSet):
+
+    queryset = FeedContentStash.objects.all()
+    serializer_classes = {
+        'default': FeedContentStashSerializer,
+        'partial_update': FeedContentStashCreateUpdateSerializer,
+        'update': FeedContentStashCreateUpdateSerializer,
+        'create': FeedContentStashCreateUpdateSerializer
+    }
+
+    pagination_class = StandardResultsSetPagination
 
 
 class DiscussionViewSet(NestedViewSetMixin,

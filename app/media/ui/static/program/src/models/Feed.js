@@ -1,8 +1,10 @@
-import {momentDate, modelInstance} from './converters.js'
+import {modelInstance, momentDate} from './converters.js'
 import {Model, Collection, serializeIds} from './Model.js'
-import {AccountModel} from './Account'
+import {get, manage, paginatedList} from './generics.js'
+import {AccountCollection} from './Account'
 import {FeedContentTypeCollection} from './FeedContentType'
 import {InterestCollection} from './Interest'
+import {FeedContentStashCollection} from './FeedContentStash'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 import {FeedContentItemModel} from './FeedContentItem'
 
@@ -12,6 +14,7 @@ export function makeFeedCollection(queryset, feedContentTypes, interests) {
             return new FeedCollection(results[2], {
                 content_types: results[0],
                 interests: results[1]
+                // stashes: results[2]
             })
         })
 }
@@ -19,13 +22,14 @@ export function makeFeedCollection(queryset, feedContentTypes, interests) {
 class FeedModel extends Model {
 
     static fields = {
-        content_types: FeedContentTypeCollection,
-        interests: InterestCollection
+        content_types: [FeedContentTypeCollection],
+        owner: AccountCollection,
+        interests: [InterestCollection],
+        stashes: [FeedContentStashCollection]
     }
 
     static fieldConverters = {
-        created: momentDate,
-        owner: (input) => modelInstance(AccountModel, input)
+        created: momentDate
     }
 
     static initialState = {
@@ -34,29 +38,17 @@ class FeedModel extends Model {
         created: {},
         name: '',
         description: '',
+        stashes: [],
         interests: [],
         content_types: []
     }
 
-    // TODO make this a Store
-    static manage(feed) {
-        return makeJsonRequest(`feed/${feed.id}/`, {
-            method: "PUT",
-            body: {
-                ...feed,
-                content_types: serializeIds(feed.content_types),
-                interests: serializeIds(feed.interests)
-            }
-        })
-            .then(jsonResponse)
-
-            .then((data) => {
-                // NOTE faking instance for now
-                const instance = {...data}
-                instance.content_types = feed.content_types
-                console.log(instance)
-                return instance
-            })
+    static manage(instance, form, collections) {
+        return manage(instance, {
+            ...form,
+            content_types: serializeIds(form.content_types),
+            interests: serializeIds(form.interests)
+        }, collections)
     }
 
     static upload(feedId, form) {
@@ -69,14 +61,15 @@ class FeedModel extends Model {
 
     static listItems(feedId, params) {
         console.log(params)
-        return makeJsonRequest(`feed/${feedId}/content/`, {
-            method: "GET"
+        return makeJsonRequest(`content/search/`, {
+            method: "POST",
+            body: {feed: feedId}
         })
             .then(jsonResponse)
 
             .then((data) => {
                 // Returns a list of ContentItem model instances
-                return data.map((input) => modelInstance(FeedContentItemModel, input))
+                return data.results.map((input) => modelInstance(FeedContentItemModel, input))
             })
     }
 }
@@ -85,20 +78,8 @@ class FeedCollection extends Collection {
 
     static Model = FeedModel
 
-    static get(id) {
-        // TODO verify id is integer (typescript)
-        return fetchAPI(`feed/${id}/`, {
-            method: "GET"
-        })
-            .then(jsonResponse)
-
-            .then((data) => {
-                return data
-            })
-            .catch((error) => {
-                // TODO better error handling
-                console.log(error)
-            })
+    async get(id, instance = null) {
+        return await get(this, id, instance)
     }
 
     static create(data, store) {
@@ -119,16 +100,12 @@ class FeedCollection extends Collection {
             })
     }
 
-    static all(params) {
-        return fetchAPI(`feed/`, {
-            method: "GET",
-            data: params
-        })
-            .then(jsonResponse)
-
-            .then((data) => {
-                return data
-            })
+    async list(params, collections) {
+        return await paginatedList(this, 0, collections, [
+            ['owner', collections.accounts.get],
+            ['interests', collections.interests.get]
+//            ['stashes', collections.stashes.get]
+        ])
     }
 
     static searchFeeds(params) {

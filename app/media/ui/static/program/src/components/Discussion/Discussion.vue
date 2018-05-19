@@ -7,7 +7,7 @@
                 <post v-for="post in posts" v-bind="post.instance" @editPost="editPost(post.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" />
 
                 <h3>Quick Reply</h3>
-                <discussion :feedId="getFeedId" :parentId="instance.id" :parentTitle="instance.content_item.title" action="create" />
+                <discussion :groupId="getGroupId" :parentId="instance.id" :parentTitle="instance.content_item.title" action="create" />
             </section>
         </template>
         <template v-if="actions.create || actions.manage">
@@ -56,8 +56,8 @@ export default {
                 return item.parent === this.instance.id
             })
         },
-        getFeedId() {
-            return this.instance.content_item.feeds[0]
+        getGroupId() {
+            return this.instance.group.id
         }
     },
     data() {
@@ -95,7 +95,7 @@ export default {
         },
 
         async details(params) {
-            this.instance = await this.showInstance(params.id, '/feed/list', DiscussionCollection, 'discussions')
+            this.instance = await this.showInstance(params.id, '/feed/list', discussions)
         },
 
         async list(params) {
@@ -116,7 +116,7 @@ export default {
             if (this.parentId) {
                 this.instanceForm.parent = this.parentId
             }
-            this.instanceForm.content_item.feeds = [this.feedId]
+            this.instanceForm.content_item.group = this.groupId
 
             try {
                 const instance = await DiscussionCollection.create(this.instanceForm)

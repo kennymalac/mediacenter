@@ -1,7 +1,10 @@
 import {Model, Collection} from './Model.js'
-import {modelInstance} from './converters.js'
 import {makeJsonRequest, jsonResponse, fetchAPI} from '../httputil.js'
+import {get, manage, paginatedList} from './generics.js'
+import {modelInstance} from './converters'
 import {FeedContentItemModel} from './FeedContentItem'
+import {AccountCollection} from './Account'
+import {GroupCollection} from './Group'
 
 export function makeDiscussionCollection() {
     return DiscussionCollection.searchDiscussions().then((items) => {
@@ -15,24 +18,29 @@ class DiscussionModel extends Model {
         id: 0,
         content_item: {},
         owner: {},
+        group: {},
         text: "",
         order: 0,
         parent: 0
+    }
+
+    static fields = {
+        owner: AccountCollection,
+        group: GroupCollection
     }
 
     static fieldConverters = {
         content_item: (input) => modelInstance(FeedContentItemModel, input)
     }
 
-    static manage(instance, form) {
-        return makeJsonRequest(`discussion/${instance.id}/`, {
-            method: "PATCH",
-            body: {...form, content_item: {...form.content_item, owner: form.content_item.owner.id}}
-        })
-            .then(jsonResponse)
-            .then((data) => {
-                instance.sync(data, form)
-            })
+    static resource = 'discussion'
+
+    static manage(instance, form, collections) {
+        return manage(
+            instance,
+            {...form, content_item: {...form.content_item, owner: form.content_item.owner.id}},
+            collections
+        )
     }
 }
 
@@ -40,21 +48,10 @@ class DiscussionCollection extends Collection {
 
     static Model = DiscussionModel
 
-    static get(id) {
-        // TODO verify id is integer (typescript)
-        // TODO attach auth headers
-        return fetchAPI(`discussion/${id}/`, {
-            method: "GET"
-        })
-            .then(jsonResponse)
+    static resource = 'discussion'
 
-            .then((data) => {
-                return new DiscussionModel(data)
-            })
-            .catch((error) => {
-                // TODO better error handling
-                console.log(error)
-            })
+    async get(id, instance = null) {
+        return await get(this, id, instance)
     }
 
     static create(data) {
@@ -71,6 +68,12 @@ class DiscussionCollection extends Collection {
                 console.log(instance)
                 return instance
             })
+    }
+
+    async list(params, collections) {
+        return await paginatedList(this, 0, collections, [
+            ['owner', collections.accounts.get]
+        ])
     }
 
     static searchDiscussions(params) {

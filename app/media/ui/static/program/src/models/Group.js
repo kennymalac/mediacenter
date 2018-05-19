@@ -1,31 +1,43 @@
-import {modelInstance} from './converters.js'
 import {Model, Collection, serializeIds} from './Model.js'
-import {FeedModel} from './Feed'
+import {get, manage, resolveInstances} from './generics.js'
 import {AccountCollection} from './Account.js'
+//import {FeedCollection} from './Feed.js'
 
-import {makeJsonRequest, jsonResponse, fetchAPI} from '../httputil.js'
+import {makeJsonRequest, jsonResponse} from '../httputil.js'
 
-export async function makeGroupCollection(queryset, accounts) {
+export async function makeGroupCollection() {
+    return new GroupCollection([])
+}
+
+export async function makeFilteredGroupCollection(queryset, accounts) {
     let results = await Promise.all([
         accounts(),
         queryset()
+//        feeds()
     ])
+    const collection = new GroupCollection([])
 
-    return new GroupCollection(results[1], {
-        members: results[0]
-    })
+    await resolveInstances(
+        collection,
+        results[1],
+        {members: results[0]}, //, feed: results[2]
+        [
+            ['members', results[0].get]
+        ]
+    )
+
+    return collection
 }
 
 class GroupModel extends Model {
 
+    static resource = 'group'
+
     static fields = {
         // TODO nested feed model
         // fields only works for lists, not a single item
-        members: AccountCollection
-    }
-
-    static fieldConverters = {
-        feed: (input) => modelInstance(FeedModel, input)
+        members: [AccountCollection]
+//        feed: FeedCollection
     }
 
     static initialState = {
@@ -38,20 +50,12 @@ class GroupModel extends Model {
         image: ""
     }
 
-    // TODO make this a Store
-    static manage(instance, form) {
-        return makeJsonRequest(`group/${instance.id}/`, {
-            method: "PATCH",
-            body: {
-                ...form,
-                members: serializeIds(form.members),
-                feed: {...form.feed, interests: serializeIds(form.feed.interests)}
-            }
-        })
-            .then(jsonResponse)
-            .then((data) => {
-                instance.sync(data, form)
-            })
+    static async manage(instance, form, collections) {
+        return await manage(instance, {
+            ...form,
+            members: serializeIds(form.members),
+            feed: {...form.feed, interests: serializeIds(form.feed.interests)}
+        }, collections)
     }
 
     static join(instance, activeAccount) {
@@ -84,25 +88,13 @@ class GroupModel extends Model {
 class GroupCollection extends Collection {
     static Model = GroupModel
 
-    static get(id) {
-        // TODO verify id is integer (typescript)
-        // TODO attach auth headers
-        return fetchAPI(`group/${id}/`, {
-            method: "GET"
-        })
-            .then(jsonResponse)
+    static resource = 'group'
 
-            .then((data) => {
-                const instance = new GroupModel({...data})
-                return instance
-            })
-            .catch((error) => {
-                // TODO better error handling
-                console.log(error)
-            })
+    async get(id, instance = null) {
+        return await get(this, id, instance)
     }
 
-    static create(form) {
+    create(form, collections) {
         return makeJsonRequest("group/", {
             method: "POST",
             body: {
@@ -113,21 +105,22 @@ class GroupCollection extends Collection {
         })
             .then(jsonResponse)
             .then((createdData) => {
-                const instance = new GroupModel({...createdData, members: form.members, feed: {...createdData.feed, ...form.feed}})
+                const instance = this.addInstance({
+                    ...createdData, members: form.members, feed: {...createdData.feed, ...form.feed}
+                }, collections)
 
-                console.log(instance)
                 return instance
             })
     }
 
-    static all(params) {
-        return fetchAPI(`group/`, {
+    static list(params) {
+        return makeJsonRequest(`group/`, {
             method: "GET",
             queryParams: params
         })
             .then(jsonResponse)
-
             .then((data) => {
+                console.log(data)
                 return data
             })
     }

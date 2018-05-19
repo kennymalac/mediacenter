@@ -176,8 +176,8 @@ export default {
         },
 
         async list(params) {
-            const store = await groups()
-            this.objects = store.values
+            const groupsCollection = await groups()
+            this.objects = groupsCollection.values
         },
 
         async details(params) {
@@ -208,14 +208,15 @@ export default {
         },
 
         manageGroup() {
-            return GroupModel.manage(this.instance, this.instanceForm)
+            const {groups, members} = this.$store
+            GroupModel.manage(this.instance, this.instanceForm, {...groups.collections, ...members.collections})
                 .catch((error) => {
                     console.log(error)
                 })
         },
 
         createGroup() {
-            return GroupCollection.create(this.instanceForm)
+            return this.$store.groups.create(this.instanceForm)
                 .then((data) => {
                     this.objects.push(data)
                     return data

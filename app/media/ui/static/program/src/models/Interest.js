@@ -1,11 +1,9 @@
 import {Model, Collection} from './Model.js'
-// import {modelInstance} from './converters.js'
-import {makeJsonRequest, jsonResponse, fetchAPI} from '../httputil.js'
+import {get, paginatedList} from './generics.js'
+import {makeJsonRequest, jsonResponse} from '../httputil.js'
 
-export function makeInterestCollection() {
-    return InterestCollection.all().then((items) => {
-        return new InterestCollection(items)
-    })
+export async function makeInterestCollection() {
+    return new InterestCollection([])
 }
 
 class InterestModel extends Model {
@@ -16,6 +14,8 @@ class InterestModel extends Model {
         // parents: {}
         // children: {},
     }
+
+    static resource = 'interest'
 
     // TODO figure out recursive relations
     // static fields = {
@@ -28,20 +28,10 @@ class InterestCollection extends Collection {
 
     static Model = InterestModel
 
-    static get(id) {
-        return fetchAPI(`interest/${id}/`, {
-            method: "GET"
-        })
-            .then(jsonResponse)
+    static resource = 'interest'
 
-            .then((data) => {
-                const instance = new InterestModel({...data})
-                return instance
-            })
-            .catch((error) => {
-                // TODO better error handling
-                console.log(error)
-            })
+    async get(id, collections, instance = null) {
+        return await get(this, id, instance)
     }
 
     static create(data) {
@@ -60,16 +50,8 @@ class InterestCollection extends Collection {
             })
     }
 
-    static all(params) {
-        return fetchAPI(`interest/`, {
-            method: "GET",
-            data: params
-        })
-            .then(jsonResponse)
-
-            .then((data) => {
-                return data
-            })
+    async list(params, collections) {
+        return await paginatedList(this, 0, collections)
     }
 
     // searchInterests

@@ -23,13 +23,19 @@ router.register(r'feed-content-type', FeedContentTypeViewSet, base_name='feed-co
 router.register(r'interest', InterestViewSet, base_name='interest')
 router.register(r'profile', ProfileViewSet, base_name='profile')
 
+router.register(
+    r'content',
+    FeedContentItemViewSet,
+    base_name='content',
+)
+
 router.register(r'feed', FeedViewSet, base_name='feed')\
-      .register(
-          r'content',
-          FeedContentItemViewSet,
-          base_name='content',
-          parents_query_lookups=['feeds']
-      )
+    .register(
+        r'stash',
+        FeedContentStashViewSet,
+        base_name='feed-stash',
+        parents_query_lookups=['feeds']
+    )
 
 router.register(r'discussion', DiscussionViewSet, base_name='discussion')
 

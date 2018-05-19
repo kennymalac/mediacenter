@@ -1,5 +1,8 @@
 import {Model, Collection} from './Model.js'
-import {fetchAPI, makeJsonRequest, jsonResponse} from '../httputil.js'
+import {GroupCollection} from './Group'
+import {ProfileCollection} from './Profile'
+import {get, paginatedList} from './generics.js'
+import {makeJsonRequest, jsonResponse} from '../httputil.js'
 
 class AccountModel extends Model {
 
@@ -13,22 +16,25 @@ class AccountModel extends Model {
         friends: [],
         profile: {}
     }
+
+    static fields = {
+        groups: [GroupCollection],
+        friends: [AccountCollection],
+        profile: ProfileCollection
+    }
 }
 
-export function makeAccountCollection() {
-    return AccountCollection.all().then((data) => {
-        return new AccountCollection(data)
-    })
+export async function makeAccountCollection() {
+    return new AccountCollection([])
 }
 
 class AccountCollection extends Collection {
     static Model = AccountModel
 
-    static get(id) {
-        return fetchAPI(`accounts/${id}`, {
-            method: "GET"
-        })
-            .then(jsonResponse)
+    static resource = 'account'
+
+    async get(id, instance = null) {
+        return await get(this, id, instance)
     }
 
     static create(data) {
@@ -40,11 +46,11 @@ class AccountCollection extends Collection {
             .then(jsonResponse)
     }
 
-    static all() {
-        return fetchAPI(`accounts/`, {
-            method: "GET"
-        })
-            .then(jsonResponse)
+    async list(params, collections) {
+        return await paginatedList(this, 0, collections, [
+            ['friends', this.get],
+            ['profile', collections.profiles.get]
+        ])
     }
 }
 
