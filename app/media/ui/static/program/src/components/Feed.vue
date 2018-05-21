@@ -46,7 +46,7 @@
                     <interest-select v-model="instanceForm.interests" />
 
                     <!-- <label class="stack" for="">Tags</label> -->
-                    <!-- <input class="stack" name="tags" v-model="instance.tags_raw" type="text" /> -->
+                    <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->
                     <input v-if="actions.create" class="stack" type="submit" value="Create" />
                     <input v-if="actions.manage" class="stack" type="submit" value="Save changes" />
                 </fieldset>
@@ -57,8 +57,8 @@
 
 <script>
 import RestfulComponent from "./RestfulComponent"
-import {FeedCollection, FeedModel} from "../models/Feed.js"
-import {feeds} from '../store.js'
+import {FeedModel} from "../models/Feed.js"
+import {feeds, interests, accounts, feedContentTypes} from '../store.js'
 
 import FeedItem from './FeedItem'
 import FeedContentItemList from './FeedContentItemList'
@@ -142,8 +142,8 @@ export default {
         },
 
         async manage(params) {
-            this.instance = await this.showInstance(params.id, 'feed/list', FeedCollection, 'feeds')
-            this.instanceForm = this.instance.instance
+            this.instance = await this.showInstance(params.id, 'feed/list', feeds)
+            this.instanceForm = this.instance.getForm()
         },
 
         async list(params) {
@@ -152,7 +152,17 @@ export default {
         },
 
         async details(params) {
-            this.instance = await this.showInstance(params.id, 'feed/list', FeedCollection, 'feeds')
+            const [
+                interestsCollection,
+                contentTypeCollection,
+                accountCollection
+            ] = await Promise.all([interests(), feedContentTypes(), accounts()])
+            
+            this.instance = await this.showInstance(params.id, 'feed/list', feeds, {
+                interests: interestsCollection,
+                content_types: contentTypeCollection,
+                owner: accountCollection
+            })
             try {
                 this.contentItems = await FeedModel.listItems(this.instance.id, {})
             }
@@ -165,17 +175,37 @@ export default {
             console.log(event)
         },
 
-        createFeed() {
-            return FeedCollection.create(this.instanceForm)
+        async createFeed() {
+            const [
+                feedCollection,
+                interestsCollection,
+                contentTypeCollection,
+                accountCollection
+            ] = await Promise.all([feeds(), interests(), feedContentTypes(), accounts()])
+            
+            return feedCollection.create(this.instanceForm, {
+                interests: interestsCollection,
+                content_types: contentTypeCollection,
+                owner: accountCollection
+            })
                 .then((data) => {
                     console.log(data)
-                    this.objects.push(data)
                     return data
                 })
         },
 
-        manageFeed() {
-            return FeedModel.manage(this.instance)
+        async manageFeed() {
+            const [
+                interestsCollection,
+                contentTypeCollection,
+                accountCollection
+            ] = await Promise.all([interests(), feedContentTypes(), accounts()])
+
+            return FeedModel.manage(this.instance, this.instanceForm, {
+                interests: interestsCollection,
+                content_types: contentTypeCollection,
+                owner: accountCollection
+            })
                 .then((data) => {
                     this.instance = data
                     return data

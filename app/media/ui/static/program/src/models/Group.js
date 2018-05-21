@@ -9,20 +9,19 @@ export async function makeGroupCollection() {
     return new GroupCollection([])
 }
 
-export async function makeFilteredGroupCollection(queryset, accounts) {
-    let results = await Promise.all([
-        accounts(),
-        queryset()
-//        feeds()
-    ])
+export async function makeFilteredGroupCollection(queryset, _accounts) {
+    let [members, values] = await Promise.all(
+        [_accounts(), queryset()]
+//        _feeds()
+    )
     const collection = new GroupCollection([])
 
     await resolveInstances(
         collection,
-        results[1],
-        {members: results[0]}, //, feed: results[2]
+        values,
+        { members }, //, feed
         [
-            ['members', results[0].get]
+            ['members', members.get]
         ]
     )
 
@@ -113,16 +112,12 @@ class GroupCollection extends Collection {
             })
     }
 
-    static list(params) {
+    static list(params = {}) {
         return makeJsonRequest(`group/`, {
             method: "GET",
             queryParams: params
         })
             .then(jsonResponse)
-            .then((data) => {
-                console.log(data)
-                return data
-            })
     }
 
     static searchGroups(data) {

@@ -5,7 +5,7 @@ import {AccountCollection, makeAccountCollection} from './models/Account.js'
 import {ProfileCollection, makeProfileCollection, makeFilteredProfileCollection} from './models/Profile.js'
 import {FeedContentTypeCollection, makeFeedContentTypeCollection} from './models/FeedContentType.js'
 import {InterestCollection, makeInterestCollection} from './models/Interest.js'
-import {FeedCollection, makeFeedCollection} from './models/Feed.js'
+import {FeedCollection, makeFilteredFeedCollection} from './models/Feed.js'
 import {DiscussionCollection, makeDiscussionCollection} from './models/Discussion.js'
 import {GroupCollection, makeFilteredGroupCollection} from './models/Group.js'
 import {AlbumCollection, makeAlbumCollection} from './models/Album.js'
@@ -106,7 +106,7 @@ export const feeds = () => {
     return singleton(
         'feeds',
         (value) => value instanceof FeedCollection,
-        () => makeFeedCollection(FeedCollection.list, feedContentTypes, interests)
+        () => makeFilteredFeedCollection(FeedCollection.all, feedContentTypes, interests, accounts)
     )
 }
 

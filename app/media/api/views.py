@@ -129,6 +129,7 @@ class FeedViewSet(NestedViewSetMixin,
     serializer_classes = {
         'default': FeedSerializer,
         'update': FeedCreateUpdateSerializer,
+        'partial_update': FeedCreateUpdateSerializer,
         'create': FeedCreateUpdateSerializer
     }
 

@@ -1,6 +1,6 @@
 import {modelInstance, momentDate} from './converters.js'
 import {Model, Collection, serializeIds} from './Model.js'
-import {get, manage, paginatedList} from './generics.js'
+import {get, manage, paginatedList, resolveInstances} from './generics.js'
 import {AccountCollection} from './Account'
 import {FeedContentTypeCollection} from './FeedContentType'
 import {InterestCollection} from './Interest'
@@ -8,15 +8,24 @@ import {FeedContentStashCollection} from './FeedContentStash'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 import {FeedContentItemModel} from './FeedContentItem'
 
-export function makeFeedCollection(queryset, feedContentTypes, interests) {
-    return Promise.all([feedContentTypes(), interests(), queryset()])
-        .then(results => {
-            return new FeedCollection(results[2], {
-                content_types: results[0],
-                interests: results[1]
-                // stashes: results[2]
-            })
-        })
+export async function makeFilteredFeedCollection(queryset, _feedContentTypes, _interests, _accounts) {
+    let [contentTypes, interests, owner, values] = await Promise.all(
+        [_feedContentTypes(), _interests(), _accounts(), queryset()]
+    )
+
+    const collection = new FeedCollection([])
+
+    await resolveInstances(
+        collection,
+        values,
+        { content_types: contentTypes, interests, owner },
+        // stashes: results[2]
+        [
+            ['interests', interests.get]
+        ]
+    )
+
+    return collection
 }
 
 class FeedModel extends Model {
@@ -32,6 +41,8 @@ class FeedModel extends Model {
         created: momentDate
     }
 
+    static resource = 'feed'
+
     static initialState = {
         owner: {},
         id: 0,
@@ -40,6 +51,7 @@ class FeedModel extends Model {
         description: '',
         stashes: [],
         interests: [],
+        rules: [],
         content_types: []
     }
 
@@ -78,26 +90,37 @@ class FeedCollection extends Collection {
 
     static Model = FeedModel
 
+    static resource = 'feed'
+
     async get(id, instance = null) {
         return await get(this, id, instance)
     }
 
-    static create(data, store) {
+    create(form, collections) {
         return makeJsonRequest("feed/", {
             method: "POST",
             body: {
-                ...data,
-                content_types: serializeIds(data.content_types),
-                interests: serializeIds(data.interests)
+                ...form,
+                content_types: serializeIds(form.content_types),
+                interests: serializeIds(form.interests)
             }
         })
             .then(jsonResponse)
             .then((createdData) => {
-                const instance = new FeedModel({...createdData, content_types: data.content_types, interests: data.interests})
+                const instance = this.addInstance({
+                    ...createdData, content_types: form.content_types, interests: form.interests
+                }, collections)
 
-                console.log(instance)
                 return instance
             })
+    }
+
+    static all(params = {}) {
+        return makeJsonRequest(`feed/`, {
+            method: "GET",
+            queryParams: params
+        })
+            .then(jsonResponse)
     }
 
     async list(params, collections) {

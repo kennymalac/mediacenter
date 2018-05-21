@@ -244,10 +244,10 @@ export class Model {
                 }
             }
         }
-        else if (this[field] !== val) {
+        else if (this[field] !== val && (val !== null && this[field] !== undefined)) {
             changed = true
             store = collections[field]
-            const instance = store.getInstance(val, isPrimaryKeys)
+            const instance = store.getInstance(val, collections, isPrimaryKeys)
 
             fieldChanges = !isPrimaryKeys
                 ? () => mutateInstance(instance)
