@@ -250,7 +250,7 @@ export class Model {
             const instance = store.getInstance(val, collections, isPrimaryKeys)
 
             fieldChanges = !isPrimaryKeys
-                ? () => mutateInstance(instance)
+                ? () => mutateInstance([instance, val])
                 : instance
         }
 

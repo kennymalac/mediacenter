@@ -224,7 +224,6 @@ export default {
             else if (this.actions.create) {
                 this.createFeed()
                     .then(data => this.$nextTick(() => {
-                        console.log(this.objects)
                         router.replace('/feed/' + data.id + '/manage')
                     }))
                     .catch((error) => {

@@ -1,12 +1,22 @@
 import {Model, Collection} from './Model.js'
-import {modelInstance} from './converters.js'
-import {AccountModel} from './Account.js'
+import {get, manage, paginatedList, resolveInstances} from './generics.js'
+import {AccountCollection} from './Account.js'
 
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 
-export async function makeAlbumCollection() {
-    let albums = await AlbumCollection.searchAlbums()
-    return new AlbumCollection(albums)
+export async function makeFilteredAlbumCollection(queryset, _accounts) {
+    let [owner, values] = await Promise.all(
+        [_accounts(), queryset()]
+    )
+    const collection = new AlbumCollection([])
+
+    await resolveInstances(
+        collection,
+        values,
+        { owner }
+    )
+
+    return collection
 }
 
 class AlbumModel extends Model {
@@ -19,18 +29,18 @@ class AlbumModel extends Model {
         owner: {}
     }
 
-    static fieldConverters = {
-        owner: (input) => modelInstance(AccountModel, input)
+    static resource = 'album'
+
+    static fields = {
+        owner: AccountCollection
     }
 
-    // TODO make this a Store
-    static manage(album) {
-        return makeJsonRequest(`album/${album.id}/`, {
-            method: "PUT",
-            body: {
-                ...album
-            }
-        })
+    static manage(instance, form, collections) {
+        return manage(
+            instance,
+            {...form},
+            collections
+        )
     }
 
     static upload(albumId, form) {
@@ -53,37 +63,33 @@ class AlbumCollection extends Collection {
     // static list()
     static Model = AlbumModel
 
-    static get(id) {
-        // TODO verify id is integer (typescript)
-        // TODO attach auth headers
-        return fetchAPI(`album/${id}/`, {
-            method: "GET"
-        })
-            .then(jsonResponse)
+    static resource = 'album'
 
-            .then((data) => {
-                return data
-            })
-            .catch((error) => {
-                // TODO better error handling
-                console.log(error)
-            })
+    async get(id, instance = null) {
+        return await get(this, id, instance)
     }
 
-    static create(data) {
+    create(form, collections) {
         return makeJsonRequest("album/", {
             method: "POST",
             body: {
-                ...data
+                ...form
             }
         })
             .then(jsonResponse)
             .then((createdData) => {
-                const instance = new AlbumModel(createdData)
+                const instance = this.addInstance({
+                    ...createdData
+                }, collections)
 
-                console.log(instance)
                 return instance
             })
+    }
+
+    async list(params, collections) {
+        return await paginatedList(this, 0, collections, [
+            ['owner', collections.accounts.get]
+        ])
     }
 
     static searchAlbums() {

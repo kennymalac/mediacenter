@@ -121,7 +121,6 @@ export default {
             try {
                 const instance = await DiscussionCollection.create(this.instanceForm)
                 instance.content_item.owner = user.details
-                this.objects.push(instance)
                 return instance
             }
             catch (error) {

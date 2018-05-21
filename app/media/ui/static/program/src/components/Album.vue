@@ -33,11 +33,11 @@
             <fieldset>
                 <legend class="stack">Details</legend>
                 <label class="stack" for="title">Title</label>
-                <input class="stack" name="title" v-model="instance.title" type="text" />
+                <input class="stack" name="title" v-model="instanceForm.title" type="text" />
                 <label class="stack" for="description">Description</label>
-                <textarea class="stack" name="description" v-model="instance.description" />
+                <textarea class="stack" name="description" v-model="instanceForm.description" />
                 <label class="stack" for="">Tags</label>
-                <input class="stack" name="tags" v-model="instance.tags_raw" type="text" />
+                <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" />
                 <input v-if="actions.create" class="stack" type="submit" value="Create" />
                 <input v-if="actions.manage" class="stack" type="submit" value="Save changes" />
             </fieldset>
@@ -62,8 +62,8 @@
 </template>
 
 <script>
-import {AlbumCollection, AlbumModel} from "../models/Album.js"
-import {albums, activeUser} from "../store.js"
+import {AlbumModel} from "../models/Album.js"
+import {albums, accounts, activeUser} from "../store.js"
 
 import RestfulComponent from "./RestfulComponent"
 import AlbumGridItem from "./AlbumGridItem"
@@ -83,6 +83,7 @@ export default {
     data() {
         return {
             instance: AlbumModel.initialState,
+            instanceForm: { owner: {} },
             mediaItems: [],
             album_tags_raw: ''
         }
@@ -90,17 +91,21 @@ export default {
     methods: {
         initialState() {
             this.instance = AlbumModel.initialState
+            this.instanceForm = { owner: {} }
             this.mediaItems = []
         },
 
-        create() {
-            // TODO
-            this.instance = {}
+        async create() {
+            this.instanceForm = AlbumModel.getNewInstance()
+            
+            const owner = await activeUser()
+            this.instanceForm.owner = owner.details.id
         },
 
         async manage(params) {
-            this.instance = await this.showInstance(params.id, 'album/list')
-            // this.instanceForm = 
+            const owner = await accounts()
+            this.instance = await this.showInstance(params.id, 'album/list', albums, { owner })
+            this.instanceForm = this.instance.getForm()
         },
 
         async list(params) {
@@ -112,22 +117,24 @@ export default {
             // this won't add mediaitems, and it definetly will not
             // work for created items
             // createAlbum does not upload mediaitems
-            const user = await activeUser()
+            const [owner, albumCollection] = await Promise.all(
+                [accounts(), albums()]
+            )
 
             try {
-                this.instance = await AlbumCollection.create({
-                    title: this.instance.title,
-                    description: this.instance.description,
-                    owner: user.details.id
-                })
-                this.objects.push(this.instance)
+                this.instance = await albumCollection.create(this.instanceForm, { owner })
+                return this.instance
             }
             catch (error) {
                 console.log(error)
             }
         },
-        manageAlbum() {
-            return AlbumModel.manage(this.instance)
+        async manageAlbum() {
+            const owner = await accounts()
+
+            return AlbumModel.manage(this.instance, this.instanceForm, {
+                owner
+            })
                 .then((data) => {
                     this.instance = data
                 })
@@ -192,8 +199,8 @@ export default {
                 })
             }
             else if (this.actions.create) {
-                this.createAlbum().then(() => this.$nextTick(() => {
-                    router.replace('/album/' + this.instance.id + '/manage')
+                this.createAlbum().then(data => this.$nextTick(() => {
+                    router.replace('/album/' + data.id + '/manage')
                     // Ready to upload media items
                 }))
             }

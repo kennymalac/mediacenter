@@ -8,7 +8,7 @@ import {InterestCollection, makeInterestCollection} from './models/Interest.js'
 import {FeedCollection, makeFilteredFeedCollection} from './models/Feed.js'
 import {DiscussionCollection, makeDiscussionCollection} from './models/Discussion.js'
 import {GroupCollection, makeFilteredGroupCollection} from './models/Group.js'
-import {AlbumCollection, makeAlbumCollection} from './models/Album.js'
+import {AlbumCollection, makeFilteredAlbumCollection} from './models/Album.js'
 
 const store = {
     activeUser: {},
@@ -114,7 +114,7 @@ export const albums = () => {
     return singleton(
         'albums',
         (value) => value instanceof AlbumCollection,
-        makeAlbumCollection
+        () => makeFilteredAlbumCollection(AlbumCollection.searchAlbums, accounts)
     )
 }
 
