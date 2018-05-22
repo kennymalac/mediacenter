@@ -42,11 +42,11 @@ async function getResource(uri, collection, instance = null, collections = {}, c
 }
 
 export async function get(collection, id, instance = null, collections = {}, children = []) {
-    return getResource(`${collection.constructor.resource}/${id}/`, instance, collections, children)
+    return getResource(`${collection.constructor.resource}/${id}/`, collection, instance, collections, children)
 }
 
 export async function getNested(collection, id, parentId, instance = null, collections = {}, children = []) {
-    return getResource(`${collection.constructor.parentResource}/${parentId}/${collection.constructor.resource}/${id}/`, instance, collections, children)
+    return getResource(`${collection.constructor.parentResource}/${parentId}/${collection.constructor.resource}/${id}/`, collection, instance, collections, children)
 }
 
 export async function resolveInstances(collection, items, collections = {}, children = []) {
@@ -82,10 +82,10 @@ async function paginateListedResource(uri, collection, page, collections = {}, c
 }
 
 export async function paginatedList(collection, page, collections = {}, children = []) {
-    return paginateListedResource(`${collection.constructor.resource}/`, page, collections, children)
+    return paginateListedResource(`${collection.constructor.resource}/`, collection, page, collections, children)
 }
 
 export async function paginatedListNested(collection, parentId, page, collections = {}, children = []) {
-    return paginateListedResource(`${collection.constructor.parentResource}/${parentId}/${collection.constructor.resource}/`, page, collections, children)
+    return paginateListedResource(`${collection.constructor.parentResource}/${parentId}/${collection.constructor.resource}/`, collection, page, collections, children)
 }
 

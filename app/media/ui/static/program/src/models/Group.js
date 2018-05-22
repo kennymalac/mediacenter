@@ -88,8 +88,8 @@ class GroupCollection extends Collection {
 
     static resource = 'group'
 
-    async get(id, instance = null) {
-        return await get(this, id, instance)
+    async get(id, collections, instance = null) {
+        return await get(this, id, instance, collections)
     }
 
     create(form, collections) {
