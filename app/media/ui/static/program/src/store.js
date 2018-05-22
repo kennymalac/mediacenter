@@ -134,6 +134,7 @@ const activeUserGroups = () => {
     return activeUser().then((user) => {
         return makeFilteredGroupCollection(
             () => GroupCollection.list({ members: user.details.id }),
+            feeds,
             accounts
         )
     })
@@ -143,8 +144,8 @@ const filterGroups = (params) => {
     console.log(params)
     return makeFilteredGroupCollection(
         () => GroupCollection.searchGroups(params),
-        accounts,
-        feeds
+        feeds,
+        accounts
     )
 }
 

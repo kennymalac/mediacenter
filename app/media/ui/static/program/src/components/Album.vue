@@ -6,17 +6,17 @@
                 <album-grid-item v-for="album in objects" @albumSelected="modifyAlbum" :album="album.instance" btnText="Edit" />
             </div>
         </div>
-        
+
         <h1 v-if="actions.manage">
             Edit Album: {{instance.title }}
         </h1>
-        
+
         <form class="main-form" v-if="actions.manage || actions.create">
             <button type="button" v-if="actions.manage" class="error">
                 <i class="ion-md-close"></i>
                 Delete Album
             </button>
-            
+
             <fieldset>
                 <legend class="stack">Settings</legend>
 
@@ -28,7 +28,7 @@
                 </select>
             </fieldset>
         </form>
-        
+
         <form class="main-form" @submit.prevent="save" v-if="actions.manage || actions.create">
             <fieldset>
                 <legend class="stack">Details</legend>
@@ -42,14 +42,14 @@
                 <input v-if="actions.manage" class="stack" type="submit" value="Save changes" />
             </fieldset>
             <!-- TODO drag and drop input -->
-            
+
             <button type="button" @click="addMediaItem">
                 Add media
             </button>
             OR
             <file-upload :multiple="true" @fileReady="uploadMediaItem" />
         </form>
-        
+
         <form v-if="actions.manage || actions.create" class="album-item-editor">
             <fieldset>
                 <legend>Media Items</legend>
@@ -97,7 +97,7 @@ export default {
 
         async create() {
             this.instanceForm = AlbumModel.getNewInstance()
-            
+
             const owner = await activeUser()
             this.instanceForm.owner = owner.details.id
         },
@@ -214,11 +214,11 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    
+
     .main-form {
         width: 480px;
     }
-    
+
     .album-item-list {
         display: flex;
         margin-top: 10px;

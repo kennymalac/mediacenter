@@ -2,7 +2,7 @@
     <div class="group-container">
         <template v-if="actions.list">
             <action-list :actions="groupActions" />
-            
+
             <section class="groups">
                 <h1>Your Groups</h1>
                 <group-list :items="objects" />
@@ -29,7 +29,7 @@
                     <div class="who-is-online">
                         <h3><div class="online-circle"></div> {{ onlineMembers.length }} User(s) online now</h3>
                     </div>
-                    
+
                     <tag-list :tags="instance.feed.interests" tagType="interest" />
                 </div>
             </section>
@@ -57,7 +57,7 @@
                     <account-select v-model="instanceForm.members" />
                     <label class="stack" for="interests">Interests</label>
                     <interest-select v-model="instanceForm.feed.interests" />
-                    
+
                     <!-- <label class="stack" for="">Tags</label> -->
                     <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->
                     <input v-if="actions.create" class="stack" type="submit" value="Create" />
@@ -87,9 +87,9 @@
 
 <script>
 import RestfulComponent from "../RestfulComponent"
-import {GroupCollection, GroupModel} from '../../models/Group.js'
+import {GroupModel} from '../../models/Group.js'
 import {FeedModel} from '../../models/Feed.js'
-import {groups, accounts, activeUser, filteredGroups} from '../../store.js'
+import {groups, feeds, accounts, interests, feedContentTypes, activeUser, filteredGroups} from '../../store.js'
 
 import AccountSelect from '../AccountSelect'
 import InterestSelect from '../InterestSelect'
@@ -171,8 +171,15 @@ export default {
         },
 
         async manage(params) {
-            this.instance = await this.showInstance(params.id, `/group/${params.id}/details`)
+            const [members, feed, interestCollection, contentTypes] = await Promise.all(
+                [accounts(), feeds(), interests(), feedContentTypes()]
+            )
+
+            this.instance = await this.showInstance(params.id, `/group/${params.id}/details`, groups, {
+                members, feed, interests: interestCollection, content_types: contentTypes
+            })
             this.instanceForm = this.instance.getForm()
+            this.instanceForm.feed.owner = this.instanceForm.owner
         },
 
         async list(params) {
@@ -184,7 +191,13 @@ export default {
             const user = await activeUser()
             this.isActiveUserMember = user.details.groupforum_set.includes(parseInt(params.id))
 
-            this.instance = await this.showInstance(params.id, '/group/list', GroupCollection, 'groups')
+            const [members, feed, interestCollection, contentTypes] = await Promise.all(
+                [accounts(), feeds(), interests(), feedContentTypes()]
+            )
+
+            this.instance = await this.showInstance(params.id, '/group/list', groups, {
+                members, feed, interests: interestCollection, content_types: contentTypes
+            })
             this.feed = this.instance.feed
 
             try {
@@ -204,12 +217,16 @@ export default {
         },
 
         search(params) {
-            
+
         },
 
         manageGroup() {
-            const {groups, members} = this.$store
-            GroupModel.manage(this.instance, this.instanceForm, {...groups.collections, ...members.collections})
+            const {accounts, feeds, interests, feedContentTypes} = this.$store
+            return GroupModel.manage(
+                this.instance,
+                this.instanceForm,
+                { members: accounts, feed: feeds, interests, content_types: feedContentTypes }
+            )
                 .catch((error) => {
                     console.log(error)
                 })
@@ -218,7 +235,6 @@ export default {
         createGroup() {
             return this.$store.groups.create(this.instanceForm)
                 .then((data) => {
-                    this.objects.push(data)
                     return data
                 })
                 .catch((error) => {

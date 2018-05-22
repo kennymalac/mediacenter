@@ -1,7 +1,7 @@
 import {Model, Collection, serializeIds} from './Model.js'
 import {get, manage, resolveInstances} from './generics.js'
 import {AccountCollection} from './Account.js'
-//import {FeedCollection} from './Feed.js'
+import {FeedCollection} from './Feed.js'
 
 import {makeJsonRequest, jsonResponse} from '../httputil.js'
 
@@ -9,9 +9,9 @@ export async function makeGroupCollection() {
     return new GroupCollection([])
 }
 
-export async function makeFilteredGroupCollection(queryset, _accounts) {
-    let [members, values] = await Promise.all(
-        [_accounts(), queryset()]
+export async function makeFilteredGroupCollection(queryset, _feeds, _accounts) {
+    let [members, feed, values] = await Promise.all(
+        [_accounts(), _feeds(), queryset()]
 //        _feeds()
     )
     const collection = new GroupCollection([])
@@ -19,7 +19,7 @@ export async function makeFilteredGroupCollection(queryset, _accounts) {
     await resolveInstances(
         collection,
         values,
-        { members }, //, feed
+        { feed, members },
         [
             ['members', members.get]
         ]
@@ -33,10 +33,9 @@ class GroupModel extends Model {
     static resource = 'group'
 
     static fields = {
-        // TODO nested feed model
         // fields only works for lists, not a single item
-        members: [AccountCollection]
-//        feed: FeedCollection
+        members: [AccountCollection],
+        feed: FeedCollection
     }
 
     static initialState = {

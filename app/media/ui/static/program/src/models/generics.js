@@ -1,8 +1,8 @@
 import {resolve} from './Model.js'
 import {makeJsonRequest, fetchAPI, jsonResponse} from '../httputil.js'
 
-export async function manage(instance, serializedData, collections = {}) {
-    return makeJsonRequest(`${instance.constructor.resource}/${instance.id}/`, {
+async function manageResource(uri, instance, serializedData, collections = {}) {
+    return makeJsonRequest(uri, {
         method: "PATCH",
         body: serializedData
     })
@@ -13,8 +13,16 @@ export async function manage(instance, serializedData, collections = {}) {
         })
 }
 
-export async function get(collection, id, instance = null, collections = {}, children = []) {
-    return await fetchAPI(`${collection.constructor.resource}/${id}/`, {
+export function manage(instance, serializedData, collections = {}) {
+    return manageResource(`${instance.constructor.resource}/${instance.id}/`, instance, serializedData, collections)
+}
+
+export function manageNested(instance, parentId, serializedData, collections = {}) {
+    return manageResource(`${instance.constructor.parentResource}/${parentId}/${instance.constructor.resource}/${instance.id}/`, instance, serializedData, collections)
+}
+
+async function getResource(uri, collection, instance = null, collections = {}, children) {
+    return await fetchAPI(`${uri}`, {
         method: "GET"
     })
         .then(jsonResponse)
@@ -31,6 +39,14 @@ export async function get(collection, id, instance = null, collections = {}, chi
             // TODO better error handling
             console.log(error)
         })
+}
+
+export async function get(collection, id, instance = null, collections = {}, children = []) {
+    return getResource(`${collection.constructor.resource}/${id}/`, instance, collections, children)
+}
+
+export async function getNested(collection, id, parentId, instance = null, collections = {}, children = []) {
+    return getResource(`${collection.constructor.parentResource}/${parentId}/${collection.constructor.resource}/${id}/`, instance, collections, children)
 }
 
 export async function resolveInstances(collection, items, collections = {}, children = []) {
@@ -54,13 +70,22 @@ export async function resolveInstances(collection, items, collections = {}, chil
     return instances
 }
 
-export async function paginatedList(collection, page, collections = {}, children = []) {
+async function paginateListedResource(uri, collection, page, collections = {}, children = []) {
     console.log(page)
 
-    const data = await fetchAPI(`${collection.constructor.resource}/`, {
+    const data = await fetchAPI(`${uri}`, {
         method: "GET"
     })
           .then(jsonResponse)
 
     return await resolveInstances(collection, data, collections, children)
 }
+
+export async function paginatedList(collection, page, collections = {}, children = []) {
+    return paginateListedResource(`${collection.constructor.resource}/`, page, collections, children)
+}
+
+export async function paginatedListNested(collection, parentId, page, collections = {}, children = []) {
+    return paginateListedResource(`${collection.constructor.parentResource}/${parentId}/${collection.constructor.resource}/`, page, collections, children)
+}
+

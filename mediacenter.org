@@ -35,6 +35,7 @@
 **** DONE closeModal
      CLOSED: [2018-04-30 Mon 18:43]
 *** Authentication
+**** TODO log out should clear store
 **** TODO connect with other media centers in some sort of Auth bridge
 **** DONE getActiveUser
      CLOSED: [2017-05-13 Sat 12:34]
@@ -65,12 +66,15 @@
 **** TODO 
 **** TODO full test coverage
 *** Album
-**** TODO owner should be Account
+**** DONE owner should be Account
+     CLOSED: [2018-05-21 Mon 15:41]
 **** TODO CRUD
-***** TODO Create
+***** DONE Create
+      CLOSED: [2018-05-21 Mon 15:41]
 ***** DONE Read
       CLOSED: [2018-04-30 Mon 18:42]
-***** TODO Update
+***** DONE Update
+      CLOSED: [2018-05-21 Mon 15:41]
 ***** TODO Delete
 **** TODO Uploading media items
 **** DONE Merge Manage Album and Create Album into "Albums"
@@ -95,7 +99,6 @@
 
 *** Interests
 **** TODO maximum number of interests per Group, Feed
-**** TODO get list of Group tags working
 **** TODO determine if view should list both Groups and Users?
 **** TODO system to vote on consolidation & removal of Interest groups?
 **** TODO determine how to deal with content spam with many interests tagged
@@ -114,6 +117,7 @@
 **** DONE basic UI
      CLOSED: [2018-05-08 Tue 16:56]
 **** TODO cross-network profiles
+**** TODO get list of Group tags working
 **** DONE model, serializer, viewset
      CLOSED: [2018-05-11 Fri 13:05]
 **** TODO CRUD

@@ -1,5 +1,5 @@
 export function serializeIds(values) {
-    return values.map((val) => { return val.instance.id })
+    return values.map((val) => { return val.id })
 }
 
 export function serializeForms(values) {
@@ -8,6 +8,11 @@ export function serializeForms(values) {
 
 function mutateInstance(mutation) {
     const [instance, diff] = mutation
+    const [changed] = diff
+    if (!changed) {
+        return instance
+    }
+
     // This instance is populated with data and is thus now a real instance
     delete instance._isFake
     instance.applyDiff(diff)
@@ -250,7 +255,7 @@ export class Model {
             const instance = store.getInstance(val, collections, isPrimaryKeys)
 
             fieldChanges = !isPrimaryKeys
-                ? () => mutateInstance([instance, val])
+                ? () => mutateInstance([instance, [true, {[field]: val}]])
                 : instance
         }
 

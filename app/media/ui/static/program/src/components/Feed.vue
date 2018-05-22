@@ -4,10 +4,10 @@
             <section>
                 <action-list :actions="feedActions" />
             </section>
-            
+
             <section class="feeds">
                 <h1>Your Feeds</h1>
-                
+
                 <feed-item v-for="feed in objects" :id="feed.id" :name="feed.name" />
             </section>
         </template>
@@ -19,7 +19,7 @@
                     </div>
                     <h2>{{ instance.name }}</h2>
                     <p class="description">{{ instance.description }}</p>
-                    
+
                     <h3>Filters</h3>
                     <feed-filter :specifiers="filters.contentTypes" :filterToggled="toggle" />
                     <feed-filter :specifiers="filters.subjects" :filterToggled="toggle" />
@@ -135,7 +135,7 @@ export default {
         initialState() {
             this.instance = { id: null, content_types: [] }
             this.contentItems = []
-            this.instanceForm = { content_types: [] }
+            this.instanceForm = { content_types: [], interests: [] }
         },
 
         create() {
@@ -157,7 +157,7 @@ export default {
                 contentTypeCollection,
                 accountCollection
             ] = await Promise.all([interests(), feedContentTypes(), accounts()])
-            
+
             this.instance = await this.showInstance(params.id, 'feed/list', feeds, {
                 interests: interestsCollection,
                 content_types: contentTypeCollection,
@@ -182,7 +182,7 @@ export default {
                 contentTypeCollection,
                 accountCollection
             ] = await Promise.all([feeds(), interests(), feedContentTypes(), accounts()])
-            
+
             return feedCollection.create(this.instanceForm, {
                 interests: interestsCollection,
                 content_types: contentTypeCollection,
