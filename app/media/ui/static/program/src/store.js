@@ -116,7 +116,7 @@ export const feeds = () => {
     return singleton(
         'feeds',
         (value) => value instanceof FeedCollection,
-        () => makeFilteredFeedCollection(FeedCollection.all, feedContentTypes, interests, accounts)
+        () => makeFilteredFeedCollection(FeedCollection.all, feedContentTypes, stashes, interests, accounts)
     )
 }
 
@@ -145,6 +145,7 @@ const activeUserGroups = () => {
         return makeFilteredGroupCollection(
             () => GroupCollection.list({ members: user.details.id }),
             feeds,
+            stashes,
             accounts,
             profiles,
             interests,
@@ -158,6 +159,7 @@ const filterGroups = (params) => {
     return makeFilteredGroupCollection(
         () => GroupCollection.searchGroups(params),
         feeds,
+        stashes,
         accounts,
         profiles,
         interests,

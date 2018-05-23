@@ -8,9 +8,9 @@ import {FeedContentStashCollection} from './FeedContentStash'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 import {FeedContentItemModel} from './FeedContentItem'
 
-export async function makeFilteredFeedCollection(queryset, _feedContentTypes, _interests, _accounts) {
-    let [contentTypes, interests, owner, values] = await Promise.all(
-        [_feedContentTypes(), _interests(), _accounts(), queryset()]
+export async function makeFilteredFeedCollection(queryset, _feedContentTypes, _stashes, _interests, _accounts) {
+    let [contentTypes, stashes, interests, owner, values] = await Promise.all(
+        [_feedContentTypes(), _stashes(), _interests(), _accounts(), queryset()]
     )
 
     const collection = new FeedCollection([])
@@ -18,10 +18,11 @@ export async function makeFilteredFeedCollection(queryset, _feedContentTypes, _i
     await resolveInstances(
         collection,
         values,
-        { content_types: contentTypes, interests, owner },
+        { content_types: contentTypes, interests, owner, stashes },
         // stashes: results[2]
         [
-            ['interests', interests.get]
+            ['interests', interests.get.bind(interests)],
+            ['stashes', stashes.get.bind(stashes)]
         ]
     )
 
@@ -125,9 +126,9 @@ class FeedCollection extends Collection {
 
     async list(params, collections) {
         return await paginatedList(this, 0, collections, [
-            ['owner', collections.accounts.get],
-            ['interests', collections.interests.get]
-//            ['stashes', collections.stashes.get]
+            ['owner', collections.accounts.get.bind(collections.accounts)],
+            ['interests', collections.interests.get.bind(collections.interests)],
+            ['stashes', collections.stashes.get.bind(collections.stashes)]
         ])
     }
 

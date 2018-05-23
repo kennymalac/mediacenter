@@ -6,13 +6,13 @@
 import ActionButton from '../ActionButton'
 
 export default {
-    props: ['id', 'image', 'name'],
+    props: ['id', 'stashId', 'image', 'name'],
     components: {
         ActionButton
     },
     computed: {
         groupLink() {
-            return `${this.id}/details`
+            return `${this.id}/details/stash/${this.stashId}/details`
         }
     }
 }

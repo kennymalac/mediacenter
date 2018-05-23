@@ -111,7 +111,7 @@ export default {
             const interestsCollection = await interests()
             const profilesCollection = await profiles()
             this.objects = await profilesCollection.list(
-                this.page,
+                {page: this.page},
                 { interests: interestsCollection }
             )
         },

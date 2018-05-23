@@ -60,7 +60,7 @@ export default {
                 // TODO no need to try this each time for details
                 // just try getting the instance directly
                 instance = await this.findInstance(id)
-                if (instance) {
+                if (instance && !instance.instance._isFake) {
                     return instance
                 }
             }

@@ -300,7 +300,7 @@ class FeedCreateUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Feed
-        fields = ('id', 'name', 'description', 'owner', 'content_types', 'interests')
+        fields = ('id', 'name', 'description', 'owner', 'content_types', 'interests', 'stashes')
 
 
 class FeedSerializer(serializers.ModelSerializer):
@@ -315,7 +315,7 @@ class FeedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Feed
-        fields = ('id', 'name', 'description', 'owner', 'content_types', 'created', 'interests')
+        fields = ('id', 'name', 'description', 'owner', 'content_types', 'created', 'interests', 'stashes')
 
 
 class FeedContentItemSerializer(serializers.ModelSerializer):

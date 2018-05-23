@@ -88,7 +88,7 @@
 import RestfulComponent from "../RestfulComponent"
 import {GroupModel} from '../../models/Group.js'
 // import {FeedModel} from '../../models/Feed.js'
-import {groups, feeds, accounts, interests, feedContentTypes, activeUser, filteredGroups} from '../../store.js'
+import {groups, feeds, stashes, accounts, interests, feedContentTypes, activeUser, filteredGroups} from '../../store.js'
 
 import AccountSelect from '../AccountSelect'
 import InterestSelect from '../InterestSelect'
@@ -156,12 +156,12 @@ export default {
         },
 
         async dependencies() {
-            const [members, feed, interestCollection, contentTypes] = await Promise.all(
-                [accounts(), feeds(), interests(), feedContentTypes()]
+            const [members, feed, stashCollection, interestCollection, contentTypes] = await Promise.all(
+                [accounts(), feeds(), stashes(), interests(), feedContentTypes()]
             )
 
             return {
-                members, feed, interests: interestCollection, content_types: contentTypes, owner: members, friends: members
+                members, feed, stashes: stashCollection, interests: interestCollection, content_types: contentTypes, owner: members, friends: members
             }
         },
 

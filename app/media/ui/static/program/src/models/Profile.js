@@ -62,8 +62,8 @@ class ProfileCollection extends Collection {
         ])
     }
 
-    async list(page, collections) {
-        return await paginatedList(this, page, collections)
+    async list(params, collections) {
+        return await paginatedList(this, params, collections)
     }
 
     static searchProfiles(params) {
