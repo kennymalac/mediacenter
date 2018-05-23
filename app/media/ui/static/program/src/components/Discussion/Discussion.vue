@@ -78,7 +78,6 @@ export default {
         },
 
         async create() {
-            await discussions()
             if (this.parentTitle) {
                 this.instanceForm.content_item.title = `Re: ${this.parentTitle}`
             }
@@ -120,8 +119,17 @@ export default {
         },
 
         async createDiscussion() {
-            const user = await activeUser()
-            this.instanceForm.content_item.owner = user.details.id
+            const [owner, members, profile, groupCollection] = await Promise.all(
+                [activeUser(), accounts(), profiles(), groups()]
+            )
+            const ownerAccount = members.getInstance(owner.details.id, {
+                groups: groupCollection,
+                members,
+                profile
+            })
+
+            this.instanceForm.content_item.owner = ownerAccount
+
             if (this.parentId) {
                 this.instanceForm.parent = this.parentId
             }
@@ -136,8 +144,6 @@ export default {
 
             try {
                 const instance = await this.$store.discussions.create(this.instanceForm, await this.dependencies())
-                // TODO owner model??
-                instance.content_item.owner = user.details
                 return instance
             }
             catch (error) {
