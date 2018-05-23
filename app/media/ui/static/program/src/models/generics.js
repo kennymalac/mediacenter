@@ -71,11 +71,10 @@ export async function resolveInstances(collection, items, collections = {}, chil
     return instances
 }
 
-async function paginateListedResource(uri, collection, page, collections = {}, children = []) {
-    console.log(page)
-
+async function paginateListedResource(uri, collection, params, collections = {}, children = []) {
     const data = await fetchAPI(`${uri}`, {
-        method: "GET"
+        method: "GET",
+        queryParams: params
     })
           .then(jsonResponse)
 

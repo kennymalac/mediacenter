@@ -51,7 +51,7 @@ class InterestCollection extends Collection {
     }
 
     async list(params, collections) {
-        return await paginatedList(this, 0, collections)
+        return await paginatedList(this, params, collections)
     }
 
     // searchInterests

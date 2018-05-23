@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.conf import settings
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin
+from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, list_route, detail_route, parser_classes
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
@@ -105,6 +106,8 @@ class InterestViewSet(ListModelMixin,
                       GenericViewSet):
     queryset = Interest.objects.all()
     serializer_class = InterestSerializer
+    filter_backends = (SearchFilter,)
+    search_fields = ('name',)
 
 
 class ProfileViewSet(MultipleSerializerMixin,

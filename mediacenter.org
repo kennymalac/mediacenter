@@ -101,6 +101,8 @@
 *** Interests
 **** TODO maximum number of interests per Group, Feed
 **** TODO determine if view should list both Groups and Users?
+**** DONE interest search in InterestSelect
+     CLOSED: [2018-05-23 Wed 10:34]
 **** TODO system to vote on consolidation & removal of Interest groups?
 **** TODO determine how to deal with content spam with many interests tagged
 **** TODO determine how to limit creation of interests
@@ -217,7 +219,8 @@ Your feed has "content decay"
 **** DONE add InterestSelect
      CLOSED: [2018-05-12 Sat 17:55]
 **** TODO backend filtering
-**** TODO remove "content" manytomany - feed content should be dynamic
+**** DONE remove "content" manytomany - feed content should be dynamic
+     CLOSED: [2018-05-23 Wed 09:53]
 **** TODO automatically create Feed for each content type
 **** TODO CRUD
 ***** DONE Create
@@ -232,7 +235,6 @@ Your feed has "content decay"
 **** TODO Filtering interface
 **** DONE Feed collection
      CLOSED: [2018-05-02 Wed 15:14]
-**** TODO FeedItem collection
 **** DONE Topic styling
      CLOSED: [2018-05-01 Tue 18:07]
 **** TODO Image styling
