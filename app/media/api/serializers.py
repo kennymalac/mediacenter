@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Max
 from django.conf import settings
-from django.core.paginator import Paginator
+from api.paginators import *
 from django_countries.serializers import CountryFieldMixin
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
@@ -313,11 +313,6 @@ class FeedSerializer(serializers.ModelSerializer):
         many=True
     )
 
-    content_types = FeedContentItemTypeSerializer(
-        many=True,
-        required=False
-    )
-
     class Meta:
         model = Feed
         fields = ('id', 'name', 'description', 'owner', 'content_types', 'created', 'interests')
@@ -328,13 +323,24 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
         queryset=Account.objects.all(),
         required=False
     )
-    content_type = serializers.StringRelatedField(
-        required=False
-    )
+    object_id = serializers.SerializerMethodField('get_content_id')
+    # content_type = serializers.StringRelatedField(
+    #     required=False
+    # )
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'content_type', 'created')
+        fields = ('id', 'title', 'description', 'owner', 'content_type', 'created', 'object_id')
+
+    def get_content_id(self, instance):
+        _model = None
+        if instance.content_type.name == FeedContentItemType.TOPIC or \
+           instance.content_type.name == FeedContentItemType.POST:
+            _model = Discussion
+        # elif instance.content_type == FeedContentItemType.IMAGE:
+        #     _model =
+
+        return _model.objects.filter(content_item=instance).values_list('id', flat=True).first()
 
 
 class FeedContentItemCreateUpdateSerializer(serializers.ModelSerializer):
@@ -342,7 +348,9 @@ class FeedContentItemCreateUpdateSerializer(serializers.ModelSerializer):
         queryset=Account.objects.all(),
         required=False
     )
-    content_type = serializers.StringRelatedField(
+
+    content_type = serializers.PrimaryKeyRelatedField(
+        queryset=FeedContentItemType.objects.all(),
         required=False
     )
 
@@ -378,7 +386,7 @@ class FeedContentStashSerializer(serializers.ModelSerializer):
         if _interests:
             content_queryset = content_queryset.filter(interests__in=Interest.objects.filter(id__in=_interests))
 
-        paginator = PageNumberPagination()
+        paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(content_queryset, self.context['request'])
         serializer = FeedContentItemSerializer(
             page,
@@ -391,6 +399,7 @@ class FeedContentStashSerializer(serializers.ModelSerializer):
 class FeedContentStashCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = FeedContentStash
+        # NOTE one request could wipe out entire stash! BAD
         fields = ('id', 'name', 'description', 'content')
 
 
@@ -418,7 +427,7 @@ class DiscussionCreateUpdateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         content_item_data = validated_data.pop('content_item')
-        group = content_item_data.pop('group')
+        # group = content_item_data.pop('group')
         order = 0
 
         if validated_data.get('parent', 0):
@@ -433,7 +442,7 @@ class DiscussionCreateUpdateSerializer(serializers.ModelSerializer):
 
         content_item = FeedContentItem.objects.create(**content_item_data, content_type=content_type)
 
-        discussion = Discussion.objects.create(**validated_data, content_item=content_item, group=group, order=order)
+        discussion = Discussion.objects.create(**validated_data, content_item=content_item, order=order)
         # discussion.members.add(*members)
 
         return discussion

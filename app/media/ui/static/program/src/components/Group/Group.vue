@@ -34,12 +34,11 @@
                 </div>
             </section>
             <div class="group-contents">
-                <section class="feed">
+                <section class="feed" v-if="!params.discussionAction">
                     <action-button v-bind="createPostAction" />
-                    <feed-content-item-list :items="contentItems" :enabledContentTypes="enabledContentTypes" />
                 </section>
+                <router-view :feedId="instance.feed.id"></router-view>
             </div>
-            <router-view :feedId="instance.feed.id"></router-view>
         </template>
         <template v-if="actions.create || actions.manage">
             <form class="main-form" @submit.prevent="save">
@@ -88,13 +87,12 @@
 <script>
 import RestfulComponent from "../RestfulComponent"
 import {GroupModel} from '../../models/Group.js'
-import {FeedModel} from '../../models/Feed.js'
+// import {FeedModel} from '../../models/Feed.js'
 import {groups, feeds, accounts, interests, feedContentTypes, activeUser, filteredGroups} from '../../store.js'
 
 import AccountSelect from '../AccountSelect'
 import InterestSelect from '../InterestSelect'
 import GroupList from './GroupList'
-import FeedContentItemList from '../FeedContentItemList'
 import FeedFilter from '../FeedFilter'
 import ActionButton from '../ActionButton'
 import ActionList from '../ActionList'
@@ -108,7 +106,6 @@ export default {
         AccountSelect,
         InterestSelect,
         GroupList,
-        FeedContentItemList,
         FeedFilter,
         ActionButton,
         ActionList,
@@ -118,9 +115,6 @@ export default {
         onlineMembers() {
             // TODO
             return this.instance.members
-        },
-        enabledContentTypes() {
-            return ["Topics"]
         }
     },
     data() {
@@ -161,6 +155,16 @@ export default {
             this.contentItems = []
         },
 
+        async dependencies() {
+            const [members, feed, interestCollection, contentTypes] = await Promise.all(
+                [accounts(), feeds(), interests(), feedContentTypes()]
+            )
+
+            return {
+                members, feed, interests: interestCollection, content_types: contentTypes, owner: members
+            }
+        },
+
         async create() {
             this.instanceForm = GroupModel.getNewInstance()
             this.instanceForm.feed = { interests: [], content_types: [] }
@@ -171,13 +175,7 @@ export default {
         },
 
         async manage(params) {
-            const [members, feed, interestCollection, contentTypes] = await Promise.all(
-                [accounts(), feeds(), interests(), feedContentTypes()]
-            )
-
-            this.instance = await this.showInstance(params.id, `/group/${params.id}/details`, groups, {
-                members, feed, interests: interestCollection, content_types: contentTypes
-            })
+            this.instance = await this.showInstance(params.id, `/group/${params.id}/details`, groups, await this.dependencies())
             this.instanceForm = this.instance.getForm()
             this.instanceForm.feed.owner = this.instanceForm.owner
         },
@@ -191,21 +189,7 @@ export default {
             const user = await activeUser()
             this.isActiveUserMember = user.details.groupforum_set.includes(parseInt(params.id))
 
-            const [members, feed, interestCollection, contentTypes] = await Promise.all(
-                [accounts(), feeds(), interests(), feedContentTypes()]
-            )
-
-            this.instance = await this.showInstance(params.id, '/group/list', groups, {
-                members, feed, interests: interestCollection, content_types: contentTypes
-            })
-            this.feed = this.instance.feed
-
-            try {
-                this.contentItems = await FeedModel.listItems(this.instance.feed.id, {})
-            }
-            catch (error) {
-                console.log(error)
-            }
+            this.instance = await this.showInstance(params.id, '/group/list', groups, await this.dependencies())
         },
 
         async searchGroups() {
@@ -225,7 +209,7 @@ export default {
             return GroupModel.manage(
                 this.instance,
                 this.instanceForm,
-                { members: accounts, feed: feeds, interests, content_types: feedContentTypes }
+                { members: accounts, feed: feeds, interests, content_types: feedContentTypes, owner: accounts }
             )
                 .catch((error) => {
                     console.log(error)

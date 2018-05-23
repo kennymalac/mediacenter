@@ -89,6 +89,7 @@
 
 ** Priority 2 (necessary)
 *** TODO slugs instead of ids in routes
+*** TODO details should be default route
 
 *** Online Now
 **** TODO websocket implementation
@@ -241,6 +242,7 @@ Your feed has "content decay"
 
 *** Model/Collection
     don't make too many assumptions
+**** TODO dependency trees
 **** TODO how to handle if Collection this.collections references a 
 collection that references that same collection? 
 **** TODO separate sync procedure from model instances?
@@ -352,4 +354,3 @@ collection that references that same collection?
    CLOSED: [2017-03-13 Mon 19:35]
 ** DONE switch to ECMAScript 6 for all frontend code
    CLOSED: [2017-03-13 Mon 19:34]
-

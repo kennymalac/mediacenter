@@ -2,7 +2,6 @@ from django.shortcuts import render, get_object_or_404
 from django.conf import settings
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, list_route, detail_route, parser_classes
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
@@ -12,6 +11,8 @@ from rest_framework_extensions.mixins import NestedViewSetMixin
 from api.models import *
 from api.serializers import *
 from api.filters import *
+from api.paginators import *
+
 
 class MultipleSerializerMixin(object):
     def get_serializer_class(self):
@@ -134,12 +135,6 @@ class FeedViewSet(NestedViewSetMixin,
     }
 
 
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 100
-    page_size_query_param = 'page_size'
-    max_page_size = 1000
-
-
 class FeedContentItemViewSet(ListModelMixin,
                              RetrieveModelMixin,
                              CreateModelMixin,
@@ -186,6 +181,22 @@ class FeedContentStashViewSet(NestedViewSetMixin,
     }
 
     pagination_class = StandardResultsSetPagination
+
+    @detail_route(methods=['POST'], url_path='content/add', permission_classes=[IsAuthenticated])
+    def add_content(self, request, pk=None, **kwargs):
+        print(kwargs.get('parent_lookup_feeds', ''))
+        instance = self.queryset.get(pk=pk)
+
+        # TODO get feed, verify feed membership/post permission
+        # if instance.owner:
+        #     return Response({
+        #         'error': ''
+        #     }, status=403)
+
+        content = FeedContentItem.objects.filter(pk__in=request.data.get('content', []))
+        instance.content.add(*list(content))
+
+        return Response({})
 
 
 class DiscussionViewSet(NestedViewSetMixin,

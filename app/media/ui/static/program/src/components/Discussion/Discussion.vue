@@ -7,7 +7,7 @@
                 <post v-for="post in posts" v-bind="post.instance" @editPost="editPost(post.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" />
 
                 <h3>Quick Reply</h3>
-                <discussion :groupId="getGroupId" :parentId="instance.id" :parentTitle="instance.content_item.title" action="create" />
+                <discussion :stashId="stashId" :feedId="feedId" :parentId="instance.id" :parentTitle="instance.content_item.title" action="create" />
             </section>
         </template>
         <template v-if="actions.create || actions.manage">
@@ -35,8 +35,8 @@
 
 <script>
 import RestfulComponent from "../RestfulComponent"
-import {activeUser, discussions} from "../../store.js"
-import {DiscussionModel, DiscussionCollection} from "../../models/Discussion.js"
+import {activeUser, discussions, accounts, stashes, profiles, feedContentTypes} from "../../store.js"
+import {DiscussionModel} from "../../models/Discussion.js"
 import Post from './Post'
 
 import router from "../../router/index.js"
@@ -44,7 +44,7 @@ import router from "../../router/index.js"
 export default {
     name: 'discussion',
     mixins: [RestfulComponent],
-    props: ['feedId', 'parentId', 'parentTitle'],
+    props: ['stashId', 'feedId', 'parentId', 'parentTitle'],
     components: {
         Post
     },
@@ -55,9 +55,6 @@ export default {
             return this.objects.filter((item) => {
                 return item.parent === this.instance.id
             })
-        },
-        getGroupId() {
-            return this.instance.group.id
         }
     },
     data() {
@@ -73,38 +70,48 @@ export default {
         },
 
         editPost(id) {
-            router.push(`/discussion/${id}/manage`)
+            router.push(`../${id}/manage`)
         },
 
         showUserProfile(id) {
             router.push(`/profile/${id}/details`)
         },
 
-        create() {
-            this.list()
+        async create() {
+            await discussions()
             if (this.parentTitle) {
                 this.instanceForm.content_item.title = `Re: ${this.parentTitle}`
+            }
+        },
+
+        async dependencies() {
+            const [owner, stashCollection, contentTypeCollection, profileCollection] = await Promise.all(
+                [accounts(), stashes(), feedContentTypes(), profiles()]
+            )
+            const stash = await stashCollection.getInstance(this.stashId)
+
+            return {
+                owner,
+                content_item: stash.collections.content,
+                content_type: contentTypeCollection,
+                content_types: contentTypeCollection,
+                profile: profileCollection
             }
         },
 
         async manage(params) {
             const fallthrough = this.parentId ? `/discussion/${this.parentId}/detail` : `/feed/list`
 
-            this.instance = await this.showInstance(params.id, fallthrough, DiscussionCollection, 'discussions')
+            this.instance = await this.showInstance(params.id, fallthrough, discussions, await this.dependencies())
             this.instanceForm = this.instance.getForm()
         },
 
         async details(params) {
-            this.instance = await this.showInstance(params.id, '/feed/list', discussions)
+            this.instance = await this.showInstance(params.id, '/feed/list', discussions, await this.dependencies())
         },
 
-        async list(params) {
-            const store = await discussions()
-            this.objects = store.values
-        },
-
-        manageDiscussion() {
-            return DiscussionModel.manage(this.instance, this.instanceForm)
+        async manageDiscussion() {
+            return DiscussionModel.manage(this.instance, this.instanceForm, await this.dependencies())
                 .catch((error) => {
                     console.log(error)
                 })
@@ -116,10 +123,21 @@ export default {
             if (this.parentId) {
                 this.instanceForm.parent = this.parentId
             }
-            this.instanceForm.content_item.group = this.groupId
+
+            const stashCollection = await stashes()
+            if (this.stashId) {
+                // TODO replies can be stored on specific stashes
+                // via pubsub
+                this.instanceForm.stash = await stashCollection.getInstance(this.stashId)
+            }
+            this.instanceForm.feed = this.feedId
 
             try {
-                const instance = await DiscussionCollection.create(this.instanceForm)
+                const instance = await this.$store.discussions.create(this.instanceForm, {
+                    owner: this.$store.accounts,
+                    content_item: this.instanceForm.stash.collections.content
+                })
+                // TODO owner model??
                 instance.content_item.owner = user.details
                 return instance
             }

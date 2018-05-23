@@ -1,13 +1,12 @@
-import {Model, Collection} from './Model.js'
-import {momentDate, modelInstance} from './converters.js'
+import {Model, Collection, serializeIds} from './Model.js'
+import {momentDate} from './converters.js'
 // import {AccountCollection} from './Account'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 import {getNested, manageNested, paginatedListNested} from './generics.js'
-import {FeedContentItemModel} from './FeedContentItem'
+import {FeedContentItemCollection} from './FeedContentItem'
 
-export async function makeFeedContentStashCollection(queryset) {
-    const stashes = await queryset()
-    return new FeedContentStashCollection(stashes)
+export async function makeFeedContentStashCollection() {
+    return new FeedContentStashCollection([])
 }
 
 class FeedContentStashModel extends Model {
@@ -26,12 +25,28 @@ class FeedContentStashModel extends Model {
         content: []
     }
 
+    static fields = {
+        content: [FeedContentItemCollection]
+    }
+
     static fieldConverters = {
         created: momentDate
     }
 
     static parentResource = 'feed'
     static resource = 'stash'
+
+    constructor(instance, collections = {}) {
+        const _collections = {
+            content: new FeedContentItemCollection([])
+        }
+        super(instance, {
+            ...collections,
+            ..._collections
+        })
+
+        this.collections = _collections
+    }
 
     static async manage(instance, form, collections) {
         return await manageNested(instance, form.feed, form, collections)
@@ -54,7 +69,20 @@ class FeedContentStashModel extends Model {
 
             .then((data) => {
                 // Returns a list of ContentItem model instances
-                return data.content.map((input) => modelInstance(FeedContentItemModel, input))
+                return data
+                // return data.content.map((input) => modelInstance(FeedContentItemModel, input))
+            })
+    }
+
+    static addContent(instance, feedId, content, collections = {}) {
+        return makeJsonRequest(`feed/${feedId}/stash/${instance.id}/content/add/`, {
+            method: "POST",
+            body: {content: serializeIds(content)}
+        })
+            .then(jsonResponse)
+
+            .then((data) => {
+                instance.sync(data, {...collections, ...instance.collections})
             })
     }
 }
@@ -66,8 +94,8 @@ class FeedContentStashCollection extends Collection {
     static parentResource = 'feed'
     static resource = 'stash'
 
-    async get(id, feedId, instance = null) {
-        return await getNested(this, id, feedId, instance)
+    async get(feedId, id, collections, instance = null) {
+        return await getNested(this, id, feedId, instance, collections)
     }
 
     async list(feedId, params, collections) {

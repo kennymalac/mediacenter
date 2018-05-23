@@ -1,13 +1,14 @@
-export default function singleton(getStore, storeValue, typeCheck, create) {
-    return new Promise((resolve, reject) => {
-        const store = getStore()
+export default async function singleton(getStore, storeValue, typeCheck, create) {
+    const store = getStore()
 
-        if (typeCheck(store[storeValue])) {
-            return resolve(store[storeValue])
-        }
-        create().then((newValue) => {
-            store[storeValue] = newValue
-            return resolve(newValue)
-        })
-    })
+    if (typeCheck(store[storeValue])) {
+        return store[storeValue]
+    }
+    else if (store[storeValue] instanceof Promise) {
+        return await store[storeValue]
+    }
+
+    store[storeValue] = create()
+    store[storeValue] = await store[storeValue]
+    return store[storeValue]
 }

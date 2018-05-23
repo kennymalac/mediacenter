@@ -8,14 +8,14 @@ export function serializeForms(values) {
 
 function mutateInstance(mutation) {
     const [instance, diff] = mutation
-    const [changed] = diff
+    const [changed, changes] = diff
     if (!changed) {
         return instance
     }
 
     // This instance is populated with data and is thus now a real instance
-    delete instance._isFake
-    instance.applyDiff(diff)
+    delete instance.instance._isFake
+    instance.applyDiff(changes)
     return instance
 }
 
@@ -173,7 +173,6 @@ export class Model {
             }
 
             if (field in this.constructor.fields && collections[field] !== undefined) {
-                // NOTE assumes that Collection is up-to-date
                 // Initialize an array of model instances
                 this.resolveNestedModelField(field, collections)
             }
@@ -210,7 +209,15 @@ export class Model {
 
     diffNestedModelField(field, val, collections = {}, many = false, isPrimaryKeys = false) {
         // Make sure this is a Model to begin with
-        if (!(collections[field] instanceof Collection)) {
+        let collection
+        if (this.collections && this.collections[field] instanceof Collection) {
+            collection = this.collections[field]
+        }
+        else {
+            collection = collections[field]
+        }
+
+        if (!(collection instanceof Collection)) {
             throw new Error(`Invalid model nested write! Resolved Collection for field ${field} not found.`)
         }
 
@@ -224,7 +231,7 @@ export class Model {
             for (let i = 0; i < val.length; i++) {
                 if (this[field][i] !== val[i]) {
                     // There is a difference, refetch the instances
-                    store = collections[field]
+                    store = collection
                     instances = store.getInstances(val, collections, isPrimaryKeys)
                     changed = true
                     break
@@ -250,12 +257,15 @@ export class Model {
             }
         }
         else if (this[field] !== val && (val !== null && this[field] !== undefined)) {
+            if (isPrimaryKeys && this[field].id === val) {
+                return [false]
+            }
             changed = true
             store = collections[field]
             const instance = store.getInstance(val, collections, isPrimaryKeys)
 
             fieldChanges = !isPrimaryKeys
-                ? () => mutateInstance([instance, [true, {[field]: val}]])
+                ? () => mutateInstance([instance, instance.diff(val, collections)])
                 : instance
         }
 
@@ -322,12 +332,14 @@ export class Model {
         }
         console.log(diffTree)
         // This instance has new field data, so it's a real instance
-        delete this._isFake
+        delete this.instance._isFake
         this.applyDiff(diffTree)
     }
 
     resolveChildren(modelField, getter) {
-        return this[modelField].map((instance) => {
+        return this[modelField].filter((instance) => {
+            return instance.instance._isFake
+        }).map((instance) => {
             return getter(instance.id, instance)
         })
     }

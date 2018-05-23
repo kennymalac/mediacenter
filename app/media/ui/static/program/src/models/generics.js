@@ -46,6 +46,7 @@ export async function get(collection, id, instance = null, collections = {}, chi
 }
 
 export async function getNested(collection, id, parentId, instance = null, collections = {}, children = []) {
+    console.log('depito')
     return getResource(`${collection.constructor.parentResource}/${parentId}/${collection.constructor.resource}/${id}/`, collection, instance, collections, children)
 }
 

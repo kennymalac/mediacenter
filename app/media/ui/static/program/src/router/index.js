@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Feed from 'components/Feed'
+import FeedContentStash from 'components/FeedContentStash'
 import Register from 'components/Register'
 import Login from 'components/Login'
 import Profile from 'components/Profile/Profile'
@@ -98,18 +99,6 @@ export default new Router({
             canReuse: false
         },
         {
-            path: '/discussion/:action',
-            name: 'Discussion',
-            props: restAction,
-            component: Discussion
-        },
-        {
-            path: '/discussion/:id/:action',
-            name: 'Discussion',
-            props: restAction,
-            component: Discussion
-        },
-        {
             path: '/interest/:id/:action',
             name: 'Interest',
             component: Interest,
@@ -132,10 +121,22 @@ export default new Router({
             // meta: { objectName: 'group' },
             children: [
                 {
-                    path: 'discussion/:discussionAction',
-                    component: Discussion,
-                    props: restAction
-                    // meta: { objectName: 'discussion' }
+                    path: 'stash/:stashId/:stashAction',
+                    component: FeedContentStash,
+                    props: restAction,
+                    children: [
+                        {
+                            path: 'discussion/:discussionId/:discussionAction',
+                            component: Discussion,
+                            props: restAction
+                        },
+                        {
+                            path: 'discussion/:discussionAction',
+                            component: Discussion,
+                            props: restAction
+                            // meta: { objectName: 'discussion' }
+                        }
+                    ]
                 }
             ]
         },

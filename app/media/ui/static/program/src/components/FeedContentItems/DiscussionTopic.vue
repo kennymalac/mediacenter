@@ -3,7 +3,7 @@
         <template slot="title" slot-scope="{ slotProps }">
             <div class="content-title">
                 <span class="content-type">Topic</span>
-                <a @click="details"> {{ item.title }}</a>
+                <router-link :to="detailsUrl"> {{ item.title }}</router-link>
             </div>
             <span class="date">{{ item.created.fromNow() }}</span>
         </template>
@@ -19,12 +19,11 @@
 
 <script>
 import ContentItem from './ContentItem'
-import {discussions} from "../../store.js"
-import router from "../../router/index.js"
 
 export default {
     name: 'feed-discussion-topic',
     props: {
+        stashId: [Number],
         item: {
             type: Object
         }
@@ -32,22 +31,16 @@ export default {
     components: {
         ContentItem
     },
+    computed: {
+        detailsUrl() {
+            return `details/discussion/${this.item.object_id}/details`
+        }
+    },
     data() {
         return {
             embedProps: {
                 src: null
             }
-        }
-    },
-    methods: {
-        async details() {
-            const store = await discussions()
-            const discussion = store.values.find((item) => {
-                console.log(item)
-                return item.content_item.id === this.item.id
-            })
-            console.log(discussion)
-            router.push(`/discussion/` + discussion.id + "/details")
         }
     }
 }

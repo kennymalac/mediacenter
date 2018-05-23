@@ -42,7 +42,7 @@ export default {
     methods: {
         listContent(contentType) {
             return this.items.filter((item) => {
-                return item.content_type === contentType ? item : false
+                return item.content_type.name === contentType ? item : false
             })
         }
     }

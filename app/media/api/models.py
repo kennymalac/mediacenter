@@ -200,7 +200,7 @@ class FeedContentStash(models.Model):
 
 
 class Discussion(models.Model):
-    group = models.ForeignKey('api.GroupForum')
+    group = models.ForeignKey('api.GroupForum', null=True)
     content_item = models.ForeignKey(FeedContentItem, related_name="+")
     parent = models.ForeignKey('self', null=True)
     order = models.IntegerField(default=0)

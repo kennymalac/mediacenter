@@ -5,6 +5,7 @@ import {AccountCollection, makeAccountCollection} from './models/Account.js'
 import {ProfileCollection, makeProfileCollection, makeFilteredProfileCollection} from './models/Profile.js'
 import {FeedContentTypeCollection, makeFeedContentTypeCollection} from './models/FeedContentType.js'
 import {InterestCollection, makeInterestCollection} from './models/Interest.js'
+import {FeedContentStashCollection, makeFeedContentStashCollection} from './models/FeedContentStash.js'
 import {FeedCollection, makeFilteredFeedCollection} from './models/Feed.js'
 import {DiscussionCollection, makeDiscussionCollection} from './models/Discussion.js'
 import {GroupCollection, makeFilteredGroupCollection} from './models/Group.js'
@@ -16,6 +17,7 @@ const store = {
     profiles: {},
     interestedUsers: {},
     interestId: 0,
+    stashes: {},
     feeds: {},
     albums: {},
     feedContentTypes: {},
@@ -50,7 +52,7 @@ const singletonFactory = (field, FieldType, reducer) => {
 export const activeUser = () => {
     return singleton(
         'activeUser',
-        (value) => value.id !== undefined && value.id !== 0,
+        value => value.details && value.details.id !== undefined && value.details.id !== 0,
         makeActiveUser
     )
 }
@@ -102,6 +104,14 @@ export const interestedUsers = (interestId) => {
     )
 }
 
+export const stashes = () => {
+    return singleton(
+        'stashes',
+        (value) => value instanceof FeedContentStashCollection,
+        makeFeedContentStashCollection
+    )
+}
+
 export const feeds = () => {
     return singleton(
         'feeds',
@@ -120,7 +130,7 @@ export const albums = () => {
 
 export const discussions = () => {
     return singleton(
-        'discussion',
+        'discussions',
         (value) => value instanceof DiscussionCollection,
         makeDiscussionCollection
     )
@@ -135,7 +145,9 @@ const activeUserGroups = () => {
         return makeFilteredGroupCollection(
             () => GroupCollection.list({ members: user.details.id }),
             feeds,
-            accounts
+            accounts,
+            interests,
+            feedContentTypes
         )
     })
 }
@@ -145,7 +157,9 @@ const filterGroups = (params) => {
     return makeFilteredGroupCollection(
         () => GroupCollection.searchGroups(params),
         feeds,
-        accounts
+        accounts,
+        interests,
+        feedContentTypes
     )
 }
 

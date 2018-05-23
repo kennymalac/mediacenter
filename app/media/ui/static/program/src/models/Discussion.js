@@ -1,15 +1,13 @@
 import {Model, Collection} from './Model.js'
 import {makeJsonRequest, jsonResponse, fetchAPI} from '../httputil.js'
 import {get, manage, paginatedList} from './generics.js'
-import {modelInstance} from './converters'
-import {FeedContentItemModel} from './FeedContentItem'
-import {AccountCollection} from './Account'
-import {GroupCollection} from './Group'
+import {FeedContentItemCollection} from './FeedContentItem'
+import {FeedContentStashModel} from './FeedContentStash'
+// import {AccountCollection} from './Account'
+// import {GroupCollection} from './Group'
 
-export function makeDiscussionCollection() {
-    return DiscussionCollection.searchDiscussions().then((items) => {
-        return new DiscussionCollection(items)
-    })
+export async function makeDiscussionCollection() {
+    return new DiscussionCollection([])
 }
 
 class DiscussionModel extends Model {
@@ -17,20 +15,17 @@ class DiscussionModel extends Model {
     static initialState = {
         id: 0,
         content_item: {},
-        owner: {},
-        group: {},
+        // owner: {},
+        // group: {},
         text: "",
         order: 0,
         parent: 0
     }
 
     static fields = {
-        owner: AccountCollection,
-        group: GroupCollection
-    }
-
-    static fieldConverters = {
-        content_item: (input) => modelInstance(FeedContentItemModel, input)
+        // owner: AccountCollection
+        // group: GroupCollection
+        content_item: FeedContentItemCollection
     }
 
     static resource = 'discussion'
@@ -38,7 +33,7 @@ class DiscussionModel extends Model {
     static manage(instance, form, collections) {
         return manage(
             instance,
-            {...form, content_item: {...form.content_item, owner: form.content_item.owner.id}},
+            {...form, content_item: {...form.content_item, content_type: form.content_item.content_type.id, owner: form.content_item.owner.id}},
             collections
         )
     }
@@ -50,24 +45,33 @@ class DiscussionCollection extends Collection {
 
     static resource = 'discussion'
 
-    async get(id, instance = null) {
-        return await get(this, id, instance)
+    async get(id, collections, instance = null) {
+        return await get(this, id, instance, collections)
     }
 
-    static create(data) {
-        return makeJsonRequest("discussion/", {
+    async create(form, collections) {
+        const data = {...form}
+        const stash = data.stash
+        const feed = data.feed
+        delete data.stash
+        delete data.feed
+
+        const created = await makeJsonRequest("discussion/", {
             method: "POST",
             body: {
                 ...data
             }
         })
-            .then(jsonResponse)
-            .then((created) => {
-                const instance = new DiscussionModel(created)
+              .then(jsonResponse)
 
-                console.log(instance)
-                return instance
-            })
+        if (!data.parent) {
+            // TODO replies can be stored on specific stashes
+            // via pubsub
+            await FeedContentStashModel.addContent(stash, feed, [created.content_item])
+        }
+        const instance = this.addInstance(created, collections)
+
+        return instance
     }
 
     async list(params, collections) {

@@ -9,9 +9,9 @@ export async function makeGroupCollection() {
     return new GroupCollection([])
 }
 
-export async function makeFilteredGroupCollection(queryset, _feeds, _accounts) {
-    let [members, feed, values] = await Promise.all(
-        [_accounts(), _feeds(), queryset()]
+export async function makeFilteredGroupCollection(queryset, _feeds, _accounts, _interests, _contentTypes) {
+    let [members, feed, values, interests, contentTypes] = await Promise.all(
+        [_accounts(), _feeds(), queryset(), _interests(), _contentTypes()]
 //        _feeds()
     )
     const collection = new GroupCollection([])
@@ -19,7 +19,7 @@ export async function makeFilteredGroupCollection(queryset, _feeds, _accounts) {
     await resolveInstances(
         collection,
         values,
-        { feed, members },
+        { members, feed, interests, content_types: contentTypes, owner: members },
         [
             ['members', members.get]
         ]

@@ -48,11 +48,10 @@ export default {
             })
             return instance
         },
-        async showInstance(id, fallthrough, collection, collections) {
+        async showInstance(id, fallthrough, collection, collections, parentId) {
             let instance
 
             if (this.objects.length === 0 && collection !== undefined) {
-                console.log(collection)
                 const store = await collection()
                 this.objects = store.values
             }
@@ -61,7 +60,6 @@ export default {
                 // TODO no need to try this each time for details
                 // just try getting the instance directly
                 instance = await this.findInstance(id)
-                console.log(instance)
                 if (instance) {
                     return instance
                 }
@@ -71,7 +69,10 @@ export default {
             if (collection) {
                 try {
                     const store = await collection()
-                    instance = await store.get(id, collections)
+                    instance = parentId
+                        ? await store.get(parentId, id, collections)
+                        : await store.get(id, collections)
+
                     return instance
                 }
                 catch (error) {
