@@ -161,7 +161,7 @@ export default {
             )
 
             return {
-                members, feed, interests: interestCollection, content_types: contentTypes, owner: members
+                members, feed, interests: interestCollection, content_types: contentTypes, owner: members, friends: members
             }
         },
 

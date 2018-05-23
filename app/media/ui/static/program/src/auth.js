@@ -110,7 +110,7 @@ export class Auth {
     getProfile(errorCallback) {
         let headers = {}
         this.authenticate(headers)
-        return fetchAPI('accounts/current-user/', {
+        return fetchAPI('account/current-user/', {
             method: 'GET',
             // Get authentication headers
             headers: headers

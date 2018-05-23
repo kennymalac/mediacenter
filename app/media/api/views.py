@@ -34,12 +34,15 @@ class MultipleSerializerMixin(object):
 
 class AccountViewSet(MultipleSerializerMixin, ModelViewSet):
     """An API for viewing and editing accounts"""
-    queryset = Account.objects.all()
+    queryset = Account.objects.filter(profile__isnull=False)
     serializer_classes = {
         'default': AccountSerializer,
         'create': FullAccountSerializer,
         'profile': PrivateAccountProfileDetailsSerializer
     }
+
+    filter_backends = (SearchFilter,)
+    search_fields = ('username',)
     # permission_classes
 
     def get_permissions(self):

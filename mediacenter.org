@@ -81,6 +81,8 @@
      CLOSED: [2018-05-11 Fri 16:47]
 **** TODO full test coverage
 *** Account
+**** DONE AccountSelect search for members
+     CLOSED: [2018-05-23 Wed 11:57]
 **** DONE AccountCollection
      CLOSED: [2018-05-04 Fri 13:31]
 **** DONE AccountSelect
@@ -156,6 +158,7 @@
 
 *** Groups
 **** TODO only members can create new Posts
+**** TODO make it so you can't add members to Group - only invite them
 **** TODO moderation system
 **** TODO what happens when owner of a group leaves?
 **** DONE joining public groups

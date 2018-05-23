@@ -34,7 +34,7 @@ export default {
                 this.options.push(instance)
             })
         },
-        asyncSearch: debounce(async function (queryParams) {
+        asyncSearch: debounce(async function(queryParams) {
             if (queryParams.length < 1) {
                 return
             }

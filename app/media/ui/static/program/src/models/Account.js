@@ -33,12 +33,12 @@ class AccountCollection extends Collection {
 
     static resource = 'account'
 
-    async get(id, instance = null) {
-        return await get(this, id, instance)
+    async get(id, collections, instance = null) {
+        return await get(this, id, instance, {...collections, friends: this})
     }
 
     static create(data) {
-        return makeJsonRequest('accounts/', {
+        return makeJsonRequest('account/', {
             method: "POST",
             body: data,
             authenticated: false
@@ -47,9 +47,9 @@ class AccountCollection extends Collection {
     }
 
     async list(params, collections) {
-        return await paginatedList(this, 0, collections, [
-            ['friends', this.get],
-            ['profile', collections.profiles.get]
+        return await paginatedList(this, 0, {...collections, friends: this}, [
+            ['friends', this.get.bind(this)],
+            ['profile', collections.profile.get.bind(collections.profile)]
         ])
     }
 }

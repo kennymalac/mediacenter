@@ -20,7 +20,7 @@ class AccountSerializer(CountryFieldMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ('id', 'username', 'country', 'email', 'profile')
+        fields = ('id', 'username', 'country', 'email', 'profile', 'friends')
 
 
 class FullAccountSerializer(AccountSerializer):

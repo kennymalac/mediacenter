@@ -146,6 +146,7 @@ const activeUserGroups = () => {
             () => GroupCollection.list({ members: user.details.id }),
             feeds,
             accounts,
+            profiles,
             interests,
             feedContentTypes
         )
@@ -158,6 +159,7 @@ const filterGroups = (params) => {
         () => GroupCollection.searchGroups(params),
         feeds,
         accounts,
+        profiles,
         interests,
         feedContentTypes
     )

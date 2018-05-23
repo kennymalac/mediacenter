@@ -337,11 +337,17 @@ export class Model {
     }
 
     resolveChildren(modelField, getter) {
-        return this[modelField].filter((instance) => {
-            return instance.instance._isFake
-        }).map((instance) => {
-            return getter(instance.id, instance)
-        })
+        if (Array.isArray(this[modelField])) {
+            return this[modelField].filter((instance) => {
+                return instance.instance._isFake
+            }).map((instance) => {
+                return getter(instance.id, instance)
+            })
+        }
+        else if (this[modelField].instance._isFake) {
+            return [getter(this[modelField].id, this[modelField])]
+        }
+        return []
     }
 
     getForm() {

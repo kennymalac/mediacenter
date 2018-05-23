@@ -9,9 +9,9 @@ from api.views import *
 from ui.views import *
 
 router = ExtendedDefaultRouter()
-router.register(r'accounts', AccountViewSet)
-router.register(r'activitylogs', ActivityLogViewSet)
-router.register(r'blogposts', BlogPostViewSet)
+router.register(r'account', AccountViewSet)
+router.register(r'activitylog', ActivityLogViewSet)
+router.register(r'blogpost', BlogPostViewSet)
 router.register(r'album', AlbumViewSet, base_name='album')\
       .register(
           r'media',
