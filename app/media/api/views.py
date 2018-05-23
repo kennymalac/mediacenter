@@ -193,10 +193,11 @@ class FeedContentStashViewSet(NestedViewSetMixin,
         #         'error': ''
         #     }, status=403)
 
-        content = FeedContentItem.objects.filter(pk__in=request.data.get('content', []))
+        content_pks = request.data.get('content', [])
+        content = FeedContentItem.objects.filter(pk__in=content_pks)
         instance.content.add(*list(content))
 
-        return Response({})
+        return Response({ 'content': request.data.get('content', []) })
 
 
 class DiscussionViewSet(NestedViewSetMixin,

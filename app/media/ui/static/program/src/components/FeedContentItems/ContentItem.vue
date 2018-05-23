@@ -15,7 +15,7 @@
             </div>
             <div class="action">
                 <i class="icon ion-md-star"></i>
-                <span>Favorite</span>
+                <span>Save</span>
             </div>
             <div class="action">
                 <i class="icon ion-md-close"></i>

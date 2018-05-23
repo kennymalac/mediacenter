@@ -15,7 +15,7 @@ export default {
         return {}
     },
     methods: {
-        favorite() {
+        save() {
             
         },
         comment() {

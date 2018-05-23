@@ -244,7 +244,7 @@ Your feed has "content decay"
     don't make too many assumptions
 **** TODO dependency trees
 **** TODO how to handle if Collection this.collections references a 
-collection that references that same collection? 
+collection that references that same collection?
 **** TODO separate sync procedure from model instances?
 **** DONE lazy nested model instances
      CLOSED: [2018-05-18 Fri 13:57]

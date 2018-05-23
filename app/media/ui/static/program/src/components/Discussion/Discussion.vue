@@ -133,10 +133,7 @@ export default {
             this.instanceForm.feed = this.feedId
 
             try {
-                const instance = await this.$store.discussions.create(this.instanceForm, {
-                    owner: this.$store.accounts,
-                    content_item: this.instanceForm.stash.collections.content
-                })
+                const instance = await this.$store.discussions.create(this.instanceForm, await this.dependencies())
                 // TODO owner model??
                 instance.content_item.owner = user.details
                 return instance
@@ -155,7 +152,7 @@ export default {
             else if (this.actions.create) {
                 this.createDiscussion().then(data => this.$nextTick(() => {
                     if (!this.parentId) {
-                        router.replace('/discussion/' + data.id + '/details')
+                        router.replace('../discussion/' + data.id + '/details')
                     }
                 }))
             }
