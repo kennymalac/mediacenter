@@ -35,7 +35,7 @@
 
 <script>
 import RestfulComponent from "../RestfulComponent"
-import {activeUser, discussions, accounts, stashes, profiles, feedContentTypes} from "../../store.js"
+import {activeUser, discussions, accounts, groups, stashes, profiles, feedContentTypes} from "../../store.js"
 import {DiscussionModel} from "../../models/Discussion.js"
 import Post from './Post'
 
@@ -85,8 +85,8 @@ export default {
         },
 
         async dependencies() {
-            const [owner, stashCollection, contentTypeCollection, profileCollection] = await Promise.all(
-                [accounts(), stashes(), feedContentTypes(), profiles()]
+            const [owner, stashCollection, contentTypeCollection, profileCollection, groupCollection] = await Promise.all(
+                [accounts(), stashes(), feedContentTypes(), profiles(), groups()]
             )
             const stash = await stashCollection.getInstance(this.stashId)
 
@@ -95,7 +95,9 @@ export default {
                 content_item: stash.collections.content,
                 content_type: contentTypeCollection,
                 content_types: contentTypeCollection,
-                profile: profileCollection
+                profile: profileCollection,
+                groups: groupCollection,
+                friends: owner
             }
         },
 
