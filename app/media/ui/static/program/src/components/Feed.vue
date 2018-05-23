@@ -58,7 +58,7 @@
 <script>
 import RestfulComponent from "./RestfulComponent"
 import {FeedModel} from "../models/Feed.js"
-import {feeds, interests, accounts, feedContentTypes} from '../store.js'
+import {feeds, stashes, interests, accounts, feedContentTypes} from '../store.js'
 
 import FeedItem from './FeedItem'
 import FeedContentItemList from './FeedContentItemList'
@@ -138,31 +138,39 @@ export default {
             this.instanceForm = { content_types: [], interests: [] }
         },
 
+        async dependencies() {
+            const [
+                interestCollection,
+                stashCollection,
+                contentTypeCollection,
+                accountCollection
+            ] = await Promise.all([stashes(), interests(), feedContentTypes(), accounts()])
+
+            return {
+                interests: interestCollection,
+                stashes: stashCollection,
+                content_types: contentTypeCollection,
+                owner: accountCollection
+            }
+        },
+
         create() {
         },
 
         async manage(params) {
-            this.instance = await this.showInstance(params.id, 'feed/list', feeds)
+            this.instance = await this.showInstance(params.id, 'feed/list', feeds, await this.dependencies())
             this.instanceForm = this.instance.getForm()
         },
 
         async list(params) {
             const store = await feeds()
-            this.objects = store.values
+            this.objects = store.values.filter((feed) => {
+                return feed.name !== ''
+            })
         },
 
         async details(params) {
-            const [
-                interestsCollection,
-                contentTypeCollection,
-                accountCollection
-            ] = await Promise.all([interests(), feedContentTypes(), accounts()])
-
-            this.instance = await this.showInstance(params.id, 'feed/list', feeds, {
-                interests: interestsCollection,
-                content_types: contentTypeCollection,
-                owner: accountCollection
-            })
+            this.instance = await this.showInstance(params.id, 'feed/list', feeds, await this.dependencies())
             try {
                 this.contentItems = await FeedModel.listItems(this.instance.id, {})
             }
@@ -176,18 +184,8 @@ export default {
         },
 
         async createFeed() {
-            const [
-                feedCollection,
-                interestsCollection,
-                contentTypeCollection,
-                accountCollection
-            ] = await Promise.all([feeds(), interests(), feedContentTypes(), accounts()])
-
-            return feedCollection.create(this.instanceForm, {
-                interests: interestsCollection,
-                content_types: contentTypeCollection,
-                owner: accountCollection
-            })
+            const feedCollection = await feeds()
+            return feedCollection.create(this.instanceForm, await this.dependencies())
                 .then((data) => {
                     console.log(data)
                     return data
@@ -195,17 +193,7 @@ export default {
         },
 
         async manageFeed() {
-            const [
-                interestsCollection,
-                contentTypeCollection,
-                accountCollection
-            ] = await Promise.all([interests(), feedContentTypes(), accounts()])
-
-            return FeedModel.manage(this.instance, this.instanceForm, {
-                interests: interestsCollection,
-                content_types: contentTypeCollection,
-                owner: accountCollection
-            })
+            return FeedModel.manage(this.instance, this.instanceForm, await this.dependencies())
                 .then((data) => {
                     this.instance = data
                     return data

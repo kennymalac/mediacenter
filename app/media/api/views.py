@@ -140,6 +140,10 @@ class FeedViewSet(NestedViewSetMixin,
         'create': FeedCreateUpdateSerializer
     }
 
+    def create(self, request):
+        request.data['owner'] = request.user.id
+        return super(FeedViewSet, self).create(request)
+
 
 class FeedContentItemViewSet(ListModelMixin,
                              RetrieveModelMixin,
