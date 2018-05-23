@@ -298,6 +298,12 @@ class FeedCreateUpdateSerializer(serializers.ModelSerializer):
         required=False
     )
 
+    stashes = serializers.PrimaryKeyRelatedField(
+        queryset=FeedContentStash.objects.all(),
+        many=True,
+        required=False
+    )
+
     class Meta:
         model = Feed
         fields = ('id', 'name', 'description', 'owner', 'content_types', 'interests', 'stashes')

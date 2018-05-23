@@ -172,9 +172,14 @@ export class Model {
                 continue
             }
 
-            if (field in this.constructor.fields && collections[field] !== undefined) {
-                // Initialize an array of model instances
-                this.resolveNestedModelField(field, collections)
+            if (field in this.constructor.fields) {
+                if (collections[field] !== undefined) {
+                    // Initialize an model instance(s)
+                    this.resolveNestedModelField(field, collections)
+                }
+                else if (!instance._isFake) {
+                    console.log(`WARNING: non-fake Model instance field ${field} is missing from collections!`)
+                }
             }
             // Convert the field if there is a conversion function specified for this field
             else if (field in this.constructor.fieldConverters) {

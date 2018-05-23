@@ -88,7 +88,7 @@
 import RestfulComponent from "../RestfulComponent"
 import {GroupModel} from '../../models/Group.js'
 // import {FeedModel} from '../../models/Feed.js'
-import {groups, feeds, stashes, accounts, interests, feedContentTypes, activeUser, filteredGroups} from '../../store.js'
+import {groups, feeds, stashes, accounts, profiles, interests, feedContentTypes, activeUser, filteredGroups} from '../../store.js'
 
 import AccountSelect from '../AccountSelect'
 import InterestSelect from '../InterestSelect'
@@ -156,12 +156,12 @@ export default {
         },
 
         async dependencies() {
-            const [members, feed, stashCollection, interestCollection, contentTypes] = await Promise.all(
-                [accounts(), feeds(), stashes(), interests(), feedContentTypes()]
+            const [members, feed, profile, stashCollection, interestCollection, contentTypes] = await Promise.all(
+                [accounts(), feeds(), profiles(), stashes(), interests(), feedContentTypes()]
             )
 
             return {
-                members, feed, stashes: stashCollection, interests: interestCollection, content_types: contentTypes, owner: members, friends: members
+                members, feed, profile, stashes: stashCollection, interests: interestCollection, content_types: contentTypes, owner: members, friends: members
             }
         },
 
@@ -169,9 +169,21 @@ export default {
             this.instanceForm = GroupModel.getNewInstance()
             this.instanceForm.feed = { interests: [], content_types: [] }
 
-            const owner = await activeUser()
-            this.instanceForm.owner = owner.details.id
-            this.instanceForm.feed.owner = this.instanceForm.owner
+            const [owner, members, profile, groupCollection] = await Promise.all(
+                [activeUser(), accounts(), profiles(), groups()]
+            )
+            const ownerAccount = members.getInstance(owner.details.id, {
+                groups: groupCollection,
+                members,
+                profile
+            })
+            this.instanceForm.owner = ownerAccount
+            this.instanceForm.feed.owner = ownerAccount
+            if (!this.instanceForm.members.find((member) => {
+                return member.id === ownerAccount.id
+            })) {
+                this.instanceForm.members.push(ownerAccount)
+            }
         },
 
         async manage(params) {
@@ -216,9 +228,12 @@ export default {
                 })
         },
 
-        createGroup() {
-            return this.$store.groups.create(this.instanceForm)
+        async createGroup() {
+            const user = await activeUser()
+
+            return this.$store.groups.create(this.instanceForm, await this.dependencies())
                 .then((data) => {
+                    user.details.groupforum_set.push(data.id)
                     return data
                 })
                 .catch((error) => {

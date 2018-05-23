@@ -98,7 +98,8 @@ class GroupCollection extends Collection {
             body: {
                 ...form,
                 members: serializeIds(form.members),
-                feed: {...form.feed, interests: serializeIds(form.feed.interests)}
+                owner: form.owner.id,
+                feed: {...form.feed, owner: form.feed.id, interests: serializeIds(form.feed.interests)}
             }
         })
             .then(jsonResponse)

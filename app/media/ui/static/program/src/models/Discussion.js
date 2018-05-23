@@ -59,7 +59,7 @@ class DiscussionCollection extends Collection {
         const created = await makeJsonRequest("discussion/", {
             method: "POST",
             body: {
-                ...data
+                ...data, owner: data.owner.id, feed: {...data.feed, owner: data.feed.owner.id}
             }
         })
               .then(jsonResponse)
