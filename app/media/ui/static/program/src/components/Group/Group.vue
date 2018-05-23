@@ -169,13 +169,14 @@ export default {
             this.instanceForm = GroupModel.getNewInstance()
             this.instanceForm.feed = { interests: [], content_types: [] }
 
-            const [owner, members, profile, groupCollection] = await Promise.all(
-                [activeUser(), accounts(), profiles(), groups()]
+            const [owner, members, profile, interestCollection, groupCollection] = await Promise.all(
+                [activeUser(), accounts(), profiles(), interests(), groups()]
             )
             const ownerAccount = members.getInstance(owner.details.id, {
                 groups: groupCollection,
                 members,
-                profile
+                profile,
+                interests: interestCollection
             })
             this.instanceForm.owner = ownerAccount
             this.instanceForm.feed.owner = ownerAccount
@@ -189,7 +190,6 @@ export default {
         async manage(params) {
             this.instance = await this.showInstance(params.id, `/group/${params.id}/details`, groups, await this.dependencies())
             this.instanceForm = this.instance.getForm()
-            this.instanceForm.feed.owner = this.instanceForm.owner
         },
 
         async list(params) {

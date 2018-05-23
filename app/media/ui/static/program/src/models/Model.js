@@ -163,7 +163,7 @@ export class Model {
     static fieldConverters = {}
 
     constructor(instance, collections = {}) {
-        this.instance = instance
+        this.instance = {...this.constructor.initialState, ...instance}
 
         for (const field of Object.keys(this.constructor.initialState)) {
             // No empty members!

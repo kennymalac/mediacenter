@@ -35,7 +35,7 @@
 
 <script>
 import RestfulComponent from "../RestfulComponent"
-import {activeUser, discussions, accounts, groups, stashes, profiles, feedContentTypes} from "../../store.js"
+import {activeUser, discussions, accounts, groups, interests, stashes, profiles, feedContentTypes} from "../../store.js"
 import {DiscussionModel} from "../../models/Discussion.js"
 import Post from './Post'
 
@@ -78,14 +78,15 @@ export default {
         },
 
         async create() {
+            await discussions()
             if (this.parentTitle) {
                 this.instanceForm.content_item.title = `Re: ${this.parentTitle}`
             }
         },
 
         async dependencies() {
-            const [owner, stashCollection, contentTypeCollection, profileCollection, groupCollection] = await Promise.all(
-                [accounts(), stashes(), feedContentTypes(), profiles(), groups()]
+            const [owner, stashCollection, contentTypeCollection, profileCollection, interestCollection, groupCollection] = await Promise.all(
+                [accounts(), stashes(), feedContentTypes(), profiles(), interests(), groups()]
             )
             const stash = await stashCollection.getInstance(this.stashId)
 
@@ -96,7 +97,8 @@ export default {
                 content_types: contentTypeCollection,
                 profile: profileCollection,
                 groups: groupCollection,
-                friends: owner
+                friends: owner,
+                interests: interestCollection
             }
         },
 
@@ -119,13 +121,14 @@ export default {
         },
 
         async createDiscussion() {
-            const [owner, members, profile, groupCollection] = await Promise.all(
-                [activeUser(), accounts(), profiles(), groups()]
+            const [owner, members, profile, interestCollection, groupCollection] = await Promise.all(
+                [activeUser(), accounts(), profiles(), interests(), groups()]
             )
             const ownerAccount = members.getInstance(owner.details.id, {
                 groups: groupCollection,
                 members,
-                profile
+                profile,
+                interests: interestCollection
             })
 
             this.instanceForm.content_item.owner = ownerAccount

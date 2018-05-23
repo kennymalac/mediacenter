@@ -35,12 +35,14 @@ class GroupModel extends Model {
     static fields = {
         // fields only works for lists, not a single item
         members: [AccountCollection],
-        feed: FeedCollection
+        feed: FeedCollection,
+        owner: [AccountCollection]
     }
 
     static initialState = {
         id: 0,
         feed: {},
+        owner: {},
         name: "",
         description: "",
         rules: [],
