@@ -60,9 +60,9 @@ export default {
 }
 
 .topic {
-    quote {
-        font-style: oblique;
+    blockquote {
         overflow: hidden;
+        max-height: 50%;
     }
 }
 </style>

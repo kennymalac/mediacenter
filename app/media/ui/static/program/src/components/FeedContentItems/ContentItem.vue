@@ -48,7 +48,7 @@ export default {
 
 <style lang="scss">
 $actions-height: 54px;
-$title-height: 24px;
+$title-height: 48px;
 
 .content-item {
     display: inline-flex;
@@ -61,6 +61,7 @@ $title-height: 24px;
     .content-title {
         height: $title-height;
         font-size: 1.5rem;
+        line-height: 1.5rem;
         font-weight: lighter;
         width: 100%;
         color: rgb(52, 73, 94);

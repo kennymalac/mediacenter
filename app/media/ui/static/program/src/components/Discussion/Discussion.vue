@@ -96,7 +96,7 @@ export default {
                 content_type: contentTypeCollection,
                 content_types: contentTypeCollection,
                 profile: profileCollection,
-                groups: groupCollection,
+                member_groups: groupCollection,
                 friends: owner,
                 interests: interestCollection
             }

@@ -6,10 +6,10 @@
                     <img v-if="content_item.owner.profile.picture" :src="content_item.owner.profile.picture" />
                     <i v-if="!content_item.owner.profile.picture" class="ion-md-person"></i>
                 </div>
-                
+
                 <div class="author-details">
                     <span class="display-name">{{ content_item.owner.profile.display_name }}</span>
-                    <span class="post-count">Posts: 300</span>
+                    <span class="user-title">Sr. Poster</span>
                 </div>
             </div>
             <div class="post-details">
@@ -44,25 +44,26 @@ export default {
 
 <style lang="scss">
 .post {
-    min-width: 600px;
+    width: 90%;
     margin: 10px 0;
     background: linear-gradient(135deg, white, rgb(236, 240, 241));
     border: 1px solid black;
     text-align: left;
     .date {
-        color: grey;
+        opacity: .5;
+        font-size: .8rem;
     }
-    
+
     .post-header {
         padding: 5px 10px;
         display: flex;
         flex-direction: row;
-        
+
         .author {
             justify-content: center;
             display: flex;
-            width: 45%;
-            
+            width: 240px;
+
             &:hover, &:focus {
                 .icon-container {
                     box-shadow: 1px 1px 20px 0px rgba(255, 255, 255, 0.25);
@@ -95,29 +96,43 @@ export default {
                     width: 100%;
                 }
                 i {
-                    font-size: 2.25em;
+                    font-size: 2.25rem;
                 }
                 border-radius: 50%;
                 background-color: white;
             }
             .author-details {
-                padding-left: 10px;
-                min-width: 200px;
+                padding-top: 3px;
+                padding-left: 8px;
+                min-width: 160px;
                 display: flex;
                 align-items: left;
                 flex-direction: column;
+                font-size: 0.8em;
+                span.display-name {
+                    font-weight: 300;
+                    font-size: 1.3rem;
+                }
+                span.user-title {
+                    opacity: .75;
+                }
             }
         }
         .post-details {
             display: flex;
             align-items: left;
             flex-direction: column;
+            .title {
+                font-weight: 300;
+                font-size: 1.45rem;
+            }
         }
         color: white;
         background: linear-gradient(180deg, #001f3f, rgba(52, 73, 94,1.0));
     }
     p.text {
         padding: 10px 20px;
+        font-size: 1rem;
     }
     .actions {
         text-align: right;

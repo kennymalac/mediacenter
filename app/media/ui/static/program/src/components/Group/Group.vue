@@ -161,7 +161,7 @@ export default {
             )
 
             return {
-                members, feed, profile, stashes: stashCollection, interests: interestCollection, content_types: contentTypes, owner: members, friends: members, member_groups: groupCollection
+                members, feed, profile, stashes: stashCollection, interests: interestCollection, content_types: contentTypes, owner: members, friends: members, member_groups: groupCollection, account: accounts
             }
         },
 
