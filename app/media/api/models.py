@@ -222,7 +222,7 @@ class GroupForum(models.Model):
     # TODO fixed set of content_items ?
     image = models.URLField(blank=True)
     is_restricted = models.BooleanField(default=False)
-    members = models.ManyToManyField(Account)
+    members = models.ManyToManyField(Account, 'member_groups')
 
 
 class Media(models.Model):

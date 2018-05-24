@@ -21,24 +21,13 @@ export function manageNested(instance, parentId, serializedData, collections = {
     return manageResource(`${instance.constructor.parentResource}/${parentId}/${instance.constructor.resource}/${instance.id}/`, instance, serializedData, collections)
 }
 
-async function getResource(uri, collection, instance = null, collections = {}, children) {
-    return await fetchAPI(`${uri}`, {
+async function getResource(uri, collection, instance = null, collections = {}, children = []) {
+    const item = await fetchAPI(`${uri}`, {
         method: "GET"
     })
         .then(jsonResponse)
 
-        .then((data) => {
-            const _instance = instance === null
-                  ? collection.getInstance(data, collections)
-                  : instance
-
-            _instance.sync(data, collections)
-            return _instance
-        })
-        .catch((error) => {
-            // TODO better error handling
-            console.log(error)
-        })
+    return await resolveInstance(collection, item, instance, collections, children)
 }
 
 export async function get(collection, id, instance = null, collections = {}, children = []) {
@@ -48,6 +37,24 @@ export async function get(collection, id, instance = null, collections = {}, chi
 export async function getNested(collection, id, parentId, instance = null, collections = {}, children = []) {
     console.log('depito')
     return getResource(`${collection.constructor.parentResource}/${parentId}/${collection.constructor.resource}/${id}/`, collection, instance, collections, children)
+}
+
+export async function resolveInstance(collection, item, _instance = null, collections = {}, children = []) {
+    const resolutions = []
+    const instance = _instance === null
+          ? collection.getInstance(item, collections)
+          : _instance
+
+    instance.sync(item, collections)
+
+    for (const [modelField, getter] of children) {
+        resolutions.push(instance.resolveChildren(
+            modelField, (id, instance) => getter(id, collections, instance)
+        ))
+    }
+
+    await resolve(resolutions)
+    return instance
 }
 
 export async function resolveInstances(collection, items, collections = {}, children = []) {

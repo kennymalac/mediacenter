@@ -122,7 +122,8 @@
 **** DONE basic UI
      CLOSED: [2018-05-08 Tue 16:56]
 **** TODO cross-network profiles
-**** TODO get list of Group tags working
+**** DONE get list of Group tags working
+     CLOSED: [2018-05-24 Thu 14:38]
 **** DONE model, serializer, viewset
      CLOSED: [2018-05-11 Fri 13:05]
 **** TODO CRUD
@@ -212,6 +213,17 @@
 **** TODO activity Summary
 **** TODO 
 
+*** FeedContentStash
+**** DONE model, serializer, viewset
+     CLOSED: [2018-05-23 Wed 17:29]
+**** TODO stash privacy
+**** TODO CRUD
+***** TODO Create
+***** TODO Read
+***** TODO Update
+***** TODO Delete
+
+
 *** Feed
 **** Feeds have a certain quota - maximum of 100 content items per feed?
 content items are recycled?
@@ -225,6 +237,9 @@ Your feed has "content decay"
 **** DONE remove "content" manytomany - feed content should be dynamic
      CLOSED: [2018-05-23 Wed 09:53]
 **** TODO automatically create Feed for each content type
+**** TODO Feed privacy
+**** DONE only show Feeds that user is owner of
+     CLOSED: [2018-05-23 Wed 17:29]
 **** TODO CRUD
 ***** DONE Create
       CLOSED: [2018-05-02 Wed 20:34]
@@ -248,6 +263,9 @@ Your feed has "content decay"
 *** Model/Collection
     don't make too many assumptions
 **** TODO dependency trees
+**** TODO fields should not reference Collection classes. 
+Collections are undefined for circular import situations.
+Use TypeScript or something instead
 **** TODO how to handle if Collection this.collections references a 
 collection that references that same collection?
 **** TODO separate sync procedure from model instances?

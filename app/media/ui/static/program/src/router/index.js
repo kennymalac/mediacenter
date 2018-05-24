@@ -72,7 +72,14 @@ export default new Router({
             name: 'Feed',
             component: Feed,
             props: restAction,
-            canReuse: false
+            canReuse: false,
+            children: [
+                {
+                    path: 'stash/:stashId/:stashAction',
+                    component: FeedContentStash,
+                    props: restAction
+                }
+            ]
         },
         {
             path: '/login',

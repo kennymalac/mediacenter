@@ -12,15 +12,27 @@ from api.models import *
 class BasicProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ('id', 'display_name', 'picture')
+        fields = ('id', 'display_name', 'picture', 'account')
+
+
+class GroupForumBasicSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GroupForum
+        fields = ('id', 'name', 'image')
 
 
 class AccountSerializer(CountryFieldMixin, serializers.ModelSerializer):
     profile = BasicProfileSerializer()
 
+    member_groups = GroupForumBasicSerializer(
+        many=True,
+        read_only=True
+    )
+
     class Meta:
         model = Account
-        fields = ('id', 'username', 'country', 'email', 'profile', 'friends')
+        fields = ('id', 'username', 'country', 'email', 'profile', 'friends', 'member_groups')
 
 
 class FullAccountSerializer(AccountSerializer):
@@ -53,7 +65,7 @@ class PrivateAccountProfileDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ('id', 'account_settings', 'profile', 'groupforum_set')
+        fields = ('id', 'account_settings', 'profile', 'member_groups')
 
 
 class LogSerializer(serializers.Serializer):
@@ -277,13 +289,13 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'display_name', 'picture', 'title', 'description', 'interests')
+        fields = ('id', 'display_name', 'account', 'picture', 'title', 'description', 'interests')
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ('id', 'display_name', 'picture', 'title', 'description', 'interests')
+        fields = ('id', 'display_name', 'account', 'picture', 'title', 'description', 'interests')
 
 
 class FeedCreateUpdateSerializer(serializers.ModelSerializer):

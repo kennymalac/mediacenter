@@ -125,7 +125,7 @@ class FeedCollection extends Collection {
     }
 
     async list(params, collections) {
-        return await paginatedList(this, 0, collections, [
+        return await paginatedList(this, params, collections, [
             ['owner', collections.accounts.get.bind(collections.accounts)],
             ['interests', collections.interests.get.bind(collections.interests)],
             ['stashes', collections.stashes.get.bind(collections.stashes)]

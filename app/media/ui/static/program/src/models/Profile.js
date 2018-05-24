@@ -1,6 +1,7 @@
 import {Model, Collection, serializeIds} from './Model.js'
 import {resolveInstances, paginatedList, get, manage} from './generics.js'
 import {InterestCollection} from './Interest.js'
+import {AccountCollection} from './Account.js'
 import {fetchAPI, jsonResponse} from '../httputil.js'
 
 class ProfileModel extends Model {
@@ -11,36 +12,40 @@ class ProfileModel extends Model {
         title: "",
         description: "",
         picture: "",
-        interests: []
+        interests: [],
+        account: {}
     }
 
     static resource = 'profile'
 
     static fields = {
-        interests: [InterestCollection]
+        interests: [InterestCollection],
+        account: AccountCollection
     }
 
     static async manage(instance, form, collections) {
         return await manage(instance, {
             ...form,
-            interests: serializeIds(form.interests)
+            interests: serializeIds(form.interests),
+            account: form.account.id
         }, collections)
     }
 }
 
-export async function makeFilteredProfileCollection(queryset, interests) {
-    let results = await Promise.all([
-        interests(),
+export async function makeFilteredProfileCollection(queryset, _interests, _accounts) {
+    let [interests, accounts, values] = await Promise.all([
+        _interests(),
+        _accounts(),
         queryset()
     ])
 
     const collection = new ProfileCollection([])
     await resolveInstances(
         collection,
-        results[1],
-        {interests: results[0]},
+        values,
+        {account: accounts, interests, friends: accounts},
         [
-            ['interests', results[0].get]
+            ['interests', interests.get.bind(interests)]
         ]
     )
 
@@ -57,9 +62,7 @@ class ProfileCollection extends Collection {
     static resource = 'profile'
 
     async get(id, collections, instance = null) {
-        return await get(this, id, instance, collections, [
-            ['interests', collections.interests.get]
-        ])
+        return await get(this, id, instance, collections)
     }
 
     async list(params, collections) {

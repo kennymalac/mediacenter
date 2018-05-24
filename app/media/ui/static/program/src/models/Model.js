@@ -33,6 +33,11 @@ export class Collection {
         })
 
         this.values = new Proxy(this.store, {})
+        this.values.all = (filter = () => true) => {
+            return this.values.filter((value) => {
+                return !value.instance._isFake && filter(value)
+            })
+        }
     }
 
     getInstance(item, collections, isPrimaryKey) {
@@ -163,12 +168,18 @@ export class Model {
     static fieldConverters = {}
 
     constructor(instance, collections = {}) {
-        this.instance = {...this.constructor.initialState, ...instance}
+        this.instance = {...instance}
 
         for (const field of Object.keys(this.constructor.initialState)) {
             // No empty members!
             if (this.instance[field] === null || this.instance[field] === undefined) {
-                delete this.instance[field]
+                // This is a partial instance
+                if (Array.isArray(this.constructor.initialState[field])) {
+                    this[field] = []
+                }
+                else if (field in this.constructor.fields) {
+                    this[field] = { id: 0, instance: { _isFake: true } }
+                }
                 continue
             }
 
@@ -196,6 +207,11 @@ export class Model {
                 set: (val) => { this.instance[field] = val }
             })
         }
+    }
+
+    static isInstance(instance) {
+        console.log(instance, this.constructor)
+        return instance instanceof this.constructor
     }
 
     resolveNestedModelField(field, collections = {}) {
@@ -355,7 +371,7 @@ export class Model {
         return []
     }
 
-    getForm() {
+    getForm(parent = null) {
         const form = {}
         // Deep copy
         for (const field of Object.keys(this.constructor.initialState)) {
@@ -366,10 +382,20 @@ export class Model {
 
             // Get the model's serialized form
             // NOTE: we retain arrays as list of Model instances for now
+            if (field in this.constructor.fields && !Array.isArray(this[field])) {
+                // Skip for recursive relations
+                if (parent !== null && this[field].id === parent.id && parent.typeCheck(this[field])) {
+                    continue
+                }
+                // Make sure recursive relations aren't resolved deeply
+                form[field] = this[field].getForm({
+                    id: this.instance.id, typeCheck: this.constructor.isInstance
+                })
+            }
 
-            form[field] = this[field] instanceof Model
-                ? this[field].getForm()
-                : form[field] = this[field]
+            else {
+                form[field] = this[field]
+            }
         }
         return form
     }

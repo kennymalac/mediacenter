@@ -98,7 +98,8 @@ export const interestedUsers = (interestId) => {
                 () => ProfileCollection.searchProfiles({
                     interests: [interestId]
                 }),
-                interests
+                interests,
+                accounts
             )
         }
     )
@@ -116,7 +117,17 @@ export const feeds = () => {
     return singleton(
         'feeds',
         (value) => value instanceof FeedCollection,
-        () => makeFilteredFeedCollection(FeedCollection.all, feedContentTypes, stashes, interests, accounts)
+        () => {
+            return activeUser().then((user) => {
+                return makeFilteredFeedCollection(
+                    () => FeedCollection.all({ owner: user.details.id }),
+                    feedContentTypes,
+                    stashes,
+                    interests,
+                    accounts
+                )
+            })
+        }
     )
 }
 

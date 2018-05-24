@@ -4,7 +4,7 @@
             <h1>User list</h1>
             <profile-list :items="objects" />
         </template>
-        
+
         <template v-if="actions.details && instance.id">
             <section class="sidebar">
                 <div class="group-info">
@@ -22,21 +22,21 @@
             <section class="main-profile">
                 <h2>{{ instance.title }}</h2>
                 <p class="description">{{ instance.description }}</p>
-                
+
                 <div class="category">
                     <span>Interests:</span>
                     <tag-list :tags="instance.interests" tagType="interest" />
                 </div>
                 <div class="category">
                     <span>Groups:</span>
-                    <tag-list :tags="groups" tagType="group" />
+                    <tag-list :tags="instance.account.member_groups" tagType="group" />
                 </div>
             </section>
             <!-- <section class="comments"> -->
             <!--     Comments go here... -->
             <!-- </section> -->
         </template>
-        
+
         <template v-if="actions.manage && instance.id">
             <form class="main-form" @submit.prevent="save">
                 <fieldset>
@@ -47,13 +47,13 @@
                     <input class="stack" name="title" v-model="instanceForm.title" type="text" />
                     <label class="stack" for="description">Description</label>
                     <textarea class="stack" name="description" v-model="instanceForm.description" />
-                    <label class="stack" for="profile_picture">Profile picture</label>
-                    <input class="stack" name="profile_picture" v-model="instanceForm.profile_picture" type="text" />
+                    <label class="stack" for="picture">Profile picture</label>
+                    <input class="stack" name="picture" v-model="instanceForm.picture" type="text" />
                     <!-- <label class="stack" for="rules">Rules</label>
                          TODO rules -->
                     <label class="stack" for="interests">Interests</label>
                     <interest-select v-model="instanceForm.interests" />
-                    
+
                     <!-- <label class="stack" for="">Tags</label> -->
                     <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->
                     <input class="stack" type="submit" value="Save changes" />
@@ -70,7 +70,7 @@ import InterestSelect from '../InterestSelect'
 import TagList from '../TagList'
 
 import {ProfileModel} from '../../models/Profile.js'
-import {profiles, activeUser, interests} from '../../store.js'
+import {profiles, accounts, groups, activeUser, interests} from '../../store.js'
 
 // import {AccountCollection} from '../models/Account.js'
 // import {auth} from "../../auth.js"
@@ -107,21 +107,36 @@ export default {
             this.instanceForm = { interests: [] }
         },
 
+        async dependencies() {
+            const [interestCollection, account, groupCollection] = await Promise.all(
+                [interests(), accounts(), groups()]
+            )
+
+            return {
+                interests: interestCollection,
+                account,
+                member_groups: groupCollection
+            }
+        },
+
         async list(params) {
-            const interestsCollection = await interests()
             const profilesCollection = await profiles()
             this.objects = await profilesCollection.list(
                 {page: this.page},
-                { interests: interestsCollection }
+                await this.dependencies()
             )
         },
 
         async details(params) {
             this.isActiveUser = false
-            const interestsCollection = await interests()
-            this.instance = await this.showInstance(params.id, '/profile/list', profiles, {
-                interests: interestsCollection
-            })
+            const deps = await this.dependencies()
+            this.instance = await this.showInstance(params.id, '/profile/list', profiles, deps)
+
+            // check if certain profile information is missing
+            if (!this.instance.title) {
+                const profilesCollection = await profiles()
+                await profilesCollection.get(this.instance.id, deps, this.instance)
+            }
             const user = await activeUser()
             this.isActiveUser = this.instance.id === user.details.profile.id
         },
@@ -131,10 +146,7 @@ export default {
                 return
             }
 
-            const interestsCollection = await interests()
-            this.instance = await this.showInstance(params.id, '/profile/list', profiles, {
-                interests: interestsCollection
-            })
+            this.instance = await this.showInstance(params.id, '/profile/list', profiles, await this.dependencies())
             this.instanceForm = this.instance.getForm()
         },
 
@@ -143,11 +155,8 @@ export default {
         },
 
         async manageProfile() {
-            const interestsCollection = await interests()
             try {
-                return await ProfileModel.manage(this.instance, this.instanceForm, {
-                    interests: interestsCollection
-                })
+                return await ProfileModel.manage(this.instance, this.instanceForm, await this.dependencies())
             }
             catch (error) {
                 console.log(error)

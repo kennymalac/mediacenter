@@ -12,13 +12,13 @@ class AccountModel extends Model {
         email: "",
         country: "",
         account_settings: {},
-        groups: [],
+        member_groups: [],
         friends: [],
         profile: {}
     }
 
     static fields = {
-        groups: [GroupCollection],
+        member_groups: [GroupCollection],
         friends: [AccountCollection],
         profile: ProfileCollection
     }

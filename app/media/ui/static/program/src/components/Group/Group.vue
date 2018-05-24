@@ -37,7 +37,7 @@
                 <section class="feed" v-if="!params.discussionAction">
                     <action-button v-bind="createPostAction" />
                 </section>
-                <router-view :feedId="instance.feed.id"></router-view>
+                <router-view v-if="instance.feed.id" :feedId="instance.feed.id"></router-view>
             </div>
         </template>
         <template v-if="actions.create || actions.manage">
@@ -156,12 +156,12 @@ export default {
         },
 
         async dependencies() {
-            const [members, feed, profile, stashCollection, interestCollection, contentTypes] = await Promise.all(
-                [accounts(), feeds(), profiles(), stashes(), interests(), feedContentTypes()]
+            const [groupCollection, members, feed, profile, stashCollection, interestCollection, contentTypes] = await Promise.all(
+                [groups(), accounts(), feeds(), profiles(), stashes(), interests(), feedContentTypes()]
             )
 
             return {
-                members, feed, profile, stashes: stashCollection, interests: interestCollection, content_types: contentTypes, owner: members, friends: members
+                members, feed, profile, stashes: stashCollection, interests: interestCollection, content_types: contentTypes, owner: members, friends: members, member_groups: groupCollection
             }
         },
 
@@ -194,14 +194,25 @@ export default {
 
         async list(params) {
             const groupsCollection = await groups()
-            this.objects = groupsCollection.values
+            const user = await activeUser()
+
+            this.objects = groupsCollection.values.all((group) => {
+                return user.details.member_groups.includes(group.id)
+            })
         },
 
         async details(params) {
             const user = await activeUser()
-            this.isActiveUserMember = user.details.groupforum_set.includes(parseInt(params.id))
+            this.isActiveUserMember = user.details.member_groups.includes(parseInt(params.id))
 
-            this.instance = await this.showInstance(params.id, '/group/list', groups, await this.dependencies())
+            const deps = await this.dependencies()
+
+            this.instance = await this.showInstance(params.id, '/group/list', groups, deps)
+            if (this.instance.feed.instance._isFake) {
+                console.log('test')
+                const groupCollection = await groups()
+                await groupCollection.get(this.instance.id, deps, this.instance)
+            }
         },
 
         async searchGroups() {
@@ -233,7 +244,7 @@ export default {
 
             return this.$store.groups.create(this.instanceForm, await this.dependencies())
                 .then((data) => {
-                    user.details.groupforum_set.push(data.id)
+                    user.details.member_groups.push(data.id)
                     return data
                 })
                 .catch((error) => {
@@ -249,7 +260,7 @@ export default {
             })
             GroupModel.join(this.instance, newMember)
                 .then(() => {
-                    user.details.groupforum_set.push(this.instance.id)
+                    user.details.member_groups.push(this.instance.id)
                     this.isActiveUserMember = true
                 })
         },
@@ -262,7 +273,7 @@ export default {
             })
             GroupModel.leave(this.instance, newMember)
                 .then(() => {
-                    user.details.groupforum_set = user.details.groupforum_set.filter((groupId) => {
+                    user.details.member_groups = user.details.member_groups.filter((groupId) => {
                         return this.instance.id !== groupId
                     })
                     this.isActiveUserMember = false

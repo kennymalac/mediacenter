@@ -19,7 +19,7 @@ export async function makeFilteredGroupCollection(queryset, _feeds, _stashes, _a
     await resolveInstances(
         collection,
         values,
-        { members, feed, stashes, profile, interests, content_types: contentTypes, owner: members, friends: members },
+        { members, account: members, feed, stashes, profile, interests, content_types: contentTypes, owner: members, friends: members, member_groups: collection },
         [
             ['members', members.get.bind(members)]
         ]
