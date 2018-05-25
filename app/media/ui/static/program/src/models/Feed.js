@@ -59,6 +59,7 @@ class FeedModel extends Model {
     static manage(instance, form, collections) {
         return manage(instance, {
             ...form,
+            owner: form.owner.id,
             content_types: serializeIds(form.content_types),
             interests: serializeIds(form.interests)
         }, collections)
@@ -72,8 +73,8 @@ class FeedModel extends Model {
         })
     }
 
-    static listItems(feedId, params) {
-        console.log(params)
+    static listItems(feedId, params, collections) {
+        console.log(params, collections)
         return makeJsonRequest(`content/search/`, {
             method: "POST",
             body: {feed: feedId}
@@ -82,7 +83,7 @@ class FeedModel extends Model {
 
             .then((data) => {
                 // Returns a list of ContentItem model instances
-                return data.results.map((input) => modelInstance(FeedContentItemModel, input))
+                return data.results.map((input) => modelInstance(FeedContentItemModel, input, collections))
             })
     }
 }

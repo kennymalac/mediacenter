@@ -388,9 +388,11 @@ export class Model {
                     continue
                 }
                 // Make sure recursive relations aren't resolved deeply
-                form[field] = this[field].getForm({
-                    id: this.instance.id, typeCheck: this.constructor.isInstance
-                })
+                if (this[field] instanceof Model) {
+                    form[field] = this[field].getForm({
+                        id: this.instance.id, typeCheck: this.constructor.isInstance
+                    })
+                }
             }
 
             else {

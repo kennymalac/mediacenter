@@ -98,6 +98,7 @@ export default {
                 profile: profileCollection,
                 member_groups: groupCollection,
                 friends: owner,
+                account: owner,
                 interests: interestCollection
             }
         },

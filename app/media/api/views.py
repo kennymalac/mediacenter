@@ -30,7 +30,7 @@ class MultipleSerializerMixin(object):
 #         self.access_level = ''
 
 #     def set_privilege(self, request):
-#         if request.user == 
+#         if request.user ==
 
 class AccountViewSet(MultipleSerializerMixin, ModelViewSet):
     """An API for viewing and editing accounts"""
@@ -163,9 +163,11 @@ class FeedContentItemViewSet(ListModelMixin,
         _feed_id = request.data.get('feed', None)
         if _feed_id:
             feed = get_object_or_404(Feed, pk=_feed_id)
-            print(feed.interests.all(), feed.content_types.all())
-            content_queryset = content_queryset.filter(content_type__in=feed.content_types.all(), interests__in=feed.interests.all())
-            print(content_queryset)
+
+            if feed.content_types.count() > 0:
+                content_queryset = content_queryset.filter(content_type__in=feed.content_types.all())
+            if feed.interests.count() > 0:
+                content_queryset = content_queryset.filter(interests__in=feed.interests.all())
 
         else:
             _content_types = request.data.get('content_types', None)
@@ -288,7 +290,7 @@ class AlbumViewSet(NestedViewSetMixin, MultipleSerializerMixin, ModelViewSet):
 
     serializer_classes = {
         'default': AlbumInfoSerializer,
-        # 'public': 
+        # 'public':
         'create': AlbumCreateSerializer
     }
 
@@ -319,4 +321,3 @@ class AlbumViewSet(NestedViewSetMixin, MultipleSerializerMixin, ModelViewSet):
     #     )
 
     #     return Response(serializer.data)
-

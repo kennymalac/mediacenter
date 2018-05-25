@@ -58,7 +58,7 @@
 <script>
 import RestfulComponent from "./RestfulComponent"
 import {FeedModel} from "../models/Feed.js"
-import {feeds, stashes, interests, accounts, feedContentTypes} from '../store.js'
+import {feeds, stashes, interests, profiles, accounts, feedContentTypes} from '../store.js'
 
 import FeedItem from './FeedItem'
 import FeedContentItemList from './FeedContentItemList'
@@ -143,14 +143,16 @@ export default {
                 interestCollection,
                 stashCollection,
                 contentTypeCollection,
-                accountCollection
-            ] = await Promise.all([stashes(), interests(), feedContentTypes(), accounts()])
+                accountCollection,
+                profile
+            ] = await Promise.all([interests(), stashes(), feedContentTypes(), accounts(), profiles()])
 
             return {
                 interests: interestCollection,
                 stashes: stashCollection,
                 content_types: contentTypeCollection,
-                owner: accountCollection
+                owner: accountCollection,
+                profile
             }
         },
 
@@ -170,9 +172,13 @@ export default {
         },
 
         async details(params) {
-            this.instance = await this.showInstance(params.id, 'feed/list', feeds, await this.dependencies())
+            const deps = await this.dependencies()
+            this.instance = await this.showInstance(params.id, 'feed/list', feeds, deps)
             try {
-                this.contentItems = await FeedModel.listItems(this.instance.id, {})
+                this.contentItems = await FeedModel.listItems(this.instance.id, {}, {
+                    content_type: deps.content_types,
+                    owner: deps.owner
+                })
             }
             catch (error) {
                 console.log(error)
