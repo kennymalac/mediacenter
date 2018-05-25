@@ -206,6 +206,13 @@ class Discussion(models.Model):
     order = models.IntegerField(default=0)
     text = models.TextField(blank=True)
 
+
+@receiver(pre_delete, sender=Discussion)
+def pre_delete_discussion(sender, **kwargs):
+    instance = kwargs.get('instance')
+    instance.content_item.delete()
+
+
 # class ContentShare(models.Model):
 #     pass
 

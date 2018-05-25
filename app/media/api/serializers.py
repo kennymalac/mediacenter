@@ -342,13 +342,14 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
         required=False
     )
     object_id = serializers.SerializerMethodField('get_content_id')
+    group_stash_ids = serializers.SerializerMethodField()
     # content_type = serializers.StringRelatedField(
     #     required=False
     # )
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'content_type', 'created', 'object_id')
+        fields = ('id', 'title', 'description', 'owner', 'content_type', 'created', 'object_id', 'group_stash_ids')
 
     def get_content_id(self, instance):
         _model = None
@@ -358,7 +359,17 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
         # elif instance.content_type == FeedContentItemType.IMAGE:
         #     _model =
 
-        return _model.objects.filter(content_item=instance).values_list('id', flat=True).first()
+        pk = _model.objects.filter(content_item=instance).values_list('id', flat=True).first()
+        return pk
+
+    def get_group_stash_ids(self, instance):
+        valid_stashes = FeedContentStash.objects.filter(content__in=(instance,), feeds__isnull=False)
+        if valid_stashes.count() > 0:
+            valid_feeds = Feed.objects.filter(stashes__in=valid_stashes, groupforum__isnull=False)
+
+            if valid_feeds.count() > 0:
+                feed = valid_feeds.first()
+                return [feed.groupforum_set.first().id, valid_stashes.get(feeds__in=(feed,)).id]
 
 
 class FeedContentItemCreateUpdateSerializer(FeedContentItemSerializer):

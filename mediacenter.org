@@ -145,7 +145,8 @@
 *** FeedContentItems
 **** DONE consider performance implication of backreference to Feeds
      CLOSED: [2018-05-09 Wed 10:59]
-**** TODO FeedContentItems outside of Feeds
+**** DONE FeedContentItems outside of Feeds
+     CLOSED: [2018-05-24 Thu 18:09]
 **** TODO sharing Feeds outside of just inside Groups?
 
 **** DONE show created date below item title
@@ -158,7 +159,9 @@
 ***** TODO Delete
 
 *** Groups
-**** TODO only members can create new Posts
+**** TODO only members can create new Posts, comment in Group Topic
+**** TODO Checkbox to share topic outside of group
+**** TODO Group owner can disable topics being shared outside of Group
 **** TODO make it so you can't add members to Group - only invite them
 **** TODO moderation system
 **** TODO what happens when owner of a group leaves?
@@ -233,7 +236,8 @@ Your feed has "content decay"
 
 **** DONE add InterestSelect
      CLOSED: [2018-05-12 Sat 17:55]
-**** TODO backend filtering
+**** DONE backend filtering
+     CLOSED: [2018-05-24 Thu 18:09]
 **** DONE remove "content" manytomany - feed content should be dynamic
      CLOSED: [2018-05-23 Wed 09:53]
 **** TODO automatically create Feed for each content type
@@ -245,7 +249,8 @@ Your feed has "content decay"
       CLOSED: [2018-05-02 Wed 20:34]
 ***** DONE Read
       CLOSED: [2018-05-02 Wed 20:34]
-***** TODO Update
+***** DONE Update
+      CLOSED: [2018-05-24 Thu 18:09]
 ***** TODO Delete
 
 **** DONE model, serializer, viewset

@@ -33,6 +33,10 @@ export default {
     },
     computed: {
         detailsUrl() {
+            if (this.item.group_stash_ids.length > 0) {
+                const [groupId, stashId] = this.item.group_stash_ids
+                return `/group/${groupId}/details/stash/${stashId}/details/discussion/${this.item.object_id}/details`
+            }
             return `details/discussion/${this.item.object_id}/details`
         }
     },
