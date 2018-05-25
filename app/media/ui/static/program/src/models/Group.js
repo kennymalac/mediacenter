@@ -54,7 +54,8 @@ class GroupModel extends Model {
         return await manage(instance, {
             ...form,
             members: serializeIds(form.members),
-            feed: {...form.feed, interests: serializeIds(form.feed.interests)}
+            owner: form.owner.id,
+            feed: {...form.feed, stashes: serializeIds(form.feed.stashes), interests: serializeIds(form.feed.interests)}
         }, collections)
     }
 

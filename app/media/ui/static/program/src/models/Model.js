@@ -210,7 +210,6 @@ export class Model {
     }
 
     static isInstance(instance) {
-        console.log(instance, this.constructor)
         return instance instanceof this.constructor
     }
 

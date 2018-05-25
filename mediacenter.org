@@ -35,6 +35,7 @@
 **** DONE closeModal
      CLOSED: [2018-04-30 Mon 18:43]
 *** Authentication
+**** TODO user permission system
 **** TODO log out should clear store
 **** TODO connect with other media centers in some sort of Auth bridge
 **** DONE getActiveUser
@@ -160,6 +161,7 @@
 
 *** Groups
 **** TODO only members can create new Posts, comment in Group Topic
+**** TODO Moderators
 **** TODO Checkbox to share topic outside of group
 **** TODO Group owner can disable topics being shared outside of Group
 **** TODO make it so you can't add members to Group - only invite them
@@ -188,7 +190,8 @@
       CLOSED: [2018-05-03 Thu 13:16]
 ***** DONE Read
       CLOSED: [2018-05-03 Thu 13:16]
-***** TODO Update
+***** DONE Update
+      CLOSED: [2018-05-24 Thu 18:41]
 ***** TODO Delete
 
 *** Discussion
@@ -208,7 +211,8 @@
       CLOSED: [2018-05-08 Tue 14:32]
 ***** DONE Read
       CLOSED: [2018-05-08 Tue 14:32]
-***** TODO Update
+***** DONE Update
+      CLOSED: [2018-05-24 Thu 18:18]
 ***** TODO Delete
 
 

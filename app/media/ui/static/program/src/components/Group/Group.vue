@@ -23,6 +23,9 @@
                         </ol>
                     </div>
 
+                    <button type="button" v-if="isActiveUserOwner" @click="editGroup">
+                        <i class="ion-md-create"></i> Edit
+                    </button>
                     <button type="button" v-if="!isActiveUserMember" @click="joinGroup">Join group</button>
                     <button type="button" v-if="isActiveUserMember" class="warning" @click="leaveGroup">Leave group</button>
 
@@ -124,6 +127,7 @@ export default {
             filteredInterests: [],
             filteredObjects: [],
             isActiveUserMember: false,
+            isActiveUserOwner: true,
             objectName: 'group',
             groupActions: [
                 {
@@ -192,6 +196,10 @@ export default {
             this.instanceForm = this.instance.getForm()
         },
 
+        editGroup() {
+            router.push(`/group/${this.instance.id}/manage`)
+        },
+
         async list(params) {
             const groupsCollection = await groups()
             const user = await activeUser()
@@ -208,8 +216,9 @@ export default {
             const deps = await this.dependencies()
 
             this.instance = await this.showInstance(params.id, '/group/list', groups, deps)
+            this.isActiveUserOwner = this.instance.owner.id === user.details.id
+
             if (this.instance.feed.instance._isFake) {
-                console.log('test')
                 const groupCollection = await groups()
                 await groupCollection.get(this.instance.id, deps, this.instance)
             }
@@ -227,12 +236,11 @@ export default {
 
         },
 
-        manageGroup() {
-            const {accounts, feeds, interests, feedContentTypes} = this.$store
+        async manageGroup() {
             return GroupModel.manage(
                 this.instance,
                 this.instanceForm,
-                { members: accounts, feed: feeds, interests, content_types: feedContentTypes, owner: accounts }
+                await this.dependencies()
             )
                 .catch((error) => {
                     console.log(error)

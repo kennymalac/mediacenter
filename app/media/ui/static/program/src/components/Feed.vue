@@ -18,6 +18,9 @@
                         <i v-if="instance.icon" :class="instance.icon"></i>
                     </div>
                     <h2>{{ instance.name }}</h2>
+                    <button type="button" v-if="isActiveUserOwner" @click="editFeed">
+                        <i class="ion-md-create"></i> Edit
+                    </button>
                     <p class="description">{{ instance.description }}</p>
 
                     <h3>Filters</h3>
@@ -58,7 +61,7 @@
 <script>
 import RestfulComponent from "./RestfulComponent"
 import {FeedModel} from "../models/Feed.js"
-import {feeds, stashes, interests, profiles, accounts, feedContentTypes} from '../store.js'
+import {feeds, stashes, interests, profiles, accounts, activeUser, feedContentTypes} from '../store.js'
 
 import FeedItem from './FeedItem'
 import FeedContentItemList from './FeedContentItemList'
@@ -89,6 +92,7 @@ export default {
     },
     data() {
         return {
+            isActiveUserOwner: false,
             instanceForm: { content_types: [] },
             instance: {
                 content_types: []
@@ -164,6 +168,10 @@ export default {
             this.instanceForm = this.instance.getForm()
         },
 
+        editFeed() {
+            router.push(`/feed/${this.instance.id}/manage`)
+        },
+
         async list(params) {
             const store = await feeds()
             this.objects = store.values.filter((feed) => {
@@ -172,8 +180,11 @@ export default {
         },
 
         async details(params) {
+            const user = await activeUser()
             const deps = await this.dependencies()
             this.instance = await this.showInstance(params.id, 'feed/list', feeds, deps)
+            this.isActiveUserOwner = this.instance.owner.id === user.details.id
+
             try {
                 this.contentItems = await FeedModel.listItems(this.instance.id, {}, {
                     content_type: deps.content_types,
@@ -213,6 +224,7 @@ export default {
             if (this.actions.manage) {
                 this.manageFeed().then((data) => {
                     console.log(data)
+                    router.push(`/feed/${this.instance.id}/details`)
                 })
             }
             else if (this.actions.create) {
