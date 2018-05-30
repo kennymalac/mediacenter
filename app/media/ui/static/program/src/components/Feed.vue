@@ -113,11 +113,11 @@ export default {
             filters: {
                 contentTypes: [
                     {
-                        name: "Images",
+                        name: "Image",
                         enabled: true
                     },
                     {
-                        name: "Hyperlinks",
+                        name: "Link",
                         enabled: true
                     },
                     {
@@ -125,7 +125,7 @@ export default {
                         enabled: true
                     },
                     {
-                        name: "Topics",
+                        name: "Topic",
                         enabled: true
                     }
                 ],

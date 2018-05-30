@@ -343,19 +343,22 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
     )
     object_id = serializers.SerializerMethodField('get_content_id')
     group_stash_ids = serializers.SerializerMethodField()
+    nested_object = serializers.SerializerMethodField()
     # content_type = serializers.StringRelatedField(
     #     required=False
     # )
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'content_type', 'created', 'object_id', 'group_stash_ids')
+        fields = ('id', 'title', 'description', 'owner', 'content_type', 'created', 'object_id', 'group_stash_ids', 'nested_object')
 
     def get_content_id(self, instance):
         _model = None
         if instance.content_type.name == FeedContentItemType.TOPIC or \
            instance.content_type.name == FeedContentItemType.POST:
             _model = Discussion
+        elif instance.content_type.name == FeedContentItemType.LINK:
+            _model = Link
         # elif instance.content_type == FeedContentItemType.IMAGE:
         #     _model =
 
@@ -370,6 +373,13 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
             if valid_feeds.count() > 0:
                 feed = valid_feeds.first()
                 return [feed.groupforum_set.first().id, valid_stashes.get(feeds__in=(feed,)).id]
+
+    def get_nested_object(self, instance):
+        """Returns a nested representation of the content item's object"""
+        if instance.content_type.name == FeedContentItemType.LINK:
+            content_id = self.get_content_id(instance)
+            if content_id:
+                return BasicLinkSerializer(instance=Link.objects.get(id=self.get_content_id(instance))).data
 
 
 class FeedContentItemCreateUpdateSerializer(FeedContentItemSerializer):
@@ -484,6 +494,11 @@ class LinkSerializer(serializers.ModelSerializer):
         model = Link
         fields = ('id', 'content_item', 'link')
 
+class BasicLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Link
+        fields = ('id', 'link')
+
 
 class LinkCreateUpdateSerializer(ContentItemCRUDSerializer):
     content_item = FeedContentItemCreateUpdateSerializer(
@@ -497,7 +512,7 @@ class LinkCreateUpdateSerializer(ContentItemCRUDSerializer):
         content_type = FeedContentItemType.objects.get(name=FeedContentItemType.LINK)
         content_item = FeedContentItem.objects.create(**content_item_data, content_type=content_type)
 
-        link = Link.objects.create(**validated_data, content_item=content_item, order=order)
+        link = Link.objects.create(**validated_data, content_item=content_item)
 
         return link
 

@@ -35,7 +35,8 @@
 
 <script>
 import RestfulComponent from "../RestfulComponent"
-import {activeUser, discussions, accounts, groups, interests, stashes, profiles, feedContentTypes} from "../../store.js"
+import {discussions, accounts, groups, interests, stashes, profiles, feedContentTypes} from "../../store.js"
+import activeUserDeps from "../../dependencies/activeUser.js"
 import {DiscussionModel} from "../../models/Discussion.js"
 import Post from './Post'
 
@@ -122,15 +123,8 @@ export default {
         },
 
         async createDiscussion() {
-            const [owner, members, profile, interestCollection, groupCollection] = await Promise.all(
-                [activeUser(), accounts(), profiles(), interests(), groups()]
-            )
-            const ownerAccount = members.getInstance(owner.details.id, {
-                groups: groupCollection,
-                members,
-                profile,
-                interests: interestCollection
-            })
+            const ownerDeps = await activeUserDeps()
+            const ownerAccount = ownerDeps.members.getInstance(ownerDeps.owner.details.id, ownerDeps)
 
             this.instanceForm.content_item.owner = ownerAccount
 

@@ -136,7 +136,6 @@
       CLOSED: [2018-05-14 Mon 17:17]
 ***** TODO Delete
 
-
 *** FeedContentTypes
 **** DONE Read
      CLOSED: [2018-05-03 Thu 17:08]
@@ -144,6 +143,7 @@
      CLOSED: [2018-05-03 Thu 17:08]
 
 *** FeedContentItems
+**** TODO sort by time posted
 **** DONE consider performance implication of backreference to Feeds
      CLOSED: [2018-05-09 Wed 10:59]
 **** DONE FeedContentItems outside of Feeds
@@ -215,6 +215,16 @@
       CLOSED: [2018-05-24 Thu 18:18]
 ***** TODO Delete
 
+
+*** Link
+**** DONE model, serializer, viewset
+     CLOSED: [2018-05-30 Wed 10:32]
+**** TODO CRUD
+***** DONE Create
+      CLOSED: [2018-05-30 Wed 10:32]
+***** TODO Read
+***** TODO Update
+***** TODO Delete
 
 *** Dashboard
 **** TODO activity Summary

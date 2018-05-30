@@ -66,19 +66,19 @@ class LinkCollection extends Collection {
 
     async list(params, collections) {
         return await paginatedList(this, 0, collections, [
-            ['owner', collections.accounts.get]
+            ['owner', collections.accounts.get.bind(collections.accounts)]
         ])
     }
 
-    static searchLinks(params) {
-        return fetchAPI(`link/`, {
-            method: "GET",
+    async searchLinks(params, collections) {
+        return fetchAPI(`link/search`, {
+            method: "POST",
             data: params
         })
             .then(jsonResponse)
 
             .then((data) => {
-                return data
+                return this.addInstances(data, collections)
             })
     }
 

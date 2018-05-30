@@ -18,7 +18,7 @@ export async function makeFilteredFeedCollection(queryset, _feedContentTypes, _s
     await resolveInstances(
         collection,
         values,
-        { content_types: contentTypes, interests, owner, stashes },
+        { content_types: contentTypes, content_type: contentTypes, interests, owner, stashes },
         // stashes: results[2]
         [
             ['interests', interests.get.bind(interests)],

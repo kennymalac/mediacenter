@@ -1,14 +1,19 @@
 <template>
     <div class="feed-list">
-        <feed-discussion-topic v-for="topic in topics" v-if="enabledContentTypes.includes('Topics')" :item="topic" />
-        <feed-discussion-topic v-for="post in posts" v-if="enabledContentTypes.includes('Posts')" :item="post" />
-        <feed-image v-for="image in images" v-if="enabledContentTypes.includes('Images')" v-bind="image" />
+    <template v-for="item in contentItems">
+        <feed-link v-if="item.content_type.name == 'link'" :item="item" />
+        <feed-discussion-topic v-if="item.content_type.name == 'topic'" :item="item" />
+        <feed-image v-if="item.content_type.name == 'img'" v-bind="item" />
+    </template>
     </div>
 </template>
 
 <script>
+import FeedLink from './FeedContentItems/Link'
 import FeedImage from './FeedContentItems/Image'
 import FeedDiscussionTopic from './FeedContentItems/DiscussionTopic'
+// import {links} from '../store.js'
+// import linkDeps from '../dependencies/Link.js'
 
 export default {
     props: {
@@ -16,33 +21,14 @@ export default {
         enabledContentTypes: [Array]
     },
     components: {
+        FeedLink,
         FeedImage,
         FeedDiscussionTopic
     },
     computed: {
-        images() {
-            return this.listContent("img")
-        },
-        videos() {
-            return this.listContent("vid")
-        },
-        topics() {
-            return this.listContent("topic")
-        },
-        posts() {
-            return this.listContent("post")
-        },
-        links() {
-            return this.listContent("link")
-        },
-        blogPosts() {
-            return this.listContent("blgpst")
-        }
-    },
-    methods: {
-        listContent(contentType) {
+        contentItems() {
             return this.items.filter((item) => {
-                return item.content_type.name === contentType ? item : false
+                return this.enabledContentTypes.includes(item.content_type.title)
             })
         }
     }

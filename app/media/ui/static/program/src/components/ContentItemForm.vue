@@ -35,7 +35,7 @@
                 </div>
 
                 <form>
-                    <input v-model="form.title" type="text" name="title" placeholder="Link title" />
+                    <input v-model="form.content_item.title" type="text" name="title" placeholder="Link title" />
                     <input v-model="form.link" type="text" name="link" placeholder="https://example.com" />
                     <!-- multiselect -->
                     <div class="footer">
@@ -50,11 +50,16 @@
 
 <script>
 import {links, feedContentTypes} from "../store.js"
+import linkDeps from "../dependencies/Link.js"
+import activeUserDeps from "../dependencies/activeUser.js"
+import {LinkModel} from "../models/Link.js"
 import router from "../router/index.js"
 
 export default {
     props: {
-        contentTypes: [Array]
+        contentTypes: [Array],
+        stash: [Object],
+        feedId: [Number, String]
     },
     data() {
         return {
@@ -82,13 +87,23 @@ export default {
             this.$emit('contentTypeSelected', ctype)
             if (ctype.title === "Image" || ctype.title === "Link") {
                 this.showUploadForm = true
+                this.form = LinkModel.getNewInstance()
             }
         },
         async submit() {
+            const ownerDeps = await activeUserDeps()
+            const ownerAccount = ownerDeps.members.getInstance(ownerDeps.owner.details.id, ownerDeps)
+
+            this.form.content_item.owner = ownerAccount
+            this.form.stash = this.stash
+            this.form.feed = this.feedId
+
             if (this.selected.title === "Link") {
                 const linkCollection = await links()
-                linkCollection.create(this.form)
+                console.log(this.form)
+                linkCollection.create(this.form, await linkDeps(this.stash.id))
                     .then((instance) => {
+                        console.log(instance)
                         router.push(`/link/${instance.id}/details`)
                     })
             }

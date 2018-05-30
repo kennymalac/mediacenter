@@ -9,6 +9,7 @@ class FeedContentItemModel extends Model {
         id: 0,
         object_id: 0,
         group_stash_ids: [],
+        nested_object: {},
         content_type: {},
         created: {},
         description: "",

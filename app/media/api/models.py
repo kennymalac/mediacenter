@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField, ArrayField
-from django.db.models.signals import pre_delete
+from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -42,7 +42,7 @@ class Account(AbstractUser, GuardianUserMixin):
         self.account_settings = settings
 
 
-@receiver(pre_delete, sender=Account)
+@receiver(post_delete, sender=Account)
 def pre_delete_user(sender, **kwargs):
     instance = kwargs.get('instance')
 
@@ -214,7 +214,7 @@ class Discussion(models.Model):
     text = models.TextField(blank=True)
 
 
-@receiver(pre_delete, sender=Discussion)
+@receiver(post_delete, sender=Discussion)
 def pre_delete_discussion(sender, **kwargs):
     instance = kwargs.get('instance')
     instance.content_item.delete()
@@ -225,10 +225,11 @@ class Link(models.Model):
     link = models.URLField()
 
 
-@receiver(pre_delete, sender=Link)
+@receiver(post_delete, sender=Link)
 def pre_delete_link(sender, **kwargs):
     instance = kwargs.get('instance')
-    instance.content_item.delete()
+    if instance.content_item:
+        instance.content_item.delete()
 
 
 # class ContentShare(models.Model):

@@ -10,7 +10,7 @@
         <!-- <action-button v-bind="uploadAction" /> -->
         <!-- <action-button v-bind="createContentItemAction" /> -->
 
-        <content-item-form :contentTypes="allowedContentTypes" @contentTypeSelected="contentTypeSelected" />
+        <content-item-form :stash="resolvedStash" :feedId="resolvedFeedId" :contentTypes="allowedContentTypes" @contentTypeSelected="contentTypeSelected" />
         <feed-content-stash :feedId="resolvedFeedId" />
 
         <h2>Recent Activity</h2>
@@ -51,7 +51,8 @@ export default {
                 extraIcon: "ion-md-add-circle"
             },
             allowedContentTypes: ['Image', 'Video', 'Topic', 'Link'],
-            resolvedFeedId: ''
+            resolvedFeedId: '',
+            resolvedStash: {}
         }
     },
     methods: {
@@ -63,12 +64,16 @@ export default {
 
             if (feedCollection.values.length === 0) {
                 // User feeds have not been fetched yet
-                await feedCollection.list({ owner: userId }, await feedDeps())
+                await feedCollection.list({ owner: userId }, await feedDeps(this.stashId))
             }
 
-            this.resolvedFeedId = feedCollection.values.find((feed) => {
+            const feed = feedCollection.values.find((feed) => {
                 return feed.owner.id === userId && feed.name === 'My Feed'
-            }).id
+            })
+            this.resolvedFeedId = feed.id
+            this.resolvedStash = feed.stashes.find((stash) => {
+                return stash.name === 'My Content'
+            })
         }
     }
 }
