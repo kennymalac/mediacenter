@@ -91,7 +91,8 @@
 import RestfulComponent from "../RestfulComponent"
 import {GroupModel} from '../../models/Group.js'
 // import {FeedModel} from '../../models/Feed.js'
-import {groups, feeds, stashes, accounts, profiles, interests, feedContentTypes, activeUser, filteredGroups} from '../../store.js'
+import {groups, accounts, profiles, interests, activeUser, filteredGroups} from '../../store.js'
+import groupDeps from '../../dependencies/Group.js'
 
 import AccountSelect from '../AccountSelect'
 import InterestSelect from '../InterestSelect'
@@ -159,16 +160,6 @@ export default {
             this.contentItems = []
         },
 
-        async dependencies() {
-            const [groupCollection, members, feed, profile, stashCollection, interestCollection, contentTypes] = await Promise.all(
-                [groups(), accounts(), feeds(), profiles(), stashes(), interests(), feedContentTypes()]
-            )
-
-            return {
-                members, feed, profile, stashes: stashCollection, interests: interestCollection, content_types: contentTypes, owner: members, friends: members, member_groups: groupCollection, account: accounts
-            }
-        },
-
         async create() {
             this.instanceForm = GroupModel.getNewInstance()
             this.instanceForm.feed = { interests: [], content_types: [] }
@@ -192,7 +183,7 @@ export default {
         },
 
         async manage(params) {
-            this.instance = await this.showInstance(params.id, `/group/${params.id}/details`, groups, await this.dependencies())
+            this.instance = await this.showInstance(params.id, `/group/${params.id}/details`, groups, await groupDeps())
             this.instanceForm = this.instance.getForm()
         },
 
@@ -213,7 +204,7 @@ export default {
             const user = await activeUser()
             this.isActiveUserMember = user.details.member_groups.includes(parseInt(params.id))
 
-            const deps = await this.dependencies()
+            const deps = await groupDeps()
 
             this.instance = await this.showInstance(params.id, '/group/list', groups, deps)
             this.isActiveUserOwner = this.instance.owner.id === user.details.id
@@ -240,7 +231,7 @@ export default {
             return GroupModel.manage(
                 this.instance,
                 this.instanceForm,
-                await this.dependencies()
+                await groupDeps()
             )
                 .catch((error) => {
                     console.log(error)
@@ -250,7 +241,7 @@ export default {
         async createGroup() {
             const user = await activeUser()
 
-            return this.$store.groups.create(this.instanceForm, await this.dependencies())
+            return this.$store.groups.create(this.instanceForm, await groupDeps())
                 .then((data) => {
                     user.details.member_groups.push(data.id)
                     return data

@@ -19,7 +19,7 @@
 <script>
 import RestfulComponent from "./RestfulComponent"
 import FeedContentItemList from './FeedContentItemList'
-import {stashes, accounts, feedContentTypes, activeUser} from '../store.js'
+import {stashes, accounts, interests, feedContentTypes, activeUser} from '../store.js'
 
 export default {
     name: 'feed-content-stash',
@@ -46,10 +46,11 @@ export default {
         },
 
         async details(params) {
-            const [contentTypeCollection, owner] = await Promise.all(
-                [feedContentTypes(), accounts()]
+            const [contentTypeCollection, owner, interestCollection] = await Promise.all(
+                [feedContentTypes(), accounts(), interests()]
             )
             this.instance = await this.showInstance(params.id, '/feed/list', stashes, {
+                interests: interestCollection,
                 content_type: contentTypeCollection,
                 owner
             }, this.feedId)
