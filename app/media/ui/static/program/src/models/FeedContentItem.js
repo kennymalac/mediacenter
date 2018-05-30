@@ -10,6 +10,7 @@ class FeedContentItemModel extends Model {
         object_id: 0,
         group_stash_ids: [],
         interests: [],
+        comments: [],
         nested_object: {},
         content_type: {},
         created: {},
@@ -20,6 +21,7 @@ class FeedContentItemModel extends Model {
 
     static fields = {
         owner: AccountCollection,
+        comments: [Collection],
         interests: [Collection],
         content_type: FeedContentTypeCollection
     }

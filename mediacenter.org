@@ -215,6 +215,19 @@
       CLOSED: [2018-05-24 Thu 18:18]
 ***** TODO Delete
 
+*** Comments
+**** TODO consider making comments optional, and allowing Discussion creation per content item
+**** DONE model, serializer, viewset
+     CLOSED: [2018-05-30 Wed 15:01]
+**** TODO CRUD
+***** DONE Create
+      CLOSED: [2018-05-30 Wed 16:49]
+***** DONE Read
+      CLOSED: [2018-05-30 Wed 16:49]
+***** TODO Update
+***** TODO Delete
+        
+
 
 *** Link
 **** DONE model, serializer, viewset
@@ -222,8 +235,10 @@
 **** TODO CRUD
 ***** DONE Create
       CLOSED: [2018-05-30 Wed 10:32]
-***** TODO Read
-***** TODO Update
+***** DONE Read
+      CLOSED: [2018-05-30 Wed 16:49]
+***** DONE Update
+      CLOSED: [2018-05-30 Wed 11:59]
 ***** TODO Delete
 
 *** Dashboard

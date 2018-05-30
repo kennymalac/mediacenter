@@ -1,8 +1,8 @@
-import {accounts, interests, stashes, groups, profiles, feedContentTypes} from "../store.js"
+import {accounts, interests, comments, stashes, groups, profiles, feedContentTypes} from "../store.js"
 
 export default async function dependencies(stashId) {
-    const [owner, stashCollection, contentTypeCollection, groupCollection, profileCollection, interestCollection] = await Promise.all(
-        [accounts(), stashes(), feedContentTypes(), groups(), profiles(), interests()]
+    const [owner, stashCollection, contentTypeCollection, groupCollection, profileCollection, interestCollection, commentCollection] = await Promise.all(
+        [accounts(), stashes(), feedContentTypes(), groups(), profiles(), interests(), comments()]
     )
     const stash = await stashCollection.getInstance(stashId)
 
@@ -15,6 +15,7 @@ export default async function dependencies(stashId) {
         profile: profileCollection,
         friends: owner,
         account: owner,
-        interests: interestCollection
+        interests: interestCollection,
+        comments: commentCollection
     }
 }

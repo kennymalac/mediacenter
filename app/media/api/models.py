@@ -190,6 +190,14 @@ class FeedContentItem(TaggedItem):
     created = models.DateTimeField(auto_now_add=True)
 
 
+class Comment(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    owner = models.ForeignKey(Account, blank=True)
+    content_item = models.ForeignKey(FeedContentItem, related_name="comments")
+    parent = models.ForeignKey('self', null=True)
+    text = models.TextField(blank=True)
+
+
 class FeedContentStash(models.Model):
     # TODO "sticky" content - maybe add order?
     name = models.CharField(max_length=140, blank=True)

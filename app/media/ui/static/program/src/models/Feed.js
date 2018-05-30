@@ -8,9 +8,9 @@ import {FeedContentStashCollection} from './FeedContentStash'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 import {FeedContentItemModel} from './FeedContentItem'
 
-export async function makeFilteredFeedCollection(queryset, _feedContentTypes, _stashes, _interests, _accounts) {
-    let [contentTypes, stashes, interests, owner, values] = await Promise.all(
-        [_feedContentTypes(), _stashes(), _interests(), _accounts(), queryset()]
+export async function makeFilteredFeedCollection(queryset, _feedContentTypes, _stashes, _interests, _comments, _accounts) {
+    let [contentTypes, stashes, interests, comments, owner, values] = await Promise.all(
+        [_feedContentTypes(), _stashes(), _interests(), _comments(), _accounts(), queryset()]
     )
 
     const collection = new FeedCollection([])
@@ -18,7 +18,7 @@ export async function makeFilteredFeedCollection(queryset, _feedContentTypes, _s
     await resolveInstances(
         collection,
         values,
-        { content_types: contentTypes, content_type: contentTypes, interests, owner, stashes },
+        { content_types: contentTypes, content_type: contentTypes, interests, owner, stashes, comments },
         // stashes: results[2]
         [
             ['interests', interests.get.bind(interests)],

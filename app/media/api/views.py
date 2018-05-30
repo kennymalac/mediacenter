@@ -223,6 +223,24 @@ class FeedContentStashViewSet(NestedViewSetMixin,
         return Response({ 'content': request.data.get('content', []) })
 
 
+class CommentViewSet(NestedViewSetMixin,
+                     MultipleSerializerMixin,
+                     ModelViewSet):
+
+    queryset = Comment.objects.all().order_by('created')
+    serializer_classes = {
+        'default': CommentSerializer,
+        'partial_update': CommentCreateUpdateSerializer,
+        'update': CommentCreateUpdateSerializer,
+        'create': CommentCreateUpdateSerializer
+    }
+
+    # def create(self, request):
+
+
+    #     super(CommentViewSet, self).create(request)
+
+
 class DiscussionViewSet(NestedViewSetMixin,
                         MultipleSerializerMixin,
                         ModelViewSet):

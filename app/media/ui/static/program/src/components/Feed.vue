@@ -173,6 +173,8 @@ export default {
             try {
                 this.contentItems = await FeedModel.listItems(this.instance.id, {}, {
                     content_type: deps.content_types,
+                    comments: deps.comments,
+                    interests: deps.interests,
                     owner: deps.owner
                 })
             }

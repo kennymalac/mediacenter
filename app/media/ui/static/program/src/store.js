@@ -4,6 +4,7 @@ import makeSingleton from './singleton.js'
 import {AccountCollection, makeAccountCollection} from './models/Account.js'
 import {ProfileCollection, makeProfileCollection, makeFilteredProfileCollection} from './models/Profile.js'
 import {FeedContentTypeCollection, makeFeedContentTypeCollection} from './models/FeedContentType.js'
+import {CommentCollection, makeCommentCollection} from './models/Comment.js'
 import {InterestCollection, makeInterestCollection} from './models/Interest.js'
 import {FeedContentStashCollection, makeFeedContentStashCollection} from './models/FeedContentStash.js'
 import {FeedCollection, makeFilteredFeedCollection} from './models/Feed.js'
@@ -75,6 +76,14 @@ export const feedContentTypes = () => {
     )
 }
 
+export const comments = () => {
+    return singleton(
+        'comments',
+        (value) => value instanceof CommentCollection,
+        makeCommentCollection
+    )
+}
+
 export const interests = () => {
     return singleton(
         'interests',
@@ -126,6 +135,7 @@ export const feeds = () => {
                     feedContentTypes,
                     stashes,
                     interests,
+                    comments,
                     accounts
                 )
             })

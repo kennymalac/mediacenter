@@ -70,7 +70,8 @@ import InterestSelect from '../InterestSelect'
 import TagList from '../TagList'
 
 import {ProfileModel} from '../../models/Profile.js'
-import {profiles, accounts, groups, activeUser, interests} from '../../store.js'
+import profileDeps from '../../dependencies/Profile.js'
+import {profiles, activeUser} from '../../store.js'
 
 // import {AccountCollection} from '../models/Account.js'
 // import {auth} from "../../auth.js"
@@ -107,29 +108,17 @@ export default {
             this.instanceForm = { interests: [] }
         },
 
-        async dependencies() {
-            const [interestCollection, account, groupCollection] = await Promise.all(
-                [interests(), accounts(), groups()]
-            )
-
-            return {
-                interests: interestCollection,
-                account,
-                member_groups: groupCollection
-            }
-        },
-
         async list(params) {
             const profilesCollection = await profiles()
             this.objects = await profilesCollection.list(
                 {page: this.page},
-                await this.dependencies()
+                await profileDeps()
             )
         },
 
         async details(params) {
             this.isActiveUser = false
-            const deps = await this.dependencies()
+            const deps = await profileDeps()
             this.instance = await this.showInstance(params.id, '/profile/list', profiles, deps)
 
             // check if certain profile information is missing
@@ -146,7 +135,7 @@ export default {
                 return
             }
 
-            this.instance = await this.showInstance(params.id, '/profile/list', profiles, await this.dependencies())
+            this.instance = await this.showInstance(params.id, '/profile/list', profiles, await profileDeps())
             this.instanceForm = this.instance.getForm()
         },
 
@@ -156,7 +145,7 @@ export default {
 
         async manageProfile() {
             try {
-                return await ProfileModel.manage(this.instance, this.instanceForm, await this.dependencies())
+                return await ProfileModel.manage(this.instance, this.instanceForm, await profileDeps())
             }
             catch (error) {
                 console.log(error)

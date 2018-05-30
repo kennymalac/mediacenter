@@ -67,7 +67,7 @@ export default {
     methods: {
         initialState() {
             this.instance = { id: null, content_item: { feeds: [] } }
-            this.instanceForm = { content_item: {} }
+            this.instanceForm = { content_item: {}, text: "" }
         },
 
         editPost(id) {
@@ -81,7 +81,7 @@ export default {
         async create() {
             await discussions()
             if (this.parentTitle) {
-                this.instanceForm.content_item.title = `Re: ${this.parentTitle}`
+                this.instanceForm = {...this.instanceForm, content_item: {...this.instanceForm.content_item, title: `Re: ${this.parentTitle}`}}
             }
         },
 

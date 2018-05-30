@@ -27,7 +27,14 @@ router.register(
     r'content',
     FeedContentItemViewSet,
     base_name='content',
+)\
+.register(
+    r'comment',
+    CommentViewSet,
+    base_name='comments',
+    parents_query_lookups=['content_item']
 )
+
 
 router.register(r'feed', FeedViewSet, base_name='feed')\
     .register(

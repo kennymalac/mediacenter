@@ -336,6 +336,22 @@ class FeedSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'owner', 'content_types', 'created', 'interests', 'stashes')
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    owner = AccountSerializer(
+        read_only=True
+    )
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'owner', 'content_item', 'parent', 'text', 'created')
+
+
+class CommentCreateUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ('id', 'owner', 'content_item', 'parent', 'text', 'created')
+
+
 class FeedContentItemSerializer(serializers.ModelSerializer):
     owner = serializers.PrimaryKeyRelatedField(
         queryset=Account.objects.all(),
@@ -350,7 +366,7 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'content_type', 'created', 'object_id', 'group_stash_ids', 'nested_object', 'interests')
+        fields = ('id', 'title', 'description', 'owner', 'content_type', 'comments', 'created', 'object_id', 'group_stash_ids', 'nested_object', 'interests')
 
     def get_content_id(self, instance):
         _model = None
@@ -391,10 +407,14 @@ class FeedContentItemCreateUpdateSerializer(FeedContentItemSerializer):
 
 class FeedContentItemProfileSerializer(serializers.ModelSerializer):
     owner = AccountSerializer()
+    comments = CommentSerializer(
+        many=True,
+        read_only=True
+    )
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'interests', 'content_type', 'created')
+        fields = ('id', 'title', 'description', 'owner', 'interests', 'comments', 'content_type', 'created')
 
 
 class FeedContentStashSerializer(serializers.ModelSerializer):

@@ -19,7 +19,8 @@
 <script>
 import RestfulComponent from "./RestfulComponent"
 import FeedContentItemList from './FeedContentItemList'
-import {stashes, accounts, interests, feedContentTypes, activeUser} from '../store.js'
+import {stashes, activeUser} from '../store.js'
+import stashDeps from '../dependencies/FeedContentStash'
 
 export default {
     name: 'feed-content-stash',
@@ -46,14 +47,7 @@ export default {
         },
 
         async details(params) {
-            const [contentTypeCollection, owner, interestCollection] = await Promise.all(
-                [feedContentTypes(), accounts(), interests()]
-            )
-            this.instance = await this.showInstance(params.id, '/feed/list', stashes, {
-                interests: interestCollection,
-                content_type: contentTypeCollection,
-                owner
-            }, this.feedId)
+            this.instance = await this.showInstance(params.id, '/feed/list', stashes, await stashDeps(), this.feedId)
         },
 
         async list(params) {
@@ -62,7 +56,7 @@ export default {
             if (store.values.length === 0) {
                 const user = await activeUser()
                 // User stashes have not been fetched yet
-                await store.list({ owner: user.details.id })
+                await store.list(this.feedId, { owner: user.details.id }, await stashDeps())
             }
 
             this.objects = store.values
