@@ -12,6 +12,7 @@ import Gallery from 'components/Gallery'
 import Album from 'components/Album'
 import Group from 'components/Group/Group'
 import Discussion from 'components/Discussion/Discussion'
+import Link from 'components/Link'
 
 Vue.use(Router)
 
@@ -68,7 +69,7 @@ export default new Router({
             canReuse: false
         },
         {
-            path: '/feed/:id/:action',
+            path: '/feed/:feedId/:feedAction',
             name: 'Feed',
             component: Feed,
             props: restAction,
@@ -77,7 +78,19 @@ export default new Router({
                 {
                     path: 'stash/:stashId/:stashAction',
                     component: FeedContentStash,
-                    props: restAction
+                    props: restAction,
+                    children: [
+                        {
+                            path: 'link/:linkId/:linkAction',
+                            component: Link,
+                            props: restAction
+                        },
+                        {
+                            path: 'link/:linkAction',
+                            component: Link,
+                            props: restAction
+                        }
+                    ]
                 }
             ]
         },

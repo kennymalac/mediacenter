@@ -3,7 +3,7 @@
         <template v-if="actions.details && instance.id">
             <router-view :feedId="feedId" :stashId="instance.id"></router-view>
 
-            <section class="feed" v-if="!params.discussionAction">
+            <section class="feed" v-if="!params.discussionAction && !params.linkAction">
                 <feed-content-item-list :stashId="instance.id" :items="instance.content" :enabledContentTypes="enabledContentTypes" />
             </section>
         </template>

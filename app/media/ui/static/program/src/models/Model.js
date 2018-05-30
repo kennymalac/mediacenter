@@ -401,7 +401,7 @@ export class Model {
                 // Make sure recursive relations aren't resolved deeply
                 if (this[field] instanceof Model) {
                     form[field] = this[field].getForm({
-                        id: this.instance.id, typeCheck: this.constructor.isInstance
+                        id: this.instance.id, typeCheck: this.constructor.isInstance.bind(this)
                     })
                 }
             }

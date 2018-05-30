@@ -104,7 +104,7 @@ export default {
                 linkCollection.create(this.form, await linkDeps(this.stash.id))
                     .then((instance) => {
                         console.log(instance)
-                        router.push(`/link/${instance.id}/details`)
+                        router.push(`/feed/${this.feedId}/details/stash/${this.stash.id}/details/link/${instance.id}/manage`)
                     })
             }
         }

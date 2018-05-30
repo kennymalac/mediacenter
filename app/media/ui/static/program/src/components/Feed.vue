@@ -31,9 +31,10 @@
                 </div>
             </section>
 
-            <section class="feed">
+            <section class="feed" v-if="!params.stashId">
                 <feed-content-item-list :enabledContentTypes="enabledContentTypes" :items="contentItems" />
             </section>
+            <router-view v-if="params.stashId" :stashId="params.stashId" :feedId="params.feedId"></router-view>
         </template>
         <template v-if="actions.create || actions.manage">
             <form class="main-form" @submit.prevent="save">
@@ -93,6 +94,7 @@ export default {
     },
     data() {
         return {
+            objectName: 'feed',
             isActiveUserOwner: false,
             instanceForm: { content_types: [] },
             instance: {

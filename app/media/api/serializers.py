@@ -350,7 +350,7 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'content_type', 'created', 'object_id', 'group_stash_ids', 'nested_object')
+        fields = ('id', 'title', 'description', 'owner', 'content_type', 'created', 'object_id', 'group_stash_ids', 'nested_object', 'interests')
 
     def get_content_id(self, instance):
         _model = None
@@ -394,7 +394,7 @@ class FeedContentItemProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'content_type', 'created')
+        fields = ('id', 'title', 'description', 'owner', 'interests', 'content_type', 'created')
 
 
 class FeedContentStashSerializer(serializers.ModelSerializer):
