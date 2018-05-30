@@ -61,7 +61,8 @@
 <script>
 import RestfulComponent from "./RestfulComponent"
 import {FeedModel} from "../models/Feed.js"
-import {feeds, stashes, interests, profiles, accounts, activeUser, feedContentTypes} from '../store.js'
+import {feeds, activeUser} from '../store.js'
+import feedDeps from '../dependencies/Feed.js'
 
 import FeedItem from './FeedItem'
 import FeedContentItemList from './FeedContentItemList'
@@ -142,29 +143,11 @@ export default {
             this.instanceForm = { content_types: [], interests: [] }
         },
 
-        async dependencies() {
-            const [
-                interestCollection,
-                stashCollection,
-                contentTypeCollection,
-                accountCollection,
-                profile
-            ] = await Promise.all([interests(), stashes(), feedContentTypes(), accounts(), profiles()])
-
-            return {
-                interests: interestCollection,
-                stashes: stashCollection,
-                content_types: contentTypeCollection,
-                owner: accountCollection,
-                profile
-            }
-        },
-
         create() {
         },
 
         async manage(params) {
-            this.instance = await this.showInstance(params.id, 'feed/list', feeds, await this.dependencies())
+            this.instance = await this.showInstance(params.id, 'feed/list', feeds, await feedDeps())
             this.instanceForm = this.instance.getForm()
         },
 
@@ -181,7 +164,7 @@ export default {
 
         async details(params) {
             const user = await activeUser()
-            const deps = await this.dependencies()
+            const deps = await feedDeps()
             this.instance = await this.showInstance(params.id, 'feed/list', feeds, deps)
             this.isActiveUserOwner = this.instance.owner.id === user.details.id
 
@@ -202,7 +185,7 @@ export default {
 
         async createFeed() {
             const feedCollection = await feeds()
-            return feedCollection.create(this.instanceForm, await this.dependencies())
+            return feedCollection.create(this.instanceForm, await feedDeps())
                 .then((data) => {
                     console.log(data)
                     return data
@@ -210,7 +193,7 @@ export default {
         },
 
         async manageFeed() {
-            return FeedModel.manage(this.instance, this.instanceForm, await this.dependencies())
+            return FeedModel.manage(this.instance, this.instanceForm, await feedDeps())
                 .then((data) => {
                     this.instance = data
                     return data

@@ -66,7 +66,7 @@ export default {
 .topic {
     blockquote {
         overflow: hidden;
-        max-height: 50%;
+        max-height: 55%;
     }
 }
 </style>

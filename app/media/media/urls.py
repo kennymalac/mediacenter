@@ -38,6 +38,7 @@ router.register(r'feed', FeedViewSet, base_name='feed')\
     )
 
 router.register(r'discussion', DiscussionViewSet, base_name='discussion')
+router.register(r'link', LinkViewSet, base_name='link')
 
 router.register(r'group', GroupForumViewSet, base_name='group')
 

@@ -356,16 +356,28 @@ export class Model {
         this.applyDiff(diffTree)
     }
 
-    resolveChildren(modelField, getter) {
+    resolveChildren(modelField, getter, collections, instance) {
         if (Array.isArray(this[modelField])) {
+            if (this[modelField].length === 0) {
+                return []
+            }
+
+            const _getter = this[modelField][0].constructor.parentResource === this.constructor.resource
+                  ? (id, instance) => getter(this.id, id, collections, instance)
+                  : (id, instance) => getter(id, collections, instance)
+
             return this[modelField].filter((instance) => {
                 return instance.instance._isFake
             }).map((instance) => {
-                return getter(instance.id, instance)
+                return _getter(instance.id, instance)
             })
         }
         else if (this[modelField].instance._isFake) {
-            return [getter(this[modelField].id, this[modelField])]
+            const _getter = this[modelField].constructor.parentResource === this.constructor.resource
+                  ? (id, instance) => getter(this.id, id, instance, collections, instance)
+                  : (id, instance) => getter(id, instance, collections, instance)
+
+            return [_getter(this[modelField].id, this[modelField])]
         }
         return []
     }

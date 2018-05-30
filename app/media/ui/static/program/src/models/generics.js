@@ -49,7 +49,7 @@ export async function resolveInstance(collection, item, _instance = null, collec
 
     for (const [modelField, getter] of children) {
         resolutions.push(instance.resolveChildren(
-            modelField, (id, instance) => getter(id, collections, instance)
+            modelField, getter, collections, instance
         ))
     }
 
@@ -69,7 +69,7 @@ export async function resolveInstances(collection, items, collections = {}, chil
 
         for (const [modelField, getter] of children) {
             resolutions.push(instance.resolveChildren(
-                modelField, (id, instance) => getter(id, collections, instance)
+                modelField, getter, collections, instance
             ))
         }
     }

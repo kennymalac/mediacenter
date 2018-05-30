@@ -104,7 +104,6 @@ class FeedContentStashCollection extends Collection {
     async list(feedId, params, collections) {
         return await paginatedListNested(this, feedId, 0, collections)
     }
-
 }
 
 export {FeedContentStashCollection, FeedContentStashModel}

@@ -51,6 +51,7 @@ $actions-height: 54px;
 $title-height: 48px;
 
 .content-item {
+    margin: 10px;
     display: inline-flex;
     flex-direction: column;
     border: 2px solid rgba(52, 73, 94,1.0);
@@ -59,6 +60,7 @@ $title-height: 48px;
     height: 280px;
     
     .content-title {
+        padding-top: 5px;
         height: $title-height;
         font-size: 1.5rem;
         line-height: 1.5rem;
@@ -73,7 +75,10 @@ $title-height: 48px;
             font-weight: normal;
             padding: 4px;
             font-size: 1rem;
-         }
+        }
+        a {
+            text-decoration: underline;
+        }
     }
     .date {
         display: inline-flex;

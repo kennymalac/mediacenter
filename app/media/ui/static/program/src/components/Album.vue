@@ -63,7 +63,7 @@
 
 <script>
 import {AlbumModel} from "../models/Album.js"
-import {albums, accounts, activeUser} from "../store.js"
+import {albums, groups, accounts, profiles, feedContentTypes, activeUser} from "../store.js"
 
 import RestfulComponent from "./RestfulComponent"
 import AlbumGridItem from "./AlbumGridItem"
@@ -95,6 +95,16 @@ export default {
             this.mediaItems = []
         },
 
+        async dependencies() {
+            const [groupCollection, owner, profile, contentTypes] = await Promise.all(
+                [groups(), accounts(), profiles(), feedContentTypes()]
+            )
+
+            return {
+                profile, content_types: contentTypes, owner, friends: owner, member_groups: groupCollection
+            }
+        },
+
         async create() {
             this.instanceForm = AlbumModel.getNewInstance()
 
@@ -103,8 +113,7 @@ export default {
         },
 
         async manage(params) {
-            const owner = await accounts()
-            this.instance = await this.showInstance(params.id, 'album/list', albums, { owner })
+            this.instance = await this.showInstance(params.id, 'album/list', albums, await this.dependencies())
             this.instanceForm = this.instance.getForm()
         },
 
@@ -117,12 +126,10 @@ export default {
             // this won't add mediaitems, and it definetly will not
             // work for created items
             // createAlbum does not upload mediaitems
-            const [owner, albumCollection] = await Promise.all(
-                [accounts(), albums()]
-            )
+            const albumCollection = await albums()
 
             try {
-                this.instance = await albumCollection.create(this.instanceForm, { owner })
+                this.instance = await albumCollection.create(this.instanceForm, await this.dependencies())
                 return this.instance
             }
             catch (error) {
@@ -130,11 +137,7 @@ export default {
             }
         },
         async manageAlbum() {
-            const owner = await accounts()
-
-            return AlbumModel.manage(this.instance, this.instanceForm, {
-                owner
-            })
+            return AlbumModel.manage(this.instance, this.instanceForm, this.dependencies())
                 .then((data) => {
                     this.instance = data
                 })

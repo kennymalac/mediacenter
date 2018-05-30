@@ -4,16 +4,18 @@ import {AccountCollection} from './Account.js'
 
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 
-export async function makeFilteredAlbumCollection(queryset, _accounts) {
-    let [owner, values] = await Promise.all(
-        [_accounts(), queryset()]
+export async function makeFilteredAlbumCollection(queryset, _accounts, _profiles, _contentTypes) {
+    let [owner, profile, contentTypes, values] = await Promise.all(
+        [_accounts(), _profiles(), _contentTypes(), queryset()]
     )
     const collection = new AlbumCollection([])
 
     await resolveInstances(
         collection,
         values,
-        { owner }
+        {
+            profile, content_types: contentTypes, owner, friends: owner
+        }
     )
 
     return collection

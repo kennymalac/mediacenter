@@ -20,6 +20,9 @@ $classicgreen: #4F8A10;
 }
 
 form {
+    textarea {
+        resize: none;
+    }
     fieldset {
         input[type="submit"] {
             text-align: center;

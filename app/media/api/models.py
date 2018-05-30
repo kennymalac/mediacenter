@@ -199,6 +199,13 @@ class FeedContentStash(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
 
+def setup_default_feed(user):
+    feed = Feed.objects.create(name="My Feed", description="All of your uploads outside of groups", owner=user)
+    stash = FeedContentStash.objects.create(name="My Content", description="Anything you upload my default will be stored here")
+    feed.content_types.add(*list(FeedContentItemType.objects.all()))
+    feed.stashes.add(stash)
+
+
 class Discussion(models.Model):
     group = models.ForeignKey('api.GroupForum', null=True)
     content_item = models.ForeignKey(FeedContentItem, related_name="+")
@@ -209,6 +216,17 @@ class Discussion(models.Model):
 
 @receiver(pre_delete, sender=Discussion)
 def pre_delete_discussion(sender, **kwargs):
+    instance = kwargs.get('instance')
+    instance.content_item.delete()
+
+
+class Link(models.Model):
+    content_item = models.ForeignKey(FeedContentItem, related_name="+")
+    link = models.URLField()
+
+
+@receiver(pre_delete, sender=Link)
+def pre_delete_link(sender, **kwargs):
     instance = kwargs.get('instance')
     instance.content_item.delete()
 

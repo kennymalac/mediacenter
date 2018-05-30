@@ -423,6 +423,19 @@ class FeedContentStashCreateUpdateSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'content')
 
 
+class ContentItemCRUDSerializer(serializers.ModelSerializer):
+    def update(self, instance, validated_data):
+        if 'content_item' in validated_data:
+            for k,v in validated_data.pop('content_item').items():
+                setattr(instance.content_item, k, v)
+                instance.content_item.save()
+
+        return super(ContentItemCRUDSerializer, self).update(instance, validated_data)
+
+    class Meta:
+        abstract = True
+
+
 class DiscussionSerializer(serializers.ModelSerializer):
     content_item = FeedContentItemProfileSerializer()
 
@@ -431,19 +444,11 @@ class DiscussionSerializer(serializers.ModelSerializer):
         fields = ('id', 'parent', 'order', 'content_item', 'group', 'text')
 
 
-class DiscussionCreateUpdateSerializer(serializers.ModelSerializer):
+class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
     content_item = FeedContentItemCreateUpdateSerializer(
         many=False,
         required=False
     )
-
-    def update(self, instance, validated_data):
-        if 'content_item' in validated_data:
-            for k,v in validated_data.pop('content_item').items():
-                setattr(instance.content_item, k, v)
-                instance.content_item.save()
-
-        return super(DiscussionCreateUpdateSerializer, self).update(instance, validated_data)
 
     def create(self, validated_data):
         content_item_data = validated_data.pop('content_item')
@@ -470,6 +475,35 @@ class DiscussionCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Discussion
         fields = ('id', 'parent', 'order', 'group', 'content_item', 'text')
+
+
+class LinkSerializer(serializers.ModelSerializer):
+    content_item = FeedContentItemProfileSerializer()
+
+    class Meta:
+        model = Link
+        fields = ('id', 'content_item', 'link')
+
+
+class LinkCreateUpdateSerializer(ContentItemCRUDSerializer):
+    content_item = FeedContentItemCreateUpdateSerializer(
+        many=False,
+        required=False
+    )
+
+    def create(self, validated_data):
+        content_item_data = validated_data.pop('content_item')
+
+        content_type = FeedContentItemType.objects.get(name=FeedContentItemType.LINK)
+        content_item = FeedContentItem.objects.create(**content_item_data, content_type=content_type)
+
+        link = Link.objects.create(**validated_data, content_item=content_item, order=order)
+
+        return link
+
+    class Meta:
+        model = Link
+        fields = ('id', 'content_item', 'link')
 
 
 class GroupForumSerializer(serializers.ModelSerializer):

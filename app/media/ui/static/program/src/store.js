@@ -8,6 +8,7 @@ import {InterestCollection, makeInterestCollection} from './models/Interest.js'
 import {FeedContentStashCollection, makeFeedContentStashCollection} from './models/FeedContentStash.js'
 import {FeedCollection, makeFilteredFeedCollection} from './models/Feed.js'
 import {DiscussionCollection, makeDiscussionCollection} from './models/Discussion.js'
+import {LinkCollection, makeLinkCollection} from './models/Link.js'
 import {GroupCollection, makeFilteredGroupCollection} from './models/Group.js'
 import {AlbumCollection, makeFilteredAlbumCollection} from './models/Album.js'
 
@@ -23,6 +24,7 @@ const store = {
     feedContentTypes: {},
     interests: {},
     discussions: {},
+    links: {},
     groups: {},
     filteredGroups: {}
 }
@@ -135,7 +137,7 @@ export const albums = () => {
     return singleton(
         'albums',
         (value) => value instanceof AlbumCollection,
-        () => makeFilteredAlbumCollection(AlbumCollection.searchAlbums, accounts)
+        () => makeFilteredAlbumCollection(AlbumCollection.searchAlbums, accounts, profiles, feedContentTypes)
     )
 }
 
@@ -144,6 +146,14 @@ export const discussions = () => {
         'discussions',
         (value) => value instanceof DiscussionCollection,
         makeDiscussionCollection
+    )
+}
+
+export const links = () => {
+    return singleton(
+        'links',
+        (value) => value instanceof LinkCollection,
+        makeLinkCollection
     )
 }
 

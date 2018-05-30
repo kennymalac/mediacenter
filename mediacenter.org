@@ -244,7 +244,6 @@ Your feed has "content decay"
      CLOSED: [2018-05-24 Thu 18:09]
 **** DONE remove "content" manytomany - feed content should be dynamic
      CLOSED: [2018-05-23 Wed 09:53]
-**** TODO automatically create Feed for each content type
 **** TODO Feed privacy
 **** DONE only show Feeds that user is owner of
      CLOSED: [2018-05-23 Wed 17:29]

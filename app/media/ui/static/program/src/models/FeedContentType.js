@@ -4,14 +4,18 @@ import {fetchAPI, jsonResponse} from '../httputil.js'
 class FeedContentTypeModel extends Model {
     static initialState = {
         id: '',
-        name: ''
+        name: '',
+        icon: '',
+        title: ''
     }
 }
 
-export function makeFeedContentTypeCollection() {
-    return FeedContentTypeCollection.fetch().then((data) => {
-        return new FeedContentTypeCollection(data)
-    })
+export async function makeFeedContentTypeCollection() {
+    const values = await FeedContentTypeCollection.fetch()
+
+    return new FeedContentTypeCollection(values.map((ctype) => {
+        return { ...ctype, icon: FeedContentTypeCollection.icons[ctype.name], title: FeedContentTypeCollection.typeMapping[ctype.name] }
+    }))
 }
 
 class FeedContentTypeCollection extends Collection {
@@ -25,6 +29,15 @@ class FeedContentTypeCollection extends Collection {
         topic: "Topic",
         post: "Post",
         blgpst: "Blog post"
+    }
+
+    static icons = {
+        img: "ion-md-image",
+        vid: "ion-md-videocam",
+        link: "ion-ios-link",
+        topic: "ion-ios-chatboxes",
+        post: "",
+        blgpst: "ion-md-text"
     }
 
     static fetch() {

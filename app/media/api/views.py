@@ -141,6 +141,14 @@ class FeedViewSet(NestedViewSetMixin,
     }
     filter_class = FeedFilter
 
+    def list(self, request):
+        if 'owner' in request.query_params:
+            owner_id = request.query_params['owner']
+            if int(owner_id) == request.user.id and Feed.objects.filter(owner=request.user, name="My Feed").count() == 0:
+                setup_default_feed(request.user)
+
+        return super(FeedViewSet, self).list(request)
+
     def create(self, request):
         request.data['owner'] = request.user.id
         return super(FeedViewSet, self).create(request)
@@ -225,6 +233,19 @@ class DiscussionViewSet(NestedViewSetMixin,
         'partial_update': DiscussionCreateUpdateSerializer,
         'update': DiscussionCreateUpdateSerializer,
         'create': DiscussionCreateUpdateSerializer
+    }
+
+
+class LinkViewSet(NestedViewSetMixin,
+                  MultipleSerializerMixin,
+                  ModelViewSet):
+
+    queryset = Link.objects.all()
+    serializer_classes = {
+        'default': LinkSerializer,
+        'partial_update': LinkCreateUpdateSerializer,
+        'update': LinkCreateUpdateSerializer,
+        'create': LinkCreateUpdateSerializer
     }
 
 

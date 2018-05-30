@@ -19,7 +19,7 @@
 <script>
 import RestfulComponent from "./RestfulComponent"
 import FeedContentItemList from './FeedContentItemList'
-import {stashes, accounts, feedContentTypes} from '../store.js'
+import {stashes, accounts, feedContentTypes, activeUser} from '../store.js'
 
 export default {
     name: 'feed-content-stash',
@@ -36,7 +36,7 @@ export default {
     },
     computed: {
         enabledContentTypes() {
-            return ["Topics"]
+            return ["Topics", "Links"]
         }
     },
     methods: {
@@ -57,7 +57,14 @@ export default {
 
         async list(params) {
             const store = await stashes()
-            this.objects = store.valuse
+
+            if (store.values.length === 0) {
+                const user = await activeUser()
+                // User stashes have not been fetched yet
+                await store.list({ owner: user.details.id })
+            }
+
+            this.objects = store.values
         }
     }
 }
