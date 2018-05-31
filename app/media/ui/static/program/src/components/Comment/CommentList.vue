@@ -1,10 +1,13 @@
 <template>
-    <div class="comments">
-        <comment-item v-for="item in items" v-bind="item.instance" :comments="nestedComments(item.id)" />
+        <transition-group name="list" tag="div" class="comments">
+            <comment-item :blacklist="blacklist" @minimizeComment="minimize(item.id)" @maximizeComment="maximize(item.id)" v-for="item in visibleItems" :key="item.id" v-bind="item.instance" :comments="nestedComments(item.id)" />
+        </transition-group>
     </div>
 </template>
 
 <script>
+import {serializeIds} from '../../models/Model.js'
+
 export default {
     name: 'comment-list',
     props: {
@@ -15,10 +18,33 @@ export default {
         },
         contentObjectId: [Number, String]
     },
+    data() {
+        return {
+            blacklist: []
+        }
+    },
+    computed: {
+        visibleItems() {
+            return this.items.filter((item) => {
+                return !this.blacklist.includes(item.id)
+            })
+        }
+    },
     components: {
         CommentItem: () => import('./CommentItem')
     },
     methods: {
+        minimize(id) {
+            for (const comment of this.nestedComments(id)) {
+                this.blacklist.push(comment.id)
+            }
+        },
+        maximize(id) {
+            const nested = serializeIds(this.nestedComments(id))
+            this.blacklist = this.blacklist.filter((bid) => {
+                return !nested.includes(bid)
+            })
+        },
         nestedComments(id) {
             return this.items.filter((item) => {
                 return item.parent === id
@@ -31,17 +57,21 @@ export default {
 <style lang="scss">
 .nested-comments {
     border-left: 1px solid grey;
+
     .comment {
         padding-left: 5px;
         margin-left: 20px;
     }
 
+    &.list-enter-active, &.list-leave-active,
     .list-enter-active, .list-leave-active {
-        transition: all 1s;
+        transition: all .5s;
     }
+    &.list-enter, &.list-leave-to,
     .list-enter, .list-leave-to  {
+        border-left-color: white;
         opacity: 0;
-        transform: translateX(30px);
+        transform: translateY(-30px);
     }
 }
 .comment {

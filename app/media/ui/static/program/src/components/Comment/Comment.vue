@@ -9,9 +9,11 @@
         <template v-if="actions.create || actions.manage">
             <form class="main-form" @submit.prevent="save">
                 <fieldset>
+                    <label v-if="parentId">Replying to: </label>
                     <textarea class="stack" name="text" v-model="instanceForm.text" />
 
-                    <input v-if="actions.create" class="stack" type="submit" value="Reply" />
+                    <input v-if="actions.create && parentId" class="stack" type="submit" value="Reply" />
+                    <input v-if="actions.create && !parentId" class="stack" type="submit" value="Create" />
                     <input v-if="actions.manage" class="stack" type="submit" value="Save changes" />
                 </fieldset>
             </form>
