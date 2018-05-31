@@ -208,7 +208,7 @@ export default {
 
             this.instance = await this.showInstance(params.id, '/group/list', groups, deps)
 
-            if (params.stashId === undefined) {
+            if (this.params.stashId === undefined) {
                 router.replace(`details/stash/${this.instance.feed.stashes[0].id}/details`)
             }
 
