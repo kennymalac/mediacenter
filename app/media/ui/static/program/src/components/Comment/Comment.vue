@@ -3,13 +3,13 @@
         <template v-if="actions.list && contentObjectId">
             <section class="comments">
                 <comment @created="created" :parent="resolvedParent" :contentObjectId="contentObjectId" action="create" />
-                <comment-list @reply="reply" :contentObjectId="contentObjectId" :items="objects" />
+                <comment-list @reply="reply" :activeUserId="activeUserId" :contentObjectId="contentObjectId" :items="objects" />
             </section>
         </template>
         <template v-if="actions.create || actions.manage">
             <form class="main-form" @submit.prevent="save">
                 <fieldset>
-                    <label v-if="parent.id">Replying to: {{ parent.owner.profile.display_name }}</label>
+                    <label v-if="parent.id">Reply to: {{ parent.owner.profile.display_name }}</label>
                     <textarea class="stack" name="text" v-model="instanceForm.text" />
 
                     <input v-if="actions.create && parent.id" class="stack" type="submit" value="Reply" />
@@ -24,7 +24,7 @@
 <script>
 import RestfulComponent from "../RestfulComponent"
 
-import {comments} from "../../store.js"
+import {comments, activeUser} from "../../store.js"
 import activeUserDeps from "../../dependencies/activeUser.js"
 import commentDeps from "../../dependencies/Comment.js"
 import {CommentModel} from "../../models/Comment.js"
@@ -52,17 +52,14 @@ export default {
         return {
             objectName: 'comment',
             instanceForm: { },
-            resolvedParent: { id: null }
+            resolvedParent: { id: null },
+            activeUserId: 0
         }
     },
     methods: {
         initialState() {
             this.instance = { id: null, content_item: { feeds: [] } }
             this.instanceForm = { content_item: {}, text: "" }
-        },
-
-        editComment(id) {
-            router.push(`../${id}/manage`)
         },
 
         showUserProfile(id) {
@@ -85,6 +82,9 @@ export default {
         },
 
         async list(params) {
+            const user = await activeUser()
+            this.activeUserId = user.details.id
+
             const store = await comments()
             if (store.values.length === 0) {
                 await store.list(this.contentObjectId, {}, await commentDeps())

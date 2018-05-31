@@ -91,6 +91,9 @@
 
 
 ** Priority 2 (necessary)
+*** TODO reporting posts for not fitting into interests
+*** TODO figure out incentives for content creators
+
 *** TODO slugs instead of ids in routes
 *** TODO details should be default route
 
@@ -226,7 +229,8 @@
       CLOSED: [2018-05-30 Wed 16:49]
 ***** DONE Read
       CLOSED: [2018-05-30 Wed 16:49]
-***** TODO Update
+***** DONE Update
+      CLOSED: [2018-05-31 Thu 13:04]
 ***** TODO Delete
         
 
@@ -297,6 +301,8 @@ Your feed has "content decay"
 
 *** Model/Collection
     don't make too many assumptions
+**** TODO resolution methods should also be singletons?
+currently mutliple resolutions are happening at once for the same ids
 **** TODO dependency trees
 **** TODO fields should not reference Collection classes. 
 Collections are undefined for circular import situations.

@@ -7,11 +7,15 @@
             <span class="user-title">Sr. Poster</span>
             <span class="date">{{ created.format('LLLL') }}</span>
         </div>
-        <a @click.prevent="$emit('reply', {id, owner})">Reply</a>
+        <a class="reply" @click.prevent="$emit('reply', {id, owner})">Reply</a>
+        <router-link v-if="isActiveUser" :to="editCommentUrl">
+            <i class="ion-md-create"></i> Edit
+        </router-link>
+
         <p class="text">{{ text }}</p>
         <transition name="list">
             <div v-if="!minimized" class="nested-comments">
-                <comment-list @reply="reply" :contentObjectId="contentObjectId" :parentId="id" :items="comments" />
+                <comment-list @reply="reply" :activeUserId="activeUserId" :contentObjectId="contentObjectId" :parentId="id" :items="comments" />
             </div>
         </transition>
     </div>
@@ -21,6 +25,10 @@
 export default {
     name: 'comment-item',
     props: {
+        activeUserId: {
+            type: Number,
+            default: 0
+        },
         blacklist: [Array],
         contentObjectId: [Number, String],
         id: [Number],
@@ -38,6 +46,13 @@ export default {
         }
     },
     computed: {
+        editCommentUrl() {
+            return `${this.id}/manage`
+        },
+        isActiveUser() {
+            return this.activeUserId === this.owner.id
+        },
+
         ownerProfile() {
             return `/profile/${this.owner.profile.id}/details`
         },

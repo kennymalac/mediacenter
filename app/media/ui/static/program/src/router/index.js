@@ -13,6 +13,7 @@ import Album from 'components/Album'
 import Group from 'components/Group/Group'
 import Discussion from 'components/Discussion/Discussion'
 import Link from 'components/Link'
+import Comment from 'components/Comment/Comment'
 
 Vue.use(Router)
 
@@ -83,7 +84,19 @@ export default new Router({
                         {
                             path: 'link/:linkId/:linkAction',
                             component: Link,
-                            props: restAction
+                            props: restAction,
+                            children: [
+                                {
+                                    path: 'comment/:commentId/:commentAction',
+                                    component: Comment,
+                                    props: restAction
+                                },
+                                {
+                                    path: 'comment/:commentAction',
+                                    component: Comment,
+                                    props: restAction
+                                }
+                            ]
                         },
                         {
                             path: 'link/:linkAction',

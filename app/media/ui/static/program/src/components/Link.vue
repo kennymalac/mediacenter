@@ -26,7 +26,7 @@
                 </p>
             </div>
             <h2>Comments</h2>
-            <comment :contentObjectId="instance.content_item.id" action="list" />
+            <router-view :contentObjectId="instance.content_item.id" />
         </template>
         <template v-if="actions.manage">
             <form class="main-form" @submit.prevent="save">

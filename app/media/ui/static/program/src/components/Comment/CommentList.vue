@@ -1,6 +1,6 @@
 <template>
         <transition-group name="list" tag="div" class="comments">
-            <comment-item @reply="reply" :contentObjectId="contentObjectId" :blacklist="blacklist" @minimizeComment="minimize(item.id)" @maximizeComment="maximize(item.id)" v-for="item in visibleItems" :key="item.id" v-bind="item.instance" :comments="nestedComments(item.id)" />
+            <comment-item :activeUserId="activeUserId" @reply="reply" :contentObjectId="contentObjectId" :blacklist="blacklist" @minimizeComment="minimize(item.id)" @maximizeComment="maximize(item.id)" v-for="item in visibleItems" :key="item.id" v-bind="item.instance" :comments="nestedComments(item.id)" />
         </transition-group>
     </div>
 </template>
@@ -12,6 +12,10 @@ export default {
     name: 'comment-list',
     props: {
         items: [Array],
+        activeUserId: {
+            type: Number,
+            default: 0
+        },
         parentId: {
             type: Number,
             default: 0
@@ -53,9 +57,7 @@ export default {
                 return item.parent === id
             })
 
-            const test = [].concat.apply(n1, serializeIds(n1).map(this.nestedComments.bind(this)))
-            console.log(test)
-            return test
+            return [].concat.apply(n1, serializeIds(n1).map(this.nestedComments.bind(this)))
         }
     }
 }
@@ -68,6 +70,9 @@ export default {
     .comment {
         padding-left: 5px;
         margin-left: 20px;
+        a.reply {
+            padding-right: 5px;
+        }
     }
 
     &.list-enter-active, &.list-leave-active,

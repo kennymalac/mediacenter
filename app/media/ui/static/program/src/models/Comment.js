@@ -28,13 +28,14 @@ class CommentModel extends Model {
         created: momentDate
     }
 
+    static parentResource = 'content'
     static resource = 'comment'
 
     static manage(instance, form, collections) {
         return manageNested(
             instance,
-            form.content_item,
-            {...form},
+            instance.content_item,
+            {...form, owner: form.owner.id},
             collections
         )
     }
@@ -67,9 +68,7 @@ class CommentCollection extends Collection {
     }
 
     async list(contentId, params, collections) {
-        return await paginatedListNested(this, contentId, params, collections, [
-            ['owner', collections.accounts.get.bind(collections.accounts)]
-        ])
+        return await paginatedListNested(this, contentId, params, collections)
     }
 }
 
