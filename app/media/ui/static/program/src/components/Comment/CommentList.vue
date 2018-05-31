@@ -1,6 +1,6 @@
 <template>
         <transition-group name="list" tag="div" class="comments">
-            <comment-item :blacklist="blacklist" @minimizeComment="minimize(item.id)" @maximizeComment="maximize(item.id)" v-for="item in visibleItems" :key="item.id" v-bind="item.instance" :comments="nestedComments(item.id)" />
+            <comment-item @reply="reply" :contentObjectId="contentObjectId" :blacklist="blacklist" @minimizeComment="minimize(item.id)" @maximizeComment="maximize(item.id)" v-for="item in visibleItems" :key="item.id" v-bind="item.instance" :comments="nestedComments(item.id)" />
         </transition-group>
     </div>
 </template>
@@ -26,7 +26,7 @@ export default {
     computed: {
         visibleItems() {
             return this.items.filter((item) => {
-                return !this.blacklist.includes(item.id)
+                return !this.blacklist.includes(item.id) && (!item.parent || item.parent === this.parentId)
             })
         }
     },
@@ -34,6 +34,9 @@ export default {
         CommentItem: () => import('./CommentItem')
     },
     methods: {
+        reply(id) {
+            this.$emit('reply', id)
+        },
         minimize(id) {
             for (const comment of this.nestedComments(id)) {
                 this.blacklist.push(comment.id)
@@ -46,9 +49,13 @@ export default {
             })
         },
         nestedComments(id) {
-            return this.items.filter((item) => {
+            let n1 = this.items.filter((item) => {
                 return item.parent === id
             })
+
+            const test = [].concat.apply(n1, serializeIds(n1).map(this.nestedComments.bind(this)))
+            console.log(test)
+            return test
         }
     }
 }

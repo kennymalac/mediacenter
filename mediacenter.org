@@ -216,6 +216,8 @@
 ***** TODO Delete
 
 *** Comments
+**** DONE nested comments
+     CLOSED: [2018-05-30 Wed 19:14]
 **** TODO consider making comments optional, and allowing Discussion creation per content item
 **** DONE model, serializer, viewset
      CLOSED: [2018-05-30 Wed 15:01]

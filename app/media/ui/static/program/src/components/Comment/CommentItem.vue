@@ -7,10 +7,11 @@
             <span class="user-title">Sr. Poster</span>
             <span class="date">{{ created.format('LLLL') }}</span>
         </div>
+        <a @click.prevent="$emit('reply', {id, owner})">Reply</a>
         <p class="text">{{ text }}</p>
         <transition name="list">
             <div v-if="!minimized" class="nested-comments">
-                <comment-list :contentObjectId="contentObjectId" :parentId="id" :items="visibleComments" />
+                <comment-list @reply="reply" :contentObjectId="contentObjectId" :parentId="id" :items="comments" />
             </div>
         </transition>
     </div>
@@ -43,11 +44,14 @@ export default {
 
         visibleComments() {
             return this.comments.filter((item) => {
-                return !this.blacklist.includes(item.id)
+                return !this.blacklist.includes(item.id) && item.parent === this.id
             })
         }
     },
     methods: {
+        reply(id) {
+            this.$emit('reply', id)
+        },
         minimize() {
             this.minimized = true
             this.$emit('minimizeComment')

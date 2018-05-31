@@ -2,24 +2,23 @@
     <div class="feed-container">
         <template v-if="actions.list && contentObjectId">
             <section class="comments">
-                <comment @created="created" :contentObjectId="contentObjectId" action="create" />
-                <comment-list :contentObjectId="contentObjectId" :items="objects" />
+                <comment @created="created" :parent="resolvedParent" :contentObjectId="contentObjectId" action="create" />
+                <comment-list @reply="reply" :contentObjectId="contentObjectId" :items="objects" />
             </section>
         </template>
         <template v-if="actions.create || actions.manage">
             <form class="main-form" @submit.prevent="save">
                 <fieldset>
-                    <label v-if="parentId">Replying to: </label>
+                    <label v-if="parent.id">Replying to: {{ parent.owner.profile.display_name }}</label>
                     <textarea class="stack" name="text" v-model="instanceForm.text" />
 
-                    <input v-if="actions.create && parentId" class="stack" type="submit" value="Reply" />
-                    <input v-if="actions.create && !parentId" class="stack" type="submit" value="Create" />
+                    <input v-if="actions.create && parent.id" class="stack" type="submit" value="Reply" />
+                    <input v-if="actions.create && !parent.id" class="stack" type="submit" value="Create" />
                     <input v-if="actions.manage" class="stack" type="submit" value="Save changes" />
                 </fieldset>
             </form>
         </template>
     </div>
-
 </template>
 
 <script>
@@ -38,7 +37,13 @@ import router from "../../router/index.js"
 export default {
     name: 'comment',
     mixins: [RestfulComponent],
-    props: ['contentObjectId', 'parentId'],
+    props: {
+        contentObjectId: [Number, String],
+        parent: {
+            type: Object,
+            default: () => { return { id: null } }
+        }
+    },
     components: {
         CommentItem,
         CommentList
@@ -46,7 +51,8 @@ export default {
     data() {
         return {
             objectName: 'comment',
-            instanceForm: { }
+            instanceForm: { },
+            resolvedParent: { id: null }
         }
     },
     methods: {
@@ -63,8 +69,8 @@ export default {
             router.push(`/profile/${id}/details`)
         },
 
-        minimizeComment() {
-
+        reply(comment) {
+            this.resolvedParent = comment
         },
 
         async create() {
@@ -72,7 +78,7 @@ export default {
         },
 
         async manage(params) {
-            const fallthrough = this.parentId ? `/comment/${this.parentId}/detail` : `/feed/list`
+            const fallthrough = this.parent.id ? `/comment/${this.parent.id}/detail` : `/feed/list`
 
             this.instance = await this.showInstance(params.id, fallthrough, comments, await commentDeps())
             this.instanceForm = this.instance.getForm()
@@ -84,7 +90,7 @@ export default {
                 await store.list(this.contentObjectId, {}, await commentDeps())
             }
             this.objects = store.values.filter((item) => {
-                return item.contentObjectId === this.parentId
+                return this.parent.id ? item.contentObjectId === this.parent.id : true
             })
         },
 
@@ -101,8 +107,8 @@ export default {
 
             this.instanceForm.owner = ownerAccount
 
-            if (this.parentId) {
-                this.instanceForm.parent = this.parentId
+            if (this.parent.id) {
+                this.instanceForm.parent = this.parent.id
             }
 
             try {
