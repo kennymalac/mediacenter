@@ -15,16 +15,12 @@ class DiscussionModel extends Model {
     static initialState = {
         id: 0,
         content_item: {},
-        // owner: {},
-        // group: {},
         text: "",
         order: 0,
         parent: 0
     }
 
     static fields = {
-        // owner: AccountCollection
-        // group: GroupCollection
         content_item: FeedContentItemCollection
     }
 

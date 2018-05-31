@@ -1,0 +1,23 @@
+{
+    "libs": [
+        "browser",
+        "ecmascript",
+        "react"
+    ],
+    "loadEagerly": [
+        "./src/**/*.js",
+        "./src/**/*.vue"
+    ],
+    "dontLoad": [
+        "./node_modules"
+    ],
+    "plugins": {
+        "requirejs": {
+            "baseURL": "./"
+        },
+        "es_modules": {},
+        "webpack": {
+            "configPath": "./build/webpack.dev.conf.js"
+        }
+    }
+}

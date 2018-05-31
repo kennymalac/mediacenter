@@ -370,7 +370,9 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
         required=False
     )
     object_id = serializers.SerializerMethodField('get_content_id')
-    group_stash_ids = serializers.SerializerMethodField()
+    origin_stash_id = serializers.SerializerMethodField()
+    feed_id = serializers.SerializerMethodField()
+    group_id = serializers.SerializerMethodField()
     nested_object = serializers.SerializerMethodField()
     # content_type = serializers.StringRelatedField(
     #     required=False
@@ -378,7 +380,7 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'content_type', 'comments', 'created', 'object_id', 'group_stash_ids', 'nested_object', 'interests')
+        fields = ('id', 'title', 'description', 'owner', 'content_type', 'comments', 'created', 'object_id', 'origin_stash_id', 'feed_id', 'group_id', 'nested_object', 'interests')
 
     def get_content_id(self, instance):
         _model = None
@@ -393,14 +395,20 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
         pk = _model.objects.filter(content_item=instance).values_list('id', flat=True).first()
         return pk
 
-    def get_group_stash_ids(self, instance):
-        valid_stashes = FeedContentStash.objects.filter(content__in=(instance,), feeds__isnull=False)
+    def get_origin_stash_id(self, instance):
+        return instance.origin_stash.id
+
+    def get_feed_id(self, instance):
+        return instance.origin_stash.feeds.first().id
+
+    def get_group_id(self, instance):
+        valid_stashes = FeedContentStash.objects.filter(owned_content__in=(instance,), feeds__isnull=False)
         if valid_stashes.count() > 0:
             valid_feeds = Feed.objects.filter(stashes__in=valid_stashes, groupforum__isnull=False)
 
             if valid_feeds.count() > 0:
                 feed = valid_feeds.first()
-                return [feed.groupforum_set.first().id, valid_stashes.get(feeds__in=(feed,)).id]
+                return feed.groupforum_set.first().id
 
     def get_nested_object(self, instance):
         """Returns a nested representation of the content item's object"""
@@ -483,7 +491,7 @@ class DiscussionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Discussion
-        fields = ('id', 'parent', 'order', 'content_item', 'group', 'text')
+        fields = ('id', 'parent', 'order', 'content_item', 'text')
 
 
 class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
@@ -494,7 +502,6 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
 
     def create(self, validated_data):
         content_item_data = validated_data.pop('content_item')
-        # group = content_item_data.pop('group')
         order = 0
 
         if validated_data.get('parent', 0):
@@ -516,7 +523,7 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
 
     class Meta:
         model = Discussion
-        fields = ('id', 'parent', 'order', 'group', 'content_item', 'text')
+        fields = ('id', 'parent', 'order', 'content_item', 'text')
 
 
 class LinkSerializer(serializers.ModelSerializer):
@@ -602,7 +609,7 @@ class GroupForumCreateUpdateSerializer(serializers.ModelSerializer):
             feed.content_types.add(*content_types)
 
         stash = FeedContentStash.objects.create(name="Default", description="Stored content for this group")
-        feed.stashes.add(stash)
+        feed.stashes.add(*(stash,))
 
         members = validated_data.pop('members')
         group = GroupForum.objects.create(**validated_data, feed=feed)

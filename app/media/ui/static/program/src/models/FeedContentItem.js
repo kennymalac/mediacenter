@@ -8,7 +8,9 @@ class FeedContentItemModel extends Model {
     static initialState = {
         id: 0,
         object_id: 0,
-        group_stash_ids: [],
+        feed_id: 0,
+        origin_stash_id: 0,
+        group_id: 0,
         interests: [],
         comments: [],
         nested_object: {},

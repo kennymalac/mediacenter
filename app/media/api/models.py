@@ -183,6 +183,7 @@ class Feed(TaggedItem):
 
 
 class FeedContentItem(TaggedItem):
+    origin_stash = models.ForeignKey('api.FeedContentStash', null=True, related_name="owned_content")
     owner = models.ForeignKey(Account, blank=True)
     content_type = models.ForeignKey(FeedContentItemType, related_name="+")
     title = models.CharField(max_length=140, blank=True)
@@ -215,7 +216,6 @@ def setup_default_feed(user):
 
 
 class Discussion(models.Model):
-    group = models.ForeignKey('api.GroupForum', null=True)
     content_item = models.ForeignKey(FeedContentItem, related_name="+")
     parent = models.ForeignKey('self', null=True)
     order = models.IntegerField(default=0)

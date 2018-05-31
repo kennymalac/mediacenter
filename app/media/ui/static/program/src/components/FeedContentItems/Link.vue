@@ -1,5 +1,5 @@
 <template>
-    <content-item :embed="embedProps" v-bind="item.instance">
+    <content-item :embed="embedProps" v-bind="item.instance" :commentsUrl="commentsUrl">
         <template slot="title" slot-scope="{ slotProps }">
             <div class="content-title">
                 <a :href="item.nested_object.link">{{ item.title }}</a>
@@ -31,12 +31,14 @@ export default {
         ContentItem
     },
     computed: {
+        commentsUrl() {
+            return `${this.detailsUrl}/comment/list`
+        },
         detailsUrl() {
-            if (this.item.group_stash_ids.length > 0) {
-                const [groupId, stashId] = this.item.group_stash_ids
-                return `/group/${groupId}/details/stash/${stashId}/details/link/${this.item.object_id}/details`
+            if (this.item.group_id !== undefined) {
+                return `/group/${this.item.group_id}/details/stash/${this.item.origin_stash_id}/details/link/${this.item.object_id}/details`
             }
-            return `details/link/${this.item.object_id}/details`
+            return `/feed/${this.item.feed_id}/details/stash/${this.item.origin_stash_id}/details/link/${this.item.object_id}/details`
         }
     },
     data() {

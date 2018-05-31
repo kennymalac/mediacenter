@@ -9,10 +9,10 @@
         <slot name="embed" :slotProps="embedProps">
         </slot>
         <div class="actions">
-            <div class="action">
+            <router-link container="div" v-if="commentsUrl" :to="commentsUrl" class="action">
                 <i class="icon ion-md-chatbubbles"></i>
                 <span>Comment</span>
-            </div>
+            </router-link>
             <div class="action">
                 <i class="icon ion-md-star"></i>
                 <span>Save</span>
@@ -33,6 +33,10 @@ export default {
     mixins: [FeedContentItem],
     props: {
         title: {
+            type: String,
+            default: ""
+        },
+        commentsUrl: {
             type: String,
             default: ""
         },

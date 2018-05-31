@@ -1,5 +1,5 @@
 <template>
-    <content-item :embed="embedProps" v-bind="item.instance">
+    <content-item :embed="embedProps" v-bind="item.instance" :commentsUrl="commentsUrl">
         <template slot="title" slot-scope="{ slotProps }">
             <div class="content-title">
                 <span class="content-type">Topic</span>
@@ -23,7 +23,6 @@ import ContentItem from './ContentItem'
 export default {
     name: 'feed-discussion-topic',
     props: {
-        stashId: [Number],
         item: {
             type: Object
         }
@@ -32,12 +31,15 @@ export default {
         ContentItem
     },
     computed: {
+        commentsUrl() {
+            // TODO should jump to bottom
+            return `${this.detailsUrl}`
+        },
         detailsUrl() {
-            if (this.item.group_stash_ids.length > 0) {
-                const [groupId, stashId] = this.item.group_stash_ids
-                return `/group/${groupId}/details/stash/${stashId}/details/discussion/${this.item.object_id}/details`
+            if (this.item.group_id !== undefined) {
+                return `/group/${this.item.group_id}/details/stash/${this.item.origin_stash_id}/details/discussion/${this.item.object_id}/details`
             }
-            return `details/discussion/${this.item.object_id}/details`
+            return `/feed/${this.item.feed_id}/details/stash/${this.item.origin_stash_id}/details/discussion/${this.item.object_id}/details`
         }
     },
     data() {
