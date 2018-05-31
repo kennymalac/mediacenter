@@ -164,6 +164,8 @@
 
 *** Groups
 **** TODO only members can create new Posts, comment in Group Topic
+**** DONE Group tags should link to group's stash
+     CLOSED: [2018-05-31 Thu 14:58]
 **** TODO Moderators
 **** TODO Checkbox to share topic outside of group
 **** TODO Group owner can disable topics being shared outside of Group

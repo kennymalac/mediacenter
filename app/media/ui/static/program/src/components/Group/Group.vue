@@ -207,6 +207,11 @@ export default {
             const deps = await groupDeps()
 
             this.instance = await this.showInstance(params.id, '/group/list', groups, deps)
+
+            if (params.stashId === undefined) {
+                router.replace(`details/stash/${this.instance.feed.stashes[0].id}/details`)
+            }
+
             this.isActiveUserOwner = this.instance.owner.id === user.details.id
 
             if (this.instance.feed.instance._isFake) {
