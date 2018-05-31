@@ -76,9 +76,7 @@ class DiscussionCollection extends Collection {
     }
 
     async list(params, collections) {
-        return await paginatedList(this, 0, collections, [
-            ['owner', collections.accounts.get]
-        ])
+        return await paginatedList(this, params, collections)
     }
 
     static searchDiscussions(params) {

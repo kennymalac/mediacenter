@@ -113,7 +113,10 @@ export default {
         },
 
         async details(params) {
-            this.instance = await this.showInstance(params.id, '/feed/list', discussions, await this.dependencies())
+            const deps = await this.dependencies()
+            this.instance = await this.showInstance(params.id, '/feed/list', discussions, deps)
+            const discussionCollection = await discussions()
+            discussionCollection.list({ parent: this.instance.id }, deps)
         },
 
         async manageDiscussion() {

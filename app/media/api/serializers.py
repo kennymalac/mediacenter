@@ -352,6 +352,18 @@ class CommentCreateUpdateSerializer(serializers.ModelSerializer):
         fields = ('id', 'owner', 'content_item', 'parent', 'text', 'created')
 
 
+class FeedContentItemBasicSerializer(serializers.ModelSerializer):
+
+    content_type = serializers.PrimaryKeyRelatedField(
+        queryset=FeedContentItemType.objects.all(),
+        required=False
+    )
+
+    class Meta:
+        model = FeedContentItem
+        fields = ('id', 'title', 'description', 'owner', 'content_type', 'created', 'interests')
+
+
 class FeedContentItemSerializer(serializers.ModelSerializer):
     owner = serializers.PrimaryKeyRelatedField(
         queryset=Account.objects.all(),
@@ -475,7 +487,7 @@ class DiscussionSerializer(serializers.ModelSerializer):
 
 
 class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
-    content_item = FeedContentItemCreateUpdateSerializer(
+    content_item = FeedContentItemBasicSerializer(
         many=False,
         required=False
     )
