@@ -2,7 +2,7 @@
     <div class="feed-container">
         <template v-if="actions.list && contentObjectId">
             <section class="comments">
-                <comment :contentObjectId="contentObjectId" action="create" />
+                <comment @created="created" :contentObjectId="contentObjectId" action="create" />
                 <comment-list :contentObjectId="contentObjectId" :items="objects" />
             </section>
         </template>
@@ -114,6 +114,10 @@ export default {
             }
         },
 
+        created(comment) {
+            this.objects.push(comment)
+        },
+
         save() {
             if (this.actions.manage) {
                 this.manageComment().then(() => {
@@ -122,6 +126,8 @@ export default {
             }
             else if (this.actions.create) {
                 this.createComment().then(data => this.$nextTick(() => {
+                    console.log(data)
+                    this.$emit('created', data)
                 }))
             }
         }
