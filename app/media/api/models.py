@@ -172,6 +172,9 @@ class Profile(TaggedItem):
     picture = models.URLField(blank=True)
     # created = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.display_name
+
 
 class Feed(TaggedItem):
     owner = models.ForeignKey(Account, null=True)
@@ -181,6 +184,9 @@ class Feed(TaggedItem):
     created = models.DateTimeField(auto_now_add=True)
     stashes = models.ManyToManyField('api.FeedContentStash', related_name='feeds')
 
+    def __str__(self):
+        return self.name
+
 
 class FeedContentItem(TaggedItem):
     origin_stash = models.ForeignKey('api.FeedContentStash', null=True, related_name="owned_content")
@@ -189,6 +195,9 @@ class FeedContentItem(TaggedItem):
     title = models.CharField(max_length=140, blank=True)
     description = models.TextField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
 
 
 class Comment(models.Model):
@@ -206,6 +215,9 @@ class FeedContentStash(models.Model):
     max_content = models.IntegerField(default=1000)
     content = models.ManyToManyField(FeedContentItem, related_name="+")
     created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
 
 
 def setup_default_feed(user):

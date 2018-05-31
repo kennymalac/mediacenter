@@ -396,10 +396,12 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
         return pk
 
     def get_origin_stash_id(self, instance):
-        return instance.origin_stash.id
+        if instance.origin_stash:
+            return instance.origin_stash.id
 
     def get_feed_id(self, instance):
-        return instance.origin_stash.feeds.first().id
+        if instance.origin_stash:
+            return instance.origin_stash.feeds.first().id
 
     def get_group_id(self, instance):
         valid_stashes = FeedContentStash.objects.filter(owned_content__in=(instance,), feeds__isnull=False)
