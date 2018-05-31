@@ -3,7 +3,7 @@
         <template v-if="actions.list && contentObjectId">
             <section class="comments">
                 <comment :contentObjectId="contentObjectId" action="create" />
-                <comment-list :contentObjectId="contentObjectId" :items="comments" />
+                <comment-list :contentObjectId="contentObjectId" :items="objects" />
             </section>
         </template>
         <template v-if="actions.create || actions.manage">
@@ -41,13 +41,6 @@ export default {
         CommentItem,
         CommentList
     },
-    computed: {
-        comments() {
-            return this.objects.filter((item) => {
-                return item.parent === this.instance.id
-            })
-        }
-    },
     data() {
         return {
             objectName: 'comment',
@@ -74,9 +67,6 @@ export default {
 
         async create() {
             await comments()
-            if (this.parentTitle) {
-                this.instanceForm = {...this.instanceForm, content_item: {...this.instanceForm.content_item, title: `Re: ${this.parentTitle}`}}
-            }
         },
 
         async manage(params) {
@@ -89,10 +79,11 @@ export default {
         async list(params) {
             const store = await comments()
             if (store.values.length === 0) {
-                this.objects = await store.list(this.contentObjectId, {}, await commentDeps())
-                return
+                await store.list(this.contentObjectId, {}, await commentDeps())
             }
-            this.objects = store.values
+            this.objects = store.values.filter((item) => {
+                return item.contentObjectId === this.parentId
+            })
         },
 
         async manageComment() {

@@ -1,6 +1,6 @@
 <template>
     <div class="comments">
-        <comment-item v-for="item in items" v-bind="item.instance" />
+        <comment-item v-for="item in items" v-bind="item.instance" :comments="nestedComments(item.id)" />
     </div>
 </template>
 
@@ -17,6 +17,13 @@ export default {
     },
     components: {
         CommentItem: () => import('./CommentItem')
+    },
+    methods: {
+        nestedComments(id) {
+            return this.items.filter((item) => {
+                return item.parent === id
+            })
+        }
     }
 }
 </script>
