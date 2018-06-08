@@ -3,7 +3,7 @@
         <template v-if="actions.details && instance.id">
             <div class="link post">
                 <div class="post-header">
-                    <div class="author">
+                    <div @click="showUserProfile(instance.id)" class="author">
                         <div class="profile-picture icon-container">
                             <img v-if="instance.content_item.owner.profile.picture" :src="instance.content_item.owner.profile.picture" />
                             <i v-if="!instance.content_item.owner.profile.picture" class="ion-md-person"></i>
@@ -20,7 +20,7 @@
                 </div>
                 <p class="text">
                     <a :href="instance.link">{{ instance.link }}</a><br />
-                    <span>Interests:</span>
+                    <span v-if="instance.content_item.interests.length">Interests:</span>
                     <tag-list :tags="instance.content_item.interests" tagType="interest" /><br />
                     {{ instance.content_item.description }}
                 </p>
@@ -86,13 +86,17 @@ export default {
         },
 
         async manage(params) {
-            const fallthrough = this.parentId ? `/link/${this.parentId}/detail` : `/feed/list`
+            const fallthrough = this.parentId ? `/link/${this.parentId}/details` : `/feed/list`
 
             this.instance = await this.showInstance(params.id, fallthrough, links, await linkDeps(this.stashId))
             this.instanceForm = this.instance.getForm()
         },
 
         async details(params) {
+            if (!this.params.commentAction) {
+                router.replace('comment/list')
+            }
+
             this.instance = await this.showInstance(params.id, '/feed/list', links, await linkDeps(this.stashId))
         },
 

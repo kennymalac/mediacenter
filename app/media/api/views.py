@@ -218,7 +218,11 @@ class FeedContentStashViewSet(NestedViewSetMixin,
 
         content_pks = request.data.get('content', [])
         content = FeedContentItem.objects.filter(pk__in=content_pks)
+
         instance.content.add(*list(content))
+
+        # All content without an origin stash now default to being shown in this stash
+        content.filter(origin_stash__isnull=True).update(origin_stash=instance)
 
         return Response({ 'content': request.data.get('content', []) })
 

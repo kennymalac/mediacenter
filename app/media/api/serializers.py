@@ -425,13 +425,19 @@ class FeedContentItemCreateUpdateSerializer(FeedContentItemSerializer):
         queryset=FeedContentItemType.objects.all(),
         required=False
     )
+    comments = CommentSerializer(
+        many=True,
+        read_only=True,
+        required=False
+    )
 
 
 class FeedContentItemProfileSerializer(serializers.ModelSerializer):
     owner = AccountSerializer()
     comments = CommentSerializer(
         many=True,
-        read_only=True
+        read_only=True,
+        required=False
     )
 
     class Meta:
