@@ -23,9 +23,10 @@ class LinkModel extends Model {
     static resource = 'link'
 
     static manage(instance, form, collections) {
+        const {link, id} = form
         return manage(
             instance,
-            {...form, content_item: {...form.content_item, interests: serializeIds(form.content_item.interests), content_type: form.content_item.content_type.id, owner: form.content_item.owner.id}},
+            {link, id, content_item: {id: form.content_item.id, description: form.content_item.description, title: form.content_item.title, interests: serializeIds(form.content_item.interests), content_type: form.content_item.content_type.id, owner: form.content_item.owner.id}},
             collections
         )
     }

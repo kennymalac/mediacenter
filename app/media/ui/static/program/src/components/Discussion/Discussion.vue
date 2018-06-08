@@ -2,9 +2,8 @@
     <div class="feed-container">
         <template v-if="actions.details && instance.id">
             <section class="posts">
-
-                <post v-bind="instance.instance" @editPost="editPost(instance.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" />
-                <post v-for="post in posts" v-bind="post.instance" @editPost="editPost(post.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" />
+                <post v-bind="instance.instance" @editPost="editPost(instance.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" :isActiveUser="activeUserId === instance.content_item.owner.id" />
+                <post v-for="post in posts" v-bind="post.instance" :isActiveUser="activeUserId === post.content_item.owner.id" @editPost="editPost(post.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" />
 
                 <h3>Quick Reply</h3>
                 <discussion :stashId="stashId" :feedId="feedId" :parentId="instance.id" :parentTitle="instance.content_item.title" action="create" />
@@ -35,7 +34,7 @@
 
 <script>
 import RestfulComponent from "../RestfulComponent"
-import {discussions, accounts, groups, interests, stashes, profiles, feedContentTypes, comments} from "../../store.js"
+import {activeUser, discussions, accounts, groups, interests, stashes, profiles, feedContentTypes, comments} from "../../store.js"
 import activeUserDeps from "../../dependencies/activeUser.js"
 import {DiscussionModel} from "../../models/Discussion.js"
 import Post from './Post'
@@ -61,6 +60,7 @@ export default {
     data() {
         return {
             objectName: 'discussion',
+            activeUserId: 0,
             instanceForm: { content_item: {} }
         }
     },
@@ -115,6 +115,10 @@ export default {
         async details(params) {
             const deps = await this.dependencies()
             this.instance = await this.showInstance(params.id, '/feed/list', discussions, deps)
+
+            const user = await activeUser()
+            this.activeUserId = user.details.id
+
             const discussionCollection = await discussions()
             discussionCollection.list({ parent: this.instance.id }, deps)
         },

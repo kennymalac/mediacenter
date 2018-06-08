@@ -18,7 +18,7 @@
             </div>
         </div>
         <p class="text">{{ text }}</p>
-        <div class="actions">
+        <div class="actions" v-if="isActiveUser">
             <button type="button" @click="$emit('editPost')">
                 <i class="ion-md-create"></i> Edit
             </button>
@@ -34,6 +34,10 @@ export default {
     props: {
         content_item: {
             type: Object
+        },
+        isActiveUser: {
+            type: Boolean,
+            default: false
         },
         text: {
             type: String

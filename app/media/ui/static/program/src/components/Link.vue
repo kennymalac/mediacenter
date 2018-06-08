@@ -3,7 +3,7 @@
         <template v-if="actions.details && instance.id">
             <div class="link post">
                 <div class="post-header">
-                    <div @click="showUserProfile(instance.id)" class="author">
+                    <div @click="showUserProfile(instance.content_item.owner.profile.id)" class="author">
                         <div class="profile-picture icon-container">
                             <img v-if="instance.content_item.owner.profile.picture" :src="instance.content_item.owner.profile.picture" />
                             <i v-if="!instance.content_item.owner.profile.picture" class="ion-md-person"></i>
@@ -24,6 +24,14 @@
                     <tag-list :tags="instance.content_item.interests" tagType="interest" /><br />
                     {{ instance.content_item.description }}
                 </p>
+                <div class="actions" v-if="isActiveUser">
+                    <button type="button" @click="editLink">
+                        <i class="ion-md-create"></i> Edit
+                    </button>
+                    <button type="button" class="error">
+                        <i class="ion-md-close"></i> Delete
+                    </button>
+                </div>
             </div>
             <h2>Comments</h2>
             <router-view :contentObjectId="instance.content_item.id" />
@@ -50,7 +58,7 @@
 
 <script>
 import RestfulComponent from "./RestfulComponent"
-import {links} from '../store.js'
+import {activeUser, links} from '../store.js'
 import {LinkModel} from '../models/Link.js'
 import linkDeps from '../dependencies/Link.js'
 
@@ -72,6 +80,7 @@ export default {
     data() {
         return {
             objectName: 'link',
+            isActiveUser: false,
             instanceForm: { content_item: {} }
         }
     },
@@ -85,6 +94,10 @@ export default {
             router.push(`/profile/${id}/details`)
         },
 
+        editLink() {
+            router.push(`../../manage`)
+        },
+
         async manage(params) {
             const fallthrough = this.parentId ? `/link/${this.parentId}/details` : `/feed/list`
 
@@ -94,10 +107,12 @@ export default {
 
         async details(params) {
             if (!this.params.commentAction) {
-                router.replace('comment/list')
+                router.replace('details/comment/list')
             }
 
             this.instance = await this.showInstance(params.id, '/feed/list', links, await linkDeps(this.stashId))
+            const user = await activeUser()
+            this.isActiveUser = this.instance.content_item.owner.id === user.details.id
         },
 
         async manageLink() {
@@ -110,7 +125,7 @@ export default {
         save() {
             if (this.actions.manage) {
                 this.manageLink().then(() => {
-                    router.push(`../${this.instance.id}/details`)
+                    router.push(`details`)
                 })
             }
         }
