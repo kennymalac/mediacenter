@@ -10,7 +10,7 @@ Obviously you can begin on anything you want straight away in a fork of this rep
 
 ## How to contribute
 ### Setting up a working local instance
-To start, you will need to install [Python 3](https://www.python.org/), [virtualenv](https://virtualenv.pypa.io/en/stable/), [Postgres](https://www.postgresql.org/), and [npm](https://www.npmjs.com/) (only a requirement for frontend dev). Instructions for installing these is outside of the scope of this tutorial. Media Center is only tested to function on Linux. All of these packages can be safely installed from your package manager, except perhaps npm, because you will need at least version 5.x. Postgres must also be at least version 5.4.  
+To start, you will need to install [Python 3](https://www.python.org/), [virtualenv](https://virtualenv.pypa.io/en/stable/), [Postgres](https://www.postgresql.org/), and [npm](https://www.npmjs.com/). Instructions for installing these is outside of the scope of this tutorial. Media Center is only tested to function on Linux. All of these packages can be safely installed from your package manager, except perhaps npm, because you will need at least version 5.x. Postgres must also be at least version 5.4.  
 
 Once you have all of that installed, here's how to setup Media Center:
 ```bash
@@ -35,16 +35,21 @@ GRANT ALL PRIVILEGES ON DATABASE <DB_NAME> TO <DB_USER>;
 python manage.py migrate --settings=media.settings.local
 # create an admin
 python manage.py createsuperuser --settings=media.settings.local
+# Now we have to build the frontend
+> cd app/media/ui/static/program
+# install required packages
+> npm install
+# build the javascript
+> npm run build
 ```
 NOTE that **\<PYTHON3\>** should be substituted for your python executable, for example "python3.6". Most distributions default to python2 being the default "python** excutable.  
 **\<PSQL_USER\>** is the user on your system that is authorized to call postgres. This is usually "postgres".  
 **\<DB_USER\>**, **\<DB_PASSWORD\>**, etc. are the values that should be configured in the Media Center's configured [local settings](app/media/media/settings/local.py). Modify this file with the values you have decided to use or simply use the values defined in that file.  
   
-After cloning the repo, setting up the virtual environment, creating a database, and creating the admin, you are finally ready to start the server. This will be available at http://localhost:8000
+After cloning the repo, setting up the virtual environment, creating a database, creating the admin, and building the frontend, you are finally ready to start the API server. Go back to the base directory for the repo and run the following command to start the server. This will be available at http://localhost:8000
 ```bash
 > python manage.py runserver --settings=media.settings.local
 ```
-There are some extra steps if you choose to contribute to the frontend which are outlined below.  
 
 ### I want to contribute to the backend codebase
 TODO  
@@ -56,11 +61,9 @@ The frontend code uses a framework called [Vue.js](https://vuejs.org/), and uses
 You likely require an editor that correctly highlights the **.vue** extension, which may require a plugin. I also recommend installing the Vue developer tools, which is available as a webextension.  
 All the frontend code lives in [app/media/ui/static/program/src](app/media/ui/static/program/src). Study it carefully if you need to.  
   
-There are some extra steps for setting up the development environment on the frontend:
+Here's how to run the frontend development server
 ```bash
 > cd app/media/ui/static/program
-# install required packages
-> npm install
 # Run the development server
 > npm run dev
 ```
