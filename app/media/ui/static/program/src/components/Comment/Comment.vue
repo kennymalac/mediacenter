@@ -1,9 +1,9 @@
 <template>
     <div class="feed-container">
-        <template v-if="actions.list && contentObjectId">
+        <template v-if="actions.list && (contentObjectId || profileId)">
             <section class="comments">
-                <comment @created="created" :parent="resolvedParent" :contentObjectId="contentObjectId" action="create" />
-                <comment-list @reply="reply" :activeUserId="activeUserId" :contentObjectId="contentObjectId" :items="objects" />
+                <comment @created="created" :parent="resolvedParent" :contentObjectId="contentObjectId" :profileId="profileId" action="create" />
+                <comment-list @reply="reply" :activeUserId="activeUserId" :contentObjectId="contentObjectId" :profileId="profileId" :items="objects" />
             </section>
         </template>
         <template v-if="actions.create || actions.manage">
@@ -24,10 +24,10 @@
 <script>
 import RestfulComponent from "../RestfulComponent"
 
-import {comments, activeUser} from "../../store.js"
+import {comments, profileComments, activeUser} from "../../store.js"
 import activeUserDeps from "../../dependencies/activeUser.js"
 import commentDeps from "../../dependencies/Comment.js"
-import {CommentModel} from "../../models/Comment.js"
+import {CommentModel, ProfileCommentModel} from "../../models/Comment.js"
 
 import CommentItem from './CommentItem'
 import CommentList from './CommentList'
@@ -38,7 +38,14 @@ export default {
     name: 'comment',
     mixins: [RestfulComponent],
     props: {
-        contentObjectId: [Number, String],
+        contentObjectId: {
+            type: [Number, String],
+            required: false
+        },
+        profileId: {
+            type: [Number, String],
+            required: false
+        },
         parent: {
             type: Object,
             default: () => { return { id: null } }
@@ -56,10 +63,27 @@ export default {
             activeUserId: 0
         }
     },
+    computed: {
+        collection() {
+            return this.profileId
+                ? profileComments
+                : comments
+        },
+        parentNestedId() {
+            return this.profileId
+                ? this.profileId
+                : this.contentObjectId
+        },
+        model() {
+            return this.profileId
+                ? ProfileCommentModel
+                : CommentModel
+        }
+    },
     methods: {
         initialState() {
             this.instance = { id: null, content_item: { feeds: [] } }
-            this.instanceForm = { content_item: {}, text: "" }
+            this.instanceForm = { text: "" }
         },
 
         showUserProfile(id) {
@@ -71,13 +95,16 @@ export default {
         },
 
         async create() {
-            await comments()
+            await this.collection()
+            if (!this.profileId) {
+                this.instanceForm.content_item = {}
+            }
         },
 
         async manage(params) {
             const fallthrough = this.parent.id ? `/comment/${this.parent.id}/detail` : `/feed/list`
 
-            this.instance = await this.showInstance(params.id, fallthrough, comments, await commentDeps())
+            this.instance = await this.showInstance(params.id, fallthrough, this.collection, await commentDeps())
             this.instanceForm = this.instance.getForm()
         },
 
@@ -85,17 +112,17 @@ export default {
             const user = await activeUser()
             this.activeUserId = user.details.id
 
-            const store = await comments()
+            const store = await this.collection()
             if (store.values.length === 0) {
-                await store.list(this.contentObjectId, {}, await commentDeps())
+                await store.list(this.parentNestedId, {}, await commentDeps())
             }
             this.objects = store.values.filter((item) => {
-                return this.parent.id ? item.contentObjectId === this.parent.id : true
+                return this.parent.id ? item.parent === this.parent.id : item.content_item === this.contentObjectId || item.user_profile === this.profileId
             })
         },
 
         async manageComment() {
-            return CommentModel.manage(this.instance, this.instanceForm, await commentDeps())
+            return this.model.manage(this.instance, this.instanceForm, await commentDeps())
                 .catch((error) => {
                     console.log(error)
                 })
@@ -112,7 +139,8 @@ export default {
             }
 
             try {
-                const instance = await this.$store.comments.create(this.contentObjectId, this.instanceForm, await commentDeps())
+                const store = await this.collection()
+                const instance = await store.create(this.parentNestedId, this.instanceForm, await commentDeps())
                 return instance
             }
             catch (error) {

@@ -4,7 +4,7 @@ import makeSingleton from './singleton.js'
 import {AccountCollection, makeAccountCollection} from './models/Account.js'
 import {ProfileCollection, makeProfileCollection, makeFilteredProfileCollection} from './models/Profile.js'
 import {FeedContentTypeCollection, makeFeedContentTypeCollection} from './models/FeedContentType.js'
-import {CommentCollection, makeCommentCollection} from './models/Comment.js'
+import {CommentCollection, makeCommentCollection, ProfileCommentCollection, makeProfileCommentCollection} from './models/Comment.js'
 import {InterestCollection, makeInterestCollection} from './models/Interest.js'
 import {FeedContentStashCollection, makeFeedContentStashCollection} from './models/FeedContentStash.js'
 import {FeedCollection, makeFilteredFeedCollection} from './models/Feed.js'
@@ -17,6 +17,7 @@ const store = {
     activeUser: {},
     accounts: {},
     profiles: {},
+    profileComments: {},
     interestedUsers: {},
     interestId: 0,
     stashes: {},
@@ -97,6 +98,14 @@ export const profiles = () => {
         'profiles',
         (value) => value instanceof ProfileCollection,
         () => makeProfileCollection()
+    )
+}
+
+export const profileComments = () => {
+    return singleton(
+        'profileComments',
+        (value) => value instanceof ProfileCommentCollection,
+        makeProfileCommentCollection
     )
 }
 

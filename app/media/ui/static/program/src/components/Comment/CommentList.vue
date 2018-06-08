@@ -1,6 +1,6 @@
 <template>
         <transition-group name="list" tag="div" class="comments">
-            <comment-item :activeUserId="activeUserId" @reply="reply" :contentObjectId="contentObjectId" :blacklist="blacklist" @minimizeComment="minimize(item.id)" @maximizeComment="maximize(item.id)" v-for="item in visibleItems" :key="item.id" v-bind="item.instance" :comments="nestedComments(item.id)" />
+            <comment-item :activeUserId="activeUserId" @reply="reply" :contentObjectId="contentObjectId" :profileId="profileId" :blacklist="blacklist" @minimizeComment="minimize(item.id)" @maximizeComment="maximize(item.id)" v-for="item in visibleItems" :key="item.id" v-bind="item.instance" :comments="nestedComments(item.id)" />
         </transition-group>
     </div>
 </template>
@@ -20,7 +20,14 @@ export default {
             type: Number,
             default: 0
         },
-        contentObjectId: [Number, String]
+        contentObjectId: {
+            type: [Number, String],
+            required: false
+        },
+        profileId: {
+            type: [Number, String],
+            required: false
+        }
     },
     data() {
         return {

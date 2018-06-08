@@ -8,11 +8,16 @@ export async function makeCommentCollection() {
     return new CommentCollection([])
 }
 
+export async function makeProfileCommentCollection() {
+    return new ProfileCommentCollection([])
+}
+
 class CommentModel extends Model {
 
     static initialState = {
         id: 0,
         content_item: 0,
+        user_profile: 0,
         owner: {},
         created: {},
         parent: 0,
@@ -41,6 +46,19 @@ class CommentModel extends Model {
     }
 }
 
+class ProfileCommentModel extends CommentModel {
+    static parentResource = 'profile'
+
+    static manage(instance, form, collections) {
+        return manageNested(
+            instance,
+            instance.user_profile,
+            {...form, owner: form.owner.id},
+            collections
+        )
+    }
+}
+
 class CommentCollection extends Collection {
 
     static Model = CommentModel
@@ -55,7 +73,7 @@ class CommentCollection extends Collection {
     async create(contentId, form, collections) {
         const data = {...form, owner: form.owner.id, content_item: contentId}
 
-        const created = await makeJsonRequest(`content/${contentId}/comment/`, {
+        const created = await makeJsonRequest(`${this.constructor.parentResource}/${contentId}/comment/`, {
             method: "POST",
             body: data
         })
@@ -72,4 +90,24 @@ class CommentCollection extends Collection {
     }
 }
 
-export {CommentCollection, CommentModel}
+class ProfileCommentCollection extends CommentCollection {
+    static Model = ProfileCommentModel
+    static parentResource = 'profile'
+
+    async create(profileId, form, collections) {
+        const data = {...form, owner: form.owner.id, user_profile: profileId}
+
+        const created = await makeJsonRequest(`${this.constructor.parentResource}/${profileId}/comment/`, {
+            method: "POST",
+            body: data
+        })
+              .then(jsonResponse)
+
+        const instance = this.addInstance(created, collections)
+        instance.sync(created, collections)
+
+        return instance
+    }
+}
+
+export {CommentCollection, CommentModel, ProfileCommentCollection, ProfileCommentModel}

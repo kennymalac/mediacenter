@@ -170,7 +170,7 @@ class Profile(TaggedItem):
     title = models.CharField(max_length=140, default="Welcome to my profile!")
     description = models.TextField(blank=True)
     picture = models.URLField(blank=True)
-    # created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.display_name
@@ -203,7 +203,8 @@ class FeedContentItem(TaggedItem):
 class Comment(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(Account, blank=True)
-    content_item = models.ForeignKey(FeedContentItem, related_name="comments")
+    content_item = models.ForeignKey(FeedContentItem, related_name="comments", null=True)
+    user_profile = models.ForeignKey(Profile, related_name="comments", null=True)
     parent = models.ForeignKey('self', null=True)
     text = models.TextField(blank=True)
 

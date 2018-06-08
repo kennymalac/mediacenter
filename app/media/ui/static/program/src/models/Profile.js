@@ -13,14 +13,16 @@ class ProfileModel extends Model {
         description: "",
         picture: "",
         interests: [],
-        account: {}
+        account: {},
+        comments: []
     }
 
     static resource = 'profile'
 
     static fields = {
         interests: [InterestCollection],
-        account: AccountCollection
+        account: AccountCollection,
+        comments: [Collection]
     }
 
     static async manage(instance, form, collections) {

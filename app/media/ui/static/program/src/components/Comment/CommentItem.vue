@@ -15,7 +15,7 @@
         <p class="text">{{ text }}</p>
         <transition name="list">
             <div v-if="!minimized" class="nested-comments">
-                <comment-list @reply="reply" :activeUserId="activeUserId" :contentObjectId="contentObjectId" :parentId="id" :items="comments" />
+                <comment-list @reply="reply" :activeUserId="activeUserId" :contentObjectId="contentObjectId" :profileId="profileId" :parentId="id" :items="comments" />
             </div>
         </transition>
     </div>
@@ -30,7 +30,14 @@ export default {
             default: 0
         },
         blacklist: [Array],
-        contentObjectId: [Number, String],
+        contentObjectId: {
+            type: [Number, String],
+            required: false
+        },
+        profileId: {
+            type: [Number, String],
+            required: false
+        },
         id: [Number],
         owner: [Object],
         created: [Object],

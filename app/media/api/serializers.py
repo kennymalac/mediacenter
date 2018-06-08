@@ -343,13 +343,13 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('id', 'owner', 'content_item', 'parent', 'text', 'created')
+        fields = ('id', 'owner', 'content_item', 'user_profile', 'parent', 'text', 'created')
 
 
 class CommentCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ('id', 'owner', 'content_item', 'parent', 'text', 'created')
+        fields = ('id', 'owner', 'content_item', 'user_profile', 'parent', 'text', 'created')
 
 
 class FeedContentItemBasicSerializer(serializers.ModelSerializer):

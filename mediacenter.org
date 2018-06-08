@@ -125,7 +125,8 @@
 *** User Profiles
 **** DONE basic UI
      CLOSED: [2018-05-08 Tue 16:56]
-**** TODO user profile comments
+**** DONE user profile comments
+     CLOSED: [2018-06-08 Fri 13:35]
 **** TODO cross-network profiles
 **** DONE get list of Group tags working
      CLOSED: [2018-05-24 Thu 14:38]

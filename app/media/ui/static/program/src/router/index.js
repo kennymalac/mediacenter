@@ -125,11 +125,23 @@ export default new Router({
             canReuse: false
         },
         {
-            path: '/profile/:id/:action',
+            path: '/profile/:profileId/:profileAction',
             name: 'Profile',
             component: Profile,
             props: restAction,
-            canReuse: false
+            canReuse: false,
+            children: [
+                {
+                    path: 'comment/:commentId/:commentAction',
+                    component: Comment,
+                    props: restAction
+                },
+                {
+                    path: 'comment/:commentAction',
+                    component: Comment,
+                    props: restAction
+                }
+            ]
         },
         {
             path: '/interest/:id/:action',

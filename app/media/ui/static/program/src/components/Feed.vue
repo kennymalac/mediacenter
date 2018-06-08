@@ -232,6 +232,7 @@ export default {
 .feed-container {
     display: flex;
     flex-direction: row;
+    flex-flow: wrap;
     justify-content: center;
     // flex-basis: 3;
     section.feed .feed-list {

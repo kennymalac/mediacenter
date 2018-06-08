@@ -1,64 +1,71 @@
 <template>
-    <div class="feed-container">
+    <div>
         <template v-if="actions.list">
-            <h1>User list</h1>
-            <profile-list :items="objects" />
+            <div class="profile-container">
+                <h1>User list</h1>
+                <profile-list :items="objects" />
+            </div>
         </template>
 
         <template v-if="actions.details && instance.id">
-            <section class="sidebar">
-                <div class="group-info">
-                    <div class="icon-container">
-                        <img v-if="instance.picture" :src="instance.picture" />
-                        <i v-if="!instance.picture" class="ion-md-person"></i>
+            <div class="profile-container">
+                <section class="sidebar">
+                    <div class="group-info">
+                        <div class="icon-container">
+                            <img v-if="instance.picture" :src="instance.picture" />
+                            <i v-if="!instance.picture" class="ion-md-person"></i>
+                        </div>
+                        <h2>{{ instance.display_name }}</h2>
+
+                        <button type="button" v-if="isActiveUser" @click="editProfile">
+                            <i class="ion-md-create"></i> Edit
+                        </button>
                     </div>
-                    <h2>{{ instance.display_name }}</h2>
+                </section>
+                <section class="main-profile">
+                    <h2>{{ instance.title }}</h2>
+                    <p class="description">{{ instance.description }}</p>
 
-                    <button type="button" v-if="isActiveUser" @click="editProfile">
-                        <i class="ion-md-create"></i> Edit
-                    </button>
-                </div>
-            </section>
-            <section class="main-profile">
-                <h2>{{ instance.title }}</h2>
-                <p class="description">{{ instance.description }}</p>
-
-                <div class="category">
-                    <span>Interests:</span>
-                    <tag-list :tags="instance.interests" tagType="interest" />
-                </div>
-                <div class="category">
-                    <span>Groups:</span>
-                    <tag-list :tags="instance.account.member_groups" tagType="group" />
-                </div>
-            </section>
-            <!-- <section class="comments"> -->
-            <!--     Comments go here... -->
-            <!-- </section> -->
+                    <div class="category">
+                        <span>Interests:</span>
+                        <tag-list :tags="instance.interests" tagType="interest" />
+                    </div>
+                    <div class="category">
+                        <span>Groups:</span>
+                        <tag-list :tags="instance.account.member_groups" tagType="group" />
+                    </div>
+                </section>
+            </div>
+            <div class="comments-container">
+                <h2>Comments</h2>
+                <router-view :profileId="instance.id" />
+            </div>
         </template>
 
         <template v-if="actions.manage && instance.id">
-            <form class="main-form" @submit.prevent="save">
-                <fieldset>
-                    <legend class="stack">Details</legend>
-                    <label class="stack" for="name">Display name</label>
-                    <input class="stack" name="name" v-model="instanceForm.display_name" type="text" />
-                    <label class="stack" for="title">Title</label>
-                    <input class="stack" name="title" v-model="instanceForm.title" type="text" />
-                    <label class="stack" for="description">Description</label>
-                    <textarea class="stack" name="description" v-model="instanceForm.description" />
-                    <label class="stack" for="picture">Profile picture</label>
-                    <input class="stack" name="picture" v-model="instanceForm.picture" type="text" />
-                    <!-- <label class="stack" for="rules">Rules</label>
-                         TODO rules -->
-                    <label class="stack" for="interests">Interests</label>
-                    <interest-select v-model="instanceForm.interests" />
+            <div class="profile-container">
+                <form class="main-form" @submit.prevent="save">
+                    <fieldset>
+                        <legend class="stack">Details</legend>
+                        <label class="stack" for="name">Display name</label>
+                        <input class="stack" name="name" v-model="instanceForm.display_name" type="text" />
+                        <label class="stack" for="title">Title</label>
+                        <input class="stack" name="title" v-model="instanceForm.title" type="text" />
+                        <label class="stack" for="description">Description</label>
+                        <textarea class="stack" name="description" v-model="instanceForm.description" />
+                        <label class="stack" for="picture">Profile picture</label>
+                        <input class="stack" name="picture" v-model="instanceForm.picture" type="text" />
+                        <!-- <label class="stack" for="rules">Rules</label>
+                             TODO rules -->
+                        <label class="stack" for="interests">Interests</label>
+                        <interest-select v-model="instanceForm.interests" />
 
-                    <!-- <label class="stack" for="">Tags</label> -->
-                    <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->
-                    <input class="stack" type="submit" value="Save changes" />
+                        <!-- <label class="stack" for="">Tags</label> -->
+                        <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->
+                        <input class="stack" type="submit" value="Save changes" />
                 </fieldset>
             </form>
+            </div>
         </template>
     </div>
 </template>
@@ -78,6 +85,7 @@ import {profiles, activeUser} from '../../store.js'
 import router from "../../router/index.js"
 
 export default {
+    name: 'profile',
     mixins: [RestfulComponent],
     components: {
         ProfileList,
@@ -86,6 +94,7 @@ export default {
     },
     data() {
         return {
+            objectName: 'profile',
             page: 1,
             instanceForm: { interests: [] },
             instance: {
@@ -117,6 +126,10 @@ export default {
         },
 
         async details(params) {
+            if (!this.params.commentAction) {
+                router.replace('details/comment/list')
+            }
+
             this.isActiveUser = false
             const deps = await profileDeps()
             this.instance = await this.showInstance(params.id, '/profile/list', profiles, deps)
@@ -166,6 +179,22 @@ export default {
 <style lang="scss">
 $dark-green: #2b9f67;
 
+.profile-container {
+    display: flex;
+    flex-direction: row;
+    flex-flow: wrap;
+    justify-content: center;
+    // flex-basis: 3;
+    section.feed .feed-list {
+        margin: 10px;
+        flex: 2;
+    }
+
+    .main-form {
+        width: 480px;
+    }
+}
+
 .main-profile {
     min-width: 500px;
     background: linear-gradient(135deg, white, rgb(236, 240, 241));
@@ -173,6 +202,7 @@ $dark-green: #2b9f67;
     padding: 20px;
     text-align: left;
 }
+
 .category {
     margin: 4px 0;
 }
