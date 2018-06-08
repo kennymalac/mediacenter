@@ -15,6 +15,12 @@
                         <img height="100%" width="100%" :src="instance.image" />
                     </div>
                     <h2>{{ instance.name }}</h2>
+
+                    <div v-if="this.instance.members.length !== 1">{{ this.instance.members.length }} Members</div>
+                    <div v-if="this.instance.members.length === 1">{{ this.instance.members.length }} Member</div>
+
+                    <tag-list :tags="instance.feed.interests" tagType="interest" />
+
                     <p class="description">{{ instance.description }}</p>
                     <div class="rules" v-if="instance.rules.length > 0">
                         <h3>Rules</h3>
@@ -26,18 +32,17 @@
                     <button type="button" v-if="isActiveUserOwner" @click="editGroup">
                         <i class="ion-md-create"></i> Edit
                     </button>
+
                     <button type="button" v-if="!isActiveUserMember" @click="joinGroup">Join group</button>
                     <button type="button" v-if="isActiveUserMember" class="warning" @click="leaveGroup">Leave group</button>
 
-                    <div class="who-is-online">
-                        <h3><div class="online-circle"></div> {{ onlineMembers.length }} User(s) online now</h3>
-                    </div>
-
-                    <tag-list :tags="instance.feed.interests" tagType="interest" />
+                    <!-- <div class="who-is-online"> -->
+                    <!--      <h3><div class="online-circle"></div> {{ onlineMembers.length }} User(s) online now</h3> -->
+                    <!-- </div> -->
                 </div>
             </section>
             <div class="group-contents">
-                <section class="feed" v-if="!params.discussionAction">
+                <section class="feed" v-if="!params.discussionAction && isActiveUserMember">
                     <action-button v-bind="createPostAction" />
                 </section>
                 <router-view v-if="instance.feed.id" :feedId="instance.feed.id"></router-view>
