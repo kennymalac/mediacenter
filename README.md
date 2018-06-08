@@ -7,8 +7,13 @@ This is a web application that hosts a registration server for viewing and uploa
 * Blog hosting and activity logs
 * Social interaction through commenting and sharing public links
 
-This web app is implemented using Django and Python, with the primary library used being Django REST Framework.
+This web app is implemented using Django and Python, with the primary library used being Django REST Framework. The frontend uses Vue.js.
 
-Currently few of these features are implemented and progress is being made on all fronts. The main priority is finishing the API and test suite.
+Currently few of these features are fully implemented and progress is being made on all fronts.
 
-The Media Center application, code, and all assets included besides publically available libraries are licensed under the **AGPL**. If you find the Media Center application useful and would like to distribute it and/or modify its source code, feel free to contact me. You are at liberty to do so in compliance with the license, see LICENSE for more details.
+## Contributing
+Please see [CONTRIBUTING.md](CONTRIBUTING.md)
+
+## License
+
+The Media Center application, code, and all assets included besides publically available libraries are licensed under the **AGPL**. If you find the Media Center application useful and would like to distribute it and/or modify its source code, feel free to contact me. You are at liberty to do so in compliance with the license, see [LICENSE](LICENSE) for more details.
