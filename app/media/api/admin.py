@@ -15,9 +15,9 @@ class MediaTagAdmin(admin.ModelAdmin):
 
 
 class MediaAdmin(admin.ModelAdmin):
-    search_fields = ('title', 'description', 'media_type', 'tags__name')
-    list_display = ('title', 'media_type', 'hidden')
-    fields = ('title', 'description', 'src', 'media_type', 'hidden', 'tags')
+    search_fields = ('title', 'description', 'tags__name')
+    list_display = ('title', 'hidden')
+    fields = ('title', 'description', 'src', 'hidden', 'tags')
 
 
 class AlbumTagAdmin(admin.ModelAdmin):

@@ -74,10 +74,10 @@ class LogSerializer(serializers.Serializer):
     message = serializers.CharField(max_length=400, allow_blank=True)
 
 
-class ActivityLogSerializer(serializers.Serializer):
-    title = serializers.CharField()
-    authors = serializers.ModelField(Account)
-    logs = serializers.ModelField(Log)
+class ActivityLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityLog
+        fields = ('id', 'message', 'context', 'author')
 
 
 class BlogPostSerializer(serializers.Serializer):
@@ -525,7 +525,12 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
         content_item = FeedContentItem.objects.create(**content_item_data, content_type=content_type)
 
         discussion = Discussion.objects.create(**validated_data, content_item=content_item, order=order)
-        # discussion.members.add(*members)
+        # discussion.members.add(*member
+        if content_type.name == FeedContentItemType.TOPIC:
+            ActivityLog.objects.create(action='create_topic', context={'group': 0, 'instance': discussion.id}, subscribed=[], message="Created topic")
+        elif content_type.name == FeedContentItemType.POST:
+            ActivityLog.objects.create(action='create_post', context={'group': 0, 'instance': discussion.id}, subscribed=[], message="Created post")
+
 
         return discussion
 

@@ -8,6 +8,8 @@
 **** TODO full test coverage
 
 
+Contemplate free plan with non-private photo uploads only, max 2MB per photo, and no video sharing
+
 * August 1st - Early Access
 
 * TODOs
@@ -146,6 +148,57 @@
      CLOSED: [2018-05-03 Thu 17:08]
 **** DONE selection box
      CLOSED: [2018-05-03 Thu 17:08]
+
+*** ActivityLog
+**** TODO notifications UI
+**** TODO privacy settings
+**** TODO 
+**** TODO Content actions
+***** TODO Image
+****** TODO create_image
+****** TODO read_image
+****** TODO update_image
+****** TODO delete_image
+****** TODO comment_image
+****** TODO save_image
+***** TODO Video
+****** TODO create_video
+****** TODO read_video
+****** TODO update_video
+****** TODO delete_video
+****** TODO comment_video
+****** TODO save_video
+***** TODO Link
+****** TODO create_link
+****** TODO read_link
+****** TODO update_link
+****** TODO delete_link
+****** TODO comment_link
+****** TODO save_link
+***** TODO Topic
+****** TODO create_topic
+****** TODO read_topic
+****** TODO update_topic
+****** TODO delete_topic
+****** TODO save_topic
+***** TODO Post
+****** TODO create_post
+****** TODO update_post
+****** TODO delete_post
+****** TODO save_post
+***** TODO BlogPost
+****** TODO create_blogpost
+****** TODO read_blogpost
+****** TODO update_blogpost
+****** TODO delete_blogpost
+****** TODO comment_blogpost
+****** TODO save_blogpost
+**** TODO ContentTag actions
+***** TODO Interest
+****** TODO create_interest
+****** TODO update_interest
+****** TODO save_interest
+**** TODO
 
 *** FeedContentItems
 **** TODO sort by time posted

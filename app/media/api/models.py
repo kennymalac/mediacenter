@@ -11,6 +11,7 @@ from django_countries.fields import CountryField
 from guardian.mixins import GuardianUserMixin
 
 import api.managers
+from api.pubsub import ALL_ACTIONS
 
 # Create your models here.
 class Account(AbstractUser, GuardianUserMixin):
@@ -50,22 +51,20 @@ def pre_delete_user(sender, **kwargs):
         instance.profile.delete()
 
 
-class Log(models.Model):
+class ActivityLog(models.Model):
     """
     Every log has a representation as a resource.
     A media log will be pulled from an activity log and the UI will infer how to display the log by information passed into the log through its association with the media.
     """
+
+    action = models.CharField(max_length=8, choices=ALL_ACTIONS)
     message = models.CharField(max_length=255)
-
-
-class ActivityLog(models.Model):
-    title = models.CharField(max_length=100)
-    authors = models.ManyToManyField(settings.AUTH_USER_MODEL)
-    logs = models.ManyToManyField(Log)
+    context = JSONField(blank=True)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, related_name="logs")
+    subscribed = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name="+")
 
 
 class BlogPost(models.Model):
-    log = models.ForeignKey(Log)
     slug = models.SlugField()
     title = models.CharField(max_length=100)
     authors = models.ManyToManyField(Account)
@@ -109,13 +108,6 @@ class MediaTag(models.Model):
     #
 
 
-mediaChoices = (
-    ('P', "PHOTO"),
-    ('V', "VIDEO"),
-    # ('W', "PHOTO EMBED")
-)
-
-
 class FeedContentItemType(models.Model):
     IMAGE = 'img'
     VIDEO = 'vid'
@@ -123,6 +115,7 @@ class FeedContentItemType(models.Model):
     BLOGPOST = 'blgpst'
     TOPIC = 'topic'
     POST = 'post'
+    # TODO reverse the order here, LOL!
     CONTENT_TYPES = (
         ('image', IMAGE),
         ('video', VIDEO),
@@ -278,15 +271,3 @@ class Media(models.Model):
     description = models.TextField(blank=True)
     hidden = models.BooleanField(default=False)
     tags = models.ManyToManyField("MediaTag", blank=True)
-    media_type = models.CharField(
-        max_length=2,
-        choices=mediaChoices
-    )
-    # TODO configure this
-    # content_id = models.CharField(max_length=255)
-
-    # permissions = models.JSONField()
-
-    # def can_change(self, user):
-    # 
-    #     if user
