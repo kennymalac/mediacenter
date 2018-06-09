@@ -14,8 +14,7 @@
         <feed-content-stash :feedId="resolvedFeedId" />
 
         <h2>Recent Activity</h2>
-        <!-- <activity-feed /> -->
-        <span class="author">Ken</span> replied to your post.
+        <activity-feed action="list" />
     </div>
 </template>
 
@@ -25,6 +24,8 @@
 import ActionButton from './ActionButton'
 import ContentItemForm from './ContentItemForm'
 import FeedContentStash from './FeedContentStash'
+import ActivityFeed from './ActivityFeed/ActivityFeed'
+
 import feedDeps from '../dependencies/Feed.js'
 
 import {feeds, activeUser} from '../store.js'
@@ -34,7 +35,8 @@ export default {
     components: {
         ActionButton,
         ContentItemForm,
-        FeedContentStash
+        FeedContentStash,
+        ActivityFeed
     },
     data() {
         return {

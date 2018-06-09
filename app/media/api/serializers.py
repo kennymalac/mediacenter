@@ -77,7 +77,7 @@ class LogSerializer(serializers.Serializer):
 class ActivityLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityLog
-        fields = ('id', 'message', 'context', 'author')
+        fields = ('id', 'action', 'message', 'context', 'author')
 
 
 class BlogPostSerializer(serializers.Serializer):
@@ -527,9 +527,11 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
         discussion = Discussion.objects.create(**validated_data, content_item=content_item, order=order)
         # discussion.members.add(*member
         if content_type.name == FeedContentItemType.TOPIC:
-            ActivityLog.objects.create(action='create_topic', context={'group': 0, 'instance': discussion.id}, subscribed=[], message="Created topic")
+            log = ActivityLog.objects.create(action='Topic00', author=content_item.owner, context={'group': 0, 'instance': discussion.id}, message="Created topic")
+            log.subscribed=[]
         elif content_type.name == FeedContentItemType.POST:
-            ActivityLog.objects.create(action='create_post', context={'group': 0, 'instance': discussion.id}, subscribed=[], message="Created post")
+            log = ActivityLog.objects.create(action='Post00', author=content_item.owner, context={'group': 0, 'instance': discussion.id}, message="Created post")
+            log.subscribed=[]
 
 
         return discussion

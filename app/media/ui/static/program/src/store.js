@@ -12,6 +12,7 @@ import {DiscussionCollection, makeDiscussionCollection} from './models/Discussio
 import {LinkCollection, makeLinkCollection} from './models/Link.js'
 import {GroupCollection, makeFilteredGroupCollection} from './models/Group.js'
 import {AlbumCollection, makeFilteredAlbumCollection} from './models/Album.js'
+import {ActivityLogCollection, makeFilteredActivityLogCollection} from './models/ActivityLog.js'
 
 const store = {
     activeUser: {},
@@ -28,7 +29,9 @@ const store = {
     discussions: {},
     links: {},
     groups: {},
-    filteredGroups: {}
+    filteredGroups: {},
+    activityLogs: {},
+    filteredActivityLogs: {}
 }
 
 const proxiedStore = new Proxy(store, {})
@@ -209,3 +212,35 @@ const filterGroups = (params) => {
 
 export const groups = groupStore('groups', activeUserGroups)
 export const filteredGroups = groupStore('filteredGroups', filterGroups)
+
+const activityLogStore = (field, reducer) => (params) => {
+    return singletonFactory(field, ActivityLogCollection, () => reducer(params))
+}
+
+const activeUserActivityLogs = () => {
+    return activeUser().then((user) => {
+        return makeFilteredActivityLogCollection(
+            () => ActivityLogCollection.searchActivityLogs({ members: user.details.id }),
+            feeds,
+            stashes,
+            accounts,
+            profiles,
+            feedContentTypes
+        )
+    })
+}
+
+const filterActivityLogs = (params) => {
+    console.log(params)
+    return makeFilteredActivityLogCollection(
+        () => ActivityLogCollection.searchActivityLogs(params),
+        feeds,
+        stashes,
+        accounts,
+        profiles,
+        feedContentTypes
+    )
+}
+
+export const activityLogs = activityLogStore('activityLogs', activeUserActivityLogs)
+export const filteredActivityLogs = activityLogStore('filteredActivityLogs', filterActivityLogs)

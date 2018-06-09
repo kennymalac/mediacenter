@@ -10,7 +10,7 @@ from ui.views import *
 
 router = ExtendedDefaultRouter()
 router.register(r'account', AccountViewSet)
-router.register(r'activitylog', ActivityLogViewSet)
+router.register(r'activity', ActivityLogViewSet)
 router.register(r'blogpost', BlogPostViewSet)
 router.register(r'album', AlbumViewSet, base_name='album')\
       .register(
