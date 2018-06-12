@@ -222,7 +222,22 @@ class FeedContentStashViewSet(NestedViewSetMixin,
         instance.content.add(*list(content))
 
         # All content without an origin stash now default to being shown in this stash
-        content.filter(origin_stash__isnull=True).update(origin_stash=instance)
+        new_content = content.filter(origin_stash__isnull=True)
+
+        for item in new_content:
+            item.origin_stash = instance
+            item.save()
+
+            content_type = item.content_type.name
+            if content_type == FeedContentItemType.TOPIC:
+                log = ActivityLog.objects.create(action='Topic00', author=item.owner, context={'instance': get_content_id(item), 'group': get_group_id(item), 'stash': item.origin_stash.id}, message="Created topic")
+                log.subscribed=[]
+            elif content_type == FeedContentItemType.POST:
+                log = ActivityLog.objects.create(action='Post00', author=item.owner, context={'instance': get_content_id(item), 'group': get_group_id(item), 'stash': item.origin_stash.id}, message="Created post")
+                log.subscribed=[]
+            elif content_type == FeedContentItemType.LINK:
+                log = ActivityLog.objects.create(action='Link00', author=item.owner, context={'instance': get_content_id(item), 'feed': get_feed_id(item), 'stash': item.origin_stash.id}, message="Created post")
+                log.subscribed=[]
 
         return Response({ 'content': request.data.get('content', []) })
 

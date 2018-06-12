@@ -40,6 +40,35 @@ export class Collection {
         }
     }
 
+    static async fetchAll(collections, initialData, dataCollections, getters = {}) {
+        let keys = []
+        let ops = []
+        for (const [key, data] of Object.entries(initialData)) {
+            const collection = dataCollections[key]
+            const getter = getters[key]
+                  ? getters[key]
+                  : collection.get.bind(collection)
+            keys.push(key)
+            ops.push(collection.fetchInstance(data, collections, getter))
+        }
+
+        const fetched = {}
+        const vals = await Promise.all(ops)
+        for (const val of vals) {
+            fetched[keys.shift()] = val
+        }
+        return fetched
+    }
+
+    async fetchInstance(item, collections, getter, always = false) {
+        // NOTE not tested with nested resources
+        const instance = this.getInstance(item, collections)
+        if (always || instance.instance._isFake) {
+            return await getter(instance.id, collections, instance)
+        }
+        return instance
+    }
+
     getInstance(item, collections, isPrimaryKey) {
         if (isPrimaryKey === undefined && Number.isInteger(item)) {
             isPrimaryKey = true

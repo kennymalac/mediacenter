@@ -37,6 +37,37 @@ class ActivityLogModel extends Model {
     }
 
     static resource = 'activity'
+
+    static async resolveLog(instance, collections) {
+        switch (instance.action) {
+        case 'create_topic':
+        case 'read_topic':
+        case 'update_topic':
+        case 'delete_topic':
+        case 'save_topic':
+            // TODO resolve stash
+            const {instance: topic, group} = await Collection.fetchAll(
+                collections,
+                { instance: instance.context.instance, group: instance.context.group },
+                { instance: collections.discussions, group: collections.groups })
+
+            return {...instance.instance, link: `/group/${instance.context.group}/details/stash/${instance.context.stash}/details/discussion/${instance.context.instance}/details/`, context: { instance: topic, group }} // , stash
+        case 'create_link':
+        case 'read_link':
+        case 'update_link':
+        case 'delete_link':
+        case 'save_link':
+            const {instance: link, feed} = await Collection.fetchAll(
+                collections,
+                { instance: instance.context.instance, feed: instance.context.feed },
+                { instance: collections.links, feed: collections.feed })
+
+            return {...instance.instance, link: `/feed/${instance.context.feed}/details/stash/${instance.context.stash}/details/link/${instance.context.instance}/details/`, context: { instance: link, feed }}
+
+        default:
+            return instance.context
+        }
+    }
 }
 
 class ActivityLogCollection extends Collection {

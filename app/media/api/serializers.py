@@ -75,6 +75,8 @@ class LogSerializer(serializers.Serializer):
 
 
 class ActivityLogSerializer(serializers.ModelSerializer):
+    action = serializers.CharField(source='get_action_display')
+
     class Meta:
         model = ActivityLog
         fields = ('id', 'action', 'message', 'context', 'author')
@@ -364,6 +366,33 @@ class FeedContentItemBasicSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'description', 'owner', 'content_type', 'created', 'interests')
 
 
+def get_content_id(instance):
+    _model = None
+    if instance.content_type.name == FeedContentItemType.TOPIC or \
+       instance.content_type.name == FeedContentItemType.POST:
+        _model = Discussion
+    elif instance.content_type.name == FeedContentItemType.LINK:
+        _model = Link
+        # elif instance.content_type == FeedContentItemType.IMAGE:
+        #     _model =
+
+    pk = _model.objects.filter(content_item=instance).values_list('id', flat=True).first()
+    return pk
+
+def get_group_id(instance):
+    valid_stashes = FeedContentStash.objects.filter(owned_content__in=(instance,), feeds__isnull=False)
+    if valid_stashes.count() > 0:
+        valid_feeds = Feed.objects.filter(stashes__in=valid_stashes, groupforum__isnull=False)
+
+        if valid_feeds.count() > 0:
+            feed = valid_feeds.first()
+            return feed.groupforum_set.first().id
+
+def get_feed_id(instance):
+    if instance.origin_stash:
+        return instance.origin_stash.feeds.first().id
+
+
 class FeedContentItemSerializer(serializers.ModelSerializer):
     owner = serializers.PrimaryKeyRelatedField(
         queryset=Account.objects.all(),
@@ -383,34 +412,17 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'description', 'owner', 'content_type', 'comments', 'created', 'object_id', 'origin_stash_id', 'feed_id', 'group_id', 'nested_object', 'interests')
 
     def get_content_id(self, instance):
-        _model = None
-        if instance.content_type.name == FeedContentItemType.TOPIC or \
-           instance.content_type.name == FeedContentItemType.POST:
-            _model = Discussion
-        elif instance.content_type.name == FeedContentItemType.LINK:
-            _model = Link
-        # elif instance.content_type == FeedContentItemType.IMAGE:
-        #     _model =
-
-        pk = _model.objects.filter(content_item=instance).values_list('id', flat=True).first()
-        return pk
+        return get_content_id(instance)
 
     def get_origin_stash_id(self, instance):
         if instance.origin_stash:
             return instance.origin_stash.id
 
     def get_feed_id(self, instance):
-        if instance.origin_stash:
-            return instance.origin_stash.feeds.first().id
+        return get_feed_id(instance)
 
     def get_group_id(self, instance):
-        valid_stashes = FeedContentStash.objects.filter(owned_content__in=(instance,), feeds__isnull=False)
-        if valid_stashes.count() > 0:
-            valid_feeds = Feed.objects.filter(stashes__in=valid_stashes, groupforum__isnull=False)
-
-            if valid_feeds.count() > 0:
-                feed = valid_feeds.first()
-                return feed.groupforum_set.first().id
+        return get_group_id(instance)
 
     def get_nested_object(self, instance):
         """Returns a nested representation of the content item's object"""
@@ -526,13 +538,6 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
 
         discussion = Discussion.objects.create(**validated_data, content_item=content_item, order=order)
         # discussion.members.add(*member
-        if content_type.name == FeedContentItemType.TOPIC:
-            log = ActivityLog.objects.create(action='Topic00', author=content_item.owner, context={'group': 0, 'instance': discussion.id}, message="Created topic")
-            log.subscribed=[]
-        elif content_type.name == FeedContentItemType.POST:
-            log = ActivityLog.objects.create(action='Post00', author=content_item.owner, context={'group': 0, 'instance': discussion.id}, message="Created post")
-            log.subscribed=[]
-
 
         return discussion
 

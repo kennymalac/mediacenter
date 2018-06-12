@@ -119,7 +119,7 @@ export default new Router({
         },
         {
             path: '/profile/:action',
-            name: 'Profile',
+            name: 'Profiles',
             component: Profile,
             props: restAction,
             canReuse: false

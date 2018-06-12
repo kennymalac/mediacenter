@@ -169,14 +169,16 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 ****** TODO comment_video
 ****** TODO save_video
 ***** TODO Link
-****** TODO create_link
+****** DONE create_link
+       CLOSED: [2018-06-12 Tue 16:02]
 ****** TODO read_link
 ****** TODO update_link
 ****** TODO delete_link
 ****** TODO comment_link
 ****** TODO save_link
 ***** TODO Topic
-****** TODO create_topic
+****** DONE create_topic
+       CLOSED: [2018-06-12 Tue 15:11]
 ****** TODO read_topic
 ****** TODO update_topic
 ****** TODO delete_topic
