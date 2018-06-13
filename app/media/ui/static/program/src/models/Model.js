@@ -38,6 +38,7 @@ export class Collection {
                 return !value.instance._isFake && filter(value)
             })
         }
+        this.promisedInstances = new Map()
     }
 
     static async fetchAll(collections, initialData, dataCollections, getters = {}) {
@@ -45,11 +46,8 @@ export class Collection {
         let ops = []
         for (const [key, data] of Object.entries(initialData)) {
             const collection = dataCollections[key]
-            const getter = getters[key]
-                  ? getters[key]
-                  : collection.get.bind(collection)
             keys.push(key)
-            ops.push(collection.fetchInstance(data, collections, getter))
+            ops.push(collection.fetchInstance(data, collections, getters[key]))
         }
 
         const fetched = {}
@@ -60,11 +58,27 @@ export class Collection {
         return fetched
     }
 
-    async fetchInstance(item, collections, getter, always = false) {
+    fetchInstance(item, collections, getter, always = false) {
         // NOTE not tested with nested resources
-        const instance = this.getInstance(item, collections)
+        const instance = item instanceof Model
+              ? item
+              : this.getInstance(item, collections)
+
         if (always || instance.instance._isFake) {
-            return await getter(instance.id, collections, instance)
+            let promised = this.promisedInstances.get(instance.id)
+            if (promised instanceof Promise) {
+                return this.promisedInstances.get(instance.id)
+            }
+            else {
+                this.promisedInstances.set(
+                    instance.id,
+                    getter ? getter() : this.get.bind(this)(instance.id, collections, instance)
+                )
+                return this.promisedInstances.get(instance.id)
+            }
+        }
+        else {
+            this.promisedInstances.delete(instance.id)
         }
         return instance
     }
@@ -398,7 +412,7 @@ export class Model {
             return this[modelField].filter((instance) => {
                 return instance.instance._isFake
             }).map((instance) => {
-                return _getter(instance.id, instance)
+                return collections[modelField].fetchInstance(instance, {}, () => _getter(instance.id, instance))
             })
         }
         else if (this[modelField].instance._isFake) {
@@ -406,7 +420,7 @@ export class Model {
                   ? (id, instance) => getter(this.id, id, instance, collections, instance)
                   : (id, instance) => getter(id, instance, collections, instance)
 
-            return [_getter(this[modelField].id, this[modelField])]
+            return [collections[modelField].fetchInstance(instance, {}, () => _getter(this[modelField].id, this[modelField]))]
         }
         return []
     }
