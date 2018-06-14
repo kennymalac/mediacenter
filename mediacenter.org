@@ -257,6 +257,10 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 ***** TODO Delete
 
 *** Discussion
+**** TODO full reply
+**** DONE separate reply into Reply component
+     CLOSED: [2018-06-14 Thu 14:14]
+**** TODO Pagination
 **** DONE Posts should have order
      CLOSED: [2018-05-12 Sat 17:41]
 **** TODO clicking new post twice breaks view
@@ -265,7 +269,6 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 **** DONE edit interface for Replies should have no description field
      CLOSED: [2018-05-09 Wed 11:13]
 **** TODO anchor links for individual posts
-**** TODO Pagination
 **** DONE model, serializer, viewset
      CLOSED: [2018-05-08 Tue 14:31]
 **** TODO CRUD

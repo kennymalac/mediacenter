@@ -176,6 +176,7 @@ export default new Router({
                             props: restAction
                         },
                         {
+                            name: 'Discussion',
                             path: 'discussion/:discussionAction',
                             component: Discussion,
                             props: restAction

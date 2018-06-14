@@ -5,28 +5,18 @@
                 <post v-bind="instance.instance" @editPost="editPost(instance.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" :isActiveUser="activeUserId === instance.content_item.owner.id" />
                 <post v-for="post in posts" v-bind="post.instance" :isActiveUser="activeUserId === post.content_item.owner.id" @editPost="editPost(post.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" />
 
-                <h3>Quick Reply</h3>
-                <discussion :stashId="stashId" :feedId="feedId" :parentId="instance.id" :parentTitle="instance.content_item.title" action="create" />
+                <div class="reply">
+                    <button @click="quickReplyActive = true" v-if="!quickReplyActive">Quick Reply</button>
+                    <button @click="reply" v-if="!quickReplyActive">Reply</button>
+                    <discussion @replied="quickReplyActive = false" v-if="quickReplyActive" action="create" :quickReply="true" :params="quickReplyParams" />
+                </div>
             </section>
         </template>
-        <template v-if="actions.create || actions.manage">
-            <form class="main-form" @submit.prevent="save">
-                <fieldset>
-                    <label class="stack" for="title">Title</label>
-                    <input class="stack" name="title" v-model="instanceForm.content_item.title" type="text" />
-                    <label v-if="!parentId && !instance.parent" class="stack" for="description">Description</label>
-                    <textarea v-if="!parentId && !instance.parent" class="stack" name="description" v-model="instanceForm.content_item.description" />
-
-                    <label class="stack" for="text">Contents</label>
-                    <textarea class="stack" name="text" v-model="instanceForm.text" />
-
-                    <!-- <label class="stack" for="">Tags</label> -->
-                    <!-- <input class="stack" name="tags" v-model="instance.tags_raw" type="text" /> -->
-                    <input v-if="actions.create && !parentId" class="stack" type="submit" value="Create" />
-                    <input v-if="actions.create && parentId" class="stack" type="submit" value="Reply" />
-                    <input v-if="actions.manage" class="stack" type="submit" value="Save changes" />
-                </fieldset>
-            </form>
+        <template v-if="actions.create">
+            <reply :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" />
+        </template>
+        <template v-if="actions.manage">
+            <reply :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="manage" />
         </template>
     </div>
 
@@ -38,15 +28,22 @@ import {activeUser, discussions, accounts, groups, interests, stashes, profiles,
 import activeUserDeps from "../../dependencies/activeUser.js"
 import {DiscussionModel} from "../../models/Discussion.js"
 import Post from './Post'
+import Reply from './Reply'
 
 import router from "../../router/index.js"
 
 export default {
     name: 'discussion',
     mixins: [RestfulComponent],
-    props: ['stashId', 'feedId', 'parentId', 'parentTitle'],
+    props: {
+        quickReply: {
+            type: Boolean,
+            default: false
+        }
+    },
     components: {
-        Post
+        Post,
+        Reply
     },
     computed: {
         discussionLink() {
@@ -55,11 +52,20 @@ export default {
             return this.objects.filter((item) => {
                 return item.parent === this.instance.id
             })
+        },
+        quickReplyParams() {
+            return {
+                parentId: this.instance.id,
+                parentTitle: this.instance.content_item.title,
+                stashId: this.params.stashId,
+                feedId: this.params.feedId
+            }
         }
     },
     data() {
         return {
             objectName: 'discussion',
+            quickReplyActive: false,
             activeUserId: 0,
             instanceForm: { content_item: {} }
         }
@@ -80,8 +86,8 @@ export default {
 
         async create() {
             await discussions()
-            if (this.parentTitle) {
-                this.instanceForm = {...this.instanceForm, content_item: {...this.instanceForm.content_item, title: `Re: ${this.parentTitle}`}}
+            if (this.params.parentTitle) {
+                this.instanceForm = {...this.instanceForm, content_item: {...this.instanceForm.content_item, title: `Re: ${this.params.parentTitle}`}}
             }
         },
 
@@ -89,7 +95,7 @@ export default {
             const [owner, stashCollection, contentTypeCollection, profileCollection, interestCollection, commentCollection, groupCollection] = await Promise.all(
                 [accounts(), stashes(), feedContentTypes(), profiles(), interests(), comments(), groups()]
             )
-            const stash = await stashCollection.getInstance(this.stashId)
+            const stash = await stashCollection.getInstance(this.params.stashId)
 
             return {
                 owner,
@@ -106,7 +112,7 @@ export default {
         },
 
         async manage(params) {
-            const fallthrough = this.parentId ? `/discussion/${this.parentId}/detail` : `/feed/list`
+            const fallthrough = this.params.parentId ? `/discussion/${this.parentId}/detail` : `/feed/list`
 
             this.instance = await this.showInstance(params.id, fallthrough, discussions, await this.dependencies())
             this.instanceForm = this.instance.getForm()
@@ -136,17 +142,17 @@ export default {
 
             this.instanceForm.content_item.owner = ownerAccount
 
-            if (this.parentId) {
-                this.instanceForm.parent = this.parentId
+            if (this.params.parentId) {
+                this.instanceForm.parent = this.params.parentId
             }
 
             const stashCollection = await stashes()
-            if (this.stashId) {
+            if (this.params.stashId) {
                 // TODO replies can be stored on specific stashes
                 // via pubsub
-                this.instanceForm.stash = await stashCollection.getInstance(this.stashId)
+                this.instanceForm.stash = await stashCollection.getInstance(this.params.stashId)
             }
-            this.instanceForm.feed = this.feedId
+            this.instanceForm.feed = this.params.feedId
 
             try {
                 const instance = await this.$store.discussions.create(this.instanceForm, await this.dependencies())
@@ -157,6 +163,19 @@ export default {
             }
         },
 
+        reply() {
+            router.push({
+                name: 'Discussion',
+                params: {
+                    discussionAction: 'create',
+                    parentId: this.instance.id,
+                    parentTitle: this.instance.content_item.title,
+                    stashId: this.params.stashId,
+                    feedId: this.params.feedId
+                }
+            })
+        },
+
         save() {
             if (this.actions.manage) {
                 this.manageDiscussion().then(() => {
@@ -165,8 +184,12 @@ export default {
             }
             else if (this.actions.create) {
                 this.createDiscussion().then(data => this.$nextTick(() => {
-                    if (!this.parentId) {
-                        router.replace('../discussion/' + data.id + '/details')
+                    if (!this.quickReply) {
+                        const id = this.params.parentId ? this.params.parentId : data.id
+                        router.replace(`../discussion/${id}/details`)
+                    }
+                    else {
+                        this.$emit('replied')
                     }
                 }))
             }
@@ -176,7 +199,10 @@ export default {
 </script>
 
 <style lang="scss">
-    textarea {
+textarea {
     min-height: 200px;
+}
+.reply {
+    margin: 10px;
 }
 </style>
