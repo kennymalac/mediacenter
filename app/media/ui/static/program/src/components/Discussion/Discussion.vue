@@ -1,6 +1,8 @@
 <template>
     <div class="feed-container">
         <template v-if="actions.details && instance.id">
+            <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
+
             <section class="posts">
                 <post v-bind="instance.instance" @editPost="editPost(instance.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" :isActiveUser="activeUserId === instance.content_item.owner.id" />
                 <post v-for="post in posts" v-bind="post.instance" :isActiveUser="activeUserId === post.content_item.owner.id" @editPost="editPost(post.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" />
@@ -29,6 +31,7 @@ import activeUserDeps from "../../dependencies/activeUser.js"
 import {DiscussionModel} from "../../models/Discussion.js"
 import Post from './Post'
 import Reply from './Reply'
+import PaginationControls from '../PaginationControls'
 
 import router from "../../router/index.js"
 
@@ -43,9 +46,13 @@ export default {
     },
     components: {
         Post,
-        Reply
+        Reply,
+        PaginationControls
     },
     computed: {
+        pageCount() {
+            return Math.ceil(this.posts.length / this.pageSize)
+        },
         discussionLink() {
         },
         posts() {
@@ -67,13 +74,20 @@ export default {
             objectName: 'discussion',
             quickReplyActive: false,
             activeUserId: 0,
-            instanceForm: { content_item: {} }
+            instanceForm: { content_item: {} },
+            currentPage: 1,
+            pageSize: 10
         }
     },
     methods: {
         initialState() {
             this.instance = { id: null, content_item: { feeds: [] } }
             this.instanceForm = { content_item: {}, text: "" }
+        },
+
+        selectPage(page) {
+            // TODO load next page of posts
+            this.currentPage = page
         },
 
         editPost(id) {

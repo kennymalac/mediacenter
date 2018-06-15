@@ -259,6 +259,7 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 *** Discussion
 **** DONE parse safe html, disable links
      CLOSED: [2018-06-15 Fri 12:08]
+**** TODO checkbox to hide Topic post from showing on page
 **** TODO tinyMCE plugin for embedding other content items?
 **** DONE full reply
      CLOSED: [2018-06-15 Fri 12:09]
