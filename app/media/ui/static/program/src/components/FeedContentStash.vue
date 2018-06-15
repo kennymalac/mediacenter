@@ -1,8 +1,7 @@
 <template>
     <div class="feed-container">
         <template v-if="actions.details && instance.id">
-            <router-view :feedId="feedId" :stashId="instance.id"></router-view>
-
+            <router-view :key="$route.name" :feedId="feedId" :stashId="instance.id"></router-view>
             <section class="feed" v-if="!params.discussionAction && !params.linkAction">
                 <feed-content-item-list :stashId="instance.id" :items="instance.content" :enabledContentTypes="enabledContentTypes" />
             </section>

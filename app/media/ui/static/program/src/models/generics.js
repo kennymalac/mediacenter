@@ -79,13 +79,21 @@ export async function resolveInstances(collection, items, collections = {}, chil
 }
 
 async function paginateListedResource(uri, collection, params, collections = {}, children = []) {
-    const data = await fetchAPI(`${uri}`, {
+    let data = await fetchAPI(`${uri}`, {
         method: "GET",
         queryParams: params
     })
           .then(jsonResponse)
 
-    return await resolveInstances(collection, data, collections, children)
+    let results
+    if (Array.isArray(data)) {
+        results = data
+        return await resolveInstances(collection, results, collections, children)
+    }
+    else if (data.results) {
+        results = data.results
+        return { ...data, results: await resolveInstances(collection, results, collections, children) }
+    }
 }
 
 export async function paginatedList(collection, params, collections = {}, children = []) {

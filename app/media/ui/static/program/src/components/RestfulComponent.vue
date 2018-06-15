@@ -8,6 +8,10 @@ export default {
             type: Object,
             required: false
         },
+        query: {
+            type: Object,
+            required: false
+        },
         isNested: {
             type: Boolean,
             default: false
@@ -85,7 +89,7 @@ export default {
         restAction(to, from) {
             let link = {}
 
-            if (from && to.fullPath.indexOf(from.fullPath) > -1) {
+            if (from && to.path.indexOf(from.path) > -1) {
                 // Do not rerender a component, this is a nested action
                 // that was redirected from the same route
                 return

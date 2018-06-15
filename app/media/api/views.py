@@ -271,7 +271,8 @@ class DiscussionViewSet(NestedViewSetMixin,
         'update': DiscussionCreateUpdateSerializer,
         'create': DiscussionCreateUpdateSerializer
     }
-    pagination = DiscussionPagination
+    pagination_class = DiscussionPagination
+    filter_class = DiscussionFilter
 
 
 class LinkViewSet(NestedViewSetMixin,

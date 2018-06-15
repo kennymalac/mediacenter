@@ -259,13 +259,17 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 *** Discussion
 **** DONE parse safe html, disable links
      CLOSED: [2018-06-15 Fri 12:08]
-**** TODO checkbox to hide Topic post from showing on page
+**** TODO minimize post button
+**** TODO showing topic on more than one page is confusing.
+checkbox to show on all pages y/n?
+**** TODO replying to a topic that goes over threshold of page should change page
 **** TODO tinyMCE plugin for embedding other content items?
 **** DONE full reply
      CLOSED: [2018-06-15 Fri 12:09]
 **** DONE separate reply into Reply component
      CLOSED: [2018-06-14 Thu 14:14]
-**** TODO Pagination
+**** DONE Pagination
+     CLOSED: [2018-06-15 Fri 15:55]
 **** DONE Posts should have order
      CLOSED: [2018-05-12 Sat 17:41]
 **** TODO clicking new post twice breaks view

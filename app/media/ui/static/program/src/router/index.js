@@ -36,6 +36,7 @@ function restAction(route) {
     if (isNested || !route.params.action || !validActions.includes(route.params.action)) {
         return {
             params: {...route.params},
+            query: {...route.query},
             // objectName: route.meta.objectName,
             isNested: true
         }
@@ -49,6 +50,7 @@ function restAction(route) {
 
     return {
         action: route.params.action,
+        query: {...route.query},
         isNested: isNested,
         id: route.params.id
     }
@@ -159,24 +161,26 @@ export default new Router({
         },
         {
             path: '/group/:groupId/:groupAction',
-            name: 'Group',
+            name: 'GroupNested',
             component: Group,
             props: restAction,
             canReuse: false,
             // meta: { objectName: 'group' },
             children: [
                 {
+                    name: 'GroupStash',
                     path: 'stash/:stashId/:stashAction',
                     component: FeedContentStash,
                     props: restAction,
                     children: [
                         {
+                            name: 'GroupDiscussionNested',
                             path: 'discussion/:discussionId/:discussionAction',
                             component: Discussion,
                             props: restAction
                         },
                         {
-                            name: 'Discussion',
+                            name: 'GroupDiscussion',
                             path: 'discussion/:discussionAction',
                             component: Discussion,
                             props: restAction

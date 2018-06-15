@@ -23,6 +23,8 @@ export default {
 
 <style lang="scss">
 .pagination-controls {
+    width: 100%;
+
     li.page-control {
         margin: 3px;
         user-select: none;

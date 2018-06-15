@@ -4,7 +4,7 @@
             <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
 
             <section class="posts">
-                <post v-bind="instance.instance" @editPost="editPost(instance.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" :isActiveUser="activeUserId === instance.content_item.owner.id" />
+                <post v-if="currentPage === 1" v-bind="instance.instance" @editPost="editPost(instance.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" :isActiveUser="activeUserId === instance.content_item.owner.id" />
                 <post v-for="post in posts" v-bind="post.instance" :isActiveUser="activeUserId === post.content_item.owner.id" @editPost="editPost(post.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" />
 
                 <div class="reply">
@@ -26,6 +26,7 @@
 
 <script>
 import RestfulComponent from "../RestfulComponent"
+import PaginatedComponent from "../PaginatedComponent"
 import {activeUser, discussions, accounts, groups, interests, stashes, profiles, feedContentTypes, comments} from "../../store.js"
 import activeUserDeps from "../../dependencies/activeUser.js"
 import {DiscussionModel} from "../../models/Discussion.js"
@@ -37,7 +38,7 @@ import router from "../../router/index.js"
 
 export default {
     name: 'discussion',
-    mixins: [RestfulComponent],
+    mixins: [RestfulComponent, PaginatedComponent],
     props: {
         quickReply: {
             type: Boolean,
@@ -50,14 +51,11 @@ export default {
         PaginationControls
     },
     computed: {
-        pageCount() {
-            return Math.ceil(this.posts.length / this.pageSize)
-        },
         discussionLink() {
         },
         posts() {
             return this.objects.filter((item) => {
-                return item.parent === this.instance.id
+                return item.parent === this.instance.id && this.isItemVisibleOnPage(item)
             })
         },
         quickReplyParams() {
@@ -69,25 +67,21 @@ export default {
             }
         }
     },
+    mounted() {
+        console.log('remounted')
+    },
     data() {
         return {
             objectName: 'discussion',
             quickReplyActive: false,
             activeUserId: 0,
-            instanceForm: { content_item: {} },
-            currentPage: 1,
-            pageSize: 10
+            instanceForm: { content_item: {} }
         }
     },
     methods: {
         initialState() {
             this.instance = { id: null, content_item: { feeds: [] } }
             this.instanceForm = { content_item: {}, text: "" }
-        },
-
-        selectPage(page) {
-            // TODO load next page of posts
-            this.currentPage = page
         },
 
         editPost(id) {
@@ -132,6 +126,12 @@ export default {
             this.instanceForm = this.instance.getForm()
         },
 
+        async listChildren(deps = null) {
+            const _deps = deps || await this.dependencies()
+            const discussionCollection = await discussions()
+            this.paginate(await discussionCollection.list({ parent: this.instance.id, page: this.currentPage }, _deps))
+        },
+
         async details(params) {
             const deps = await this.dependencies()
             this.instance = await this.showInstance(params.id, '/feed/list', discussions, deps)
@@ -139,8 +139,7 @@ export default {
             const user = await activeUser()
             this.activeUserId = user.details.id
 
-            const discussionCollection = await discussions()
-            discussionCollection.list({ parent: this.instance.id }, deps)
+            this.listChildren(deps)
         },
 
         async manageDiscussion() {
