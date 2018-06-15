@@ -10,9 +10,11 @@
                 <div class="reply">
                     <button @click="quickReplyActive = true" v-if="!quickReplyActive">Quick Reply</button>
                     <button @click="reply" v-if="!quickReplyActive">Reply</button>
-                    <discussion @replied="quickReplyActive = false" v-if="quickReplyActive" action="create" :quickReply="true" :params="quickReplyParams" />
+                    <discussion @replied="quickReplyActive = false; selectPage(pageCount)" v-if="quickReplyActive" action="create" :quickReply="true" :params="quickReplyParams" />
                 </div>
             </section>
+
+            <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
         </template>
         <template v-if="actions.create">
             <reply :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" />
@@ -130,6 +132,9 @@ export default {
             const _deps = deps || await this.dependencies()
             const discussionCollection = await discussions()
             this.paginate(await discussionCollection.list({ parent: this.instance.id, page: this.currentPage }, _deps))
+            if (this.query.last) {
+                this.selectPage(this.pageCount)
+            }
         },
 
         async details(params) {
@@ -178,7 +183,6 @@ export default {
 
         reply() {
             router.push({
-                name: 'Discussion',
                 params: {
                     discussionAction: 'create',
                     parentId: this.instance.id,
@@ -198,8 +202,15 @@ export default {
             else if (this.actions.create) {
                 this.createDiscussion().then(data => this.$nextTick(() => {
                     if (!this.quickReply) {
-                        const id = this.params.parentId ? this.params.parentId : data.id
-                        router.replace(`../discussion/${id}/details`)
+                        router.replace({
+                            params: {
+                                discussionAction: 'details',
+                                id: this.params.parentId ? this.params.parentId : data.id
+                            },
+                            query: {
+                                last: 1
+                            }
+                        })
                     }
                     else {
                         this.$emit('replied')
