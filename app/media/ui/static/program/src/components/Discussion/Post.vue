@@ -9,7 +9,7 @@
 
                 <div class="author-details">
                     <span class="display-name">{{ content_item.owner.profile.display_name }}</span>
-                    <span class="user-title">Sr. Poster</span>
+                    <span class="user-title">{{ userTitle }}</span>
                 </div>
             </div>
             <div class="post-details">
@@ -41,6 +41,10 @@ export default {
         },
         text: {
             type: String
+        },
+        userTitle: {
+            type: String,
+            default: "User"
         }
     }
 }
