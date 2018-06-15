@@ -17,7 +17,7 @@
                 <span class="date">{{ content_item.created.format('LLLL') }}</span>
             </div>
         </div>
-        <p class="text">{{ text }}</p>
+        <div v-html="text" class="text"></div>
         <div class="actions" v-if="isActiveUser">
             <button type="button" @click="$emit('editPost')">
                 <i class="ion-md-create"></i> Edit
@@ -134,7 +134,7 @@ export default {
         color: white;
         background: linear-gradient(180deg, #001f3f, rgba(52, 73, 94,1.0));
     }
-    p.text {
+    div.text {
         padding: 10px 20px;
         font-size: 1rem;
     }

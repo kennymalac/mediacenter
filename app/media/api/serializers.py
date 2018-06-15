@@ -1,3 +1,4 @@
+from bleach.sanitizer import Cleaner
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Max
 from django.conf import settings
@@ -514,11 +515,19 @@ class DiscussionSerializer(serializers.ModelSerializer):
         fields = ('id', 'parent', 'order', 'content_item', 'text')
 
 
+cleaner = Cleaner(['a', 'abbr', 'acronym', 'b', 'code', 'pre', 'blockqote', 'span', 'sub', 'sup', 'code', 'em', 'i', 'ul', 'li', 'ol', 'strong', 'l', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'thead', 'caption', 'tbody', 'col', 'colgroup', 'tfoot', 'th', 'tr', 'td'], attributes={'*': ['style', 'alt', 'width', 'height'], 'a': ['href', 'title'], 'abbr': ['title'], 'acronym': ['title'], 'table': ['align', 'cellpadding', 'cellspacing'], 'th': ['scope'], 'colgroup': ['span'], 'caption': ['align']}, styles=['color', 'font-weight', 'text-decoration', 'background-color', 'color', 'text-align', 'border-style', 'border', 'border-width', 'border-color'])
+
+
 class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
     content_item = FeedContentItemBasicSerializer(
         many=False,
         required=False
     )
+
+    def save(self):
+        text = self.validated_data['text']
+        self.validated_data['text'] = cleaner.clean(text)
+        super(DiscussionCreateUpdateSerializer, self).save()
 
     def create(self, validated_data):
         content_item_data = validated_data.pop('content_item')
