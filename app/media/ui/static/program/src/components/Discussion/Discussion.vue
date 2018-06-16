@@ -10,7 +10,7 @@
                 <div class="reply">
                     <button @click="quickReplyActive = true" v-if="!quickReplyActive">Quick Reply</button>
                     <button @click="reply" v-if="!quickReplyActive">Reply</button>
-                    <discussion @canceled="quickReplyActive = false" @replied="quickReplyActive = false; selectPage(pageCount)" v-if="quickReplyActive" action="create" :quickReply="true" :params="quickReplyParams" />
+                    <discussion @canceled="quickReplyActive = false" @replied="quickReplied" v-if="quickReplyActive" action="create" :quickReply="true" :params="quickReplyParams" />
                 </div>
             </section>
 
@@ -84,6 +84,12 @@ export default {
         initialState() {
             this.instance = { id: null, content_item: { feeds: [] } }
             this.instanceForm = { content_item: {}, text: "" }
+        },
+
+        quickReplied() {
+            this.quickReplyActive = false
+            ++this.itemCount
+            this.selectPage(this.pageCount)
         },
 
         editPost(id) {

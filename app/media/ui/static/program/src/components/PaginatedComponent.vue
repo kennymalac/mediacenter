@@ -10,7 +10,7 @@ export default {
     },
     computed: {
         pageCount() {
-            return Math.ceil(this.itemCount / this.pageSize)
+            return Math.ceil(this.itemCount / this.pageSize) || 1
         },
         currentPage() {
             return this.query.page ? parseInt(this.query.page) : 1
@@ -30,8 +30,10 @@ export default {
 
         paginate(response) {
             this.itemCount = response.count
-            this.pageMinOrder = response.results[0].order
-            this.pageMaxOrder = response.results.slice(-1)[0].order
+            if (this.itemCount !== 0) {
+                this.pageMinOrder = response.results[0].order
+                this.pageMaxOrder = response.results.slice(-1)[0].order
+            }
         },
 
         isItemVisibleOnPage(item) {
