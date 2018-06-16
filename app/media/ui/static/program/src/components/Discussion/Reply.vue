@@ -14,9 +14,13 @@
 
                 <!-- <label class="stack" for="">Tags</label> -->
                 <!-- <input class="stack" name="tags" v-model="instance.tags_raw" type="text" /> -->
-                <input v-if="action === 'create' && !parentId" class="stack" type="submit" value="Create" />
-                <input v-if="action === 'create' && parentId" class="stack" type="submit" value="Reply" />
-                <input v-if="action === 'manage'" class="stack" type="submit" value="Save changes" />
+                <div style="display: flex;">
+                    <button class="stack error" type="button" @click="$emit('canceled')"><i class="ion-ios-undo"></i> Cancel</button>
+
+                    <input v-if="action === 'create' && !parentId" class="stack" type="submit" value="Create" />
+                    <input v-if="action === 'create' && parentId" class="stack" type="submit" value="Reply" />
+                    <input v-if="action === 'manage'" class="stack" type="submit" value="Save changes" />
+                </div>
             </fieldset>
         </form>
     </div>
@@ -107,5 +111,16 @@ form.reply-form {
     min-width: 480px;
     width: 100%;
     weight: 100%;
+    button.stack.error {
+        text-align: center;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        border-bottom-left-radius: .2em;
+    }
+    input[type=submit] {
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
+        border-bottom-right-radius: .2em;
+    }
 }
 </style>

@@ -260,9 +260,12 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 **** DONE parse safe html, disable links
      CLOSED: [2018-06-15 Fri 12:08]
 **** TODO minimize post button
+**** DONE cancel button on Reply
+     CLOSED: [2018-06-15 Fri 16:57]
 **** TODO showing topic on more than one page is confusing.
 checkbox to show on all pages y/n?
-**** TODO replying to a topic that goes over threshold of page should change page
+**** DONE replying to a topic that goes over threshold of page should change page
+     CLOSED: [2018-06-15 Fri 17:01]
 **** TODO tinyMCE plugin for embedding other content items?
 **** DONE full reply
      CLOSED: [2018-06-15 Fri 12:09]

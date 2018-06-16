@@ -10,17 +10,17 @@
                 <div class="reply">
                     <button @click="quickReplyActive = true" v-if="!quickReplyActive">Quick Reply</button>
                     <button @click="reply" v-if="!quickReplyActive">Reply</button>
-                    <discussion @replied="quickReplyActive = false; selectPage(pageCount)" v-if="quickReplyActive" action="create" :quickReply="true" :params="quickReplyParams" />
+                    <discussion @canceled="quickReplyActive = false" @replied="quickReplyActive = false; selectPage(pageCount)" v-if="quickReplyActive" action="create" :quickReply="true" :params="quickReplyParams" />
                 </div>
             </section>
 
             <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
         </template>
         <template v-if="actions.create">
-            <reply :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" />
+            <reply @canceled="quickReply ? $emit('canceled') : $router.go(-1)" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" />
         </template>
         <template v-if="actions.manage">
-            <reply :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="manage" />
+            <reply @canceled="$router.go(-1)" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="manage" />
         </template>
     </div>
 
