@@ -14,6 +14,12 @@
 
                 <!-- <label class="stack" for="">Tags</label> -->
                 <!-- <input class="stack" name="tags" v-model="instance.tags_raw" type="text" /> -->
+                <label class="stack">
+                    <input v-model="instanceForm.content_item.is_anonymous" name="is_anonymous" type="checkbox">
+                    <span class="checkable">Post Anonymously</span>
+                </label>
+
+
                 <div style="display: flex;">
                     <button class="stack error" type="button" @click="$emit('canceled')"><i class="ion-ios-undo"></i> Cancel</button>
 

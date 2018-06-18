@@ -184,6 +184,7 @@ class Feed(TaggedItem):
 class FeedContentItem(TaggedItem):
     origin_stash = models.ForeignKey('api.FeedContentStash', null=True, related_name="owned_content")
     owner = models.ForeignKey(Account, blank=True)
+    is_anonymous = models.BooleanField(default=False)
     content_type = models.ForeignKey(FeedContentItemType, related_name="+")
     title = models.CharField(max_length=140, blank=True)
     description = models.TextField(blank=True)
@@ -198,6 +199,7 @@ class Comment(models.Model):
     owner = models.ForeignKey(Account, blank=True)
     content_item = models.ForeignKey(FeedContentItem, related_name="comments", null=True)
     user_profile = models.ForeignKey(Profile, related_name="comments", null=True)
+    is_anonymous = models.BooleanField(default=False)
     parent = models.ForeignKey('self', null=True)
     text = models.TextField(blank=True)
 

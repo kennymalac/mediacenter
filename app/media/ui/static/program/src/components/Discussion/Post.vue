@@ -7,8 +7,12 @@
                     <i v-if="!content_item.owner.profile.picture" class="ion-md-person"></i>
                 </div>
 
-                <div class="author-details">
+                <div v-if="!content_item.is_anonymous" class="author-details">
                     <span class="display-name">{{ content_item.owner.profile.display_name }}</span>
+                    <span class="user-title">{{ userTitle }}</span>
+                </div>
+                <div v-if="content_item.is_anonymous" class="author-details">
+                    <span class="display-name">Anonymous</span>
                     <span class="user-title">{{ userTitle }}</span>
                 </div>
             </div>

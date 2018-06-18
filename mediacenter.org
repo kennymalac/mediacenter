@@ -31,7 +31,6 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
      CLOSED: [2018-04-30 Mon 18:43]
 **** DONE Fix media browser breaking entire app
      CLOSED: [2018-04-30 Mon 18:41]
-**** TODO playSlideshow
 **** DONE goForward/goBack
      CLOSED: [2017-05-13 Sat 12:47]
 **** DONE closeModal
@@ -257,6 +256,8 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 ***** TODO Delete
 
 *** Discussion
+**** DONE anonymous replies
+     CLOSED: [2018-06-18 Mon 16:29]
 **** DONE parse safe html, disable links
      CLOSED: [2018-06-15 Fri 12:08]
 **** TODO minimize post button
@@ -275,7 +276,6 @@ checkbox to show on all pages y/n?
      CLOSED: [2018-06-15 Fri 15:55]
 **** DONE Posts should have order
      CLOSED: [2018-05-12 Sat 17:41]
-**** TODO clicking new post twice breaks view
 **** TODO should post count show number of Posts in current group?
 **** TODO last edited date
 **** DONE edit interface for Replies should have no description field
@@ -293,6 +293,8 @@ checkbox to show on all pages y/n?
 ***** TODO Delete
 
 *** Comments
+**** DONE anonymous comments
+     CLOSED: [2018-06-18 Mon 16:49]
 **** DONE nested comments
      CLOSED: [2018-05-30 Wed 19:14]
 **** TODO consider making comments optional, and allowing Discussion creation per content item
@@ -408,6 +410,7 @@ collection that references that same collection?
 
 *** TODO deployment to a VPS
 *** Authentication
+**** TODO merge Login and Register
 **** TODO better encryption (?)
      can't trust js crypto,
      maybe extend jwt, idk
@@ -423,6 +426,7 @@ collection that references that same collection?
 
 *** TODO activitylog
 *** Media Browser
+**** TODO playSlideshow
 **** TODO moveable modal with window controls
 **** TODO applyEffects (low priority)
 **** TODO multiple media item rows

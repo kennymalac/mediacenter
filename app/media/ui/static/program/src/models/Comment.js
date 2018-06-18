@@ -19,6 +19,7 @@ class CommentModel extends Model {
         content_item: 0,
         user_profile: 0,
         owner: {},
+        is_anonymous: false,
         created: {},
         parent: 0,
         text: ""

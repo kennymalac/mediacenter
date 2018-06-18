@@ -9,8 +9,15 @@
         <template v-if="actions.create || actions.manage">
             <form class="main-form" @submit.prevent="save">
                 <fieldset>
-                    <label v-if="parent.id">Reply to: {{ parent.owner.profile.display_name }}</label>
+                    <label v-if="parent.id && parent.owner.id !== -1">Reply to: {{ parent.owner.profile.display_name }}</label>
+                    <label v-if="parent.id && parent.owner.id === -1">Reply to: Anonymous</label>
+
                     <textarea class="stack" name="text" v-model="instanceForm.text" />
+
+                    <label class="stack">
+                        <input v-model="instanceForm.is_anonymous" name="is_anonymous" type="checkbox">
+                        <span class="checkable">Post Anonymously</span>
+                    </label>
 
                     <input v-if="actions.create && parent.id" class="stack" type="submit" value="Reply" />
                     <input v-if="actions.create && !parent.id" class="stack" type="submit" value="Create" />

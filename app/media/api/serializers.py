@@ -33,7 +33,18 @@ class AccountSerializer(CountryFieldMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ('id', 'username', 'country', 'email', 'profile', 'friends', 'member_groups')
+        fields = ('id', 'username', 'country', 'email', 'profile', 'friends', 'member_groups'
+)
+    def to_representation(self, obj):
+        if self.context.get('is_anonymous', False):
+            return {
+                'id': -1,
+                'username': 'Anonymous',
+                'country': '',
+                'email': ''
+            }
+
+        return super(AccountSerializer, self).to_representation(obj)
 
 
 class FullAccountSerializer(AccountSerializer):
@@ -339,20 +350,37 @@ class FeedSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'owner', 'content_types', 'created', 'interests', 'stashes')
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentBasicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ('id', 'owner', 'is_anonymous', 'content_item', 'user_profile', 'parent', 'text', 'created')
+
+    def to_representation(self, obj):
+        # TODO make this a mixin?
+        self.context['is_anonymous'] = obj.is_anonymous
+
+        result = super(CommentBasicSerializer, self).to_representation(obj)
+
+        # If this is the primary key serializer, give it the forgotten fake intance
+        if obj.is_anonymous and isinstance(result['owner'], int):
+            result['owner'] = {
+                'id': -1,
+                'username': 'Anonymous',
+                'country': '',
+                'email': ''
+            }
+
+        return result
+
+
+class CommentSerializer(CommentBasicSerializer):
     owner = AccountSerializer(
         read_only=True
     )
 
-    class Meta:
-        model = Comment
-        fields = ('id', 'owner', 'content_item', 'user_profile', 'parent', 'text', 'created')
 
-
-class CommentCreateUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = ('id', 'owner', 'content_item', 'user_profile', 'parent', 'text', 'created')
+class CommentCreateUpdateSerializer(CommentBasicSerializer):
+    pass
 
 
 class FeedContentItemBasicSerializer(serializers.ModelSerializer):
@@ -361,11 +389,28 @@ class FeedContentItemBasicSerializer(serializers.ModelSerializer):
         queryset=FeedContentItemType.objects.all(),
         required=False
     )
+    is_anonymous = serializers.BooleanField(
+        required=False
+    )
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'content_type', 'created', 'interests')
+        fields = ('id', 'title', 'description', 'owner', 'is_anonymous', 'content_type', 'created', 'interests')
 
+    def to_representation(self, obj):
+        self.context['is_anonymous'] = obj.is_anonymous
+        result = super(FeedContentItemBasicSerializer, self).to_representation(obj)
+
+        # If this is the primary key serializer, give it the forgotten fake intance
+        if obj.is_anonymous and isinstance(result['owner'], int):
+            result['owner'] = {
+                'id': -1,
+                'username': 'Anonymous',
+                'country': '',
+                'email': ''
+            }
+
+        return result
 
 def get_content_id(instance):
     _model = None
@@ -394,7 +439,7 @@ def get_feed_id(instance):
         return instance.origin_stash.feeds.first().id
 
 
-class FeedContentItemSerializer(serializers.ModelSerializer):
+class FeedContentItemSerializer(FeedContentItemBasicSerializer):
     owner = serializers.PrimaryKeyRelatedField(
         queryset=Account.objects.all(),
         required=False
@@ -410,7 +455,7 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'content_type', 'comments', 'created', 'object_id', 'origin_stash_id', 'feed_id', 'group_id', 'nested_object', 'interests')
+        fields = ('id', 'title', 'description', 'owner', 'is_anonymous', 'content_type', 'comments', 'created', 'object_id', 'origin_stash_id', 'feed_id', 'group_id', 'nested_object', 'interests')
 
     def get_content_id(self, instance):
         return get_content_id(instance)
@@ -434,10 +479,6 @@ class FeedContentItemSerializer(serializers.ModelSerializer):
 
 
 class FeedContentItemCreateUpdateSerializer(FeedContentItemSerializer):
-    content_type = serializers.PrimaryKeyRelatedField(
-        queryset=FeedContentItemType.objects.all(),
-        required=False
-    )
     comments = CommentSerializer(
         many=True,
         read_only=True,
@@ -445,7 +486,7 @@ class FeedContentItemCreateUpdateSerializer(FeedContentItemSerializer):
     )
 
 
-class FeedContentItemProfileSerializer(serializers.ModelSerializer):
+class FeedContentItemProfileSerializer(FeedContentItemBasicSerializer):
     owner = AccountSerializer()
     comments = CommentSerializer(
         many=True,
@@ -455,7 +496,7 @@ class FeedContentItemProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'interests', 'comments', 'content_type', 'created')
+        fields = ('id', 'title', 'description', 'owner', 'interests', 'comments', 'content_type', 'created', 'is_anonymous')
 
 
 class FeedContentStashSerializer(serializers.ModelSerializer):

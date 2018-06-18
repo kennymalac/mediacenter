@@ -11,6 +11,7 @@ class FeedContentItemModel extends Model {
         feed_id: 0,
         origin_stash_id: 0,
         group_id: 0,
+        is_anonymous: false,
         interests: [],
         comments: [],
         nested_object: {},

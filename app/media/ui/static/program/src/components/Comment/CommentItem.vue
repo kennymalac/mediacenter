@@ -3,8 +3,9 @@
         <div class="author">
             <div @click="minimize" v-if="!minimized" class="minimize">[-]</div>
             <div @click="maximize" v-if="minimized" class="minimize">[+]</div>
-            <span class="display-name"><router-link :to="ownerProfile">{{ owner.profile.display_name }}</router-link></span>
-            <span class="user-title">Sr. Poster</span>
+            <span v-if="!is_anonymous" class="display-name"><router-link :to="ownerProfile">{{ owner.profile.display_name }}</router-link></span>
+            <span v-if="is_anonymous" class="display-name">Anonymous</span>
+            <span v-if="!is_anonymous" class="user-title">User</span>
             <span class="date">{{ created.format('LLLL') }}</span>
         </div>
         <a class="reply" @click.prevent="$emit('reply', {id, owner})">Reply</a>
@@ -40,6 +41,10 @@ export default {
         },
         id: [Number],
         owner: [Object],
+        is_anonymous: {
+            type: Boolean,
+            default: false
+        },
         created: [Object],
         text: [String],
         comments: [Array]

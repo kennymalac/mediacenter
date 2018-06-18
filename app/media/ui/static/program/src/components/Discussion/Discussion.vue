@@ -5,7 +5,7 @@
 
             <section class="posts">
                 <post v-if="currentPage === 1" v-bind="instance.instance" @editPost="editPost(instance.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" :isActiveUser="activeUserId === instance.content_item.owner.id" />
-                <post v-for="post in posts" v-bind="post.instance" :isActiveUser="activeUserId === post.content_item.owner.id" @editPost="editPost(post.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" />
+                <post v-for="post in posts" v-bind="post.instance" :isActiveUser="activeUserId === post.content_item.owner.id" @editPost="editPost(post.id)" @userProfile="showUserProfile(post.instance.content_item.owner.profile.id)" />
 
                 <div class="reply">
                     <button @click="quickReplyActive = true" v-if="!quickReplyActive">Quick Reply</button>
