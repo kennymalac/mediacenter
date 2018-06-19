@@ -31,7 +31,7 @@
 
 <script>
 import {auth} from "../auth.js"
-import router from '../router/index.js'
+//import router from '../router/index.js'
 
 import Modal from './Gui/Modal/Modal'
 
@@ -85,7 +85,6 @@ export default {
         },
         login() {
             // TODO JWT token auth
-
             let that = this
             auth.login(this.user.username, this.user.password, (error) => {
                 that.infoBox.status = "error"
@@ -93,7 +92,8 @@ export default {
             }).then(() => {
                 that.infoBox.status = "success"
                 that.infoBox.message = "Your account was logged in successfully"
-                router.replace('/')
+                this.$resetStore()
+                //that.$router.replace('/')
                 this.$forceUpdate()
             })
         },
@@ -101,7 +101,9 @@ export default {
             this.infoBox.status = "info"
             this.infoBox.message = "You have been logged out"
             console.log('logout')
+
             auth.logout()
+            this.$resetStore()
             this.$forceUpdate()
         }
     }

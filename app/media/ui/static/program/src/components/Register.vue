@@ -17,7 +17,7 @@
                     <label class="stack" for="retype-password">Re-type Password</label>
                     <input class="stack" v-model="instanceForm.retype_password" id="retype-password" type="password" placeholder="Password">
                     <label class="stack" for="email">Email Address</label>
-                    <input class="stack" v-model="instanceForm.email" id="email" type="email" placeholder="Email Address">
+                    <input class="stack" autocomplete="email" v-model="instanceForm.email" id="email" type="email" placeholder="Email Address">
                     
                     <label class="stack">
                         <input name="subscribe" class="stack" v-model="instanceForm.subscribe" id="subscribe" type="checkbox">

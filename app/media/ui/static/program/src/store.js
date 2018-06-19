@@ -14,7 +14,7 @@ import {GroupCollection, makeFilteredGroupCollection} from './models/Group.js'
 import {AlbumCollection, makeFilteredAlbumCollection} from './models/Album.js'
 import {ActivityLogCollection, makeFilteredActivityLogCollection} from './models/ActivityLog.js'
 
-const store = {
+export const initialState = {
     activeUser: {},
     accounts: {},
     profiles: {},
@@ -34,11 +34,18 @@ const store = {
     filteredActivityLogs: {}
 }
 
-const proxiedStore = new Proxy(store, {})
+let store = Object.assign({}, initialState)
+
+let proxiedStore = new Proxy(store, {})
 
 export const storePlugin = {
     install(Vue) {
         Vue.prototype.$store = proxiedStore
+        Vue.prototype.$resetStore = () => {
+            store = Object.assign({}, initialState)
+            proxiedStore = new Proxy(store, {})
+            Vue.prototype.$store = proxiedStore
+        }
     }
 }
 
@@ -142,6 +149,7 @@ export const feeds = () => {
         (value) => value instanceof FeedCollection,
         () => {
             return activeUser().then((user) => {
+                console.log('user', user)
                 return makeFilteredFeedCollection(
                     () => FeedCollection.all({ owner: user.details.id }),
                     feedContentTypes,

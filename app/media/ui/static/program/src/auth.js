@@ -22,6 +22,7 @@ export class Auth {
             }
         }
         catch (e) {
+            console.log(e)
             // Ignore error
         }
     }
@@ -85,7 +86,6 @@ export class Auth {
                 this.currentSession.user.details.username = username
                 localStorage.setItem(this.storageKey + "activeUser", username)
                 localStorage.setItem(this.storageKey + username, token)
-                this.getProfile(errorCallback)
             })
             .catch((error) => {
                 errorCallback(error)
@@ -134,7 +134,8 @@ export const auth = new Auth()
 export function makeActiveUser() {
     return auth.getProfile((error) => {
         // TODO better error callback
-        console.log(error)
+        console.log('auth error')
+        console.log(error.response)
     }).then(() => {
         return auth.getActiveUser()
     })

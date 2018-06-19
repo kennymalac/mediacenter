@@ -36,8 +36,12 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 **** DONE closeModal
      CLOSED: [2018-04-30 Mon 18:43]
 *** Authentication
+**** DONE don't require refresh for authentication
+     CLOSED: [2018-06-19 Tue 16:34]
+**** TODO better permission system, login shouldn't require Store reset
 **** TODO user permission system
-**** TODO log out should clear store
+**** DONE log out should clear store
+     CLOSED: [2018-06-19 Tue 16:34]
 **** TODO connect with other media centers in some sort of Auth bridge
 **** DONE getActiveUser
      CLOSED: [2017-05-13 Sat 12:34]
