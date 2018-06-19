@@ -1,5 +1,5 @@
 <template>
-    <div class="modal" v-show="isOpen">
+    <vue-drag-resize :preventActiveBehavior="false" :x="initialPos.x" :y="initialPos.y" :w="initialSize.w" :h="initialSize.h" :minw="400" :minh="400" class="modal" v-show="isOpen">
         <div class="modal-title">
             <slot name="title" :slotProps="titleProps">
                 <label class="modal-title-text">
@@ -16,10 +16,11 @@
             <slot>
             </slot>
         </div>
-    </div>
+    </vue-drag-resize>
 </template>
 
 <script>
+import VueDragResize from 'vue-drag-resize'
 import ModalToolbarItem from './ModalToolbarItem'
 
 export default {
@@ -38,10 +39,25 @@ export default {
         }
     },
     components: {
+        VueDragResize,
         ModalToolbarItem
     },
     defaults: {
         title: ""
+    },
+    computed: {
+        initialPos() {
+            return {
+                x: window.innerWidth / 4,
+                y: 75
+            }
+        },
+        initialSize() {
+            return {
+                w: window.innerWidth / 2,
+                h: window.innerHeight - 100
+            }
+        }
     },
     data() {
         return {
@@ -64,17 +80,18 @@ export default {
 <style lang="scss">
 @import "../../../classicTheme.scss";
 
+.vdr.active:before {
+    left: 0;
+}
+
 $modal-title-height: 2.75rem;
 
 .modal {
     border-radius: 3px/2px;
+    position: relative;
     display: block;
-    position: absolute;
+    width: 100%;
     border: 2px solid #001f3f;
-    width: 85%;
-    height: 50rem;
-    margin-left: 7.5%;
-    margin-right: 7.5%;
     box-sizing: content-box;
     animation-name: slideup;
     
@@ -102,7 +119,6 @@ $modal-title-height: 2.75rem;
         .toolbar {
             min-width: 200px;
             display: inline-flex;
-            position: absolute;
             left: 1rem;
         }
         /* &.label { */
