@@ -37,14 +37,14 @@
                     <button type="button" v-if="isActiveUserMember" class="warning" @click="leaveGroup">Leave group</button>
 
                     <!-- <div class="who-is-online"> -->
-                    <!--      <h3><div class="online-circle"></div> {{ onlineMembers.length }} User(s) online now</h3> -->
-                    <!-- </div> -->
+                        <!--      <h3><div class="online-circle"></div> {{ onlineMembers.length }} User(s) online now</h3> -->
+                        <!-- </div> -->
                 </div>
             </section>
             <div class="group-contents">
-                <section class="feed" v-if="!params.discussionAction && isActiveUserMember">
-                    <action-button v-bind="createPostAction" />
-                </section>
+                <div v-if="!params.discussionAction && isActiveUserMember">
+                    <content-item-form :stash="resolvedStash" :groupId="instance.id" :feedId="instance.feed.id" :contentTypes="allowedContentTypes" @contentTypeSelected="contentTypeSelected" />
+                </div>
                 <router-view v-if="instance.feed.id" :feedId="instance.feed.id"></router-view>
             </div>
         </template>
@@ -99,6 +99,7 @@ import {GroupModel} from '../../models/Group.js'
 import {groups, accounts, profiles, interests, activeUser, filteredGroups} from '../../store.js'
 import groupDeps from '../../dependencies/Group.js'
 
+import ContentItemForm from '../ContentItemForm'
 import AccountSelect from '../AccountSelect'
 import InterestSelect from '../InterestSelect'
 import GroupList from './GroupList'
@@ -112,6 +113,7 @@ import router from "../../router/index.js"
 export default {
     mixins: [RestfulComponent],
     components: {
+        ContentItemForm,
         AccountSelect,
         InterestSelect,
         GroupList,
@@ -128,13 +130,14 @@ export default {
     },
     data() {
         return {
+            objectName: 'group',
             instance: { id: null },
             instanceForm: { members: [], feed: {} },
+            resolvedStash: {},
             filteredInterests: [],
             filteredObjects: [],
             isActiveUserMember: false,
             isActiveUserOwner: true,
-            objectName: 'group',
             groupActions: [
                 {
                     icon: "ion-ios-people",
@@ -148,13 +151,8 @@ export default {
                     title: "Find a Group"
                 }
             ],
-            createPostAction: {
-                icon: "ion-md-list-box",
-                // link: "post",
-                link: "details/discussion/create",
-                title: "New Post",
-                extraIcon: "ion-md-add-circle"
-            },
+            // TODO make dynamic
+            allowedContentTypes: ['Image', 'Video', 'Topic', 'Link'],
             contentItems: []
         }
     },
@@ -163,6 +161,10 @@ export default {
             this.instance = GroupModel.initialState
             this.instanceForm = { members: [], feed: {} }
             this.contentItems = []
+        },
+
+        async contentTypeSelected() {
+
         },
 
         async create() {
@@ -213,9 +215,15 @@ export default {
 
             this.instance = await this.showInstance(params.id, '/group/list', groups, deps)
 
-            if (this.params.stashId === undefined) {
-                router.replace(`details/stash/${this.instance.feed.stashes[0].id}/details`)
+            let stashId = this.params.stashId
+            if (stashId === undefined) {
+                stashId = this.instance.feed.stashes[0].id
+                router.replace(`details/stash/${stashId}/details`)
             }
+
+            this.resolvedStash = this.instance.feed.stashes.find((stash) => {
+                return stash.id === parseInt(stashId)
+            })
 
             this.isActiveUserOwner = this.instance.owner.id === user.details.id
 

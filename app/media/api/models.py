@@ -239,14 +239,11 @@ def pre_delete_discussion(sender, **kwargs):
 
 @receiver(pre_save, sender=Discussion)
 def change_text_last_edited(sender, instance, **kwargs):
-    try:
-        old_text = sender.objects.filter(pk=instance.pk).values_list('text', flat=True)[0]
+    old = sender.objects.filter(pk=instance.pk)
+    if old.count() != 0:
+        old_text = old.values_list('text', flat=True)[0]
         if old_text != instance.text:
             instance.text_last_edited = datetime.now()
-
-    except sender.DoesNotExist:
-        # Object does not exist yet, which is okay
-        pass
 
 
 class Link(models.Model):

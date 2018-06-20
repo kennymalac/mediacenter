@@ -211,6 +211,7 @@ export default {
                         router.replace({
                             params: {
                                 discussionAction: 'details',
+                                discussionId: this.params.parentId ? this.params.parentId : data.id,
                                 id: this.params.parentId ? this.params.parentId : data.id
                             },
                             query: {

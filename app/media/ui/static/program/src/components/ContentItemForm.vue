@@ -53,13 +53,16 @@ import {links, feedContentTypes} from "../store.js"
 import linkDeps from "../dependencies/Link.js"
 import activeUserDeps from "../dependencies/activeUser.js"
 import {LinkModel} from "../models/Link.js"
-import router from "../router/index.js"
 
 export default {
     props: {
         contentTypes: [Array],
         stash: [Object],
-        feedId: [Number, String]
+        feedId: [Number, String],
+        groupId: {
+            type: Number,
+            required: false
+        }
     },
     data() {
         return {
@@ -89,6 +92,26 @@ export default {
                 this.showUploadForm = true
                 this.form = LinkModel.getNewInstance()
             }
+            else if (this.selected.title === "Topic") {
+                if (this.groupId) {
+                    this.$router.push({
+                        name: 'GroupDiscussion',
+                        params: {
+                            groupId: this.groupId,
+                            groupAction: 'details',
+                            stashId: this.stash.id,
+                            stashAction: 'details',
+                            discussionAction: 'create'
+                        }
+                    })
+                }
+                else {
+                    // TODO discussions outside of Groups?
+                    this.$router.push({
+
+                    })
+                }
+            }
         },
         async submit() {
             const ownerDeps = await activeUserDeps()
@@ -104,7 +127,7 @@ export default {
                 linkCollection.create(this.form, await linkDeps(this.stash.id))
                     .then((instance) => {
                         console.log(instance)
-                        router.push(`/feed/${this.feedId}/details/stash/${this.stash.id}/details/link/${instance.id}/manage`)
+                        this.$router.push(`/feed/${this.feedId}/details/stash/${this.stash.id}/details/link/${instance.id}/manage`)
                     })
             }
         }

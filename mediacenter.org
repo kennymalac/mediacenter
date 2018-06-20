@@ -264,6 +264,8 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
      CLOSED: [2018-06-18 Mon 16:29]
 **** DONE parse safe html, disable links
      CLOSED: [2018-06-15 Fri 12:08]
+**** DONE ContentItemForm instead of New Post
+     CLOSED: [2018-06-20 Wed 11:00]
 **** TODO minimize post button
 **** DONE cancel button on Reply
      CLOSED: [2018-06-15 Fri 16:57]

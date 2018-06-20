@@ -107,7 +107,7 @@ export default {
 
         async details(params) {
             if (!this.params.commentAction) {
-                router.replace('comment/list')
+                router.replace('details/comment/list')
             }
 
             this.instance = await this.showInstance(params.id, '/feed/list', links, await linkDeps(this.stashId))
