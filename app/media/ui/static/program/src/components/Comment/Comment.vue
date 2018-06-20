@@ -120,12 +120,12 @@ export default {
             this.activeUserId = user.details.id
 
             const store = await this.collection()
-            if (store.values.length === 0) {
-                await store.list(this.parentNestedId, {}, await commentDeps())
-            }
             this.objects = store.values.filter((item) => {
                 return this.parent.id ? item.parent === this.parent.id : item.content_item === this.contentObjectId || item.user_profile === this.profileId
             })
+            if (this.objects.length === 0) {
+                this.objects = await store.list(this.parentNestedId, {}, await commentDeps())
+            }
         },
 
         async manageComment() {

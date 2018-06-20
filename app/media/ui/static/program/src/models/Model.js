@@ -218,16 +218,19 @@ export class Model {
             if (this.instance[field] === null || this.instance[field] === undefined) {
                 // This is a partial instance
                 if (Array.isArray(this.constructor.initialState[field])) {
-                    this[field] = []
+                    this.instance[field] = []
                 }
                 else if (field in this.constructor.fields) {
-                    this[field] = { id: 0, instance: { _isFake: true } }
+                    this.instance[field] = { id: 0, instance: { _isFake: true } }
                 }
-                continue
+                else {
+                    this.instance[field] = this.constructor.initialState[field]
+                }
+                // continue
             }
 
             if (field in this.constructor.fields) {
-                if (collections[field] !== undefined) {
+                if (this.instance[field].id !== 0 && collections[field] !== undefined) {
                     // Initialize an model instance(s)
                     this.resolveNestedModelField(field, collections)
                 }

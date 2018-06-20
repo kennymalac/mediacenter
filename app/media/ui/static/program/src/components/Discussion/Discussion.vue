@@ -111,7 +111,7 @@ export default {
             const [owner, stashCollection, contentTypeCollection, profileCollection, interestCollection, commentCollection, groupCollection] = await Promise.all(
                 [accounts(), stashes(), feedContentTypes(), profiles(), interests(), comments(), groups()]
             )
-            const stash = await stashCollection.getInstance(this.params.stashId)
+            const stash = await stashCollection.getInstance(parseInt(this.params.stashId))
 
             return {
                 owner,

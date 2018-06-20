@@ -1,6 +1,9 @@
 import moment from 'moment'
 
 export function momentDate(input) {
+    if (input === null) {
+        return {}
+    }
     return moment(input)
 }
 

@@ -35,7 +35,7 @@ export default {
             return `${this.detailsUrl}/comment/list`
         },
         detailsUrl() {
-            if (this.item.group_id !== undefined) {
+            if (this.item.group_id !== 0) {
                 return `/group/${this.item.group_id}/details/stash/${this.item.origin_stash_id}/details/link/${this.item.object_id}/details`
             }
             return `/feed/${this.item.feed_id}/details/stash/${this.item.origin_stash_id}/details/link/${this.item.object_id}/details`

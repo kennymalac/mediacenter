@@ -550,10 +550,14 @@ class ContentItemCRUDSerializer(serializers.ModelSerializer):
 
 class DiscussionSerializer(serializers.ModelSerializer):
     content_item = FeedContentItemProfileSerializer()
+    text_last_edited = serializers.DateTimeField(
+        required=False,
+        read_only=True
+    )
 
     class Meta:
         model = Discussion
-        fields = ('id', 'parent', 'order', 'content_item', 'text')
+        fields = ('id', 'parent', 'order', 'content_item', 'text', 'text_last_edited')
 
 
 cleaner = Cleaner(['a', 'p', 'abbr', 'acronym', 'b', 'code', 'pre', 'blockqote', 'span', 'sub', 'sup', 'code', 'em', 'i', 'ul', 'li', 'ol', 'strong', 'l', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'thead', 'caption', 'tbody', 'col', 'colgroup', 'tfoot', 'th', 'tr', 'td'], attributes={'*': ['style', 'alt', 'width', 'height'], 'a': ['href', 'title'], 'abbr': ['title'], 'acronym': ['title'], 'table': ['align', 'cellpadding', 'cellspacing'], 'th': ['scope'], 'colgroup': ['span'], 'caption': ['align']}, styles=['color', 'font-weight', 'text-decoration', 'background-color', 'color', 'text-align', 'border-style', 'border', 'border-width', 'border-color'])
@@ -563,6 +567,10 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
     content_item = FeedContentItemBasicSerializer(
         many=False,
         required=False
+    )
+    text_last_edited = serializers.DateTimeField(
+        required=False,
+        read_only=True
     )
 
     def save(self):
@@ -593,7 +601,7 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
 
     class Meta:
         model = Discussion
-        fields = ('id', 'parent', 'order', 'content_item', 'text')
+        fields = ('id', 'parent', 'order', 'content_item', 'text', 'text_last_edited')
 
 
 class LinkSerializer(serializers.ModelSerializer):

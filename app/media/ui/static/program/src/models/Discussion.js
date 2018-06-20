@@ -3,6 +3,7 @@ import {makeJsonRequest, jsonResponse, fetchAPI} from '../httputil.js'
 import {get, manage, paginatedList} from './generics.js'
 import {FeedContentItemCollection} from './FeedContentItem'
 import {FeedContentStashModel} from './FeedContentStash'
+import {momentDate} from './converters.js'
 // import {AccountCollection} from './Account'
 // import {GroupCollection} from './Group'
 
@@ -17,11 +18,17 @@ class DiscussionModel extends Model {
         content_item: {},
         text: "",
         order: 0,
-        parent: 0
+        parent: 0,
+        text_last_edited: {},
+        edited: false
     }
 
     static fields = {
         content_item: FeedContentItemCollection
+    }
+
+    static fieldConverters = {
+        text_last_edited: momentDate
     }
 
     static resource = 'discussion'

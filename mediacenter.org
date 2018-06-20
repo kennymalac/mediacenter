@@ -281,7 +281,8 @@ checkbox to show on all pages y/n?
 **** DONE Posts should have order
      CLOSED: [2018-05-12 Sat 17:41]
 **** TODO should post count show number of Posts in current group?
-**** TODO last edited date
+**** DONE last edited date
+     CLOSED: [2018-06-20 Wed 10:01]
 **** DONE edit interface for Replies should have no description field
      CLOSED: [2018-05-09 Wed 11:13]
 **** TODO anchor links for individual posts

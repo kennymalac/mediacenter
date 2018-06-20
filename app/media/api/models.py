@@ -1,8 +1,10 @@
 from __future__ import unicode_literals
 
+from datetime import datetime
+
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField, ArrayField
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -228,12 +230,23 @@ class Discussion(models.Model):
     parent = models.ForeignKey('self', null=True)
     order = models.IntegerField(default=0)
     text = models.TextField(blank=True)
-
+    text_last_edited = models.DateTimeField(null=True)
 
 @receiver(post_delete, sender=Discussion)
 def pre_delete_discussion(sender, **kwargs):
     instance = kwargs.get('instance')
     instance.content_item.delete()
+
+@receiver(pre_save, sender=Discussion)
+def change_text_last_edited(sender, instance, **kwargs):
+    try:
+        old_text = sender.objects.filter(pk=instance.pk).values_list('text', flat=True)[0]
+        if old_text != instance.text:
+            instance.text_last_edited = datetime.now()
+
+    except sender.DoesNotExist:
+        # Object does not exist yet, which is okay
+        pass
 
 
 class Link(models.Model):

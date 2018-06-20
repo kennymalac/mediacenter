@@ -22,6 +22,7 @@
             </div>
         </div>
         <div v-html="text" class="text"></div>
+        <span v-if="text_last_edited.format" class="date" style="padding-left: 20px;">Last edited: {{ text_last_edited.format('LLLL') }}</span>
         <div class="actions" v-if="isActiveUser">
             <button type="button" @click="$emit('editPost')">
                 <i class="ion-md-create"></i> Edit
@@ -37,6 +38,9 @@
 export default {
     props: {
         content_item: {
+            type: Object
+        },
+        text_last_edited: {
             type: Object
         },
         isActiveUser: {
