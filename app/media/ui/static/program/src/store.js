@@ -42,9 +42,9 @@ export const storePlugin = {
     install(Vue) {
         Vue.prototype.$store = proxiedStore
         Vue.prototype.$resetStore = () => {
-            store = Object.assign({}, initialState)
-            proxiedStore = new Proxy(store, {})
-            Vue.prototype.$store = proxiedStore
+            for (const key of Object.keys(store)) {
+                proxiedStore[key] = initialState[key]
+            }
         }
     }
 }

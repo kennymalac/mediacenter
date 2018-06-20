@@ -93,6 +93,8 @@ export default {
                 that.infoBox.status = "success"
                 that.infoBox.message = "Your account was logged in successfully"
                 this.$resetStore()
+
+                this.$store.loggedIn = true
                 //that.$router.replace('/')
                 this.$forceUpdate()
             })

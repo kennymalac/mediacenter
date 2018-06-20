@@ -381,6 +381,7 @@ Your feed has "content decay"
 
 *** Model/Collection
     don't make too many assumptions
+**** TODO ability to watch store for prop changes
 **** TODO resolution methods should also be singletons?
 currently mutliple resolutions are happening at once for the same ids
 **** TODO dependency trees

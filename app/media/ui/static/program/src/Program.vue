@@ -1,7 +1,7 @@
 <template>
     <div id="program">
         <header>
-            <header-menu/>
+            <header-menu :loggedIn="$store.activeUser.details && $store.activeUser.details.id !== 0" />
             <!-- <auth-menu></auth-menu> -->
         </header>
 

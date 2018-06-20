@@ -9,7 +9,7 @@
         
         <div class="menu">
             <router-link class="button pseudo" to="/login">Login</router-link>
-            <router-link class="button pseudo" to="/register">Register</router-link>
+            <router-link v-if="!loggedIn" class="button pseudo" to="/register">Register</router-link>
             <router-link class="button pseudo" to="/feed/list"><i class="ion-ios-list-box"></i> Feeds</router-link>
             <router-link class="button pseudo" to="/group/list"><i class="ion-ios-people"></i> Groups</router-link>
             <router-link class="button pseudo" to="/profile/list"><i class="ion-md-people"></i> Users</router-link>
@@ -23,9 +23,14 @@
 <script>
 export default {
     name: 'header-menu',
+    props: {
+        loggedIn: {
+            type: Boolean,
+            default: false
+        }
+    },
     data() {
         return {
-
         }
     }
 }
