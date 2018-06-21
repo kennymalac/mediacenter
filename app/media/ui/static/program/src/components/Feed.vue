@@ -142,7 +142,7 @@ export default {
         initialState() {
             this.instance = { id: null, content_types: [] }
             this.contentItems = []
-            this.instanceForm = { content_types: [], interests: [] }
+            this.instanceForm = { content_types: [], interests: [], visibility: { value: '0', text: 'Public' } }
         },
 
         create() {

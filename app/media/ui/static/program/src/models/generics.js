@@ -1,5 +1,5 @@
 import {resolve} from './Model.js'
-import {makeJsonRequest, fetchAPI, jsonResponse} from '../httputil.js'
+import {makeJsonRequest, makeHeaders, fetchAPI, jsonResponse} from '../httputil.js'
 
 async function manageResource(uri, instance, serializedData, collections = {}) {
     return makeJsonRequest(uri, {
@@ -22,8 +22,10 @@ export function manageNested(instance, parentId, serializedData, collections = {
 }
 
 async function getResource(uri, collection, instance = null, collections = {}, children = []) {
+    const headers = {}
     const item = await fetchAPI(`${uri}`, {
-        method: "GET"
+        method: "GET",
+        headers: makeHeaders(headers)
     })
         .then(jsonResponse)
 

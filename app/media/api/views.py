@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.shortcuts import render, get_object_or_404
 from django.conf import settings
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
@@ -13,6 +14,7 @@ from api.models import *
 from api.serializers import *
 from api.filters import *
 from api.paginators import *
+from api.permissions import *
 
 
 class MultipleSerializerMixin(object):
@@ -140,6 +142,7 @@ class FeedViewSet(NestedViewSetMixin,
         'create': FeedCreateUpdateSerializer
     }
     filter_class = FeedFilter
+    permission_classes = [IsAuthenticated, IsPublicOrGroupMemberOrOwner]
 
     def list(self, request):
         if 'owner' in request.query_params:
@@ -166,7 +169,7 @@ class FeedContentItemViewSet(ListModelMixin,
 
     @list_route(methods=['POST'], url_path='search', permission_classes=[IsAuthenticated])
     def search(self, request):
-        content_queryset = self.get_queryset()
+        content_queryset = self.get_queryset().filter(Q(visibility='0') | Q(owner=request.user))
 
         _feed_id = request.data.get('feed', None)
         if _feed_id:
@@ -205,10 +208,16 @@ class FeedContentStashViewSet(NestedViewSetMixin,
 
     pagination_class = StandardResultsSetPagination
 
+
     @detail_route(methods=['POST'], url_path='content/add', permission_classes=[IsAuthenticated])
     def add_content(self, request, pk=None, **kwargs):
-        print(kwargs.get('parent_lookup_feeds', ''))
         instance = self.queryset.get(pk=pk)
+        feed_parent_pk = kwargs.get('parent_lookup_feeds', False)
+        require_private = False
+        if feed_parent_pk:
+            # All content must be private
+            print(Feed.objects.get(id=feed_parent_pk).visibility)
+            require_private = Feed.objects.filter(id=feed_parent_pk, visibility='9').count() > 0
 
         # TODO get feed, verify feed membership/post permission
         # if instance.owner:
@@ -226,6 +235,9 @@ class FeedContentStashViewSet(NestedViewSetMixin,
 
         for item in new_content:
             item.origin_stash = instance
+            if require_private:
+                item.visibility = '9'
+
             item.save()
 
             content_type = item.content_type.name

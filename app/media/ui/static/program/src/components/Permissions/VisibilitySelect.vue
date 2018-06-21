@@ -5,14 +5,14 @@ export default {
     name: 'visibility-select',
     mixins: [SelectMixin],
     props: {
-        value: String
+        value: Object
     },
     data() {
         return {
             options: [
-                'Public',
-                'Unlisted',
-                'Private'
+                { text: 'Public', value: '0' },
+                { text: 'Unlisted', value: '1' },
+                { text: 'Private', value: '9' }
             ]
         }
     }

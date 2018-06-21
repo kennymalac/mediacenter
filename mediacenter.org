@@ -206,6 +206,7 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 **** TODO
 
 *** FeedContentItems
+**** TODO unlisted feedcontentitems
 **** TODO private feedcontentitems
 **** TODO sort by time posted
 **** DONE consider performance implication of backreference to Feeds
@@ -229,7 +230,8 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
      CLOSED: [2018-05-31 Thu 14:58]
 **** DONE unlisted groups
      CLOSED: [2018-06-21 Thu 14:07]
-**** TODO private groups (Group owner can disable topics being shared outside of Group)
+**** DONE private groups (Group owner can disable topics being shared outside of Group)
+     CLOSED: [2018-06-21 Thu 16:43]
 **** TODO Moderators
 **** TODO Checkbox to share topic outside of group
 **** TODO make it so you can't add members to Group - only invite them

@@ -57,7 +57,7 @@ class GroupModel extends Model {
             ...form,
             members: serializeIds(form.members),
             owner: form.owner.id,
-            feed: {...form.feed, owner: form.owner.id, stashes: serializeIds(form.feed.stashes), interests: serializeIds(form.feed.interests)}
+            feed: {...form.feed, visibility: form.feed.visibility.value, owner: form.owner.id, stashes: serializeIds(form.feed.stashes), interests: serializeIds(form.feed.interests)}
         }, collections)
     }
 
@@ -104,7 +104,7 @@ class GroupCollection extends Collection {
                 ...form,
                 members: serializeIds(form.members),
                 owner: form.owner.id,
-                feed: {...form.feed, owner: form.feed.id, interests: serializeIds(form.feed.interests)}
+                feed: {...form.feed, visibility: form.feed.visibility.value, owner: form.feed.id, interests: serializeIds(form.feed.interests)}
             }
         })
             .then(jsonResponse)

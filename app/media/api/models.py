@@ -200,6 +200,8 @@ class FeedContentItem(TaggedItem):
     description = models.TextField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
+    visibility = models.CharField(max_length=2, choices=VISIBILITY, default='0')
+
     def __str__(self):
         return self.title
 
@@ -284,6 +286,9 @@ class GroupForum(models.Model):
     # TODO various options, i.e. moderators can invite, only owner can invite, etc.
     # invite_policy = models.CharField()
     members = models.ManyToManyField(Account, 'member_groups')
+
+    def __str__(self):
+        return self.name
 
 
 class Media(models.Model):

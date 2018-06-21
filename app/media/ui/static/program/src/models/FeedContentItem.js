@@ -1,7 +1,7 @@
 import {Model, Collection} from './Model.js'
 import {AccountCollection} from './Account'
 import {FeedContentTypeCollection} from './FeedContentType.js'
-import {momentDate} from './converters.js'
+import {momentDate, choice, visibilityChoices} from './converters.js'
 
 class FeedContentItemModel extends Model {
 
@@ -19,7 +19,8 @@ class FeedContentItemModel extends Model {
         created: {},
         description: "",
         owner: {},
-        title: ""
+        title: "",
+        visibility: {}
     }
 
     static fields = {
@@ -30,7 +31,8 @@ class FeedContentItemModel extends Model {
     }
 
     static fieldConverters = {
-        created: momentDate
+        created: momentDate,
+        visibility: (input) => choice(input, visibilityChoices)
     }
 }
 

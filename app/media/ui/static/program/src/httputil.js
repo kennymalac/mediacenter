@@ -19,6 +19,7 @@ export function makeJsonRequest(uri, params, baseUrl) {
         method: method,
         headers: makeHeaders(defaultJsonHeaders, needsAuth)
     }
+    console.log(_params)
     if (queryParams !== undefined) {
         _params.queryParams = queryParams
     }

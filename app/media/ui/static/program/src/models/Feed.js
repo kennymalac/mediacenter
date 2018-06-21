@@ -1,4 +1,4 @@
-import {modelInstance, momentDate} from './converters.js'
+import {modelInstance, momentDate, choice, visibilityChoices} from './converters.js'
 import {Model, Collection, serializeIds} from './Model.js'
 import {get, manage, paginatedList, resolveInstances} from './generics.js'
 import {AccountCollection} from './Account'
@@ -39,7 +39,8 @@ class FeedModel extends Model {
     }
 
     static fieldConverters = {
-        created: momentDate
+        created: momentDate,
+        visibility: (input) => choice(input, visibilityChoices)
     }
 
     static resource = 'feed'
@@ -54,13 +55,14 @@ class FeedModel extends Model {
         interests: [],
         rules: [],
         content_types: [],
-        visibility: ''
+        visibility: {}
     }
 
     static manage(instance, form, collections) {
         return manage(instance, {
             ...form,
             owner: form.owner.id,
+            visibility: form.visibility.value,
             content_types: serializeIds(form.content_types),
             interests: serializeIds(form.interests)
         }, collections)
@@ -104,6 +106,7 @@ class FeedCollection extends Collection {
             method: "POST",
             body: {
                 ...form,
+                visibility: form.visibility.value,
                 content_types: serializeIds(form.content_types),
                 interests: serializeIds(form.interests)
             }

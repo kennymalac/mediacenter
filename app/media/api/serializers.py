@@ -330,8 +330,6 @@ class FeedCreateUpdateSerializer(serializers.ModelSerializer):
         required=False
     )
 
-    visibility = serializers.CharField(source='get_visibility_display')
-
 
     class Meta:
         model = Feed
@@ -347,8 +345,6 @@ class FeedSerializer(serializers.ModelSerializer):
     interests = InterestSerializer(
         many=True
     )
-
-    visibility = serializers.CharField(source='get_visibility_display')
 
     class Meta:
         model = Feed
@@ -397,10 +393,9 @@ class FeedContentItemBasicSerializer(serializers.ModelSerializer):
     is_anonymous = serializers.BooleanField(
         required=False
     )
-
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'is_anonymous', 'content_type', 'created', 'interests')
+        fields = ('id', 'title', 'description', 'owner', 'is_anonymous', 'content_type', 'visibility', 'created', 'interests')
 
     def to_representation(self, obj):
         self.context['is_anonymous'] = obj.is_anonymous
@@ -460,7 +455,7 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'is_anonymous', 'content_type', 'comments', 'created', 'object_id', 'origin_stash_id', 'feed_id', 'group_id', 'nested_object', 'interests')
+        fields = ('id', 'title', 'description', 'owner', 'is_anonymous', 'content_type', 'comments', 'created', 'object_id', 'origin_stash_id', 'feed_id', 'group_id', 'nested_object', 'visibility', 'interests')
 
     def get_content_id(self, instance):
         return get_content_id(instance)
@@ -501,7 +496,7 @@ class FeedContentItemProfileSerializer(FeedContentItemBasicSerializer):
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'interests', 'comments', 'content_type', 'created', 'is_anonymous')
+        fields = ('id', 'title', 'description', 'owner', 'interests', 'comments', 'content_type', 'created', 'is_anonymous', 'visibility')
 
 
 class FeedContentStashSerializer(serializers.ModelSerializer):
@@ -673,6 +668,8 @@ class GroupForumCreateUpdateSerializer(serializers.ModelSerializer):
             print(validated_data)
             for k,v in validated_data.pop('feed').items():
                 setattr(instance.feed, k, v)
+
+            instance.feed.save()
 
         return super(GroupForumCreateUpdateSerializer, self).update(instance, validated_data)
 
