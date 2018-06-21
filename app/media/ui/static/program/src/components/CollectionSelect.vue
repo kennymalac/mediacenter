@@ -50,16 +50,23 @@ export default {
     components: {
         Multiselect
     },
+    computed: {
+        options() {
+            return this.values.all
+                ? this.values.all()
+                : this.values
+        }
+    },
     data() {
         return {
-            options: [],
+            values: [],
             selected: []
         }
     },
     mounted() {
         this.selected = this.value
         this.collection().then((store) => {
-            this.options = store.values
+            this.values = store.values
         })
     },
     methods: {

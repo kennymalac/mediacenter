@@ -31,7 +31,8 @@ export default {
             InterestCollection.create({
                 name: tag
             }).then((instance) => {
-                this.options.push(instance)
+                this.values.push(instance)
+                this.value.push(instance)
             })
         },
         asyncSearch: debounce(async function(queryParams) {
