@@ -174,6 +174,29 @@ export default new Router({
                     props: restAction,
                     children: [
                         {
+                            name: 'GroupLinkNested',
+                            path: 'link/:linkId/:linkAction',
+                            component: Link,
+                            props: restAction,
+                            children: [
+                                {
+                                    path: 'comment/:commentId/:commentAction',
+                                    component: Comment,
+                                    props: restAction
+                                },
+                                {
+                                    path: 'comment/:commentAction',
+                                    component: Comment,
+                                    props: restAction
+                                }
+                            ]
+                        },
+                        {
+                            path: 'link/:linkAction',
+                            component: Link,
+                            props: restAction
+                        },
+                        {
                             name: 'GroupDiscussionNested',
                             path: 'discussion/:discussionId/:discussionAction',
                             component: Discussion,

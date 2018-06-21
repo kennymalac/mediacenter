@@ -618,7 +618,7 @@ class BasicLinkSerializer(serializers.ModelSerializer):
 
 
 class LinkCreateUpdateSerializer(ContentItemCRUDSerializer):
-    content_item = FeedContentItemCreateUpdateSerializer(
+    content_item = FeedContentItemBasicSerializer(
         many=False,
         required=False
     )

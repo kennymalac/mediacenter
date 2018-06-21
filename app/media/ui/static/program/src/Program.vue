@@ -15,9 +15,13 @@
 import Header from './components/Header.vue'
 //import Pager from './pager.js'
 //import 'pure-css'
+import {activeUser} from './store.js'
 
 export default {
     name: 'program',
+    async mounted() {
+        await activeUser()
+    },
     components: {
         'header-menu': Header
     }

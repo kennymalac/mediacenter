@@ -239,7 +239,8 @@ class FeedContentStashViewSet(NestedViewSetMixin,
                 log = ActivityLog.objects.create(action='Link00', author=item.owner, context={'instance': get_content_id(item), 'feed': get_feed_id(item), 'stash': item.origin_stash.id}, message="Created post")
                 log.subscribed=[]
 
-        return Response({ 'content': request.data.get('content', []) })
+        data_content = FeedContentItemSerializer(new_content, many=True)
+        return Response({ 'content': data_content.data })
 
 
 class CommentViewSet(NestedViewSetMixin,

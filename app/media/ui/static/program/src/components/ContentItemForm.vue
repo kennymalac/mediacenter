@@ -127,7 +127,23 @@ export default {
                 linkCollection.create(this.form, await linkDeps(this.stash.id))
                     .then((instance) => {
                         console.log(instance)
-                        this.$router.push(`/feed/${this.feedId}/details/stash/${this.stash.id}/details/link/${instance.id}/manage`)
+
+                        if (this.groupId) {
+                            this.$router.push({
+                                name: 'GroupLinkNested',
+                                params: {
+                                    groupId: this.groupId,
+                                    groupAction: 'details',
+                                    stashId: this.stash.id,
+                                    stashAction: 'details',
+                                    linkId: instance.id,
+                                    linkAction: 'details'
+                                }
+                            })
+                        }
+                        else {
+                            this.$router.push(`/feed/${this.feedId}/details/stash/${this.stash.id}/details/link/${instance.id}/manage`)
+                        }
                     })
             }
         }
