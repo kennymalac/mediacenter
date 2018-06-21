@@ -6,7 +6,7 @@
             @input="$emit('input', $event)"
             @tag="addTag"
             :options="options"
-            :multiple="true"
+            :multiple="multiple"
             :custom-label="optionLabel"
             :taggable="taggable"
             track-by="id"
@@ -19,7 +19,7 @@
             @input="$emit('input', $event)"
             @tag="addTag"
             :options="options"
-            :multiple="true"
+            :multiple="multiple"
             :custom-label="optionLabel"
             :taggable="taggable"
             track-by="id"
@@ -41,6 +41,10 @@ export default {
         taggable: {
             type: Boolean,
             default: false
+        },
+        multiple: {
+            type: Boolean,
+            default: true
         },
         search: {
             type: Boolean,

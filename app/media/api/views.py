@@ -306,7 +306,9 @@ class GroupForumViewSet(NestedViewSetMixin,
     def search(self, request):
         interests = Interest.objects.filter(id__in=request.data.get('interests', []))
 
-        serializer = GroupForumSerializer(self.get_queryset().filter(feed__interests__in=interests), many=True)
+        # NOTE private groups shouldn't show in list action either
+        # TODO make default list action more secure
+        serializer = GroupForumSerializer(self.get_queryset().filter(feed__interests__in=interests, feed__visibility='0'), many=True)
         return Response(serializer.data)
 
     @detail_route(methods=['POST'], url_path='join', permission_classes=[IsAuthenticated])

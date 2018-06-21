@@ -59,12 +59,6 @@
                     <label class="stack" for="image">Image</label>
                     <input class="stack" name="image" v-model="instanceForm.image" type="text" />
 
-                    <label class="stack">
-                        <input v-model="instanceForm.is_restricted" type="checkbox" />
-                        <span class="checkable">Invite-only</span>
-                    </label>
-                    <!-- <label class="stack" for="rules">Rules</label>
-                         TODO rules -->
                     <label class="stack" for="members">Members</label>
                     <account-select v-model="instanceForm.members" />
                     <label class="stack" for="interests">Interests</label>
@@ -72,6 +66,18 @@
 
                     <!-- <label class="stack" for="">Tags</label> -->
                     <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->
+                </fieldset>
+                <fieldset>
+                    <legend class="stack">Permissions</legend>
+                    <label class="stack">
+                        <input v-model="instanceForm.is_restricted" type="checkbox" />
+                        <span class="checkable">Invite only</span>
+                    </label>
+                    <!-- <label class="stack" for="interests">Invite Policy</label> -->
+                    <label class="stack" for="visibility">Visibility</label>
+                    <visibility-select v-model="instanceForm.feed.visibility" />
+                    <!-- <label class="stack" for="rules">Rules</label>
+                         TODO rules -->
                     <input v-if="actions.create" class="stack" type="submit" value="Create" />
                     <input v-if="actions.manage" class="stack" type="submit" value="Save changes" />
                 </fieldset>
@@ -107,6 +113,7 @@ import groupDeps from '../../dependencies/Group.js'
 import ContentItemForm from '../ContentItemForm'
 import AccountSelect from '../AccountSelect'
 import InterestSelect from '../InterestSelect'
+import VisibilitySelect from '../Permissions/VisibilitySelect'
 import GroupList from './GroupList'
 import FeedFilter from '../FeedFilter'
 import ActionButton from '../ActionButton'
@@ -121,6 +128,7 @@ export default {
         ContentItemForm,
         AccountSelect,
         InterestSelect,
+        VisibilitySelect,
         GroupList,
         FeedFilter,
         ActionButton,

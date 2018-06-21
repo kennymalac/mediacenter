@@ -170,6 +170,12 @@ class Profile(TaggedItem):
     def __str__(self):
         return self.display_name
 
+VISIBILITY = (
+    ('0', 'Public'),
+    ('1', 'Unlisted'),
+    # ('2', 'Friends')
+    ('9', 'Private')
+)
 
 class Feed(TaggedItem):
     owner = models.ForeignKey(Account, null=True)
@@ -178,6 +184,8 @@ class Feed(TaggedItem):
     content_types = models.ManyToManyField(FeedContentItemType, related_name='+')
     created = models.DateTimeField(auto_now_add=True)
     stashes = models.ManyToManyField('api.FeedContentStash', related_name='feeds')
+
+    visibility = models.CharField(max_length=2, choices=VISIBILITY, default='0')
 
     def __str__(self):
         return self.name

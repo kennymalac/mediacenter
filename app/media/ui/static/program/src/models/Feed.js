@@ -53,7 +53,8 @@ class FeedModel extends Model {
         stashes: [],
         interests: [],
         rules: [],
-        content_types: []
+        content_types: [],
+        visibility: ''
     }
 
     static manage(instance, form, collections) {

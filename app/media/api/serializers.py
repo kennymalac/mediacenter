@@ -330,9 +330,12 @@ class FeedCreateUpdateSerializer(serializers.ModelSerializer):
         required=False
     )
 
+    visibility = serializers.CharField(source='get_visibility_display')
+
+
     class Meta:
         model = Feed
-        fields = ('id', 'name', 'description', 'owner', 'content_types', 'interests', 'stashes')
+        fields = ('id', 'name', 'description', 'owner', 'content_types', 'interests', 'stashes', 'visibility')
 
 
 class FeedSerializer(serializers.ModelSerializer):
@@ -345,9 +348,11 @@ class FeedSerializer(serializers.ModelSerializer):
         many=True
     )
 
+    visibility = serializers.CharField(source='get_visibility_display')
+
     class Meta:
         model = Feed
-        fields = ('id', 'name', 'description', 'owner', 'content_types', 'created', 'interests', 'stashes')
+        fields = ('id', 'name', 'description', 'owner', 'content_types', 'created', 'interests', 'stashes', 'visibility')
 
 
 class CommentBasicSerializer(serializers.ModelSerializer):
