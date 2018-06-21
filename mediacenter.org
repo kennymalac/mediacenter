@@ -226,6 +226,7 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 **** TODO only members can create new Posts, comment in Group Topic
 **** DONE Group tags should link to group's stash
      CLOSED: [2018-05-31 Thu 14:58]
+**** TODO private groups
 **** TODO Moderators
 **** TODO Checkbox to share topic outside of group
 **** TODO Group owner can disable topics being shared outside of Group
@@ -260,6 +261,7 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 ***** TODO Delete
 
 *** Discussion
+**** TODO is_restricted
 **** DONE anonymous replies
      CLOSED: [2018-06-18 Mon 16:29]
 **** DONE parse safe html, disable links

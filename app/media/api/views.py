@@ -314,6 +314,7 @@ class GroupForumViewSet(NestedViewSetMixin,
         instance = self.queryset.get(pk=pk)
 
         if instance.is_restricted:
+            # TODO detect invite
             return Response({
                 'error': 'Joining this group is by invitation only'
             }, status=400)

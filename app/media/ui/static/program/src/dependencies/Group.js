@@ -2,7 +2,7 @@ import {groups, feeds, interests, stashes, accounts, profiles, comments, feedCon
 
 export default async function dependencies() {
     const [groupCollection, members, feed, profile, stashCollection, interestCollection, commentCollection, contentTypes] = await Promise.all(
-        [groups(), accounts(), feeds(), interests(), profiles(), stashes(), interests(), comments(), feedContentTypes()]
+        [groups(), accounts(), feeds(), profiles(), stashes(), interests(), comments(), feedContentTypes()]
     )
 
     return {

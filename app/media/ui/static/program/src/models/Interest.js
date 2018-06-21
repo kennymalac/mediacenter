@@ -34,7 +34,7 @@ class InterestCollection extends Collection {
         return await get(this, id, instance)
     }
 
-    static create(data) {
+    create(data) {
         return makeJsonRequest("interest/", {
             method: "POST",
             body: {
@@ -42,8 +42,10 @@ class InterestCollection extends Collection {
             }
         })
             .then(jsonResponse)
-            .then((created) => {
-                const instance = new InterestModel(created)
+            .then((createdData) => {
+                const instance = this.addInstance({
+                    ...createdData
+                })
 
                 console.log(instance)
                 return instance

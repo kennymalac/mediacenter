@@ -2,7 +2,6 @@
 import CollectionSelect from './CollectionSelect'
 import debounce from 'debounce'
 
-import {InterestCollection} from '../models/Interest.js'
 import {interests} from '../store.js'
 
 export default {
@@ -27,11 +26,11 @@ export default {
         optionLabel(option) {
             return option.name
         },
-        addTag(tag) {
-            InterestCollection.create({
+        async addTag(tag) {
+            const interestCollection = await interests()
+            interestCollection.create({
                 name: tag
             }).then((instance) => {
-                this.values.push(instance)
                 this.value.push(instance)
             })
         },

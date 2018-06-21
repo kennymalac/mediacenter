@@ -47,15 +47,17 @@ class GroupModel extends Model {
         description: "",
         rules: [],
         members: [],
-        image: ""
+        image: "",
+        is_restricted: false
     }
 
     static async manage(instance, form, collections) {
+        console.log(form)
         return await manage(instance, {
             ...form,
             members: serializeIds(form.members),
             owner: form.owner.id,
-            feed: {...form.feed, stashes: serializeIds(form.feed.stashes), interests: serializeIds(form.feed.interests)}
+            feed: {...form.feed, owner: form.owner.id, stashes: serializeIds(form.feed.stashes), interests: serializeIds(form.feed.interests)}
         }, collections)
     }
 

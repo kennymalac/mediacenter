@@ -271,9 +271,10 @@ class GroupForum(models.Model):
     )
     # interests = models.ManyToManyField(Interest, related_name='+')
     feed = models.ForeignKey(Feed)
-    # TODO fixed set of content_items ?
     image = models.URLField(blank=True)
     is_restricted = models.BooleanField(default=False)
+    # TODO various options, i.e. moderators can invite, only owner can invite, etc.
+    # invite_policy = models.CharField()
     members = models.ManyToManyField(Account, 'member_groups')
 
 

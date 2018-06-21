@@ -33,7 +33,7 @@
                         <i class="ion-md-create"></i> Edit
                     </button>
 
-                    <button type="button" v-if="!isActiveUserMember" @click="joinGroup">Join group</button>
+                    <button type="button" v-if="!isActiveUserMember && !instance.is_restricted" @click="joinGroup">Join group</button>
                     <button type="button" v-if="isActiveUserMember" class="warning" @click="leaveGroup">Leave group</button>
 
                     <!-- <div class="who-is-online"> -->
@@ -58,6 +58,11 @@
                     <textarea class="stack" name="description" v-model="instanceForm.description" />
                     <label class="stack" for="image">Image</label>
                     <input class="stack" name="image" v-model="instanceForm.image" type="text" />
+
+                    <label class="stack">
+                        <input v-model="instanceForm.is_restricted" type="checkbox" />
+                        <span class="checkable">Invite-only</span>
+                    </label>
                     <!-- <label class="stack" for="rules">Rules</label>
                          TODO rules -->
                     <label class="stack" for="members">Members</label>
