@@ -17,6 +17,7 @@
     "babel-runtime": "^6.26.0",
     "debounce": "^1.1.0",
     "django-channels": "^1.1.8",
+    "geoposition-to-geojson": "^1.0.1",
     "ionicons": "^3.0.0",
     "ladda": "^1.0.6",
     "lodash": "^4.17.10",

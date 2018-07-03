@@ -4,6 +4,7 @@ import Feed from 'components/Feed'
 import FeedContentStash from 'components/FeedContentStash'
 import Register from 'components/Register'
 import Login from 'components/Login'
+import Place from 'components/Place/Place'
 import Profile from 'components/Profile/Profile'
 import Chat from 'components/Chat'
 import Home from 'components/Home'
@@ -118,6 +119,12 @@ export default new Router({
             path: '/register',
             name: 'Register',
             component: Register
+        },
+        {
+            path: '/place/:action',
+            name: 'Place',
+            props: restAction,
+            component: Place
         },
         {
             path: '/profile/:action',

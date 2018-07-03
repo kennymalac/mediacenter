@@ -38,6 +38,7 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 *** Authentication
 **** DONE don't require refresh for authentication
      CLOSED: [2018-06-19 Tue 16:34]
+**** TODO Account always shows as successfully being logged in even on error
 **** TODO better permission system, login shouldn't require Store reset
 **** TODO user permission system
 **** DONE log out should clear store
@@ -102,6 +103,20 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 *** TODO slugs instead of ids in routes
 *** TODO details should be default route
 
+*** Places
+**** TODO limit users to 1 place
+**** TODO geolocation content filtering
+**** DONE geolocation connect API
+     CLOSED: [2018-07-02 Mon 19:15]
+**** DONE model, serializer, viewset
+     CLOSED: [2018-07-02 Mon 19:15]
+**** TODO CRUD
+***** TODO Create
+***** DONE Read
+      CLOSED: [2018-07-02 Mon 19:15]
+***** TODO Update
+***** TODO Delete
+
 *** Online Now
 **** TODO websocket implementation
 **** TODO component
@@ -128,6 +143,7 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 ***** TODO Delete
 
 *** User Profiles
+**** TODO group tags are broken
 **** DONE basic UI
      CLOSED: [2018-05-08 Tue 16:56]
 **** DONE user profile comments
@@ -225,6 +241,7 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 ***** TODO Delete
 
 *** Groups
+**** TODO tagged content within groups
 **** TODO only members can create new Posts, comment in Group Topic
 **** DONE Group tags should link to group's stash
      CLOSED: [2018-05-31 Thu 14:58]
@@ -391,6 +408,7 @@ Your feed has "content decay"
 *** Model/Collection
     don't make too many assumptions
 **** TODO ability to watch store for prop changes
+**** TODO singletons can have dependencies
 **** TODO resolution methods should also be singletons?
 currently mutliple resolutions are happening at once for the same ids
 **** TODO dependency trees

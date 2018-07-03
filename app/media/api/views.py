@@ -1,3 +1,6 @@
+import json
+from decimal import Decimal
+
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404
 from django.conf import settings
@@ -9,6 +12,8 @@ from rest_framework.decorators import api_view, list_route, detail_route, parser
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
+
+from django.contrib.gis.geos import GEOSGeometry
 
 from api.models import *
 from api.serializers import *
@@ -113,6 +118,30 @@ class InterestViewSet(ListModelMixin,
     serializer_class = InterestSerializer
     filter_backends = (SearchFilter,)
     search_fields = ('name',)
+
+
+class PlaceViewSet(ListModelMixin,
+                   RetrieveModelMixin,
+                   GenericViewSet):
+    queryset = Place.objects.all()
+    serializer_class = PlaceSerializer
+    filter_backends = (SearchFilter,)
+    search_fields = ('owner',)
+
+    @list_route(methods=['POST'], url_path='connect')
+    def connect(self, request, *args, **kwargs):
+        position = request.data.get('position', None)
+        if not position:
+            return Response({
+                'error': 'No position provided'
+            }, status=400)
+
+        home = Place.objects.create(name="Home", position=GEOSGeometry(json.dumps(position)), owner=request.user)
+        home.save()
+
+        PlaceRestriction.objects.create(place=home, max_distance=Decimal("50"))
+
+        return Response(self.get_serializer(home).data)
 
 
 class ProfileViewSet(MultipleSerializerMixin,

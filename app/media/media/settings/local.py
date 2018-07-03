@@ -5,7 +5,8 @@ from media.settings.base import *
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        # django.db.backends.postgresql_psycopg2
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'mediacenter',
         'USER': 'mediacenter',
         'PASSWORD': 'test123',

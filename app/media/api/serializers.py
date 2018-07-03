@@ -1,6 +1,7 @@
 from bleach.sanitizer import Cleaner
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Max
+from django.contrib.gis.db.models.functions import AsGeoJSON
 from django.conf import settings
 from api.paginators import *
 from django_countries.serializers import CountryFieldMixin
@@ -294,6 +295,18 @@ class InterestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Interest
         fields = ('id', 'name')
+
+
+class PlaceSerializer(serializers.ModelSerializer):
+    # position = serializers.SerializerMethodField()
+    owner = AccountSerializer()
+
+    class Meta:
+        model = Place
+        fields = ('id', 'name', 'owner', 'position')
+
+    # def get_position(instance):
+    #     return instance.position
 
 
 class ProfileSerializer(serializers.ModelSerializer):

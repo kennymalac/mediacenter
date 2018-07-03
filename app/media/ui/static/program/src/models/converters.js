@@ -1,10 +1,17 @@
 import moment from 'moment'
+import geojsonify from 'geoposition-to-geojson'
 
 export function momentDate(input) {
     if (input === null) {
         return {}
     }
     return moment(input)
+}
+
+export function geoJSON(input) {
+    // SRID=4326;POINT (long lat)
+    const geo = input.slice(input.indexOf('(') + 1, input.indexOf(')')).split(" ")
+    return geojsonify({ coords: { longitude: geo[0], latitude: geo[1] } }).geometry
 }
 
 export const visibilityChoices = {

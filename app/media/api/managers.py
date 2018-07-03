@@ -1,5 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import UserManager
+#from django.contrib.gis.db.models.functions import Distance, AsGeoJSON
+
+
+
+# class PlaceManager(models.Manager):
+#     def (place, distance):
+#         return self.annotate(distance=distance(''))
+
 
 class AccountManager(UserManager):
     # def _create_user(self):

@@ -21,6 +21,7 @@ router.register(r'album', AlbumViewSet, base_name='album')\
       )
 router.register(r'feed-content-type', FeedContentTypeViewSet, base_name='feed-content-type')
 router.register(r'interest', InterestViewSet, base_name='interest')
+router.register(r'place', PlaceViewSet, base_name='place')
 router.register(r'profile', ProfileViewSet, base_name='profile')\
 .register(
     r'comment',

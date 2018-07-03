@@ -8,6 +8,7 @@ from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.gis.db.models import GeometryField
 
 from django_countries.fields import CountryField
 from guardian.mixins import GuardianUserMixin
@@ -148,10 +149,24 @@ class Interest(ContentTag):
     # Art, Computers, Design > Digital Art > Anime
 
 
+class Place(models.Model):
+    owner = models.ForeignKey(Account, null=True)
+    name = models.CharField(max_length=140, blank=True)
+    description = models.TextField(blank=True)
+    position = GeometryField(geography=True)
+    #objects = api.managers.PlaceManager
+
+
+class PlaceRestriction(models.Model):
+    place = models.ForeignKey(Place, blank=True)
+    # 999.99 mi maximum
+    max_distance = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
+
+
 class TaggedItem(models.Model):
     # Associated tags
     interests = models.ManyToManyField(Interest, blank=True)
-    # places = models.ManyToManyField(Place)
+    places = models.ManyToManyField(PlaceRestriction, blank=True)
     # people (people without accounts most likely)
     # organizations
     # 
