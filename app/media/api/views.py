@@ -203,11 +203,25 @@ class FeedContentItemViewSet(ListModelMixin,
     serializer_class = FeedContentItemSerializer
     pagination_class = StandardResultsSetPagination
 
+    def get_serializer(self, *args, **kwargs):
+        """
+        Return the serializer instance that should be used for validating and
+        deserializing input, and for serializing output.
+        """
+        serializer_class = self.get_serializer_class()
+        if 'extra_context' in kwargs:
+            # Put this into the serializer
+            extra_context = kwargs.pop('extra_context')
+        else:
+            extra_context = {}
+        kwargs['context'] = {**self.get_serializer_context(), **extra_context}
+        return serializer_class(*args, **kwargs)
 
     @list_route(methods=['POST'], url_path='search', permission_classes=[IsAuthenticated])
     def search(self, request):
         content_queryset = self.get_queryset().filter(Q(visibility='0') | Q(owner=request.user))
 
+        allowed_places = []
         # First find applicable places to this user's local area if they have one configured
         user_places = Place.objects.filter(owner=request.user)
         if user_places.count() > 0:
@@ -226,6 +240,7 @@ class FeedContentItemViewSet(ListModelMixin,
                 # Either the content has no configured Place, or the place is within the place restriction's radius
                 allowed_places = geo_request.json()['results']
                 print(allowed_places)
+                allowed_places.append(place.id)
                 content_queryset = content_queryset.filter(Q(places__in=allowed_places) | Q(places__isnull=True))
         else:
             # Only include posts without geolocation
@@ -249,7 +264,8 @@ class FeedContentItemViewSet(ListModelMixin,
             if _interests:
                 content_queryset = content_queryset.filter(interests__in=Interest.objects.filter(id__in=_interests))
 
-        serializer = self.get_serializer(self.paginate_queryset(content_queryset), many=True)
+        serializer = self.get_serializer(self.paginate_queryset(content_queryset), many=True, extra_context={'allowed_places': allowed_places})
+
 
         return self.get_paginated_response(serializer.data)
 

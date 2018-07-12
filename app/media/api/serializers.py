@@ -466,6 +466,7 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
     origin_stash_id = serializers.SerializerMethodField()
     feed_id = serializers.SerializerMethodField()
     group_id = serializers.SerializerMethodField()
+    is_local = serializers.SerializerMethodField()
     nested_object = serializers.SerializerMethodField()
     # content_type = serializers.StringRelatedField(
     #     required=False
@@ -473,7 +474,7 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'is_anonymous', 'content_type', 'comments', 'created', 'object_id', 'origin_stash_id', 'feed_id', 'group_id', 'nested_object', 'visibility', 'interests')
+        fields = ('id', 'title', 'description', 'owner', 'is_anonymous', 'is_local', 'content_type', 'comments', 'created', 'object_id', 'origin_stash_id', 'feed_id', 'group_id', 'nested_object', 'visibility', 'interests')
 
     def get_content_id(self, instance):
         return get_content_id(instance)
@@ -487,6 +488,15 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
 
     def get_group_id(self, instance):
         return get_group_id(instance)
+
+    def get_is_local(self, instance):
+        allowed_places = self.context.get('allowed_places', [])
+
+        for place_id in [p.id for p in instance.places.all()]:
+            if place_id in allowed_places:
+                return True
+
+        return False
 
     def get_nested_object(self, instance):
         """Returns a nested representation of the content item's object"""

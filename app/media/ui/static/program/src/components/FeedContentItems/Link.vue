@@ -4,7 +4,7 @@
             <div class="content-title">
                 <a :href="item.nested_object.link">{{ item.title }}</a>
             </div>
-            <span class="date">{{ item.created.fromNow() }}</span>
+            <span class="date">{{ item.created.fromNow() }} <span class="local-tag" v-if="item.is_local">(Local)</span></span>
         </template>
         <template slot="embed" slot-scope="{ slotProps }">
             <div class="default-preview">
@@ -62,6 +62,12 @@ export default {
         padding: 4px;
         font-size: 1rem;
     }
+}
+
+span.local-tag {
+    padding-left: 5px;
+    font-weight: bold;
+    color: green;
 }
 
 .topic {
