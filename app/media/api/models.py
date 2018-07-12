@@ -153,9 +153,11 @@ class Place(models.Model):
     owner = models.ForeignKey(Account, null=True)
     name = models.CharField(max_length=140, blank=True)
     description = models.TextField(blank=True)
-    position = GeometryField(geography=True)
     #objects = api.managers.PlaceManager
 
+    @property
+    def position(self):
+        pass
 
 class PlaceRestriction(models.Model):
     place = models.ForeignKey(Place, blank=True)
