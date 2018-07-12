@@ -49,6 +49,9 @@
                     <label class="stack" for="interests">Interests</label>
                     <interest-select v-model="instanceForm.content_item.interests" />
 
+                    <label class="stack" for="places">Places</label>
+                    <place-select v-model="instanceForm.content_item.places" />
+
                     <input type="submit" class="stack" value="Save changes" />
                 </fieldset>
             </form>
@@ -64,6 +67,7 @@ import linkDeps from '../dependencies/Link.js'
 
 import Comment from './Comment/Comment'
 import InterestSelect from './InterestSelect'
+import PlaceSelect from './PlaceSelect'
 import TagList from './TagList'
 
 import router from "../router/index.js"
@@ -75,6 +79,7 @@ export default {
     components: {
         Comment,
         InterestSelect,
+        PlaceSelect,
         TagList
     },
     data() {

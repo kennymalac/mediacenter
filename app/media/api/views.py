@@ -1,3 +1,4 @@
+import requests
 import json
 from decimal import Decimal
 
@@ -12,8 +13,6 @@ from rest_framework.decorators import api_view, list_route, detail_route, parser
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
-
-from django.contrib.gis.geos import GEOSGeometry
 
 from api.models import *
 from api.serializers import *
@@ -125,8 +124,7 @@ class PlaceViewSet(ListModelMixin,
                    GenericViewSet):
     queryset = Place.objects.all()
     serializer_class = PlaceSerializer
-    filter_backends = (SearchFilter,)
-    search_fields = ('owner',)
+    filter_class = PlaceFilter
 
     @list_route(methods=['POST'], url_path='connect')
     def connect(self, request, *args, **kwargs):
@@ -136,8 +134,18 @@ class PlaceViewSet(ListModelMixin,
                 'error': 'No position provided'
             }, status=400)
 
-        home = Place.objects.create(name="Home", position=GEOSGeometry(json.dumps(position)), owner=request.user)
+        home = Place.objects.create(name="Home", owner=request.user)
         home.save()
+
+        coords = position['coordinates']
+
+        # Add position to geolocation microservice
+        geo_request = requests.put('{}/location/'.format(settings.GEOLOCATION_API), json={ 'latitude': coords[1], 'longitude': coords[0], 'place_id': home.id })
+        if geo_request.status_code != 201:
+            home.delete()
+            return Response({
+                'error': 'Something went wrong, please try again later'
+            }, status=500)
 
         PlaceRestriction.objects.create(place=home, max_distance=Decimal("50"))
 
@@ -199,6 +207,29 @@ class FeedContentItemViewSet(ListModelMixin,
     @list_route(methods=['POST'], url_path='search', permission_classes=[IsAuthenticated])
     def search(self, request):
         content_queryset = self.get_queryset().filter(Q(visibility='0') | Q(owner=request.user))
+
+        # First find applicable places to this user's local area if they have one configured
+        user_places = Place.objects.filter(owner=request.user)
+        if user_places.count() > 0:
+            # TODO configurable place distance, multiple places
+            place = user_places.first()
+            restriction = PlaceRestriction.objects.filter(place=place).first()
+            geo_request = requests.post('{}/location/distance-radius'.format(settings.GEOLOCATION_API), json={ 'place_id': place.id, 'distance': float(restriction.max_distance), 'unit': 'mi' })
+            if geo_request.status_code != 200:
+                # Only include posts without geolocation
+                content_queryset = content_queryset.filter(places__isnull=True)
+
+                # return Response({
+                #     'error': 'Something went wrong, please try again later'
+                # }, status=500)
+            else:
+                # Either the content has no configured Place, or the place is within the place restriction's radius
+                allowed_places = geo_request.json()['results']
+                print(allowed_places)
+                content_queryset = content_queryset.filter(Q(places__in=allowed_places) | Q(places__isnull=True))
+        else:
+            # Only include posts without geolocation
+            content_queryset = content_queryset.filter(places__isnull=True)
 
         _feed_id = request.data.get('feed', None)
         if _feed_id:

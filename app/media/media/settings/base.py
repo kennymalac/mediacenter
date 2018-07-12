@@ -156,7 +156,11 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
 }
 
-# Custom Media Center settings
+################################
+# Custom Media Center settings #
+################################
+
+GEOLOCATION_API = "http://127.0.0.1:9980"
 GUESTS_CAN_UPLOAD = False
 
 CHANNEL_LAYERS = {

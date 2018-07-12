@@ -1,7 +1,6 @@
 from bleach.sanitizer import Cleaner
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Max
-from django.contrib.gis.db.models.functions import AsGeoJSON
 from django.conf import settings
 from api.paginators import *
 from django_countries.serializers import CountryFieldMixin
@@ -298,15 +297,11 @@ class InterestSerializer(serializers.ModelSerializer):
 
 
 class PlaceSerializer(serializers.ModelSerializer):
-    # position = serializers.SerializerMethodField()
     owner = AccountSerializer()
 
     class Meta:
         model = Place
-        fields = ('id', 'name', 'owner', 'position')
-
-    # def get_position(instance):
-    #     return instance.position
+        fields = ('id', 'name', 'owner')
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -408,11 +403,16 @@ class FeedContentItemBasicSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'is_anonymous', 'content_type', 'visibility', 'created', 'interests')
+        fields = ('id', 'title', 'description', 'owner', 'is_anonymous', 'content_type', 'visibility', 'created', 'interests', 'places')
 
     def to_representation(self, obj):
         self.context['is_anonymous'] = obj.is_anonymous
         result = super(FeedContentItemBasicSerializer, self).to_representation(obj)
+
+        # Filter to only include places that are owned by this user
+        request = self.context.get("request")
+        if request and hasattr(request, 'user'):
+            result['places'] = [place.id for place in obj.places.filter(owner=request.user)]
 
         # If this is the primary key serializer, give it the forgotten fake intance
         if obj.is_anonymous and isinstance(result['owner'], int):

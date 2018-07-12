@@ -13,6 +13,7 @@ class FeedContentItemModel extends Model {
         group_id: 0,
         is_anonymous: false,
         interests: [],
+        places: [],
         comments: [],
         nested_object: {},
         content_type: {},
@@ -27,6 +28,7 @@ class FeedContentItemModel extends Model {
         owner: AccountCollection,
         comments: [Collection],
         interests: [Collection],
+        places: [Collection],
         content_type: FeedContentTypeCollection
     }
 

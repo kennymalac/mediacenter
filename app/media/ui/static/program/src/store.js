@@ -6,7 +6,7 @@ import {ProfileCollection, makeProfileCollection, makeFilteredProfileCollection}
 import {FeedContentTypeCollection, makeFeedContentTypeCollection} from './models/FeedContentType.js'
 import {CommentCollection, makeCommentCollection, ProfileCommentCollection, makeProfileCommentCollection} from './models/Comment.js'
 import {InterestCollection, makeInterestCollection} from './models/Interest.js'
-import {PlaceCollection, makeFilteredPlaceCollection} from './models/Place.js'
+import {PlaceCollection, makePlaceCollection} from './models/Place.js'
 import {FeedContentStashCollection, makeFeedContentStashCollection} from './models/FeedContentStash.js'
 import {FeedCollection, makeFilteredFeedCollection} from './models/Feed.js'
 import {DiscussionCollection, makeDiscussionCollection} from './models/Discussion.js'
@@ -109,14 +109,7 @@ export const places = () => {
     return singleton(
         'places',
         (value) => value instanceof PlaceCollection,
-        () => {
-            return activeUser().then((user) => {
-                return makeFilteredPlaceCollection(
-                    () => PlaceCollection.all({ owner: user.details.id }),
-                    accounts
-                )
-            })
-        }
+        makePlaceCollection
     )
 }
 
@@ -172,6 +165,7 @@ export const feeds = () => {
                     feedContentTypes,
                     stashes,
                     interests,
+                    places,
                     comments,
                     accounts
                 )
@@ -217,6 +211,7 @@ const activeUserGroups = () => {
             accounts,
             profiles,
             interests,
+            places,
             feedContentTypes
         )
     })
@@ -231,6 +226,7 @@ const filterGroups = (params) => {
         accounts,
         profiles,
         interests,
+        places,
         feedContentTypes
     )
 }

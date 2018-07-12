@@ -171,9 +171,11 @@ export default {
             this.isActiveUserOwner = this.instance.owner.id === user.details.id
 
             try {
+                // TODO optimize
                 this.contentItems = await FeedModel.listItems(this.instance.id, {}, {
                     content_type: deps.content_types,
                     comments: deps.comments,
+                    places: deps.places,
                     interests: deps.interests,
                     owner: deps.owner
                 })

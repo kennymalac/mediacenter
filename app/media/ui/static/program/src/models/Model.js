@@ -200,7 +200,7 @@ export class Collection {
     }
 
     addInstances(values, collections) {
-        return values.map((instance) => this.addInstance.bind(this)(collections))
+        return values.map((instance) => this.addInstance.bind(this)(instance, collections))
     }
 }
 

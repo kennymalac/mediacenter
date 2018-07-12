@@ -1,4 +1,4 @@
-import {momentDate, geoJSON} from './converters.js'
+import {momentDate} from './converters.js'
 import {Model, Collection} from './Model.js'
 import {get, manage, paginatedList, resolveInstances} from './generics.js'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
@@ -32,8 +32,7 @@ class PlaceModel extends Model {
     }
 
     static fieldConverters = {
-        created: momentDate,
-        position: geoJSON
+        created: momentDate
     }
 
     static resource = 'place'
@@ -42,7 +41,6 @@ class PlaceModel extends Model {
         owner: {},
         id: 0,
         created: {},
-        position: {},
         name: '',
         description: ''
     }
@@ -102,6 +100,19 @@ class PlaceCollection extends Collection {
         return await paginatedList(this, params, collections, [
             ['owner', collections.accounts.get.bind(collections.accounts)]
         ])
+    }
+
+    getActiveUserPlaces(activeUser, collections) {
+        return makeJsonRequest(`place/`, {
+            method: "GET",
+            queryParams: { owner: activeUser.details.id }
+        })
+            .then(jsonResponse)
+            .then((data) => {
+                const instances = this.addInstances(data, collections)
+
+                return instances
+            })
     }
 }
 

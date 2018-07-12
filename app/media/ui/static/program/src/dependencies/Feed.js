@@ -1,17 +1,19 @@
-import {stashes, interests, comments, profiles, accounts, feedContentTypes} from '../store.js'
+import {stashes, interests, places, comments, profiles, accounts, feedContentTypes} from '../store.js'
 
 export default async function dependencies() {
     const [
         interestCollection,
+        placeCollection,
         commentCollection,
         stashCollection,
         contentTypeCollection,
         accountCollection,
         profile
-    ] = await Promise.all([interests(), comments(), stashes(), feedContentTypes(), accounts(), profiles()])
+    ] = await Promise.all([interests(), places(), comments(), stashes(), feedContentTypes(), accounts(), profiles()])
 
     return {
         interests: interestCollection,
+        places: placeCollection,
         comments: commentCollection,
         stashes: stashCollection,
         content_types: contentTypeCollection,

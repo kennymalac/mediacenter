@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import requests
 from datetime import datetime
 
 from django.conf import settings
@@ -159,6 +160,15 @@ class Place(models.Model):
     def position(self):
         pass
 
+
+@receiver(post_delete, sender=Place)
+def post_delete_place(sender, **kwargs):
+    instance = kwargs.get('instance')
+    geo_request = requests.delete('{}/location/'.format(settings.GEOLOCATION_API), json={ 'place_id': instance.id })
+    if geo_request.status_code != 200:
+        print(geo_request.status_code)
+
+
 class PlaceRestriction(models.Model):
     place = models.ForeignKey(Place, blank=True)
     # 999.99 mi maximum
@@ -168,7 +178,7 @@ class PlaceRestriction(models.Model):
 class TaggedItem(models.Model):
     # Associated tags
     interests = models.ManyToManyField(Interest, blank=True)
-    places = models.ManyToManyField(PlaceRestriction, blank=True)
+    places = models.ManyToManyField(Place, blank=True)
     # people (people without accounts most likely)
     # organizations
     # 
