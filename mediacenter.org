@@ -104,6 +104,11 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 *** TODO details should be default route
 
 *** Places
+**** DONE integrate GeoSpace microservice
+     CLOSED: [2018-07-12 Thu 13:06]
+**** TODO show "Local" tag for local content
+**** TODO configurable PlaceRestriction max_distance
+**** TODO default feed created for Place
 **** TODO limit users to 1 place
 **** TODO geolocation content filtering
 **** DONE geolocation connect API

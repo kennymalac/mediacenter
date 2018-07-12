@@ -11,6 +11,11 @@ from api.models import *
 
 
 class BasicProfileSerializer(serializers.ModelSerializer):
+    account = serializers.PrimaryKeyRelatedField(
+        queryset=Account.objects.all(),
+        required=False
+    )
+
     class Meta:
         model = Profile
         fields = ('id', 'display_name', 'picture', 'account')
