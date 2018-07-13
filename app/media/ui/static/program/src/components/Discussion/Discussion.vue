@@ -29,7 +29,7 @@
 <script>
 import RestfulComponent from "../RestfulComponent"
 import PaginatedComponent from "../PaginatedComponent"
-import {activeUser, discussions, accounts, groups, interests, stashes, profiles, feedContentTypes, comments} from "../../store.js"
+import {activeUser, discussions, accounts, groups, interests, places, stashes, profiles, feedContentTypes, comments} from "../../store.js"
 import activeUserDeps from "../../dependencies/activeUser.js"
 import {DiscussionModel} from "../../models/Discussion.js"
 import Post from './Post'
@@ -108,8 +108,8 @@ export default {
         },
 
         async dependencies() {
-            const [owner, stashCollection, contentTypeCollection, profileCollection, interestCollection, commentCollection, groupCollection] = await Promise.all(
-                [accounts(), stashes(), feedContentTypes(), profiles(), interests(), comments(), groups()]
+            const [owner, stashCollection, contentTypeCollection, profileCollection, interestCollection, placeCollection, commentCollection, groupCollection] = await Promise.all(
+                [accounts(), stashes(), feedContentTypes(), profiles(), interests(), places(), comments(), groups()]
             )
             const stash = await stashCollection.getInstance(parseInt(this.params.stashId))
 
@@ -123,7 +123,8 @@ export default {
                 friends: owner,
                 account: owner,
                 comments: commentCollection,
-                interests: interestCollection
+                interests: interestCollection,
+                places: placeCollection
             }
         },
 

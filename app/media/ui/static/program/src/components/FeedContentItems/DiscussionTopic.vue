@@ -61,7 +61,10 @@ export default {
         color: white;
         font-weight: normal;
         padding: 4px;
-        font-size: 1rem;
+        height: 2rem;
+        margin-right: 4px;
+        // align-self: flex-start;
+        font-size: .8rem;
     }
 }
 

@@ -2,7 +2,7 @@
     <content-item :embed="embedProps" v-bind="item.instance" :commentsUrl="commentsUrl">
         <template slot="title" slot-scope="{ slotProps }">
             <div class="content-title">
-                <a :href="item.nested_object.link">{{ item.title }}</a>
+                <i class="ion-ios-link"></i> <a class="external-link" :href="item.nested_object.link">{{ item.title }}</a>
             </div>
             <span class="date">{{ item.created.fromNow() }} <span class="local-tag" v-if="item.is_local">(Local)</span></span>
         </template>
@@ -53,6 +53,7 @@ export default {
 
 <style scoped lang="scss">
 .content-title {
+    .ion-ios-link { padding-right: 5px; }
     .content-type {
         display: inline-flex;
         border-radius: 6px;
@@ -62,12 +63,6 @@ export default {
         padding: 4px;
         font-size: 1rem;
     }
-}
-
-span.local-tag {
-    padding-left: 5px;
-    font-weight: bold;
-    color: green;
 }
 
 .topic {

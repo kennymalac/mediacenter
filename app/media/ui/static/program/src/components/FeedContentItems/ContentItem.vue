@@ -9,17 +9,13 @@
         <slot name="embed" :slotProps="embedProps">
         </slot>
         <div class="actions">
-            <router-link container="div" v-if="commentsUrl" :to="commentsUrl" class="action">
+            <router-link tag="div" v-if="commentsUrl" :to="commentsUrl" class="action">
                 <i class="icon ion-md-chatbubbles"></i>
-                <span>Comment</span>
+                <span class="text">Comment</span>
             </router-link>
             <div class="action">
                 <i class="icon ion-md-star"></i>
-                <span>Save</span>
-            </div>
-            <div class="action">
-                <i class="icon ion-md-close"></i>
-                <span>Hide</span>
+                <span class="text">Save</span>
             </div>
         </div>
     </div>
@@ -62,15 +58,31 @@ $title-height: 48px;
     border-radius: 4px / 5px;
     width: 333px;
     height: 280px;
-    
+
+    span.local-tag {
+        padding-left: 5px;
+        font-weight: bold;
+        color: #4F8A10;
+    }
+
     .content-title {
+        justify-content: center;
+        display: flex;
+        flex-direction: row;
+
+        &:hover, &:focus {
+            box-shadow: inset 0 0 0 99em rgba(255, 255, 255, 0.05);
+        }
+
+        color: white;
+        background: linear-gradient(180deg, #001f3f, rgba(52, 73, 94,1.0));
+
         padding-top: 5px;
         height: $title-height;
         font-size: 1.5rem;
         line-height: 1.5rem;
         font-weight: lighter;
         width: 100%;
-        color: rgb(52, 73, 94);
         .content-type {
             display: inline-flex;
             border-radius: 6px;
@@ -81,7 +93,11 @@ $title-height: 48px;
             font-size: 1rem;
         }
         a {
-            text-decoration: underline;
+            color: white;
+            text-decoration: none;
+            &.external-link {
+                text-decoration: underline;
+            }
         }
     }
     .date {
@@ -91,32 +107,51 @@ $title-height: 48px;
         align-self: center;
         color: grey;
     }
-    
+
     .actions {
+        margin-bottom: 10px;
         display: flex;
-        align-self: flex-end;
         height: $actions-height;
+        justify-content: center;
         width: 100%;
         .action {
-            background-color: #2c3e50;
+            text-align: center;
+            justify-content: center;
+            display: flex;
+            flex-direction: column;
+            background-color: #1F8DD6;
+            box-shadow: 0 0.3rem 0 #26619C;
+            border-radius: 3px;
+
             color: white;
             user-select: none;
-            width: 110px;
+            width: 120px;
+            margin-right: 10px;
             padding: 2px 16px;
             height: 100%;
+            span.text {
+                font-size: .75rem;
+                line-height: 1rem;
+            }
             i.icon {
                 padding-top: 2px;
                 display: flex;
                 font-size: 1.6rem;
                 margin: auto;
-                width: 28px;
-                height: 24px;
+            }
+            i.icon.ion-md-star {
+                color: #f1c40f;
+            }
+            &:active {
+                box-shadow: none;
+                margin-top: .3rem;
             }
         }
         .action:hover {
-            box-shadow: inset 0 0 0 99em rgba(255, 255, 255, 0.2);
             cursor: pointer;
+            background-color: #239ef0;
         }
+
     }
     .default-preview {
         justify-content: center;
