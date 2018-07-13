@@ -62,6 +62,9 @@ $title-height: 48px;
     span.local-tag {
         padding-left: 5px;
         font-weight: bold;
+        i {
+            color: #f87373;
+        }
         color: #4F8A10;
     }
 

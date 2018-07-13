@@ -4,7 +4,7 @@
             <div class="content-title">
                 <i class="ion-ios-link"></i> <a class="external-link" :href="item.nested_object.link">{{ item.title }}</a>
             </div>
-            <span class="date">{{ item.created.fromNow() }} <span class="local-tag" v-if="item.is_local">(Local)</span></span>
+            <span class="date">{{ item.created.fromNow() }} <span class="local-tag" v-if="item.is_local"><i class="ion-ios-pin"></i> Local</span></span>
         </template>
         <template slot="embed" slot-scope="{ slotProps }">
             <div class="default-preview">
