@@ -127,6 +127,23 @@ export default new Router({
             component: Place
         },
         {
+            path: '/place/:placeId/:placeAction',
+            name: 'PlaceNested',
+            component: Place,
+            props: restAction,
+            canReuse: false,
+            // meta: { objectName: 'place' },
+            children: [
+                {
+                    path: 'feed/:feedId/:feedAction',
+                    name: 'PlaceFeed',
+                    component: Feed,
+                    props: restAction,
+                    canReuse: false
+                }
+            ]
+        },
+        {
             path: '/profile/:action',
             name: 'Profiles',
             component: Profile,

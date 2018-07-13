@@ -1,5 +1,15 @@
 <template>
     <div>
+        <template v-if="actions.details && instance.id">
+            <section class="sidebar">
+                <div class="group-info">
+                    <h2>{{ instance.name }}</h2>
+                </div>
+            </section>
+            <div class="place-contents">
+                <router-view v-if="instance.default_feed.id" :feedId="instance.default_feed.id"></router-view>
+            </div>
+        </template>
         <template v-if="actions.list && isActiveUserConnected">
             <place-list :items="objects" />
         </template>
@@ -56,6 +66,7 @@ export default {
     data() {
         return {
             objectName: 'place',
+            instance: { id: null },
             loading: true
         }
     },
@@ -70,13 +81,29 @@ export default {
             this.objects = await placeCollection.getActiveUserPlaces(owner, await placeDeps())
             this.loading = false
         },
+
+        async details(params) {
+            const deps = await placeDeps()
+
+            this.instance = await this.showInstance(params.id, '/place/list', places, deps)
+
+            let feedId = params.feedId
+
+            if (feedId === undefined) {
+                feedId = this.instance.default_feed.id
+                this.$router.replace(`details/feed/${feedId}/details`)
+            }
+        },
+
         async connect() {
             const placeCollection = await places()
             const deps = await placeDeps()
 
             navigator.geolocation.getCurrentPosition((position) => {
                 console.log('Location: ', position)
-                this.instance = placeCollection.connect({ position: geojsonify(position).geometry }, deps)
+                placeCollection.connect({ position: geojsonify(position).geometry }, deps).then((instance) => {
+                    this.instance = instance
+                })
             }, () => {
                 console.log('Location retrieval failure')
             }, this.positionOptions)

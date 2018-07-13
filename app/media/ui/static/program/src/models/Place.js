@@ -28,7 +28,8 @@ export async function makeFilteredPlaceCollection(queryset, _accounts) {
 class PlaceModel extends Model {
 
     static fields = {
-        owner: Collection
+        owner: Collection,
+        default_feed: Collection
     }
 
     static fieldConverters = {
@@ -39,6 +40,7 @@ class PlaceModel extends Model {
 
     static initialState = {
         owner: {},
+        default_feed: {},
         id: 0,
         created: {},
         name: '',

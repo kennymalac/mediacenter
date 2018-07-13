@@ -154,6 +154,7 @@ class Place(models.Model):
     owner = models.ForeignKey(Account, null=True)
     name = models.CharField(max_length=140, blank=True)
     description = models.TextField(blank=True)
+    default_feed = models.ForeignKey('api.Feed', null=True)
     #objects = api.managers.PlaceManager
 
     @property

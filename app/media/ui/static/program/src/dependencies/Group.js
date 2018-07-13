@@ -6,6 +6,6 @@ export default async function dependencies() {
     )
 
     return {
-        members, feed, profile, stashes: stashCollection, places: placeCollection, interests: interestCollection, content_types: contentTypes, comments: commentCollection, owner: members, friends: members, member_groups: groupCollection, account: accounts
+        members, default_feed: feed, feed, profile, stashes: stashCollection, places: placeCollection, interests: interestCollection, content_types: contentTypes, comments: commentCollection, owner: members, friends: members, member_groups: groupCollection, account: members
     }
 }

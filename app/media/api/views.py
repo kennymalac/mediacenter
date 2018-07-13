@@ -149,6 +149,13 @@ class PlaceViewSet(ListModelMixin,
 
         PlaceRestriction.objects.create(place=home, max_distance=Decimal("50"))
 
+        # Setup a Feed with this Place as its filter
+        feed = Feed.objects.create(name="Home", owner=request.user, description="Content from your local area", visibility='9')
+        feed.places.add(home)
+        home.default_feed = feed
+        feed.save()
+        home.save()
+
         return Response(self.get_serializer(home).data)
 
 
@@ -221,8 +228,26 @@ class FeedContentItemViewSet(ListModelMixin,
     def search(self, request):
         content_queryset = self.get_queryset().filter(Q(visibility='0') | Q(owner=request.user))
 
+        _feed_id = request.data.get('feed', None)
+        if _feed_id:
+            feed = get_object_or_404(Feed, pk=_feed_id)
+
+            if feed.content_types.count() > 0:
+                content_queryset = content_queryset.filter(content_type__in=feed.content_types.all())
+            if feed.interests.count() > 0:
+                content_queryset = content_queryset.filter(interests__in=feed.interests.all())
+
+        else:
+            _content_types = request.data.get('content_types', None)
+            if _content_types:
+                content_queryset = content_queryset.filter(content_type__in=FeedContentType.objects.filter(id__in=_content_types))
+
+            _interests = request.data.get('interests', None)
+            if _interests:
+                content_queryset = content_queryset.filter(interests__in=Interest.objects.filter(id__in=_interests))
+
+        # Find applicable places to this user's local area if they have one configured
         allowed_places = []
-        # First find applicable places to this user's local area if they have one configured
         user_places = Place.objects.filter(owner=request.user)
         if user_places.count() > 0:
             # TODO configurable place distance, multiple places
@@ -241,28 +266,15 @@ class FeedContentItemViewSet(ListModelMixin,
                 allowed_places = geo_request.json()['results']
                 print(allowed_places)
                 allowed_places.append(place.id)
-                content_queryset = content_queryset.filter(Q(places__in=allowed_places) | Q(places__isnull=True))
+                # TODO verify place in user_places
+                if feed.place_set.count():
+                    # This is a Place feed so only show content from this local area
+                    content_queryset = content_queryset.filter(places__in=allowed_places)
+                else:
+                    content_queryset = content_queryset.filter(Q(places__in=allowed_places) | Q(places__isnull=True))
         else:
             # Only include posts without geolocation
             content_queryset = content_queryset.filter(places__isnull=True)
-
-        _feed_id = request.data.get('feed', None)
-        if _feed_id:
-            feed = get_object_or_404(Feed, pk=_feed_id)
-
-            if feed.content_types.count() > 0:
-                content_queryset = content_queryset.filter(content_type__in=feed.content_types.all())
-            if feed.interests.count() > 0:
-                content_queryset = content_queryset.filter(interests__in=feed.interests.all())
-
-        else:
-            _content_types = request.data.get('content_types', None)
-            if _content_types:
-                content_queryset = content_queryset.filter(content_type__in=FeedContentType.objects.filter(id__in=_content_types))
-
-            _interests = request.data.get('interests', None)
-            if _interests:
-                content_queryset = content_queryset.filter(interests__in=Interest.objects.filter(id__in=_interests))
 
         serializer = self.get_serializer(self.paginate_queryset(content_queryset), many=True, extra_context={'allowed_places': allowed_places})
 

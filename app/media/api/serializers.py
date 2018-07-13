@@ -306,7 +306,7 @@ class PlaceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Place
-        fields = ('id', 'name', 'owner')
+        fields = ('id', 'name', 'owner', 'default_feed')
 
 
 class ProfileSerializer(serializers.ModelSerializer):
