@@ -91,7 +91,7 @@ export default {
 
             if (feedId === undefined) {
                 feedId = this.instance.default_feed.id
-                this.$router.replace(`details/feed/${feedId}/details`)
+                this.$router.replace(`/place/${this.instance.id}/details/feed/${feedId}/details`)
             }
         },
 

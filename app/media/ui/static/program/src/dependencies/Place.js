@@ -6,6 +6,7 @@ export default async function dependencies() {
     return {
         profile: await profiles(),
         owner: deps.account,
+        friends: deps.account,
         default_feed: await feeds(),
         ...deps
     }
