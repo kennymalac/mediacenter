@@ -71,7 +71,7 @@ export class Auth {
         return this.currentSession.user.token
     }
 
-    login(username, password, errorCallback) {
+    login(username, password) {
         return makeJsonRequest('api-token-auth/', {
             method: 'POST',
             body: {
@@ -86,9 +86,6 @@ export class Auth {
                 this.currentSession.user.details.username = username
                 localStorage.setItem(this.storageKey + "activeUser", username)
                 localStorage.setItem(this.storageKey + username, token)
-            })
-            .catch((error) => {
-                errorCallback(error)
             })
     }
 

@@ -108,6 +108,7 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
      CLOSED: [2018-07-12 Thu 13:06]
 **** DONE show "Local" tag for local content
      CLOSED: [2018-07-12 Thu 18:24]
+**** TODO Local Groups
 **** TODO when a Place gets deleted, content associated with that place should be set to Private
 **** TODO configurable PlaceRestriction max_distance
 **** DONE default feed created for Place

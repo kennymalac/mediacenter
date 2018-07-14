@@ -3,19 +3,19 @@
         <div :class="info">
             {{ infoBox.message }}
         </div>
-        
+
         <Modal :isOpen="isModalOpen" :onClose="closeModal" justifyContent="center" :titleProps="{ title: 'Login' }">
-            
+
             <form id="login-form" v-if="!loggedIn()" @submit.prevent="login">
                 <fieldset>
                     <input v-model="user.username" class="stack" type="text" placeholder="username" />
                     <input v-model="user.password" class="stack" type="password" placeholder="password" />
-                    
+
                     <label for="remember" class="stack">
                         <input id="remember" type="checkbox">
                         <span class="checkable">Remember me</span>
                     </label>
-                    
+
                     <input type="submit" class="stack" value="Sign in" />
                 </fieldset>
                 <!-- {% csrf_token %} -->
@@ -86,10 +86,7 @@ export default {
         login() {
             // TODO JWT token auth
             let that = this
-            auth.login(this.user.username, this.user.password, (error) => {
-                that.infoBox.status = "error"
-                that.infoBox.message = 'The account could not be logged in for the following reason: ' + error
-            }).then(() => {
+            auth.login(this.user.username, this.user.password).then(() => {
                 that.infoBox.status = "success"
                 that.infoBox.message = "Your account was logged in successfully"
                 this.$resetStore()
@@ -97,6 +94,10 @@ export default {
                 this.$store.loggedIn = true
                 //that.$router.replace('/')
                 this.$forceUpdate()
+            })
+            .catch((error) => {
+                that.infoBox.status = "error"
+                that.infoBox.message = 'The account could not be logged in for the following reason: ' + error
             })
         },
         logout() {
