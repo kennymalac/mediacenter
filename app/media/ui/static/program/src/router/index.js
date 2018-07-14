@@ -140,6 +140,13 @@ export default new Router({
                     component: Feed,
                     props: restAction,
                     canReuse: false
+                },
+                {
+                    path: 'group/:groupAction',
+                    name: 'PlaceGroup',
+                    component: Group,
+                    props: restAction,
+                    canReuse: false
                 }
             ]
         },

@@ -253,8 +253,9 @@ class FeedContentItemViewSet(ListModelMixin,
             # TODO configurable place distance, multiple places
             place = user_places.first()
             restriction = PlaceRestriction.objects.filter(place=place).first()
-            geo_request = requests.post('{}/location/distance-radius'.format(settings.GEOLOCATION_API), json={ 'place_id': place.id, 'distance': float(restriction.max_distance), 'unit': 'mi' })
-            if geo_request.status_code != 200:
+            other_places = Place.objects.other_places(place, restriction)
+
+            if len(other_places) == 0:
                 # Only include posts without geolocation
                 content_queryset = content_queryset.filter(places__isnull=True)
 
@@ -263,9 +264,6 @@ class FeedContentItemViewSet(ListModelMixin,
                 # }, status=500)
             else:
                 # Either the content has no configured Place, or the place is within the place restriction's radius
-                allowed_places = geo_request.json()['results']
-                print(allowed_places)
-                allowed_places.append(place.id)
                 # TODO verify place in user_places
                 if feed.place_set.count():
                     # This is a Place feed so only show content from this local area

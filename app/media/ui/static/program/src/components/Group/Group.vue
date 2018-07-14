@@ -215,6 +215,14 @@ export default {
             const groupsCollection = await groups()
             const user = await activeUser()
 
+            if (this.params.placeId) {
+                this.objects = groupsCollection.values.all((group) => {
+                    return user.details.member_groups.includes(group.id) && group.places.filter((item) => {
+                        return item.id === this.params.placeId
+                    })
+                })
+            }
+
             this.objects = groupsCollection.values.all((group) => {
                 return user.details.member_groups.includes(group.id)
             })

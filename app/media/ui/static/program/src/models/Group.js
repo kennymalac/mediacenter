@@ -47,6 +47,7 @@ class GroupModel extends Model {
         description: "",
         rules: [],
         members: [],
+        places: [],
         image: "",
         is_restricted: false
     }

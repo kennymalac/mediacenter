@@ -4,9 +4,19 @@ from django.contrib.auth.models import UserManager
 
 
 
-# class PlaceManager(models.Manager):
-#     def (place, distance):
-#         return self.annotate(distance=distance(''))
+class PlaceManager(models.Manager):
+    def other_places(self, place, restriction):
+        # TODO configurable place distance, multiple places
+        restriction = PlaceRestriction.objects.filter(place=place).first()
+        geo_request = requests.post('{}/location/distance-radius'.format(settings.GEOLOCATION_API), json={ 'place_id': place.id, 'distance': float(restriction.max_distance), 'unit': 'mi' })
+        if geo_request.status_code != 200:
+            return []
+
+        # Either the content has no configured Place, or the place is within the place restriction's radius
+        allowed_places = geo_request.json()['results']
+        print(allowed_places)
+        allowed_places.append(place.id)
+        return allowed_places
 
 
 class AccountManager(UserManager):

@@ -155,7 +155,7 @@ class Place(models.Model):
     name = models.CharField(max_length=140, blank=True)
     description = models.TextField(blank=True)
     default_feed = models.ForeignKey('api.Feed', null=True)
-    #objects = api.managers.PlaceManager
+    objects = api.managers.PlaceManager
 
     @property
     def position(self):

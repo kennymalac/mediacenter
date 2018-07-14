@@ -3,7 +3,8 @@
         <template v-if="actions.details && instance.id">
             <section class="sidebar">
                 <div class="group-info">
-                    <h2>{{ instance.name }}</h2>
+                    <button @click="showGroups" class="">Local Groups</button>
+                    <button class="">Local Posts</button>
                 </div>
             </section>
             <div class="place-contents">
@@ -87,9 +88,10 @@ export default {
 
             this.instance = await this.showInstance(params.id, '/place/list', places, deps)
 
-            let feedId = params.feedId
+            let feedId = this.params.feedId
 
-            if (feedId === undefined) {
+            // Default to showing the Place's default feed
+            if (!this.params.groupAction && feedId === undefined) {
                 feedId = this.instance.default_feed.id
                 this.$router.replace(`/place/${this.instance.id}/details/feed/${feedId}/details`)
             }
@@ -107,6 +109,10 @@ export default {
             }, () => {
                 console.log('Location retrieval failure')
             }, this.positionOptions)
+        },
+
+        showGroups() {
+            this.$router.push(`/place/${this.instance.id}/details/group/list`)
         }
     }
 }
