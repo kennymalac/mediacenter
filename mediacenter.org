@@ -108,12 +108,15 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
      CLOSED: [2018-07-12 Thu 13:06]
 **** DONE show "Local" tag for local content
      CLOSED: [2018-07-12 Thu 18:24]
-**** TODO Local Groups
+**** DONE Local Groups
+     CLOSED: [2018-07-14 Sat 15:15]
+**** TODO fix uploading to local groups
 **** TODO when a Place gets deleted, content associated with that place should be set to Private
 **** TODO configurable PlaceRestriction max_distance
 **** DONE default feed created for Place
      CLOSED: [2018-07-12 Thu 19:26]
 **** TODO limit users to 1 place
+**** TODO immutable Places OR time limit on Place changes to prevent abuse
 **** TODO geolocation content filtering
 **** DONE geolocation connect API
      CLOSED: [2018-07-02 Mon 19:15]

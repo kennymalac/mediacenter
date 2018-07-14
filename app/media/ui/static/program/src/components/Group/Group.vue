@@ -3,12 +3,15 @@
         <template v-if="actions.list">
             <action-list :actions="groupActions" />
 
-            <section class="groups">
-                <h1 v-if="!isLocalGroups">Your Groups</h1>
-                <h1 v-if="isLocalGroups">Your Local Groups</h1>
+            <section class="groups" v-if="isLocalGroups">
+                <h1>Your Local Groups</h1>
+                <group-list :link="localGroupRedirectLink" :items="objects" />
+                <p v-if="objects.length == 0">You are not a member of any local groups, <router-link to="search">discover your location</router-link>.</p>
+            </section>
+            <section class="groups" v-if="!isLocalGroups">
+                <h1>Your Groups</h1>
                 <group-list :items="objects" />
-                <p v-if="!isLocalGroups && objects.length == 0">You are not a member of any groups, join a group and it will be listed here.</p>
-                <p v-if="isLocalGroups  && objects.length == 0">You are not a member of any local groups, <router-link to="search">discover your location</router-link>.</p>
+                <p v-if="objects.length == 0">You are not a member of any groups, join a group and it will be listed here.</p>
             </section>
         </template>
         <template v-if="actions.details && instance.id">
@@ -99,12 +102,15 @@
                     </fieldset>
                 </form>
             </section>
-            <section class="groups">
-                <h1 v-if="!isLocalGroups">Find Groups</h1>
-                <h1 v-if="isLocalGroups">Find Local Groups</h1>
+            <section class="groups" v-if="isLocalGroups">
+                <h1>Find Local Groups</h1>
                 <group-list :items="filteredObjects" />
-                <p v-if="!isLocalGroups && objects.length == 0">No groups were found, why not <router-link to="create">create one</router-link>?</p>
-                <p v-if="isLocalGroups  && objects.length == 0">No local groups were found, why not <router-link to="create">create one</router-link>?</p>
+                <p v-if="filteredObjects.length == 0">No local groups were found, why not <router-link to="create">create one</router-link>?</p>
+            </section>
+            <section class="groups" v-if="!isLocalGroups">
+                <h1>Find Groups</h1>
+                <group-list :items="filteredObjects" />
+                <p v-if="filteredObjects.length == 0">No groups were found, why not <router-link to="create">create one</router-link>?</p>
             </section>
         </template>
     </div>
@@ -196,6 +202,10 @@ export default {
 
         async contentTypeSelected() {
 
+        },
+
+        localGroupRedirectLink(id) {
+            return `/group/${id}/details`
         },
 
         async create() {
