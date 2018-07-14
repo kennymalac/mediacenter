@@ -1,13 +1,13 @@
+import requests
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import UserManager
 #from django.contrib.gis.db.models.functions import Distance, AsGeoJSON
 
 
-
 class PlaceManager(models.Manager):
     def other_places(self, place, restriction):
         # TODO configurable place distance, multiple places
-        restriction = PlaceRestriction.objects.filter(place=place).first()
         geo_request = requests.post('{}/location/distance-radius'.format(settings.GEOLOCATION_API), json={ 'place_id': place.id, 'distance': float(restriction.max_distance), 'unit': 'mi' })
         if geo_request.status_code != 200:
             return []

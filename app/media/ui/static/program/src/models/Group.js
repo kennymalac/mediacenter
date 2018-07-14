@@ -47,9 +47,9 @@ class GroupModel extends Model {
         description: "",
         rules: [],
         members: [],
-        places: [],
         image: "",
-        is_restricted: false
+        is_restricted: false,
+        is_local: false
     }
 
     static async manage(instance, form, collections) {
@@ -130,7 +130,7 @@ class GroupCollection extends Collection {
         console.log(data)
         return makeJsonRequest(`group/search/`, {
             method: "POST",
-            body: {interests: serializeIds(data.interests)}
+            body: {...data, interests: serializeIds(data.interests)}
         })
             .then(jsonResponse)
 

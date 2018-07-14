@@ -343,10 +343,25 @@ class FeedCreateUpdateSerializer(serializers.ModelSerializer):
         required=False
     )
 
+    places = serializers.PrimaryKeyRelatedField(
+        queryset=Place.objects.all(),
+        many=True,
+        required=False
+    )
 
     class Meta:
         model = Feed
-        fields = ('id', 'name', 'description', 'owner', 'content_types', 'interests', 'stashes', 'visibility')
+        fields = ('id', 'name', 'description', 'owner', 'content_types', 'interests', 'places', 'stashes', 'visibility')
+
+    def to_representation(self, obj):
+        result = super(FeedCreateUpdateSerializer, self).to_representation(obj)
+
+        # Filter to only include places that are owned by this user
+        request = self.context.get("request")
+        if request and hasattr(request, 'user'):
+            result['places'] = [place.id for place in obj.places.filter(owner=request.user)]
+
+        return result
 
 
 class FeedSerializer(serializers.ModelSerializer):
@@ -676,9 +691,14 @@ class GroupForumSerializer(serializers.ModelSerializer):
         read_only=False
     )
 
+    is_local = serializers.SerializerMethodField()
+
     class Meta:
         model = GroupForum
-        fields = ('id', 'name', 'image', 'description', 'feed', 'owner', 'is_restricted', 'members', 'rules')
+        fields = ('id', 'name', 'image', 'description', 'feed', 'owner', 'is_restricted', 'is_local', 'members', 'rules')
+
+    def get_is_local(self, instance):
+        return instance.feed.places.count() != 0
 
 
 class GroupForumCreateUpdateSerializer(serializers.ModelSerializer):
@@ -705,16 +725,24 @@ class GroupForumCreateUpdateSerializer(serializers.ModelSerializer):
         feed_data = validated_data.pop('feed')
         interests = None
         content_types = None
+        places = None
+        print(feed_data)
+
         if 'interests' in feed_data:
             interests = feed_data.pop('interests')
         if 'content_types' in feed_data:
             content_types = feed_data.pop('content_types')
+        if 'places' in feed_data:
+            places = feed_data.pop('places')
 
         feed = Feed.objects.create(**feed_data)
         if interests:
             feed.interests.add(*interests)
         if content_types:
             feed.content_types.add(*content_types)
+        if places:
+            # NOTE only Places owned by this user can be added to the Group's feed
+            feed.places.add(*places)
 
         stash = FeedContentStash.objects.create(name="Default", description="Stored content for this group")
         feed.stashes.add(*(stash,))

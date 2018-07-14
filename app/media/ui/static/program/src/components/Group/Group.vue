@@ -4,8 +4,11 @@
             <action-list :actions="groupActions" />
 
             <section class="groups">
-                <h1>Your Groups</h1>
+                <h1 v-if="!isLocalGroups">Your Groups</h1>
+                <h1 v-if="isLocalGroups">Your Local Groups</h1>
                 <group-list :items="objects" />
+                <p v-if="!isLocalGroups && objects.length == 0">You are not a member of any groups, join a group and it will be listed here.</p>
+                <p v-if="isLocalGroups  && objects.length == 0">You are not a member of any local groups, <router-link to="search">discover your location</router-link>.</p>
             </section>
         </template>
         <template v-if="actions.details && instance.id">
@@ -86,6 +89,7 @@
         <template v-if="actions.search">
             <section class="sidebar" style="height: 300px;">
                 <form class="search-form">
+                    <restriction-widget :place="place" v-if="isLocalGroups" />
                     <fieldset>
                         <label class="stack" for="interests">Interests</label>
                         <interest-select v-model="filteredInterests" />
@@ -96,8 +100,11 @@
                 </form>
             </section>
             <section class="groups">
-                <h1>Find Groups</h1>
+                <h1 v-if="!isLocalGroups">Find Groups</h1>
+                <h1 v-if="isLocalGroups">Find Local Groups</h1>
                 <group-list :items="filteredObjects" />
+                <p v-if="!isLocalGroups && objects.length == 0">No groups were found, why not <router-link to="create">create one</router-link>?</p>
+                <p v-if="isLocalGroups  && objects.length == 0">No local groups were found, why not <router-link to="create">create one</router-link>?</p>
             </section>
         </template>
     </div>
@@ -113,6 +120,7 @@ import groupDeps from '../../dependencies/Group.js'
 import ContentItemForm from '../ContentItemForm'
 import AccountSelect from '../AccountSelect'
 import InterestSelect from '../InterestSelect'
+import RestrictionWidget from '../Place/RestrictionWidget'
 import VisibilitySelect from '../Permissions/VisibilitySelect'
 import GroupList from './GroupList'
 import FeedFilter from '../FeedFilter'
@@ -129,16 +137,26 @@ export default {
         AccountSelect,
         InterestSelect,
         VisibilitySelect,
+        RestrictionWidget,
         GroupList,
         FeedFilter,
         ActionButton,
         ActionList,
         TagList
     },
+    props: {
+        place: {
+            type: Object,
+            required: false
+        }
+    },
     computed: {
         onlineMembers() {
             // TODO
             return this.instance.members
+        },
+        isLocalGroups() {
+            return this.params && this.params.placeId
         }
     },
     data() {
@@ -195,6 +213,11 @@ export default {
             })
             this.instanceForm.owner = ownerAccount
             this.instanceForm.feed.owner = ownerAccount
+
+            if (this.isLocalGroups) {
+                this.instanceForm.feed.places = [this.place.id]
+            }
+
             if (!this.instanceForm.members.find((member) => {
                 return member.id === ownerAccount.id
             })) {
@@ -215,17 +238,16 @@ export default {
             const groupsCollection = await groups()
             const user = await activeUser()
 
-            if (this.params.placeId) {
+            if (this.isLocalGroups) {
                 this.objects = groupsCollection.values.all((group) => {
-                    return user.details.member_groups.includes(group.id) && group.places.filter((item) => {
-                        return item.id === this.params.placeId
-                    })
+                    return user.details.member_groups.includes(group.id) && group.is_local
                 })
             }
-
-            this.objects = groupsCollection.values.all((group) => {
-                return user.details.member_groups.includes(group.id)
-            })
+            else {
+                this.objects = groupsCollection.values.all((group) => {
+                    return user.details.member_groups.includes(group.id)
+                })
+            }
         },
 
         async details(params) {
@@ -256,9 +278,15 @@ export default {
 
         async searchGroups() {
             this.$store.filteredGroups = {}
-            const store = await filteredGroups({
+
+            const qs = {
                 interests: this.filteredInterests
-            })
+            }
+            if (this.isLocalGroups) {
+                qs.place = this.place.id
+            }
+
+            const store = await filteredGroups(qs)
             this.filteredObjects = store.values
         },
 

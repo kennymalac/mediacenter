@@ -4,11 +4,11 @@
             <section class="sidebar">
                 <div class="group-info">
                     <button @click="showGroups" class="">Local Groups</button>
-                    <button class="">Local Posts</button>
+                    <button @click="showPosts" class="">Local Posts</button>
                 </div>
             </section>
             <div class="place-contents">
-                <router-view v-if="instance.default_feed.id" :feedId="instance.default_feed.id"></router-view>
+                <router-view v-if="instance.default_feed.id" :place="instance.instance" :feedId="instance.default_feed.id"></router-view>
             </div>
         </template>
         <template v-if="actions.list && isActiveUserConnected">
@@ -113,6 +113,11 @@ export default {
 
         showGroups() {
             this.$router.push(`/place/${this.instance.id}/details/group/list`)
+        },
+
+        showPosts() {
+            const feedId = this.instance.default_feed.id
+            this.$router.push(`/place/${this.instance.id}/details/feed/${feedId}/details`)
         }
     }
 }

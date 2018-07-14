@@ -253,9 +253,9 @@ class FeedContentItemViewSet(ListModelMixin,
             # TODO configurable place distance, multiple places
             place = user_places.first()
             restriction = PlaceRestriction.objects.filter(place=place).first()
-            other_places = Place.objects.other_places(place, restriction)
+            allowed_places = Place.objects.other_places(place, restriction)
 
-            if len(other_places) == 0:
+            if len(allowed_places) == 0:
                 # Only include posts without geolocation
                 content_queryset = content_queryset.filter(places__isnull=True)
 
@@ -402,11 +402,38 @@ class GroupForumViewSet(NestedViewSetMixin,
 
     @list_route(methods=['POST'], url_path='search', permission_classes=[IsAuthenticated])
     def search(self, request):
+        group_queryset = self.get_queryset()
+
+        place_id = request.data.get('place', 0)
+        if place_id:
+            user_places = Place.objects.filter(owner=request.user, id=place_id)
+            if user_places.count() > 0:
+                # TODO configurable place distance, multiple places
+                place = user_places.first()
+                restriction = PlaceRestriction.objects.filter(place=place).first()
+                allowed_places = Place.objects.other_places(place, restriction)
+                print(allowed_places)
+
+                if len(allowed_places) == 0:
+                    group_queryset = group_queryset.filter(feed__places__isnull=True)
+                else:
+                    group_queryset = group_queryset.filter(feed__places__in=allowed_places)
+
+            else:
+                return Response({
+                    'error': 'Unauthorized search parameters'
+                }, status=400)
+        else:
+            group_queryset = group_queryset.filter(feed__places__isnull=True)
+
         interests = Interest.objects.filter(id__in=request.data.get('interests', []))
+
+        if interests.count():
+            group_queryset = group_queryset.filter(feed__interests__in=interests)
 
         # NOTE private groups shouldn't show in list action either
         # TODO make default list action more secure
-        serializer = GroupForumSerializer(self.get_queryset().filter(feed__interests__in=interests, feed__visibility='0'), many=True)
+        serializer = GroupForumSerializer(group_queryset.filter(feed__visibility='0'), many=True)
         return Response(serializer.data)
 
     @detail_route(methods=['POST'], url_path='join', permission_classes=[IsAuthenticated])
