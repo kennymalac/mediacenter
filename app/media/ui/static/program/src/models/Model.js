@@ -24,6 +24,7 @@ export async function resolve(resolutions) {
 }
 
 export class Collection {
+    collections = {}
 
     constructor(values, collections = {}) {
         this.storedIds = []
@@ -31,6 +32,7 @@ export class Collection {
             this.storedIds.push(val.id)
             return new this.constructor.Model({...val}, collections)
         })
+        this.collections = {...this.collections, ...collections}
 
         this.values = new Proxy(this.store, {})
         this.values.all = (filter = () => true) => {
@@ -181,7 +183,7 @@ export class Collection {
     }
 
     addInstance(data, collections) {
-        const instance = new this.constructor.Model({...data}, collections)
+        const instance = new this.constructor.Model({...data}, {...collections, ...this.collections})
         this.storedIds.push(data.id)
         this.store.push(instance)
         return instance
@@ -234,7 +236,7 @@ export class Model {
                     // Initialize an model instance(s)
                     this.resolveNestedModelField(field, collections)
                 }
-                else if (!instance._isFake) {
+                else if (!this.instance._isFake && (!this.instance[field].instance || !this.instance[field].instance._isFake)) {
                     console.log(`WARNING: non-fake Model instance field ${field} is missing from collections!`)
                 }
             }
@@ -278,6 +280,10 @@ export class Model {
         let collection
         if (this.collections && this.collections[field] instanceof Collection) {
             collection = this.collections[field]
+        }
+        // NOTE just a test
+        else if (this.collections && this.collections.profiles[field] instanceof Collection) {
+            collection = this.collections.profiles[field]
         }
         else {
             collection = collections[field]

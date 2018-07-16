@@ -9,7 +9,7 @@ export class Auth {
         // TODO manage session outside of Auth
         this.currentSession = {
             user: {
-                details: { id: 0, username: null, user_settings: {}, profile: {} },
+                details: { id: 0, member_groups: [], username: null, user_settings: {}, profile: {} },
                 token: null
             }
         }

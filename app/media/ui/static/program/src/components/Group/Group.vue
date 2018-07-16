@@ -270,6 +270,10 @@ export default {
 
             let stashId = this.params.stashId
             if (stashId === undefined) {
+                if (this.instance.feed.id === 0) {
+                    const groupCollection = await groups()
+                    this.instance = await groupCollection.get(this.instance.id, deps, this.instance)
+                }
                 stashId = this.instance.feed.stashes[0].id
                 router.replace(`details/stash/${stashId}/details`)
             }
@@ -296,7 +300,8 @@ export default {
                 qs.place = this.place.id
             }
 
-            const store = await filteredGroups(qs)
+            this.$store.groupFilterParams = qs
+            const store = await filteredGroups()
             this.filteredObjects = store.values
         },
 

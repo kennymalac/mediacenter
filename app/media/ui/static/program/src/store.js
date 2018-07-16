@@ -1,12 +1,12 @@
 import {makeActiveUser} from './auth.js'
-import makeSingleton from './singleton.js'
+import {Store} from './comfyStore'
 
 import {AccountCollection, makeAccountCollection} from './models/Account.js'
 import {ProfileCollection, makeProfileCollection, makeFilteredProfileCollection} from './models/Profile.js'
 import {FeedContentTypeCollection, makeFeedContentTypeCollection} from './models/FeedContentType.js'
 import {CommentCollection, makeCommentCollection, ProfileCommentCollection, makeProfileCommentCollection} from './models/Comment.js'
 import {InterestCollection, makeInterestCollection} from './models/Interest.js'
-import {PlaceCollection, makePlaceCollection} from './models/Place.js'
+import {PlaceCollection, makePlaceCollection, makeFilteredPlaceCollection} from './models/Place.js'
 import {FeedContentStashCollection, makeFeedContentStashCollection} from './models/FeedContentStash.js'
 import {FeedCollection, makeFilteredFeedCollection} from './models/Feed.js'
 import {DiscussionCollection, makeDiscussionCollection} from './models/Discussion.js'
@@ -18,6 +18,7 @@ import {ActivityLogCollection, makeFilteredActivityLogCollection} from './models
 export const initialState = {
     activeUser: {},
     accounts: {},
+    comments: {},
     profiles: {},
     profileComments: {},
     interestedUsers: {},
@@ -31,196 +32,170 @@ export const initialState = {
     discussions: {},
     links: {},
     groups: {},
+    groupFilterParams: {},
     filteredGroups: {},
     activityLogs: {},
+    activityLogFilterParams: {},
     filteredActivityLogs: {}
 }
 
-let store = Object.assign({}, initialState)
+const store = new Store(initialState)
+let proxiedStore = new Proxy(store.store, {})
 
-let proxiedStore = new Proxy(store, {})
+export const activeUserPlaces = store.deferredCollection(
+    'activeUserPlaces',
+    PlaceCollection,
+    (deps) => {
+        const {activeUser} = deps
+        return makeFilteredPlaceCollection(
+            () => PlaceCollection.all({ owner: activeUser.details.id }),
+            deps
+        )
+    },
+    {},
+    ['activeUser']
+)
 
-export const storePlugin = {
-    install(Vue) {
-        Vue.prototype.$store = proxiedStore
-        Vue.prototype.$resetStore = () => {
-            for (const key of Object.keys(store)) {
-                proxiedStore[key] = initialState[key]
-            }
-        }
+export const activeUser = store.singleton(
+    'activeUser',
+    value => value.details && typeof value.details.id === "number" && value.details.id !== 0,
+    makeActiveUser
+)
+
+export const accounts = store.singleton(
+    'accounts',
+    (value) => value instanceof AccountCollection,
+    makeAccountCollection
+)
+
+export const feedContentTypes = store.singleton(
+    'feedContentTypes',
+    (value) => value instanceof FeedContentTypeCollection,
+    makeFeedContentTypeCollection
+)
+
+export const comments = store.deferredCollection(
+    'comments',
+    CommentCollection,
+    makeCommentCollection,
+    {
+        owner: 'accounts'
     }
-}
+)
 
-const getStore = () => {
-    return proxiedStore
-}
+export const interests = store.singleton(
+    'interests',
+    (value) => value instanceof InterestCollection,
+    makeInterestCollection
+)
 
-const singleton = (field, typeCheck, create) => makeSingleton(getStore, field, typeCheck, create)
+export const places = store.singleton(
+    'places',
+    (value) => value instanceof PlaceCollection,
+    makePlaceCollection
+)
 
-const singletonFactory = (field, FieldType, reducer) => {
-    return singleton(
-        field,
-        (value) => value instanceof FieldType,
-        reducer
-    )
-}
+export const profiles = store.deferredCollection(
+    'profiles',
+    ProfileCollection,
+    makeProfileCollection,
+    {
+        interests: 'interests',
+        account: 'accounts',
+        comments: 'profileComments'
+    }
+)
 
-export const activeUser = () => {
-    return singleton(
-        'activeUser',
-        value => value.details && value.details.id !== undefined && value.details.id !== 0,
-        makeActiveUser
-    )
-}
+export const profileComments = store.deferredCollection(
+    'profileComments',
+    ProfileCommentCollection,
+    makeProfileCommentCollection,
+    {
+        owner: 'accounts'
+    }
+)
 
-export const accounts = () => {
-    return singleton(
-        'accounts',
-        (value) => value instanceof AccountCollection,
-        makeAccountCollection
-    )
-}
+store.singleton(
+    'interestId',
+    value => value !== undefined && value !== 0
+)
 
-export const feedContentTypes = () => {
-    return singleton(
-        'feedContentTypes',
-        (value) => value instanceof FeedContentTypeCollection,
-        makeFeedContentTypeCollection
-    )
-}
+export const interestedUsers = store.deferredCollection(
+    'interestedUsers',
+    ProfileCollection,
+    (deps) => {
+        const {interests, account, comments, interestId} = deps
+        console.log(interestId)
+        return makeFilteredProfileCollection(
+            () => ProfileCollection.searchProfiles({
+                interests: [interestId]
+            }),
+            {interests, account, comments}
+        )
+    },
+    {
+        interests: 'interests',
+        account: 'accounts',
+        comments: 'profileComments'
+    },
+    ['interestId']
+)
 
-export const comments = () => {
-    return singleton(
-        'comments',
-        (value) => value instanceof CommentCollection,
-        makeCommentCollection
-    )
-}
+export const stashes = store.singleton(
+    'stashes',
+    (value) => value instanceof FeedContentStashCollection,
+    makeFeedContentStashCollection
+)
 
-export const interests = () => {
-    return singleton(
-        'interests',
-        (value) => value instanceof InterestCollection,
-        makeInterestCollection
-    )
-}
+export const feeds = store.singleton(
+    'feeds',
+    (value) => value instanceof FeedCollection,
+    (deps) => {
+        const {activeUser} = deps
 
-export const places = () => {
-    return singleton(
-        'places',
-        (value) => value instanceof PlaceCollection,
-        makePlaceCollection
-    )
-}
-
-export const profiles = () => {
-    return singleton(
-        'profiles',
-        (value) => value instanceof ProfileCollection,
-        () => makeProfileCollection()
-    )
-}
-
-export const profileComments = () => {
-    return singleton(
-        'profileComments',
-        (value) => value instanceof ProfileCommentCollection,
-        makeProfileCommentCollection
-    )
-}
-
-export const interestedUsers = (interestId) => {
-    return singleton(
-        'interestedUsers',
-        (value) => value instanceof ProfileCollection,
-        () => {
-            return makeFilteredProfileCollection(
-                () => ProfileCollection.searchProfiles({
-                    interests: [interestId]
-                }),
-                interests,
-                accounts
-            )
-        }
-    )
-}
-
-export const stashes = () => {
-    return singleton(
-        'stashes',
-        (value) => value instanceof FeedContentStashCollection,
-        makeFeedContentStashCollection
-    )
-}
-
-export const feeds = () => {
-    return singleton(
-        'feeds',
-        (value) => value instanceof FeedCollection,
-        () => {
-            return activeUser().then((user) => {
-                console.log('user', user)
-                return makeFilteredFeedCollection(
-                    () => FeedCollection.all({ owner: user.details.id }),
-                    feedContentTypes,
-                    stashes,
-                    interests,
-                    places,
-                    comments,
-                    accounts
-                )
-            })
-        }
-    )
-}
-
-export const albums = () => {
-    return singleton(
-        'albums',
-        (value) => value instanceof AlbumCollection,
-        () => makeFilteredAlbumCollection(AlbumCollection.searchAlbums, accounts, profiles, feedContentTypes)
-    )
-}
-
-export const discussions = () => {
-    return singleton(
-        'discussions',
-        (value) => value instanceof DiscussionCollection,
-        makeDiscussionCollection
-    )
-}
-
-export const links = () => {
-    return singleton(
-        'links',
-        (value) => value instanceof LinkCollection,
-        makeLinkCollection
-    )
-}
-
-const groupStore = (field, reducer) => (params) => {
-    return singletonFactory(field, GroupCollection, () => reducer(params))
-}
-
-const activeUserGroups = () => {
-    return activeUser().then((user) => {
-        return makeFilteredGroupCollection(
-            () => GroupCollection.list({ members: user.details.id }),
-            feeds,
+        return makeFilteredFeedCollection(
+            () => FeedCollection.all({ owner: activeUser.details.id }),
+            feedContentTypes,
             stashes,
-            accounts,
-            profiles,
             interests,
             places,
-            feedContentTypes
+            comments,
+            accounts
         )
-    })
+    },
+    ['activeUser']
+)
+
+export const albums = store.singleton(
+    'albums',
+    (value) => value instanceof AlbumCollection,
+    () => makeFilteredAlbumCollection(AlbumCollection.searchAlbums, accounts, profiles, feedContentTypes)
+)
+
+export const discussions = store.singleton(
+    'discussions',
+    (value) => value instanceof DiscussionCollection,
+    makeDiscussionCollection
+)
+
+export const links = store.singleton(
+    'links',
+    (value) => value instanceof LinkCollection,
+    makeLinkCollection
+)
+
+const groupCollection = (field, reducer, dependencies = []) => {
+    return store.deferredCollection(field, GroupCollection, reducer, {
+        feed: 'feeds',
+        owner: 'accounts',
+        members: 'accounts'
+    }, dependencies)
 }
 
-const filterGroups = (params) => {
-    console.log(params)
+const activeUserGroups = (deps) => {
+    const {activeUser} = deps
     return makeFilteredGroupCollection(
-        () => GroupCollection.searchGroups(params),
+        () => GroupCollection.list({ members: activeUser.details.id }),
         feeds,
         stashes,
         accounts,
@@ -231,30 +206,36 @@ const filterGroups = (params) => {
     )
 }
 
-export const groups = groupStore('groups', activeUserGroups)
-export const filteredGroups = groupStore('filteredGroups', filterGroups)
-
-const activityLogStore = (field, reducer) => (params) => {
-    return singletonFactory(field, ActivityLogCollection, () => reducer(params))
+const filterGroups = (deps) => {
+    const {groupFilterParams} = deps
+    return makeFilteredGroupCollection(
+        () => GroupCollection.searchGroups(groupFilterParams),
+        feeds,
+        stashes,
+        accounts,
+        profiles,
+        interests,
+        places,
+        feedContentTypes
+    )
 }
 
-const activeUserActivityLogs = () => {
-    return activeUser().then((user) => {
-        return makeFilteredActivityLogCollection(
-            () => ActivityLogCollection.searchActivityLogs({ members: user.details.id }),
-            feeds,
-            stashes,
-            accounts,
-            profiles,
-            feedContentTypes
-        )
-    })
+store.singleton(
+    'groupFilterParams',
+    value => value !== undefined
+)
+
+export const groups = groupCollection('groups', activeUserGroups, ['activeUser'])
+export const filteredGroups = groupCollection('filteredGroups', filterGroups, ['groupFilterParams'])
+
+const activityLogCollection = (field, reducer, dependencies) => {
+    return store.deferredCollection(field, ActivityLogCollection, reducer, {}, dependencies)
 }
 
-const filterActivityLogs = (params) => {
-    console.log(params)
+const activeUserActivityLogs = (deps) => {
+    const {activeUser} = deps
     return makeFilteredActivityLogCollection(
-        () => ActivityLogCollection.searchActivityLogs(params),
+        () => ActivityLogCollection.searchActivityLogs({ members: activeUser.details.id }),
         feeds,
         stashes,
         accounts,
@@ -263,5 +244,35 @@ const filterActivityLogs = (params) => {
     )
 }
 
-export const activityLogs = activityLogStore('activityLogs', activeUserActivityLogs)
-export const filteredActivityLogs = activityLogStore('filteredActivityLogs', filterActivityLogs)
+store.singleton(
+    'activityLogFilterParams',
+    value => value !== undefined
+)
+
+const filterActivityLogs = (deps) => {
+    const {activityLogFilterParams} = deps
+    return makeFilteredActivityLogCollection(
+        () => ActivityLogCollection.searchActivityLogs(activityLogFilterParams),
+        feeds,
+        stashes,
+        accounts,
+        profiles,
+        feedContentTypes
+    )
+}
+
+export const activityLogs = activityLogCollection('activityLogs', activeUserActivityLogs, ['activeUser'])
+export const filteredActivityLogs = activityLogCollection('filteredActivityLogs', filterActivityLogs, ['activityLogFilterParams'])
+
+export const storePlugin = {
+    install(Vue) {
+        Vue.prototype.$store = proxiedStore
+        // for debugging
+        window.store = store
+        Vue.prototype.$resetStore = () => {
+            for (const key of Object.keys(store)) {
+                proxiedStore[key] = initialState[key]
+            }
+        }
+    }
+}

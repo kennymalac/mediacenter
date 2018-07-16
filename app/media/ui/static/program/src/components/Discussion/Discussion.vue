@@ -45,6 +45,10 @@ export default {
         quickReply: {
             type: Boolean,
             default: false
+        },
+        feedId: {
+            type: Number,
+            required: false
         }
     },
     components: {
@@ -177,7 +181,7 @@ export default {
                 // via pubsub
                 this.instanceForm.stash = await stashCollection.getInstance(this.params.stashId)
             }
-            this.instanceForm.feed = this.params.feedId
+            this.instanceForm.feed = this.feedId || this.params.feedId
 
             try {
                 const instance = await this.$store.discussions.create(this.instanceForm, await this.dependencies())

@@ -3,7 +3,7 @@
         <template v-if="actions.details && instance.id">
             <section class="groups">
                 <h1>{{ instance.name }}</h1>
-                
+
                 <template v-if="interestedUsers.length">
                     <p>{{ interestedUsers.length }} User(s) have this interest</p>
                     <profile-list :items="interestedUsers" />
@@ -41,17 +41,17 @@ export default {
         },
 
         async details(params) {
+            this.instance = await this.showInstance(params.id, '/feed/list', interests)
+
             if (params.id !== this.$store.interestId) {
                 // Reset store
                 this.$store.interestedUsers = {}
                 this.$store.interestId = params.id
             }
 
-            this.instance = await this.showInstance(params.id, '/feed/list', interests)
-            const interested = await interestedUsers(params.id)
+            const interested = await interestedUsers()
             this.interestedUsers = interested.values
         }
     }
 }
 </script>
-

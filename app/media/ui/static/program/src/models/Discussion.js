@@ -70,7 +70,7 @@ class DiscussionCollection extends Collection {
         if (!data.parent) {
             // TODO replies can be stored on specific stashes
             // via pubsub
-            await FeedContentStashModel.addContent(stash, feed, [created.content_item])
+            await FeedContentStashModel.addContent(stash, feed, [created.content_item], collections)
         }
         const instance = this.addInstance(created, collections)
         instance.sync(created, collections)

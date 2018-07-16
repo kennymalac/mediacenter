@@ -34,18 +34,14 @@ class ProfileModel extends Model {
     }
 }
 
-export async function makeFilteredProfileCollection(queryset, _interests, _accounts) {
-    let [interests, accounts, values] = await Promise.all([
-        _interests(),
-        _accounts(),
-        queryset()
-    ])
+export async function makeFilteredProfileCollection(queryset, deps) {
+    const {interests, account} = deps
 
-    const collection = new ProfileCollection([])
+    const collection = new ProfileCollection([], deps)
     await resolveInstances(
         collection,
-        values,
-        {account: accounts, interests, friends: accounts},
+        await queryset(),
+        {account, interests, friends: account},
         [
             ['interests', interests.get.bind(interests)]
         ]
@@ -54,8 +50,8 @@ export async function makeFilteredProfileCollection(queryset, _interests, _accou
     return collection
 }
 
-export async function makeProfileCollection() {
-    return new ProfileCollection([])
+export async function makeProfileCollection(deps) {
+    return new ProfileCollection([], deps)
 }
 
 class ProfileCollection extends Collection {

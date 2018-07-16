@@ -1,6 +1,6 @@
 import {momentDate} from './converters.js'
 import {Model, Collection} from './Model.js'
-import {get, manage, paginatedList, resolveInstances} from './generics.js'
+import {get, manage, paginatedList, makeFilteredCollection} from './generics.js'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 
 export async function makePlaceCollection() {
@@ -8,21 +8,8 @@ export async function makePlaceCollection() {
     return collection
 }
 
-export async function makeFilteredPlaceCollection(queryset, _accounts) {
-    let [accounts, values] = await Promise.all(
-        [_accounts(), queryset()]
-    )
-
-    const collection = new PlaceCollection([])
-
-    await resolveInstances(
-        collection,
-        values,
-        { owner: accounts },
-        // stashes: results[2]
-    )
-
-    return collection
+export async function makeFilteredPlaceCollection(queryset) {
+    return await makeFilteredCollection(PlaceModel, queryset)
 }
 
 class PlaceModel extends Model {
