@@ -36,28 +36,10 @@ class CommentModel extends Model {
 
     static parentResource = 'content'
     static resource = 'comment'
-
-    static manage(instance, form, collections) {
-        return manageNested(
-            instance,
-            instance.content_item,
-            {...form, owner: form.owner.id},
-            collections
-        )
-    }
 }
 
 class ProfileCommentModel extends CommentModel {
     static parentResource = 'profile'
-
-    static manage(instance, form, collections) {
-        return manageNested(
-            instance,
-            instance.user_profile,
-            {...form, owner: form.owner.id},
-            collections
-        )
-    }
 }
 
 class CommentCollection extends Collection {
@@ -81,9 +63,19 @@ class CommentCollection extends Collection {
               .then(jsonResponse)
 
         const instance = this.addInstance(created, collections)
-        instance.sync(created, collections)
+        this.sync(instance, created, collections)
 
         return instance
+    }
+
+    manage(instance, form, collections) {
+        return manageNested(
+            this,
+            instance,
+            instance.content_item,
+            {...form, owner: form.owner.id},
+            collections
+        )
     }
 
     async list(contentId, params, collections) {
@@ -105,9 +97,19 @@ class ProfileCommentCollection extends CommentCollection {
               .then(jsonResponse)
 
         const instance = this.addInstance(created, collections)
-        instance.sync(created, collections)
+        this.sync(instance, created, collections)
 
         return instance
+    }
+
+    manage(instance, form, collections) {
+        return manageNested(
+            this,
+            instance,
+            instance.user_profile,
+            {...form, owner: form.owner.id},
+            collections
+        )
     }
 }
 

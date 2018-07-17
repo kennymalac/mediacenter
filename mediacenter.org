@@ -38,12 +38,12 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 *** Authentication
 **** DONE don't require refresh for authentication
      CLOSED: [2018-06-19 Tue 16:34]
-**** TODO Account always shows as successfully being logged in even on error
+**** DONE Account always shows as successfully being logged in even on error
+     CLOSED: [2018-07-16 Mon 17:22]
 **** TODO better permission system, login shouldn't require Store reset
 **** TODO user permission system
 **** DONE log out should clear store
      CLOSED: [2018-06-19 Tue 16:34]
-**** TODO connect with other media centers in some sort of Auth bridge
 **** DONE getActiveUser
      CLOSED: [2017-05-13 Sat 12:34]
 **** DONE getToken
@@ -102,7 +102,6 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 
 *** TODO slugs instead of ids in routes
 *** TODO details should be default route
-
 *** Places
 **** DONE integrate GeoSpace microservice
      CLOSED: [2018-07-12 Thu 13:06]
@@ -420,7 +419,8 @@ Your feed has "content decay"
 *** Model/Collection
     don't make too many assumptions
 **** TODO ability to watch store for prop changes
-**** TODO singletons can have dependencies
+**** DONE singletons can have dependencies
+     CLOSED: [2018-07-16 Mon 17:21]
 **** TODO resolution methods should also be singletons?
 currently mutliple resolutions are happening at once for the same ids
 **** TODO dependency trees
@@ -429,7 +429,8 @@ Collections are undefined for circular import situations.
 Use TypeScript or something instead
 **** TODO how to handle if Collection this.collections references a 
 collection that references that same collection?
-**** TODO separate sync procedure from model instances?
+**** DONE separate sync procedure from model instances?
+     CLOSED: [2018-07-16 Mon 17:21]
 **** DONE lazy nested model instances
      CLOSED: [2018-05-18 Fri 13:57]
 **** TODO better filtering mechanism
@@ -454,6 +455,7 @@ collection that references that same collection?
 
 *** TODO deployment to a VPS
 *** Authentication
+**** TODO connect with other media centers in some sort of Auth bridge
 **** TODO merge Login and Register
 **** TODO better encryption (?)
      can't trust js crypto,

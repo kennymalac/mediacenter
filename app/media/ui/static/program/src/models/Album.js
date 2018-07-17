@@ -37,14 +37,6 @@ class AlbumModel extends Model {
         owner: AccountCollection
     }
 
-    static manage(instance, form, collections) {
-        return manage(
-            instance,
-            {...form},
-            collections
-        )
-    }
-
     static upload(albumId, form) {
         return fetchAPI(`album/${albumId}/upload/`, {
             method: "POST",
@@ -86,6 +78,14 @@ class AlbumCollection extends Collection {
 
                 return instance
             })
+    }
+
+    static manage(instance, form, collections) {
+        return manage(
+            instance,
+            {...form},
+            collections
+        )
     }
 
     async list(params, collections) {

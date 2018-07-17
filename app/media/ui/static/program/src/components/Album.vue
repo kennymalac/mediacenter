@@ -137,7 +137,8 @@ export default {
             }
         },
         async manageAlbum() {
-            return AlbumModel.manage(this.instance, this.instanceForm, this.dependencies())
+            const albumCollection = await albums()
+            return albumCollection.manage(this.instance, this.instanceForm, this.dependencies())
                 .then((data) => {
                     this.instance = data
                 })

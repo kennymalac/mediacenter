@@ -245,16 +245,16 @@ export default {
         },
 
         async list(params) {
-            const groupsCollection = await groups()
+            const groupCollection = await groups()
             const user = await activeUser()
 
             if (this.isLocalGroups) {
-                this.objects = groupsCollection.values.all((group) => {
+                this.objects = groupCollection.values.all((group) => {
                     return user.details.member_groups.includes(group.id) && group.is_local
                 })
             }
             else {
-                this.objects = groupsCollection.values.all((group) => {
+                this.objects = groupCollection.values.all((group) => {
                     return user.details.member_groups.includes(group.id)
                 })
             }
@@ -310,7 +310,8 @@ export default {
         },
 
         async manageGroup() {
-            return GroupModel.manage(
+            const groupCollection = await groups()
+            return groupCollection.manage(
                 this.instance,
                 this.instanceForm,
                 await groupDeps()
@@ -323,7 +324,8 @@ export default {
         async createGroup() {
             const user = await activeUser()
 
-            return this.$store.groups.create(this.instanceForm, await groupDeps())
+            const groupCollection = await groups()
+            return groupCollection.create(this.instanceForm, await groupDeps())
                 .then((data) => {
                     user.details.member_groups.push(data.id)
                     return data
@@ -339,7 +341,8 @@ export default {
             const newMember = accountSet.values.find((account) => {
                 return account.id === user.details.id
             })
-            GroupModel.join(this.instance, newMember)
+            const groupCollection = await groups()
+            groupCollection.join(this.instance, newMember)
                 .then(() => {
                     user.details.member_groups.push(this.instance.id)
                     this.isActiveUserMember = true
@@ -352,7 +355,8 @@ export default {
             const newMember = accountSet.values.find((account) => {
                 return account.id === user.details.id
             })
-            GroupModel.leave(this.instance, newMember)
+            const groupCollection = await groups()
+            groupCollection.leave(this.instance, newMember)
                 .then(() => {
                     user.details.member_groups = user.details.member_groups.filter((groupId) => {
                         return this.instance.id !== groupId

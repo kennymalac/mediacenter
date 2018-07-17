@@ -204,6 +204,163 @@ export class Collection {
     addInstances(values, collections) {
         return values.map((instance) => this.addInstance.bind(this)(instance, collections))
     }
+
+    getNestedCollection(field, instance = {}, collections = {}) {
+        // Make sure this is a Model to begin with
+        let collection
+        if (instance.collections && instance.collections[field] instanceof Collection) {
+            collection = instance.collections[field]
+        }
+        else if (this.collections && this.collections[field] instanceof Collection) {
+            collection = this.collections[field]
+        }
+        else {
+            collection = collections[field]
+        }
+
+        if (!(collection instanceof Collection)) {
+            throw new Error(`Invalid model nested write! Resolved Collection for field ${field} not found.`)
+        }
+
+        return collection
+    }
+
+    diffNestedModelField(instance, field, val, collections = {}, many = false, isPrimaryKeys = false) {
+        const collection = this.getNestedCollection(field, instance, collections)
+
+        let store
+        let changed = false
+        let fieldChanges
+
+        if (many) {
+            let instances = []
+
+            for (let i = 0; i < val.length; i++) {
+                if (instance[field][i] !== val[i]) {
+                    // There is a difference, refetch the instances
+                    store = collection
+                    instances = store.getInstances(val, collections, isPrimaryKeys)
+                    changed = true
+                    break
+                }
+            }
+
+            if (store) {
+                // Non-pk fields support nested writes
+                if (!isPrimaryKeys) {
+                    const nestedChanges = []
+
+                    // For each instance, get a diff tree so it can later be applied
+                    for (let i = 0; i < val.length; i++) {
+                        nestedChanges.push([instances[i], store.diff(instances[i], val[i], collections)])
+                    }
+
+                    // Later this will function will be called to apply all nested changes
+                    fieldChanges = () => nestedChanges.map(mutateInstance)
+                }
+                else {
+                    fieldChanges = instances
+                }
+            }
+        }
+        else if (instance[field] !== val && (val !== null && instance[field] !== undefined)) {
+            if (isPrimaryKeys && instance[field].id === val) {
+                return [false]
+            }
+            changed = true
+            store = collection
+            const _instance = store.getInstance(val, collections, isPrimaryKeys)
+
+            fieldChanges = !isPrimaryKeys
+                ? () => mutateInstance([_instance, collection.diff(_instance, val, collections)])
+                : _instance
+        }
+
+        return [changed, fieldChanges]
+    }
+
+    diff(instance, data, collections = {}) {
+        let changed = false
+        let changes = {}
+        let many
+        for (const [field, val] of Object.entries(data)) {
+            if (Array.isArray(val)) {
+                if (val.length === 0 && instance[field].length !== 0) {
+                    changes[field] = []
+                    changed = true
+                    continue
+                }
+
+                many = true
+            }
+            else {
+                many = false
+            }
+
+            if (field in instance.constructor.fields) {
+                const [nestedChanged, nestedChanges] = this.diffNestedModelField(
+                    instance,
+                    field,
+                    val,
+                    collections,
+                    many,
+                    many ? Number.isInteger(val[0]) : Number.isInteger(val))
+
+                if (nestedChanged) {
+                    changes[field] = nestedChanges
+                }
+            }
+
+            else if (this[field] !== val) {
+                changes[field] = val
+            }
+        }
+
+        changed = Object.keys(changes).length > 0
+        return [changed, changes]
+    }
+
+    sync(instance, data, collections = {}) {
+        // Takes a data response and sets those attributes in the model
+        // NOTE: does not handle nested CREATE,
+        // only constructor() for Model handles nested CREATE
+        // Also does not handle nested writes for lists of instances, only single instances
+
+        const [changed, diffTree] = this.diff(instance, data, collections)
+        if (!changed) {
+            return
+        }
+        console.log(diffTree)
+        // This instance has new field data, so it's a real instance
+        delete instance._isFake
+        instance.applyDiff(diffTree)
+    }
+
+    resolveChildren(parentInstance, modelField, getter, collections, instance) {
+        if (Array.isArray(parentInstance[modelField])) {
+            if (parentInstance[modelField].length === 0) {
+                return []
+            }
+
+            const _getter = parentInstance[modelField][0].constructor.parentResource === parentInstance.constructor.resource
+                  ? (id, instance) => getter(parentInstance.id, id, collections, instance)
+                  : (id, instance) => getter(id, collections, instance)
+
+            return parentInstance[modelField].filter((instance) => {
+                return instance.instance._isFake
+            }).map((instance) => {
+                return collections[modelField].fetchInstance(instance, {}, () => _getter(instance.id, instance))
+            })
+        }
+        else if (parentInstance[modelField].instance._isFake) {
+            const _getter = parentInstance[modelField].constructor.parentResource === parentInstance.constructor.resource
+                  ? (id, instance) => getter(parentInstance.id, id, instance, collections, instance)
+                  : (id, instance) => getter(id, instance, collections, instance)
+
+            return [collections[modelField].fetchInstance(instance, {}, () => _getter(parentInstance[modelField].id, parentInstance[modelField]))]
+        }
+        return []
+    }
 }
 
 export class Model {
@@ -257,10 +414,6 @@ export class Model {
         }
     }
 
-    static isInstance(instance) {
-        return instance instanceof this.constructor
-    }
-
     resolveNestedModelField(field, collections = {}) {
         // Single primary key or instance case
         if (Number.isInteger(this.instance[field]) || Number.isInteger(this.instance[field].id)) {
@@ -275,113 +428,8 @@ export class Model {
         }
     }
 
-    diffNestedModelField(field, val, collections = {}, many = false, isPrimaryKeys = false) {
-        // Make sure this is a Model to begin with
-        let collection
-        if (this.collections && this.collections[field] instanceof Collection) {
-            collection = this.collections[field]
-        }
-        // NOTE just a test
-        else if (this.collections && this.collections.profiles[field] instanceof Collection) {
-            collection = this.collections.profiles[field]
-        }
-        else {
-            collection = collections[field]
-        }
-
-        if (!(collection instanceof Collection)) {
-            throw new Error(`Invalid model nested write! Resolved Collection for field ${field} not found.`)
-        }
-
-        let store
-        let changed = false
-        let fieldChanges
-
-        if (many) {
-            let instances = []
-
-            for (let i = 0; i < val.length; i++) {
-                if (this[field][i] !== val[i]) {
-                    // There is a difference, refetch the instances
-                    store = collection
-                    instances = store.getInstances(val, collections, isPrimaryKeys)
-                    changed = true
-                    break
-                }
-            }
-
-            if (store) {
-                // Non-pk fields support nested writes
-                if (!isPrimaryKeys) {
-                    const nestedChanges = []
-
-                    // For each instance, get a diff tree so it can later be applied
-                    for (let i = 0; i < val.length; i++) {
-                        nestedChanges.push([instances[i], instances[i].diff(val[i], collections)])
-                    }
-
-                    // Later this will function will be called to apply all nested changes
-                    fieldChanges = () => nestedChanges.map(mutateInstance)
-                }
-                else {
-                    fieldChanges = instances
-                }
-            }
-        }
-        else if (this[field] !== val && (val !== null && this[field] !== undefined)) {
-            if (isPrimaryKeys && this[field].id === val) {
-                return [false]
-            }
-            changed = true
-            store = collections[field]
-            const instance = store.getInstance(val, collections, isPrimaryKeys)
-
-            fieldChanges = !isPrimaryKeys
-                ? () => mutateInstance([instance, instance.diff(val, collections)])
-                : instance
-        }
-
-        return [changed, fieldChanges]
-    }
-
-    diff(data, collections = {}) {
-        let changed = false
-        let changes = {}
-        let many
-        for (const [field, val] of Object.entries(data)) {
-            if (Array.isArray(val)) {
-                if (val.length === 0 && this[field].length !== 0) {
-                    changes[field] = []
-                    changed = true
-                    continue
-                }
-
-                many = true
-            }
-            else {
-                many = false
-            }
-
-            if (field in this.constructor.fields) {
-                const [nestedChanged, nestedChanges] = this.diffNestedModelField(
-                    field,
-                    val,
-                    collections,
-                    many,
-                    many ? Number.isInteger(val[0]) : Number.isInteger(val))
-
-                if (nestedChanged) {
-                    changes[field] = nestedChanges
-                }
-            }
-
-            else if (this[field] !== val) {
-                changes[field] = val
-            }
-        }
-
-        changed = Object.keys(changes).length > 0
-        return [changed, changes]
+    static isInstance(instance) {
+        return instance instanceof this.constructor
     }
 
     applyDiff(diff) {
@@ -390,48 +438,6 @@ export class Model {
                 ? val()
                 : val
         }
-    }
-
-    sync(data, collections = {}) {
-        // Takes a data response and sets those attributes in the model
-        // NOTE: does not handle nested CREATE,
-        // only constructor() for Model handles nested CREATE
-        // Also does not handle nested writes for lists of instances, only single instances
-
-        const [changed, diffTree] = this.diff(data, collections)
-        if (!changed) {
-            return
-        }
-        console.log(diffTree)
-        // This instance has new field data, so it's a real instance
-        delete this.instance._isFake
-        this.applyDiff(diffTree)
-    }
-
-    resolveChildren(modelField, getter, collections, instance) {
-        if (Array.isArray(this[modelField])) {
-            if (this[modelField].length === 0) {
-                return []
-            }
-
-            const _getter = this[modelField][0].constructor.parentResource === this.constructor.resource
-                  ? (id, instance) => getter(this.id, id, collections, instance)
-                  : (id, instance) => getter(id, collections, instance)
-
-            return this[modelField].filter((instance) => {
-                return instance.instance._isFake
-            }).map((instance) => {
-                return collections[modelField].fetchInstance(instance, {}, () => _getter(instance.id, instance))
-            })
-        }
-        else if (this[modelField].instance._isFake) {
-            const _getter = this[modelField].constructor.parentResource === this.constructor.resource
-                  ? (id, instance) => getter(this.id, id, instance, collections, instance)
-                  : (id, instance) => getter(id, instance, collections, instance)
-
-            return [collections[modelField].fetchInstance(instance, {}, () => _getter(this[modelField].id, this[modelField]))]
-        }
-        return []
     }
 
     getForm(parent = null) {

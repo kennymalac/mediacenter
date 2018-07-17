@@ -199,7 +199,8 @@ export default {
         },
 
         async manageFeed() {
-            return FeedModel.manage(this.instance, this.instanceForm, await feedDeps())
+            const feedCollection = await feeds()
+            return feedCollection.manage(this.instance, this.instanceForm, await feedDeps())
                 .then((data) => {
                     this.instance = data
                     return data

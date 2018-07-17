@@ -1,24 +1,24 @@
 import {resolve} from './Model.js'
 import {makeJsonRequest, makeHeaders, fetchAPI, jsonResponse} from '../httputil.js'
 
-async function manageResource(uri, instance, serializedData, collections = {}) {
+async function manageResource(uri, collection, instance, serializedData, collections = {}) {
     return makeJsonRequest(uri, {
         method: "PATCH",
         body: serializedData
     })
         .then(jsonResponse)
         .then((data) => {
-            instance.sync(data, collections)
+            collection.sync(instance, data, collections)
             return instance
         })
 }
 
-export function manage(instance, serializedData, collections = {}) {
-    return manageResource(`${instance.constructor.resource}/${instance.id}/`, instance, serializedData, collections)
+export function manage(collection, instance, serializedData, collections = {}) {
+    return manageResource(`${instance.constructor.resource}/${instance.id}/`, collection, instance, serializedData, collections)
 }
 
-export function manageNested(instance, parentId, serializedData, collections = {}) {
-    return manageResource(`${instance.constructor.parentResource}/${parentId}/${instance.constructor.resource}/${instance.id}/`, instance, serializedData, collections)
+export function manageNested(collection, instance, parentId, serializedData, collections = {}) {
+    return manageResource(`${instance.constructor.parentResource}/${parentId}/${instance.constructor.resource}/${instance.id}/`, collection, instance, serializedData, collections)
 }
 
 async function getResource(uri, collection, instance = null, collections = {}, children = []) {
@@ -37,7 +37,7 @@ export async function get(collection, id, instance = null, collections = {}, chi
 }
 
 export async function getNested(collection, id, parentId, instance = null, collections = {}, children = []) {
-    console.log('depito')
+    console.log('depito', id, parentId, instance)
     return getResource(`${collection.constructor.parentResource}/${parentId}/${collection.constructor.resource}/${id}/`, collection, instance, collections, children)
 }
 
@@ -47,11 +47,11 @@ export async function resolveInstance(collection, item, _instance = null, collec
           ? collection.getInstance(item, collections)
           : _instance
 
-    instance.sync(item, collections)
+    collection.sync(instance, item, collections)
 
     for (const [modelField, getter] of children) {
-        resolutions.push(instance.resolveChildren(
-            modelField, getter, collections, instance
+        resolutions.push(collection.resolveChildren(
+            instance, modelField, getter, collections, instance
         ))
     }
 
@@ -67,11 +67,11 @@ export async function resolveInstances(collection, items, collections = {}, chil
 
     for (let i = 0; i < items.length; i++) {
         const instance = instances[i]
-        instance.sync(items[i], collections)
+        collection.sync(instance, items[i], collections)
 
         for (const [modelField, getter] of children) {
-            resolutions.push(instance.resolveChildren(
-                modelField, getter, collections, instance
+            resolutions.push(collection.resolveChildren(
+                instance, modelField, getter, collections, instance
             ))
         }
     }

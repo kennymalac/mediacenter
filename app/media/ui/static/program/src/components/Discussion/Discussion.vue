@@ -31,7 +31,6 @@ import RestfulComponent from "../RestfulComponent"
 import PaginatedComponent from "../PaginatedComponent"
 import {activeUser, discussions, accounts, groups, interests, places, stashes, profiles, feedContentTypes, comments} from "../../store.js"
 import activeUserDeps from "../../dependencies/activeUser.js"
-import {DiscussionModel} from "../../models/Discussion.js"
 import Post from './Post'
 import Reply from './Reply'
 import PaginationControls from '../PaginationControls'
@@ -159,7 +158,8 @@ export default {
         },
 
         async manageDiscussion() {
-            return DiscussionModel.manage(this.instance, this.instanceForm, await this.dependencies())
+            const discussionCollection = await discussions()
+            return discussionCollection.manage(this.instance, this.instanceForm, await this.dependencies())
                 .catch((error) => {
                     console.log(error)
                 })
@@ -184,7 +184,8 @@ export default {
             this.instanceForm.feed = this.feedId || this.params.feedId
 
             try {
-                const instance = await this.$store.discussions.create(this.instanceForm, await this.dependencies())
+                const discussionCollection = await discussions()
+                const instance = await discussionCollection.create(this.instanceForm, await this.dependencies())
                 return instance
             }
             catch (error) {

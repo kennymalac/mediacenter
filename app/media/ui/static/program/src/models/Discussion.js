@@ -32,14 +32,6 @@ class DiscussionModel extends Model {
     }
 
     static resource = 'discussion'
-
-    static manage(instance, form, collections) {
-        return manage(
-            instance,
-            {...form, content_item: {...form.content_item, content_type: form.content_item.content_type.id, owner: form.content_item.owner.id}},
-            collections
-        )
-    }
 }
 
 class DiscussionCollection extends Collection {
@@ -73,9 +65,18 @@ class DiscussionCollection extends Collection {
             await FeedContentStashModel.addContent(stash, feed, [created.content_item], collections)
         }
         const instance = this.addInstance(created, collections)
-        instance.sync(created, collections)
+        this.sync(instance, created, collections)
 
         return instance
+    }
+
+    static manage(instance, form, collections) {
+        return manage(
+            this,
+            instance,
+            {...form, content_item: {...form.content_item, content_type: form.content_item.content_type.id, owner: form.content_item.owner.id}},
+            collections
+        )
     }
 
     async list(params, collections) {

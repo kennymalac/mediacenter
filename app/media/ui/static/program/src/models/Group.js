@@ -51,42 +51,6 @@ class GroupModel extends Model {
         is_restricted: false,
         is_local: false
     }
-
-    static async manage(instance, form, collections) {
-        console.log(form)
-        return await manage(instance, {
-            ...form,
-            members: serializeIds(form.members),
-            owner: form.owner.id,
-            feed: {...form.feed, visibility: form.feed.visibility.value, owner: form.owner.id, stashes: serializeIds(form.feed.stashes), interests: serializeIds(form.feed.interests)}
-        }, collections)
-    }
-
-    static join(instance, activeAccount) {
-        return makeJsonRequest(`group/${instance.id}/join/`, {
-            method: "POST",
-            body: {}
-        })
-            .then(jsonResponse)
-            .then((data) => {
-                // Add the user to the group member list
-                instance.members.push(activeAccount)
-            })
-    }
-
-    static leave(instance, activeAccount) {
-        return makeJsonRequest(`group/${instance.id}/leave/`, {
-            method: "POST",
-            body: {}
-        })
-            .then(jsonResponse)
-            .then((data) => {
-                // Remove the user from this group
-                instance.members = instance.members.filter((account) => {
-                    return activeAccount.id !== account.id
-                })
-            })
-    }
 }
 
 class GroupCollection extends Collection {
@@ -118,6 +82,16 @@ class GroupCollection extends Collection {
             })
     }
 
+    async manage(instance, form, collections) {
+        console.log(form)
+        return await manage(this, instance, {
+            ...form,
+            members: serializeIds(form.members),
+            owner: form.owner.id,
+            feed: {...form.feed, visibility: form.feed.visibility.value, owner: form.owner.id, stashes: serializeIds(form.feed.stashes), interests: serializeIds(form.feed.interests)}
+        }, collections)
+    }
+
     static list(params = {}) {
         return makeJsonRequest(`group/`, {
             method: "GET",
@@ -139,6 +113,31 @@ class GroupCollection extends Collection {
             })
     }
 
+    join(instance, activeAccount) {
+        return makeJsonRequest(`group/${instance.id}/join/`, {
+            method: "POST",
+            body: {}
+        })
+            .then(jsonResponse)
+            .then((data) => {
+                // Add the user to the group member list
+                instance.members.push(activeAccount)
+            })
+    }
+
+    leave(instance, activeAccount) {
+        return makeJsonRequest(`group/${instance.id}/leave/`, {
+            method: "POST",
+            body: {}
+        })
+            .then(jsonResponse)
+            .then((data) => {
+                // Remove the user from this group
+                instance.members = instance.members.filter((account) => {
+                    return activeAccount.id !== account.id
+                })
+            })
+    }
 }
 
 export {GroupCollection, GroupModel}

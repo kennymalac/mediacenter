@@ -34,7 +34,7 @@ import RestfulComponent from "../RestfulComponent"
 import {comments, profileComments, activeUser} from "../../store.js"
 import activeUserDeps from "../../dependencies/activeUser.js"
 import commentDeps from "../../dependencies/Comment.js"
-import {CommentModel, ProfileCommentModel} from "../../models/Comment.js"
+// import {CommentModel, ProfileCommentModel} from "../../models/Comment.js"
 
 import CommentItem from './CommentItem'
 import CommentList from './CommentList'
@@ -80,11 +80,6 @@ export default {
             return this.profileId
                 ? this.profileId
                 : this.contentObjectId
-        },
-        model() {
-            return this.profileId
-                ? ProfileCommentModel
-                : CommentModel
         }
     },
     methods: {
@@ -129,7 +124,8 @@ export default {
         },
 
         async manageComment() {
-            return this.model.manage(this.instance, this.instanceForm, await commentDeps())
+            const collection = await this.collection()
+            return collection.manage(this.instance, this.instanceForm, await commentDeps())
                 .catch((error) => {
                     console.log(error)
                 })

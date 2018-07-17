@@ -58,24 +58,6 @@ class FeedModel extends Model {
         visibility: {}
     }
 
-    static manage(instance, form, collections) {
-        return manage(instance, {
-            ...form,
-            owner: form.owner.id,
-            visibility: form.visibility.value,
-            content_types: serializeIds(form.content_types),
-            interests: serializeIds(form.interests)
-        }, collections)
-    }
-
-    static upload(feedId, form) {
-        return fetchAPI(`feed/${feedId}/upload/`, {
-            method: "POST",
-            headers: makeHeaders({}),
-            body: form
-        })
-    }
-
     static listItems(feedId, params, collections) {
         console.log(params, collections)
         return makeJsonRequest(`content/search/`, {
@@ -119,6 +101,24 @@ class FeedCollection extends Collection {
 
                 return instance
             })
+    }
+
+    manage(instance, form, collections) {
+        return manage(this, instance, {
+            ...form,
+            owner: form.owner.id,
+            visibility: form.visibility.value,
+            content_types: serializeIds(form.content_types),
+            interests: serializeIds(form.interests)
+        }, collections)
+    }
+
+    upload(feedId, form) {
+        return fetchAPI(`feed/${feedId}/upload/`, {
+            method: "POST",
+            headers: makeHeaders({}),
+            body: form
+        })
     }
 
     static all(params = {}) {

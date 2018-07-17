@@ -62,7 +62,7 @@
 <script>
 import RestfulComponent from "./RestfulComponent"
 import {activeUser, links} from '../store.js'
-import {LinkModel} from '../models/Link.js'
+//import {LinkModel} from '../models/Link.js'
 import linkDeps from '../dependencies/Link.js'
 
 import Comment from './Comment/Comment'
@@ -121,7 +121,8 @@ export default {
         },
 
         async manageLink() {
-            return LinkModel.manage(this.instance, this.instanceForm, await linkDeps(this.stashId))
+            const linksCollection = await links()
+            return linksCollection.manage(this.instance, this.instanceForm, await linkDeps(this.stashId))
                 .catch((error) => {
                     console.log(error)
                 })

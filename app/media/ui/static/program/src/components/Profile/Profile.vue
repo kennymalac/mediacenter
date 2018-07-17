@@ -76,7 +76,7 @@ import ProfileList from './ProfileList'
 import InterestSelect from '../InterestSelect'
 import TagList from '../TagList'
 
-import {ProfileModel} from '../../models/Profile.js'
+// import {ProfileModel} from '../../models/Profile.js'
 import profileDeps from '../../dependencies/Profile.js'
 import {profiles, activeUser} from '../../store.js'
 
@@ -158,7 +158,8 @@ export default {
 
         async manageProfile() {
             try {
-                return await ProfileModel.manage(this.instance, this.instanceForm, await profileDeps())
+                const profilesCollection = await profiles()
+                return await profilesCollection.manage(this.instance, this.instanceForm, await profileDeps())
             }
             catch (error) {
                 console.log(error)
