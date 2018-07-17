@@ -5,8 +5,8 @@ import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.
 import {getNested, manageNested, paginatedListNested} from './generics.js'
 import {FeedContentItemCollection} from './FeedContentItem'
 
-export async function makeFeedContentStashCollection() {
-    return new FeedContentStashCollection([])
+export async function makeFeedContentStashCollection(deps) {
+    return new FeedContentStashCollection([], deps)
 }
 
 class FeedContentStashModel extends Model {
@@ -38,7 +38,7 @@ class FeedContentStashModel extends Model {
 
     constructor(instance, collections = {}) {
         const _collections = {
-            content: new FeedContentItemCollection([])
+            content: new FeedContentItemCollection([], {...collections.stashes})
         }
         super(instance, {
             ...collections,
@@ -98,11 +98,11 @@ class FeedContentStashCollection extends Collection {
     static resource = 'stash'
 
     async get(feedId, id, collections, instance = null) {
-        return await getNested(this, id, feedId, instance, collections)
+        return await getNested(this, id, feedId, instance, {...collections, ...this.collections})
     }
 
     async list(feedId, params, collections) {
-        return await paginatedListNested(this, feedId, 0, collections)
+        return await paginatedListNested(this, feedId, 0, {...collections, ...this.collections})
     }
 }
 

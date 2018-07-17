@@ -11,7 +11,7 @@ export async function makeFilteredActivityLogCollection(queryset, _feeds, _stash
         [_accounts(), _feeds(), _stashes(), _profiles(), queryset(), _contentTypes()]
         //        _feeds()
     )
-    const collection = new ActivityLogCollection([])
+    const collection = new ActivityLogCollection([], { author: members })
 
     await resolveInstances(
         collection,

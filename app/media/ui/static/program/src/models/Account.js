@@ -24,8 +24,8 @@ class AccountModel extends Model {
     }
 }
 
-export async function makeAccountCollection() {
-    return new AccountCollection([])
+export async function makeAccountCollection(deps) {
+    return new AccountCollection([], deps)
 }
 
 class AccountCollection extends Collection {

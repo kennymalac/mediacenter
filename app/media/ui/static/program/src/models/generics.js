@@ -106,11 +106,11 @@ export async function paginatedListNested(collection, parentId, params, collecti
     return paginateListedResource(`${collection.constructor.parentResource}/${parentId}/${collection.constructor.resource}/`, collection, params, collections, children)
 }
 
-export async function makeFilteredCollection(CollectionType, queryset, _deps) {
+export async function makeFilteredCollection(CollectionType, queryset, _deps, resolutions = []) {
     let values = await queryset()
     let deps = []
     if (_deps) {
-        deps = await _deps()
+        deps = await _deps
     }
 
     const collection = new CollectionType([])
@@ -118,7 +118,8 @@ export async function makeFilteredCollection(CollectionType, queryset, _deps) {
     await resolveInstances(
         collection,
         values,
-        deps
+        deps,
+        resolutions
     )
 
     return collection

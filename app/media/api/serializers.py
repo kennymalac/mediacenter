@@ -358,7 +358,7 @@ class FeedCreateUpdateSerializer(serializers.ModelSerializer):
 
         # Filter to only include places that are owned by this user
         request = self.context.get("request")
-        if request and hasattr(request, 'user'):
+        if request and hasattr(request, 'user') and not request.user.is_anonymous:
             result['places'] = [place.id for place in obj.places.filter(owner=request.user)]
 
         return result
@@ -431,7 +431,7 @@ class FeedContentItemBasicSerializer(serializers.ModelSerializer):
 
         # Filter to only include places that are owned by this user
         request = self.context.get("request")
-        if request and hasattr(request, 'user'):
+        if request and hasattr(request, 'user') and not request.user.is_anonymous:
             result['places'] = [place.id for place in obj.places.filter(owner=request.user)]
 
         # If this is the primary key serializer, give it the forgotten fake intance

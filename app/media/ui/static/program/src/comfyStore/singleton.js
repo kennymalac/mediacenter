@@ -14,7 +14,6 @@ export async function makeSingleton(getStore, storeValue, typeCheck, create) {
 }
 
 export class Singleton {
-    value = null
     create = null
     dependencies = []
     typeCheck = null
@@ -26,13 +25,15 @@ export class Singleton {
     }
 
     async resolve(resolvedDeps) {
-        if (this.value !== null && this.typeCheck(this.value)) {
+        if (this.value !== null && this.value !== undefined && this.typeCheck(this.value)) {
             return this.value
         }
         else if (this.value instanceof Promise) {
             return await this.value
         }
-        this.value = this.create(await resolvedDeps)
+        this.value = (async function(create, deps) {
+            return create(await deps)
+        })(this.create.bind(this), resolvedDeps)
         this.value = await this.value
         return this.value
     }

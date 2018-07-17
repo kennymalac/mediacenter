@@ -21,9 +21,13 @@ export default {
     data() {
         return {
             instance: { id: null },
+            // logs: { values: [] },
             objectName: 'activityfeed'
         }
     },
+    // async mounted() {
+    //     this.logs = (await this.$store).values
+    // },
     methods: {
         initialState() {
             this.instance = ActivityLogModel.initialState

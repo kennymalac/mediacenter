@@ -4,7 +4,7 @@ export default {
     render(h) {
         let template
 
-        if (this.id === undefined) {
+        if (this.id === undefined || this.author.profile.id === undefined) {
             return (
                 <div>
                 </div>

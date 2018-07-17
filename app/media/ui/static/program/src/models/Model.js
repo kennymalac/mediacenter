@@ -332,7 +332,7 @@ export class Collection {
         }
         console.log(diffTree)
         // This instance has new field data, so it's a real instance
-        delete instance._isFake
+        delete instance.instance._isFake
         instance.applyDiff(diffTree)
     }
 

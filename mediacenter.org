@@ -36,12 +36,14 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 **** DONE closeModal
      CLOSED: [2018-04-30 Mon 18:43]
 *** Authentication
+**** TODO Invite-only registration
 **** DONE don't require refresh for authentication
      CLOSED: [2018-06-19 Tue 16:34]
 **** DONE Account always shows as successfully being logged in even on error
      CLOSED: [2018-07-16 Mon 17:22]
 **** TODO better permission system, login shouldn't require Store reset
 **** TODO user permission system
+**** TODO Secure API
 **** DONE log out should clear store
      CLOSED: [2018-06-19 Tue 16:34]
 **** DONE getActiveUser
@@ -87,6 +89,8 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 **** DONE Merge Manage Album and Create Album into "Albums"
      CLOSED: [2018-05-11 Fri 16:47]
 **** TODO full test coverage
+*** Groups
+**** TODO make it so you can't add members to Group - only invite them
 *** Account
 **** DONE AccountSelect search for members
      CLOSED: [2018-05-23 Wed 11:57]
@@ -262,7 +266,6 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
      CLOSED: [2018-06-21 Thu 16:43]
 **** TODO Moderators
 **** TODO Checkbox to share topic outside of group
-**** TODO make it so you can't add members to Group - only invite them
 **** TODO moderation system
 **** TODO what happens when owner of a group leaves?
 **** DONE joining public groups
@@ -418,6 +421,13 @@ Your feed has "content decay"
 
 *** Model/Collection
     don't make too many assumptions
+**** DONE *there's a problem with ActivityLog not getting the real instance of Account*
+     CLOSED: [2018-07-17 Tue 14:43]
+<2018-07-16 Mon>
+I suspect that there is a problem with duplicate Collections or something.
+It appears that the "context" attribute gets the correct Account instance but author does not.
+Analyze comfyStore's index.js deferred instancing and see if the Collection resolution closure is discarding a Collection?
+
 **** TODO ability to watch store for prop changes
 **** DONE singletons can have dependencies
      CLOSED: [2018-07-16 Mon 17:21]

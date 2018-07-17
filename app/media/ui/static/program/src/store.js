@@ -62,15 +62,15 @@ export const activeUser = store.singleton(
     makeActiveUser
 )
 
-export const accounts = store.singleton(
+export const accounts = store.deferredCollection(
     'accounts',
-    (value) => value instanceof AccountCollection,
+    AccountCollection,
     makeAccountCollection
 )
 
-export const feedContentTypes = store.singleton(
+export const feedContentTypes = store.deferredCollection(
     'feedContentTypes',
-    (value) => value instanceof FeedContentTypeCollection,
+    FeedContentTypeCollection,
     makeFeedContentTypeCollection
 )
 
@@ -83,15 +83,15 @@ export const comments = store.deferredCollection(
     }
 )
 
-export const interests = store.singleton(
+export const interests = store.deferredCollection(
     'interests',
-    (value) => value instanceof InterestCollection,
+    InterestCollection,
     makeInterestCollection
 )
 
-export const places = store.singleton(
+export const places = store.deferredCollection(
     'places',
-    (value) => value instanceof PlaceCollection,
+    PlaceCollection,
     makePlaceCollection
 )
 
@@ -141,46 +141,54 @@ export const interestedUsers = store.deferredCollection(
     ['interestId']
 )
 
-export const stashes = store.singleton(
+export const stashes = store.deferredCollection(
     'stashes',
-    (value) => value instanceof FeedContentStashCollection,
-    makeFeedContentStashCollection
+    FeedContentStashCollection,
+    makeFeedContentStashCollection,
+    {
+        owner: 'accounts',
+        comments: 'comments',
+        interests: 'interests',
+        places: 'places',
+        content_type: 'feedContentTypes'
+    }
 )
 
-export const feeds = store.singleton(
+export const feeds = store.deferredCollection(
     'feeds',
-    (value) => value instanceof FeedCollection,
+    FeedCollection,
     (deps) => {
         const {activeUser} = deps
 
         return makeFilteredFeedCollection(
             () => FeedCollection.all({ owner: activeUser.details.id }),
-            feedContentTypes,
-            stashes,
-            interests,
-            places,
-            comments,
-            accounts
+            deps
         )
+    },
+    {
+        content_types: 'feedContentTypes',
+        stashes: 'stashes',
+        interests: 'interests',
+        owner: 'accounts'
     },
     ['activeUser']
 )
 
-export const albums = store.singleton(
+export const albums = store.deferredCollection(
     'albums',
-    (value) => value instanceof AlbumCollection,
+    AlbumCollection,
     () => makeFilteredAlbumCollection(AlbumCollection.searchAlbums, accounts, profiles, feedContentTypes)
 )
 
-export const discussions = store.singleton(
+export const discussions = store.deferredCollection(
     'discussions',
-    (value) => value instanceof DiscussionCollection,
+    DiscussionCollection,
     makeDiscussionCollection
 )
 
-export const links = store.singleton(
+export const links = store.deferredCollection(
     'links',
-    (value) => value instanceof LinkCollection,
+    LinkCollection,
     makeLinkCollection
 )
 
@@ -229,7 +237,9 @@ export const groups = groupCollection('groups', activeUserGroups, ['activeUser']
 export const filteredGroups = groupCollection('filteredGroups', filterGroups, ['groupFilterParams'])
 
 const activityLogCollection = (field, reducer, dependencies) => {
-    return store.deferredCollection(field, ActivityLogCollection, reducer, {}, dependencies)
+    return store.deferredCollection(field, ActivityLogCollection, reducer, {
+        'author': 'accounts'
+    }, dependencies)
 }
 
 const activeUserActivityLogs = (deps) => {
