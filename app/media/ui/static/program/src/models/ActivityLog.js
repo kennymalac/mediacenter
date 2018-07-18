@@ -2,24 +2,18 @@ import {Model, Collection} from './Model.js'
 import {get, paginatedList, resolveInstances} from './generics.js'
 import {makeJsonRequest, jsonResponse} from '../httputil.js'
 
-export async function makeActivityLogCollection() {
-    return new ActivityLogCollection([])
+export function makeActivityLogCollection(deps) {
+    return new ActivityLogCollection([], deps)
 }
 
-export async function makeFilteredActivityLogCollection(queryset, _feeds, _stashes, _accounts, _profiles, _contentTypes) {
-    let [members, feed, stashes, profile, values, contentTypes] = await Promise.all(
-        [_accounts(), _feeds(), _stashes(), _profiles(), queryset(), _contentTypes()]
-        //        _feeds()
-    )
-    const collection = new ActivityLogCollection([], { author: members })
+export async function filterActivityLogCollection(collection, queryset, deps) {
+    const values = await queryset()
 
     await resolveInstances(
         collection,
         values,
-        { account: members, feed, stashes, profile, content_types: contentTypes, owner: members, author: members }
+        deps
     )
-
-    return collection
 }
 
 class ActivityLogModel extends Model {

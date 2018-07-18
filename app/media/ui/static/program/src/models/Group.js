@@ -5,27 +5,22 @@ import {FeedCollection} from './Feed.js'
 
 import {makeJsonRequest, jsonResponse} from '../httputil.js'
 
-export async function makeGroupCollection() {
-    return new GroupCollection([])
+export function makeGroupCollection(deps) {
+    return new GroupCollection([], deps)
 }
 
-export async function makeFilteredGroupCollection(queryset, _feeds, _stashes, _accounts, _profiles, _interests, _places, _contentTypes) {
-    let [members, feed, stashes, profile, values, interests, places, contentTypes] = await Promise.all(
-        [_accounts(), _feeds(), _stashes(), _profiles(), queryset(), _interests(), _places(), _contentTypes()]
-//        _feeds()
-    )
-    const collection = new GroupCollection([])
+export async function filterGroupCollection(collection, queryset, deps) {
+    const values = await queryset()
+    const members = await deps.members
 
     await resolveInstances(
         collection,
         values,
-        { members, account: members, feed, stashes, profile, interests, places, content_types: contentTypes, owner: members, friends: members, member_groups: collection },
+        deps,
         [
             ['members', members.get.bind(members)]
         ]
     )
-
-    return collection
 }
 
 class GroupModel extends Model {

@@ -8,7 +8,7 @@ async function manageResource(uri, collection, instance, serializedData, collect
     })
         .then(jsonResponse)
         .then((data) => {
-            collection.sync(instance, data, collections)
+            collection.sync(instance, data, {...collections, ...collection.collections})
             return instance
         })
 }
@@ -29,7 +29,7 @@ async function getResource(uri, collection, instance = null, collections = {}, c
     })
         .then(jsonResponse)
 
-    return await resolveInstance(collection, item, instance, collections, children)
+    return await resolveInstance(collection, item, instance, {...collections, ...collection.collections}, children)
 }
 
 export async function get(collection, id, instance = null, collections = {}, children = []) {
@@ -47,7 +47,7 @@ export async function resolveInstance(collection, item, _instance = null, collec
           ? collection.getInstance(item, collections)
           : _instance
 
-    collection.sync(instance, item, collections)
+    collection.sync(instance, item, {...collections, ...collection.collections})
 
     for (const [modelField, getter] of children) {
         resolutions.push(collection.resolveChildren(
@@ -60,7 +60,7 @@ export async function resolveInstance(collection, item, _instance = null, collec
 }
 
 export async function resolveInstances(collection, items, collections = {}, children = []) {
-    const instances = collection.getInstances(items, collections)
+    const instances = collection.getInstances(items, {...collections, ...collection.collections})
     const resolutions = []
 
     console.log(instances)
@@ -71,7 +71,7 @@ export async function resolveInstances(collection, items, collections = {}, chil
 
         for (const [modelField, getter] of children) {
             resolutions.push(collection.resolveChildren(
-                instance, modelField, getter, collections, instance
+                instance, modelField, getter, {...collections, ...collection.collections}, instance
             ))
         }
     }
@@ -94,7 +94,7 @@ async function paginateListedResource(uri, collection, params, collections = {},
     }
     else if (data.results) {
         results = data.results
-        return { ...data, results: await resolveInstances(collection, results, collections, children) }
+        return { ...data, results: await resolveInstances(collection, results, {...collections, ...collection.collections}, children) }
     }
 }
 

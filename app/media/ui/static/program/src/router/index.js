@@ -6,7 +6,7 @@ import Register from 'components/Register'
 import Login from 'components/Login'
 import Place from 'components/Place/Place'
 import Profile from 'components/Profile/Profile'
-import Chat from 'components/Chat'
+//import Chat from 'components/Chat'
 import Home from 'components/Home'
 import Interest from 'components/Interest'
 import Gallery from 'components/Gallery'
@@ -244,11 +244,11 @@ export default new Router({
                 }
             ]
         },
-        {
-            path: '/chat',
-            name: 'Chat',
-            component: Chat
-        },
+        // {
+        //     path: '/chat',
+        //     name: 'Chat',
+        //     component: Chat
+        // },
         {
             path: '/gallery',
             name: 'Gallery',

@@ -9,12 +9,15 @@ import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.
 import {FeedContentItemModel} from './FeedContentItem'
 
 export async function makeFilteredFeedCollection(queryset, deps) {
-    const {interests, owner, stashes} = deps
+    const {interests, places, comments, owner, stashes} = deps
     const collection = new FeedCollection([], {
         interests,
         owner,
         stashes,
-        content_types: deps.content_types
+        content_types: deps.content_types,
+        content_type: deps.content_types,
+        places,
+        comments
     })
 
     await resolveInstances(

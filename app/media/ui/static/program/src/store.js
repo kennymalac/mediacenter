@@ -11,9 +11,9 @@ import {FeedContentStashCollection, makeFeedContentStashCollection} from './mode
 import {FeedCollection, makeFilteredFeedCollection} from './models/Feed.js'
 import {DiscussionCollection, makeDiscussionCollection} from './models/Discussion.js'
 import {LinkCollection, makeLinkCollection} from './models/Link.js'
-import {GroupCollection, makeFilteredGroupCollection} from './models/Group.js'
+import {GroupCollection, makeGroupCollection, filterGroupCollection} from './models/Group.js'
 import {AlbumCollection, makeFilteredAlbumCollection} from './models/Album.js'
-import {ActivityLogCollection, makeFilteredActivityLogCollection} from './models/ActivityLog.js'
+import {ActivityLogCollection, makeActivityLogCollection, filterActivityLogCollection} from './models/ActivityLog.js'
 
 export const initialState = {
     activeUser: {},
@@ -47,6 +47,7 @@ export const activeUserPlaces = store.deferredCollection(
     PlaceCollection,
     (deps) => {
         const {activeUser} = deps
+
         return makeFilteredPlaceCollection(
             () => PlaceCollection.all({ owner: activeUser.details.id }),
             deps
@@ -65,7 +66,12 @@ export const activeUser = store.singleton(
 export const accounts = store.deferredCollection(
     'accounts',
     AccountCollection,
-    makeAccountCollection
+    makeAccountCollection,
+    {
+        'member_groups': 'groups',
+        'profile': 'profiles',
+        'friends': 'accounts'
+    }
 )
 
 export const feedContentTypes = store.deferredCollection(
@@ -168,6 +174,8 @@ export const feeds = store.deferredCollection(
     {
         content_types: 'feedContentTypes',
         stashes: 'stashes',
+        places: 'places',
+        comments: 'comments',
         interests: 'interests',
         owner: 'accounts'
     },
@@ -202,30 +210,25 @@ const groupCollection = (field, reducer, dependencies = []) => {
 
 const activeUserGroups = (deps) => {
     const {activeUser} = deps
-    return makeFilteredGroupCollection(
+
+    const collection = makeGroupCollection(deps)
+    filterGroupCollection(
+        collection,
         () => GroupCollection.list({ members: activeUser.details.id }),
-        feeds,
-        stashes,
-        accounts,
-        profiles,
-        interests,
-        places,
-        feedContentTypes
+        deps
     )
+    return collection
 }
 
 const filterGroups = (deps) => {
     const {groupFilterParams} = deps
-    return makeFilteredGroupCollection(
+    const collection = makeGroupCollection(deps)
+    filterGroupCollection(
+        collection,
         () => GroupCollection.searchGroups(groupFilterParams),
-        feeds,
-        stashes,
-        accounts,
-        profiles,
-        interests,
-        places,
-        feedContentTypes
+        deps
     )
+    return collection
 }
 
 store.singleton(
@@ -244,14 +247,13 @@ const activityLogCollection = (field, reducer, dependencies) => {
 
 const activeUserActivityLogs = (deps) => {
     const {activeUser} = deps
-    return makeFilteredActivityLogCollection(
+    const collection = makeActivityLogCollection(deps)
+    filterActivityLogCollection(
+        collection,
         () => ActivityLogCollection.searchActivityLogs({ members: activeUser.details.id }),
-        feeds,
-        stashes,
-        accounts,
-        profiles,
-        feedContentTypes
+        deps
     )
+    return collection
 }
 
 store.singleton(
@@ -261,14 +263,13 @@ store.singleton(
 
 const filterActivityLogs = (deps) => {
     const {activityLogFilterParams} = deps
-    return makeFilteredActivityLogCollection(
+    const collection = makeActivityLogCollection(deps)
+    filterActivityLogCollection(
+        collection,
         () => ActivityLogCollection.searchActivityLogs(activityLogFilterParams),
-        feeds,
-        stashes,
-        accounts,
-        profiles,
-        feedContentTypes
+        deps
     )
+    return collection
 }
 
 export const activityLogs = activityLogCollection('activityLogs', activeUserActivityLogs, ['activeUser'])

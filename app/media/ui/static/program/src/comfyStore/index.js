@@ -12,8 +12,7 @@ export class Store {
                 get: () => {
                     let singleton = this.state[key]
                     if (singleton instanceof Singleton) {
-                        const value = singleton.resolve(this.resolveSingletonDependencies(singleton, key))
-                        singleton.deferred = false
+                        const value = singleton.get(() => this.resolveSingletonDependencies(singleton, key))
                         return value
                     }
                     else {
@@ -32,7 +31,8 @@ export class Store {
             field,
             (value) => value instanceof CollectionType,
             create,
-            _deps
+            _deps,
+            true
         )
         //const collections = {}
         for (const [nestedField, singletonName] of Object.entries(collectionDeps)) {
@@ -46,10 +46,16 @@ export class Store {
         return singleton
     }
 
-    singleton(field, typeCheck, create = () => {}, dependencies = []) {
-        this.state[field] = new Proxy(new Singleton(typeCheck, create, dependencies), {
+    singleton(field, typeCheck, create = () => {}, dependencies = [], isDeferred = false) {
+        const singleton = new Singleton(typeCheck, create, dependencies)
+        singleton.deferred = isDeferred
+        this.state[field] = new Proxy(singleton, {
             construct(target, args) {
                 return this.state[field]
+            },
+            set(obj, prop, value) {
+                // console.log(`${field} singleton value set: `, obj, prop, value)
+                return Reflect.set(...arguments)
             }
         })
         // Return a closure that resolves the instance
@@ -58,44 +64,88 @@ export class Store {
         }
     }
 
-    getRelatedSingletonValue(requesterSingleton, requester, name) {
+    getRelatedSingletonValue(requesterSingleton, requester, name, dependencyBlacklist) {
         let singleton = this.state[name]
 
-        // Do not resolve the requester singleton as part of the dependency resolution
-        const needResolve = this.resolveSingletonDependencies(singleton, name, singleton.dependencies.filter((dep) => {
-            const isAccessorPair = Array.isArray(dep)
-            const singletonName = isAccessorPair
-                  ? dep[1]
-                  : dep
+        // if (name === 'activeUser') {
+        console.log('parent: ', requester, 'blacklist', dependencyBlacklist, 'child: ', name)
+        // }
+        console.log(singleton.dependencies)
 
-            return !dep.deferred && singletonName !== requester
-        }))
-
-        const requestedDep = singleton.dependencies.find((dep) => {
-            const isAccessorPair = Array.isArray(dep)
-            const singletonName = isAccessorPair
-                  ? dep[1]
-                  : dep
-
-            return !dep.deferred && singletonName === requester
-        })
-        if (requestedDep) {
-            // Use the singleton that was created already, do not re-resolve
-            needResolve[requester] = requesterSingleton
+        if (singleton.value !== undefined) {
+            return singleton.get()
         }
 
-        singleton.deferred = false
-        return singleton.resolve(needResolve)
+        const _blacklist = dependencyBlacklist.slice(0)
+        _blacklist.push(requester)
+
+        // Do not resolve the requester singleton as part of the dependency resolution
+        const resolved = this.resolveSingletonDependencies(singleton, name, singleton.dependencies.filter((dep) => {
+            const isAccessorPair = Array.isArray(dep)
+            const singletonName = isAccessorPair
+                  ? dep[1]
+                  : dep
+
+            return !_blacklist.includes(singletonName) && !this.state[singletonName].created
+        }), _blacklist)
+        const needResolve = {}
+
+        for (const dep of singleton.dependencies) {
+            const isAccessorPair = Array.isArray(dep)
+            const depKey = isAccessorPair
+                  ? dep[0]
+                  : dep
+            const singletonName = isAccessorPair
+                  ? dep[1]
+                  : dep
+
+            if (_blacklist.includes(singletonName)) {
+                console.log(requesterSingleton)
+                needResolve[depKey] = [singletonName, this.state[singletonName]]
+            }
+            // this.state[singletonName].deferred && this.state[singletonName].value instanceof Promise
+            else if (this.state[singletonName].created) {
+                needResolve[depKey] = [singletonName, this.state[singletonName]]
+            }
+        }
+
+        //console.log('needResolve', needResolve)
+        return singleton.get(async() => {
+            //console.log('resolved', resolved)
+            const deps = await resolved
+            //console.log('deps', deps)
+
+            //console.log('needResolve', needResolve)
+            const promisedDeps = {}
+            for (const [key, value] of Object.entries(needResolve)) {
+                const [_name, val] = value
+                console.log(name, _name, value)
+                if (name === _name || val.dependencies.includes(name)) {
+                    // Do not resolve circular dependency - resolve ourself first
+                    promisedDeps[key] = val.get
+                }
+                if (val.created && !val.deferred) {
+                    deps[key] = await val.get()
+                }
+                else {
+                    promisedDeps[key] = val.get()
+                }
+            }
+
+            return {...deps, ...promisedDeps}
+        })
     }
 
-    async resolveSingletonDependencies(singleton, singletonName, _dependencies) {
+    async resolveSingletonDependencies(singleton, singletonName, _dependencies, blacklist = []) {
         const depsKeys = []
-        singleton.deferred = true
-        const dependencies = _dependencies || singleton.dependencies.filter((dep) => {
-            return !dep.deferred
-        })
 
-        const storedVals = dependencies.map((dep) => {
+        const dependencies = _dependencies || singleton.dependencies
+
+        if (dependencies.length === 0) {
+            return {}
+        }
+
+        const storedVals = dependencies.map(async (dep) => {
             const isAccessorPair = Array.isArray(dep)
             const depKey = isAccessorPair
                 ? dep[0]
@@ -105,10 +155,13 @@ export class Store {
                 : dep
 
             depsKeys.push(depKey)
-            return this.getRelatedSingletonValue(singleton, singletonName, depName)
+            return this.getRelatedSingletonValue(singleton, singletonName, depName, blacklist)
         })
 
+        //console.log('storedVals, depsKeys', storedVals, depsKeys)
+
         const allDeps = await Promise.all(storedVals)
+        //console.log('allDeps', allDeps)
 
         const deps = {}
         // Assemble map of the dependency name to its resolved singleton value
@@ -119,15 +172,18 @@ export class Store {
     }
 
     async resolveReducerDependencies(reducer, dependencies = []) {
+        // TODO broken af
         // TODO fix for Array dependencies
         const depsKeys = []
-        const resolve = []
-        for (const {key, storeLookupKey} of Object.entries(dependencies)) {
+        // const resolve = []
+        const allDeps = []
+        for (const [key, storeLookupKey] of Object.entries(dependencies)) {
             depsKeys.push(key)
-            resolve.push(this.store[storeLookupKey])
+            //resolved.push(this.store[storeLookupKey])
+            allDeps.push(this.store[storeLookupKey])
         }
-        // Resolve all singletons in one go
-        const allDeps = await Promise.all(resolve)
+        // TODO Resolve all singletons in dependency tree
+        // const allDeps = await Promise.all(resolve)
 
         const deps = {}
         // Assemble map of the dependency name to its resolved singleton value

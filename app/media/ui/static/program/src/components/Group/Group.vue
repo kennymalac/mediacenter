@@ -5,13 +5,13 @@
 
             <section class="groups" v-if="isLocalGroups">
                 <h1>Your Local Groups</h1>
-                <group-list :link="localGroupRedirectLink" :items="objects" />
-                <p v-if="objects.length == 0">You are not a member of any local groups, <router-link to="search">discover your location</router-link>.</p>
+                <group-list :link="localGroupRedirectLink" :items="items" />
+                <p v-if="items.length == 0">You are not a member of any local groups, <router-link to="search">discover your location</router-link>.</p>
             </section>
             <section class="groups" v-if="!isLocalGroups">
                 <h1>Your Groups</h1>
-                <group-list :items="objects" />
-                <p v-if="objects.length == 0">You are not a member of any groups, join a group and it will be listed here.</p>
+                <group-list :items="items" />
+                <p v-if="items.length == 0">You are not a member of any groups, join a group and it will be listed here.</p>
             </section>
         </template>
         <template v-if="actions.details && instance.id">
@@ -163,6 +163,21 @@ export default {
         },
         isLocalGroups() {
             return this.params && this.params.placeId
+        },
+        items() {
+            if (!this.objects.all) {
+                return []
+            }
+            if (this.isLocalGroups) {
+                return this.objects.all((group) => {
+                    return this.$store.activeUser.details.member_groups.includes(group.id) && group.is_local
+                })
+            }
+            else {
+                return this.objects.all((group) => {
+                    return this.$store.activeUser.details.member_groups.includes(group.id)
+                })
+            }
         }
     },
     data() {
@@ -246,18 +261,9 @@ export default {
 
         async list(params) {
             const groupCollection = await groups()
-            const user = await activeUser()
+            await activeUser()
 
-            if (this.isLocalGroups) {
-                this.objects = groupCollection.values.all((group) => {
-                    return user.details.member_groups.includes(group.id) && group.is_local
-                })
-            }
-            else {
-                this.objects = groupCollection.values.all((group) => {
-                    return user.details.member_groups.includes(group.id)
-                })
-            }
+            this.objects = groupCollection.values
         },
 
         async details(params) {

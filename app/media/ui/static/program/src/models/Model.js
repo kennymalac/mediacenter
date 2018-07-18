@@ -205,20 +205,24 @@ export class Collection {
         return values.map((instance) => this.addInstance.bind(this)(instance, collections))
     }
 
+    isCollectionOrPromise(collection) {
+        return collection instanceof Collection || collection instanceof Promise
+    }
+
     getNestedCollection(field, instance = {}, collections = {}) {
         // Make sure this is a Model to begin with
         let collection
-        if (instance.collections && instance.collections[field] instanceof Collection) {
+        if (instance.collections && this.isCollectionOrPromise(instance.collections[field])) {
             collection = instance.collections[field]
         }
-        else if (this.collections && this.collections[field] instanceof Collection) {
+        else if (this.collections && this.isCollectionOrPromise(this.collections[field])) {
             collection = this.collections[field]
         }
         else {
             collection = collections[field]
         }
 
-        if (!(collection instanceof Collection)) {
+        if (!this.isCollectionOrPromise(collection)) {
             throw new Error(`Invalid model nested write! Resolved Collection for field ${field} not found.`)
         }
 
@@ -227,6 +231,15 @@ export class Collection {
 
     diffNestedModelField(instance, field, val, collections = {}, many = false, isPrimaryKeys = false) {
         const collection = this.getNestedCollection(field, instance, collections)
+        if (collection instanceof Promise) {
+            // This Collection has not resolved yet, the operation needs to be deferred
+            // Defer the mutation until the collection resolves
+            collection.then((collectionVal) => {
+                this.collections[field] = collectionVal
+                this.sync(instance, {[field]: val}, collections)
+            })
+            return [false, undefined]
+        }
 
         let store
         let changed = false
@@ -347,6 +360,10 @@ export class Collection {
                   : (id, instance) => getter(id, collections, instance)
 
             return parentInstance[modelField].filter((instance) => {
+                if (!instance.instance) {
+                    // The instance's collection has not been resolved yet
+                    return false
+                }
                 return instance.instance._isFake
             }).map((instance) => {
                 return collections[modelField].fetchInstance(instance, {}, () => _getter(instance.id, instance))
@@ -417,11 +434,26 @@ export class Model {
     resolveNestedModelField(field, collections = {}) {
         // Single primary key or instance case
         if (Number.isInteger(this.instance[field]) || Number.isInteger(this.instance[field].id)) {
-            this.instance[field] = collections[field].getInstance(this.instance[field], collections)
+            if (collections[field] instanceof Promise) {
+                // This is a deferred collection
+                collections[field].then((collection) => {
+                    this.instance[field] = collection.getInstance(this.instance[field], {...collections, [field]: collection})
+                })
+            }
+            else {
+                this.instance[field] = collections[field].getInstance(this.instance[field], collections)
+            }
         }
         // Multiple instances or multiple primary keys
         else if (Array.isArray(this.constructor.fields[field])) {
-            this.instance[field] = collections[field].getInstances(this.instance[field], collections)
+            if (collections[field] instanceof Promise) {
+                collections[field].then((collection) => {
+                    this.instance[field] = collection.getInstances(this.instance[field], {...collections, [field]: collection})
+                })
+            }
+            else {
+                this.instance[field] = collections[field].getInstances(this.instance[field], collections)
+            }
         }
         else {
             throw new Error('Invalid model field instantiation: model field is neither a pk, object, nor an array')

@@ -374,6 +374,7 @@ checkbox to show on all pages y/n?
 *** FeedContentStash
 **** DONE model, serializer, viewset
      CLOSED: [2018-05-23 Wed 17:29]
+**** TODO sticky/pinned feedcontentitems
 **** TODO stash privacy
 **** TODO CRUD
 ***** TODO Create
@@ -437,13 +438,15 @@ currently mutliple resolutions are happening at once for the same ids
 **** TODO fields should not reference Collection classes. 
 Collections are undefined for circular import situations.
 Use TypeScript or something instead
-**** TODO how to handle if Collection this.collections references a 
+**** DONE how to handle if Collection this.collections references a 
+     CLOSED: [2018-07-18 Wed 16:31]
 collection that references that same collection?
 **** DONE separate sync procedure from model instances?
      CLOSED: [2018-07-16 Mon 17:21]
 **** DONE lazy nested model instances
      CLOSED: [2018-05-18 Fri 13:57]
-**** TODO better filtering mechanism
+**** DONE better filtering mechanism
+     CLOSED: [2018-07-18 Wed 16:31]
 **** DONE better nested Models behavior
      CLOSED: [2018-05-18 Fri 13:57]
 **** DONE get rid of modelInstance

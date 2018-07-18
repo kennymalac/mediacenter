@@ -1,6 +1,6 @@
 <template>
     <div class="activity-feed-container">
-        <activity-log-list :items="objects" />
+        <activity-log-list :items="items" />
     </div>
 </template>
 
@@ -25,6 +25,16 @@ export default {
             objectName: 'activityfeed'
         }
     },
+    computed: {
+        items() {
+            if (!this.objects.all) {
+                return []
+            }
+            return this.objects.all((log) => {
+                return log.author.id === this.$store.activeUser.details.id
+            })
+        }
+    },
     // async mounted() {
     //     this.logs = (await this.$store).values
     // },
@@ -36,11 +46,9 @@ export default {
 
         async list(params) {
             const activityLogsCollection = await activityLogs()
-            const user = await activeUser()
+            await activeUser()
 
-            this.objects = activityLogsCollection.values.all((log) => {
-                return log.author.id === user.details.id
-            })
+            this.objects = activityLogsCollection.values
         }
     }
 }
