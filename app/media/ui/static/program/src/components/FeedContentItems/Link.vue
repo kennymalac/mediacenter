@@ -4,7 +4,14 @@
             <div class="content-title">
                 <i class="ion-ios-link"></i> <a class="external-link" :href="item.nested_object.link">{{ item.title }}</a>
             </div>
-            <span class="date">{{ item.created.fromNow() }} <span class="local-tag" v-if="item.is_local"><i class="ion-ios-pin"></i> Local</span></span>
+            <span class="date">
+                {{ item.created.fromNow() }}
+                <span class="local-tag" v-if="item.is_local"><i class="ion-ios-pin"></i> Local</span>
+                <span v-if="item.group_id && showGroupTag">
+                    <span v-html="'&nbsp;in'"></span>
+                    <tag-list className="tag-box" :tags="[{name: item.group_name, id: item.group_id}]" tagType="group" />
+                </span>
+            </span>
         </template>
         <template slot="embed" slot-scope="{ slotProps }">
             <div class="default-preview">
@@ -18,6 +25,7 @@
 
 <script>
 import ContentItem from './ContentItem'
+import TagList from '../TagList'
 
 export default {
     name: 'feed-link',
@@ -25,10 +33,15 @@ export default {
         stashId: [Number],
         item: {
             type: Object
+        },
+        showGroupTag: {
+            type: Boolean,
+            default: true
         }
     },
     components: {
-        ContentItem
+        ContentItem,
+        TagList
     },
     computed: {
         commentsUrl() {

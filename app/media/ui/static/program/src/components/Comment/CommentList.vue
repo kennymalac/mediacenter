@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import {serializeIds} from '../../models/Model.js'
+import {serializeIds} from '../../models/serializers.js'
 
 export default {
     name: 'comment-list',

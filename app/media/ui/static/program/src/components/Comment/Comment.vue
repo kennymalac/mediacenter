@@ -104,7 +104,7 @@ export default {
         },
 
         async manage(params) {
-            const fallthrough = this.parent.id ? `/comment/${this.parent.id}/detail` : `/feed/list`
+            const fallthrough = this.parent.id ? `/comment/${this.parent.id}/details` : `/feed/list`
 
             this.instance = await this.showInstance(params.id, fallthrough, this.collection, await commentDeps())
             this.instanceForm = this.instance.getForm()

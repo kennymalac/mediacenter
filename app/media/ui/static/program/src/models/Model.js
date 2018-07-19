@@ -1,11 +1,3 @@
-export function serializeIds(values) {
-    return values.map((val) => { return val.id })
-}
-
-export function serializeForms(values) {
-    return values.map((val) => { return val.getForm() })
-}
-
 function mutateInstance(mutation) {
     const [instance, diff] = mutation
     const [changed, changes] = diff
@@ -13,8 +5,7 @@ function mutateInstance(mutation) {
         return instance
     }
 
-    // This instance is populated with data and is thus now a real instance
-    delete instance.instance._isFake
+    instance.isFake = false
     instance.applyDiff(changes)
     return instance
 }
@@ -344,8 +335,8 @@ export class Collection {
             return
         }
         console.log(diffTree)
-        // This instance has new field data, so it's a real instance
-        delete instance.instance._isFake
+
+        instance.isFake = false
         instance.applyDiff(diffTree)
     }
 
@@ -457,6 +448,16 @@ export class Model {
         }
         else {
             throw new Error('Invalid model field instantiation: model field is neither a pk, object, nor an array')
+        }
+    }
+
+    set isFake(value) {
+        if (value === false) {
+            // This instance is populated with data and is thus now a real instance
+            delete this.instance._isFake
+        }
+        else {
+            this.instance.isFake = value
         }
     }
 

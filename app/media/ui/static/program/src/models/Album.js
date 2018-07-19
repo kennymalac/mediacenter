@@ -80,8 +80,9 @@ class AlbumCollection extends Collection {
             })
     }
 
-    static manage(instance, form, collections) {
+    manage(instance, form, collections) {
         return manage(
+            this,
             instance,
             {...form},
             collections

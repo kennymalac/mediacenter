@@ -5,7 +5,13 @@
                 <span class="content-type">Topic</span>
                 <router-link :to="detailsUrl"> {{ item.title }}</router-link>
             </div>
-            <span class="date">{{ item.created.fromNow() }}</span>
+            <span class="date">
+                {{ item.created.fromNow() }}
+                <span v-if="item.group_id && showGroupTag">
+                    <span v-html="'&nbsp;in'"></span>
+                    <tag-list className="tag-box" :tags="[{name: item.group_name, id: item.group_id}]" tagType="group" />
+                </span>
+            </span>
         </template>
         <template slot="embed" slot-scope="{ slotProps }">
             <div class="default-preview topic">
@@ -19,16 +25,22 @@
 
 <script>
 import ContentItem from './ContentItem'
+import TagList from '../TagList'
 
 export default {
     name: 'feed-discussion-topic',
     props: {
         item: {
             type: Object
+        },
+        showGroupTag: {
+            type: Boolean,
+            default: true
         }
     },
     components: {
-        ContentItem
+        ContentItem,
+        TagList
     },
     computed: {
         commentsUrl() {

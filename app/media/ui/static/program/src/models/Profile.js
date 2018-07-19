@@ -1,4 +1,5 @@
-import {Model, Collection, serializeIds} from './Model.js'
+import {Model, Collection} from './Model.js'
+import {serializeIds} from './serializers.js'
 import {resolveInstances, paginatedList, get, manage} from './generics.js'
 import {InterestCollection} from './Interest.js'
 import {AccountCollection} from './Account.js'
@@ -23,14 +24,6 @@ class ProfileModel extends Model {
         interests: [InterestCollection],
         account: AccountCollection,
         comments: [Collection]
-    }
-
-    static async manage(instance, form, collections) {
-        return await manage(instance, {
-            ...form,
-            interests: serializeIds(form.interests),
-            account: form.account.id
-        }, collections)
     }
 }
 
@@ -58,6 +51,14 @@ class ProfileCollection extends Collection {
     static Model = ProfileModel
 
     static resource = 'profile'
+
+    async manage(instance, form, collections) {
+        return await manage(this, instance, {
+            ...form,
+            interests: serializeIds(form.interests),
+            account: form.account.id
+        }, collections)
+    }
 
     async get(id, collections, instance = null) {
         return await get(this, id, instance, collections)

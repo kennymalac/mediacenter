@@ -3,7 +3,7 @@
         <template v-if="actions.details && instance.id">
             <router-view :key="$route.name" :feedId="feedId" :stashId="instance.id"></router-view>
             <section class="feed" v-if="!params.discussionAction && !params.linkAction">
-                <feed-content-item-list :stashId="instance.id" :items="content" :enabledContentTypes="enabledContentTypes" />
+                <feed-content-item-list :stashId="instance.id" :showGroupTag="showGroupTag" :items="content" :enabledContentTypes="enabledContentTypes" />
             </section>
         </template>
         <template v-if="actions.create || actions.manage">
@@ -24,7 +24,7 @@ import stashDeps from '../dependencies/FeedContentStash'
 export default {
     name: 'feed-content-stash',
     mixins: [RestfulComponent],
-    props: ['feedId'],
+    props: ['feedId', 'showGroupTag'],
     components: {
         FeedContentItemList
     },

@@ -51,7 +51,7 @@
                 <div v-if="!params.discussionAction && !params.linkAction && isActiveUserMember">
                     <content-item-form :stash="resolvedStash" :groupId="instance.id" :feedId="instance.feed.id" :contentTypes="allowedContentTypes" @contentTypeSelected="contentTypeSelected" />
                 </div>
-                <router-view v-if="instance.feed.id" :feedId="instance.feed.id"></router-view>
+                <router-view v-if="instance.feed.id" :feedId="instance.feed.id" :showGroupTag="false"></router-view>
             </div>
         </template>
         <template v-if="actions.create || actions.manage">

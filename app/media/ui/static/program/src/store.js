@@ -53,7 +53,10 @@ export const activeUserPlaces = store.deferredCollection(
             deps
         )
     },
-    {},
+    {
+        owner: 'accounts',
+        default_feed: 'feeds'
+    },
     ['activeUser']
 )
 
@@ -98,7 +101,11 @@ export const interests = store.deferredCollection(
 export const places = store.deferredCollection(
     'places',
     PlaceCollection,
-    makePlaceCollection
+    makePlaceCollection,
+    {
+        owner: 'accounts',
+        default_feed: 'feeds'
+    }
 )
 
 export const profiles = store.deferredCollection(

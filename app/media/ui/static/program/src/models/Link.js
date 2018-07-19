@@ -1,4 +1,5 @@
-import {serializeIds, Model, Collection} from './Model.js'
+import {Model, Collection} from './Model.js'
+import {serializeContentItem} from './serializers.js'
 import {makeJsonRequest, jsonResponse, fetchAPI} from '../httputil.js'
 import {get, manage, paginatedList} from './generics.js'
 import {FeedContentItemCollection} from './FeedContentItem'
@@ -21,15 +22,6 @@ class LinkModel extends Model {
     }
 
     static resource = 'link'
-
-    static manage(instance, form, collections) {
-        const {link, id} = form
-        return manage(
-            instance,
-            {link, id, content_item: {id: form.content_item.id, description: form.content_item.description, title: form.content_item.title, interests: serializeIds(form.content_item.interests), places: serializeIds(form.content_item.places), content_type: form.content_item.content_type.id, owner: form.content_item.owner.id}},
-            collections
-        )
-    }
 }
 
 class LinkCollection extends Collection {
@@ -40,6 +32,16 @@ class LinkCollection extends Collection {
 
     async get(id, collections, instance = null) {
         return await get(this, id, instance, collections)
+    }
+
+    async manage(instance, form, collections) {
+        const {link, id} = form
+        return manage(
+            this,
+            instance,
+            {link, id, content_item: serializeContentItem(form)},
+            collections
+        )
     }
 
     async create(form, collections) {

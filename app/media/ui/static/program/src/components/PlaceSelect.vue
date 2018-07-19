@@ -3,7 +3,7 @@ import CollectionSelect from './CollectionSelect'
 //import debounce from 'debounce'
 
 import {places, activeUser} from '../store.js'
-import placeDeps from '../dependencies/Place.js'
+//import placeDeps from '../dependencies/Place.js'
 
 export default {
     name: 'place-select',
@@ -23,9 +23,7 @@ export default {
         const owner = await activeUser()
         
         const placeCollection = await places()
-        if (placeCollection.values.length === 0) {
-            await placeCollection.getActiveUserPlaces(owner, await placeDeps())
-        }
+        await placeCollection.getActiveUserPlaces(owner, {})
     },
     methods: {
         optionLabel(option) {

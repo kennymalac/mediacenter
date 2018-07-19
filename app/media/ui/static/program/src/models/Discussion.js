@@ -1,4 +1,5 @@
 import {Model, Collection} from './Model.js'
+import {serializeContentItem} from './serializers.js'
 import {makeJsonRequest, jsonResponse, fetchAPI} from '../httputil.js'
 import {get, manage, paginatedList} from './generics.js'
 import {FeedContentItemCollection} from './FeedContentItem'
@@ -70,11 +71,11 @@ class DiscussionCollection extends Collection {
         return instance
     }
 
-    static manage(instance, form, collections) {
+    async manage(instance, form, collections) {
         return manage(
             this,
             instance,
-            {...form, content_item: {...form.content_item, content_type: form.content_item.content_type.id, owner: form.content_item.owner.id}},
+            {...form, content_item: serializeContentItem(form)},
             collections
         )
     }

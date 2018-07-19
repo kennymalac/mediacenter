@@ -1,5 +1,5 @@
 <template>
-    <div class="tag-list">
+    <div :class="className">
         <span v-for="tag in tags" :class="tagClass" @click="clickTag(tag.id)">{{ tag.name }}</span>
     </div>
 </template>
@@ -12,6 +12,10 @@ export default {
         id: [Number],
         name: [String],
         tags: [Array],
+        className: {
+            type: [String, Array],
+            default: "tag-list"
+        },
         tagType: {
             type: String,
             default: ""

@@ -1,10 +1,10 @@
 import {momentDate} from './converters.js'
 import {Model, Collection} from './Model.js'
-import {get, manage, paginatedList, makeFilteredCollection} from './generics.js'
+import {get, manage, paginatedList, makeFilteredCollection, resolveInstances} from './generics.js'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 
-export async function makePlaceCollection() {
-    const collection = new PlaceCollection([])
+export async function makePlaceCollection(deps) {
+    const collection = new PlaceCollection([], deps)
     return collection
 }
 
@@ -34,13 +34,6 @@ class PlaceModel extends Model {
         description: ''
     }
 
-    static manage(instance, form, collections) {
-        return manage(instance, {
-            ...form,
-            owner: form.owner.id
-        }, collections)
-    }
-
     static upload(placeId, form) {
         return fetchAPI(`place/${placeId}/upload/`, {
             method: "POST",
@@ -58,6 +51,13 @@ class PlaceCollection extends Collection {
 
     async get(id, collections, instance = null) {
         return await get(this, id, instance, collections)
+    }
+
+    async manage(instance, form, collections) {
+        return await manage(instance, {
+            ...form,
+            owner: form.owner.id
+        }, collections)
     }
 
     connect(form, collections) {
@@ -98,9 +98,7 @@ class PlaceCollection extends Collection {
         })
             .then(jsonResponse)
             .then((data) => {
-                const instances = this.addInstances(data, collections)
-
-                return instances
+                return resolveInstances(this, data, collections)
             })
     }
 }

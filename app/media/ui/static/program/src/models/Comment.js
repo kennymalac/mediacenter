@@ -68,7 +68,7 @@ class CommentCollection extends Collection {
         return instance
     }
 
-    manage(instance, form, collections) {
+    async manage(instance, form, collections) {
         return manageNested(
             this,
             instance,
@@ -102,7 +102,7 @@ class ProfileCommentCollection extends CommentCollection {
         return instance
     }
 
-    manage(instance, form, collections) {
+    async manage(instance, form, collections) {
         return manageNested(
             this,
             instance,

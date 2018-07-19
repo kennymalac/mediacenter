@@ -1,5 +1,6 @@
 import {modelInstance, momentDate, choice, visibilityChoices} from './converters.js'
-import {Model, Collection, serializeIds} from './Model.js'
+import {Model, Collection} from './Model.js'
+import {serializeIds} from './serializers.js'
 import {get, manage, paginatedList, resolveInstances} from './generics.js'
 import {AccountCollection} from './Account'
 import {FeedContentTypeCollection} from './FeedContentType'
@@ -40,6 +41,7 @@ class FeedModel extends Model {
         content_types: [FeedContentTypeCollection],
         owner: AccountCollection,
         interests: [InterestCollection],
+        places: [Collection],
         stashes: [FeedContentStashCollection]
     }
 
@@ -57,6 +59,7 @@ class FeedModel extends Model {
         name: '',
         description: '',
         stashes: [],
+        places: [],
         interests: [],
         rules: [],
         content_types: [],
@@ -113,6 +116,7 @@ class FeedCollection extends Collection {
             owner: form.owner.id,
             visibility: form.visibility.value,
             content_types: serializeIds(form.content_types),
+            stashes: serializeIds(form.stashes),
             interests: serializeIds(form.interests)
         }, collections)
     }

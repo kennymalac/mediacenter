@@ -67,11 +67,10 @@ export default {
             selected: []
         }
     },
-    mounted() {
+    async mounted() {
+        const collection = await this.collection()
         this.selected = this.value
-        this.collection().then((store) => {
-            this.values = store.values
-        })
+        this.values = collection.values
     },
     methods: {
         addTag(tag) {

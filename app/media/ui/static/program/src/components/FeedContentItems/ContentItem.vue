@@ -68,6 +68,10 @@ $title-height: 48px;
         color: #4F8A10;
     }
 
+    .tag-box {
+        display: inline;
+    }
+
     .content-title {
         justify-content: center;
         display: flex;
@@ -93,7 +97,7 @@ $title-height: 48px;
             color: white;
             font-weight: normal;
             padding: 4px;
-            font-size: 1rem;
+            font-size: .8rem;
         }
         a {
             color: white;

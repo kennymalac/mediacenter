@@ -1,8 +1,8 @@
 <template>
     <div class="feed-list">
     <template v-for="item in contentItems">
-        <feed-link v-if="item.content_type.name == 'link'" :item="item" />
-        <feed-discussion-topic v-if="item.content_type.name == 'topic'" :item="item" />
+        <feed-link v-if="item.content_type.name == 'link'" :showGroupTag="showGroupTag" :item="item" />
+        <feed-discussion-topic v-if="item.content_type.name == 'topic'" :showGroupTag="showGroupTag" :item="item" />
         <feed-image v-if="item.content_type.name == 'img'" v-bind="item" />
     </template>
     </div>
@@ -18,7 +18,11 @@ import FeedDiscussionTopic from './FeedContentItems/DiscussionTopic'
 export default {
     props: {
         items: [Array],
-        enabledContentTypes: [Array]
+        enabledContentTypes: [Array],
+        showGroupTag: {
+            type: Boolean,
+            default: true
+        }
     },
     components: {
         FeedLink,

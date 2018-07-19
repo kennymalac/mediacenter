@@ -1,4 +1,5 @@
-import {Model, Collection, serializeIds} from './Model.js'
+import {Model, Collection} from './Model.js'
+import {serializeIds} from './serializers.js'
 import {momentDate} from './converters.js'
 // import {AccountCollection} from './Account'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
@@ -38,7 +39,7 @@ class FeedContentStashModel extends Model {
 
     constructor(instance, collections = {}) {
         const _collections = {
-            content: new FeedContentItemCollection([], {...collections.stashes})
+            content: new FeedContentItemCollection([])
         }
         super(instance, {
             ...collections,
@@ -46,10 +47,6 @@ class FeedContentStashModel extends Model {
         })
 
         this.collections = _collections
-    }
-
-    static async manage(instance, form, collections) {
-        return await manageNested(instance, form.feed, form, collections)
     }
 
     static upload(feedId, form) {
@@ -99,6 +96,10 @@ class FeedContentStashCollection extends Collection {
 
     async get(feedId, id, collections, instance = null) {
         return await getNested(this, id, feedId, instance, {...collections, ...this.collections})
+    }
+
+    async manage(instance, form, collections) {
+        return await manageNested(this, instance, form.feed, form, collections)
     }
 
     async list(feedId, params, collections) {

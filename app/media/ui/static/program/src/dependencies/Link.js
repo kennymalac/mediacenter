@@ -1,22 +1,14 @@
-import {accounts, interests, places, comments, stashes, groups, profiles, feedContentTypes} from "../store.js"
+import {stashes} from "../store.js"
+import stashDeps from "./FeedContentStash.js"
 
 export default async function dependencies(stashId) {
-    const [owner, stashCollection, contentTypeCollection, groupCollection, profileCollection, interestCollection, placeCollection, commentCollection] = await Promise.all(
-        [accounts(), stashes(), feedContentTypes(), groups(), profiles(), interests(), places(), comments()]
-    )
+    const otherDeps = await stashDeps()
+
+    const stashCollection = await stashes()
     const stash = await stashCollection.getInstance(stashId)
 
     return {
-        owner,
-        content_item: stash.collections.content,
-        content_type: contentTypeCollection,
-        content_types: contentTypeCollection,
-        member_groups: groupCollection,
-        profile: profileCollection,
-        friends: owner,
-        account: owner,
-        interests: interestCollection,
-        places: placeCollection,
-        comments: commentCollection
+        ...otherDeps,
+        content_item: stash.collections.content
     }
 }

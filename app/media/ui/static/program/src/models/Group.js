@@ -1,4 +1,5 @@
-import {Model, Collection, serializeIds} from './Model.js'
+import {Model, Collection} from './Model.js'
+import {serializeIds} from './serializers.js'
 import {get, manage, resolveInstances} from './generics.js'
 import {AccountCollection} from './Account.js'
 import {FeedCollection} from './Feed.js'

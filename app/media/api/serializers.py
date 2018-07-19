@@ -458,14 +458,17 @@ def get_content_id(instance):
     pk = _model.objects.filter(content_item=instance).values_list('id', flat=True).first()
     return pk
 
-def get_group_id(instance):
+def get_group_id_name(instance):
+    # TODO optimize...
     valid_stashes = FeedContentStash.objects.filter(owned_content__in=(instance,), feeds__isnull=False)
     if valid_stashes.count() > 0:
         valid_feeds = Feed.objects.filter(stashes__in=valid_stashes, groupforum__isnull=False)
 
         if valid_feeds.count() > 0:
             feed = valid_feeds.first()
-            return feed.groupforum_set.first().id
+            group = feed.groupforum_set.first()
+            return [group.id, group.name]
+
 
 def get_feed_id(instance):
     if instance.origin_stash:
@@ -481,6 +484,7 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
     origin_stash_id = serializers.SerializerMethodField()
     feed_id = serializers.SerializerMethodField()
     group_id = serializers.SerializerMethodField()
+    group_name = serializers.SerializerMethodField()
     is_local = serializers.SerializerMethodField()
     nested_object = serializers.SerializerMethodField()
     # content_type = serializers.StringRelatedField(
@@ -489,7 +493,7 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'is_anonymous', 'is_local', 'content_type', 'comments', 'created', 'object_id', 'origin_stash_id', 'feed_id', 'group_id', 'nested_object', 'visibility', 'interests')
+        fields = ('id', 'title', 'description', 'owner', 'is_anonymous', 'is_local', 'content_type', 'comments', 'created', 'object_id', 'origin_stash_id', 'feed_id', 'group_id', 'group_name', 'nested_object', 'visibility', 'interests')
 
     def get_content_id(self, instance):
         return get_content_id(instance)
@@ -502,7 +506,14 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
         return get_feed_id(instance)
 
     def get_group_id(self, instance):
-        return get_group_id(instance)
+        v = get_group_id_name(instance)
+        if v:
+            return v[0]
+
+    def get_group_name(self, instance):
+        v = get_group_id_name(instance)
+        if v:
+            return v[1]
 
     def get_is_local(self, instance):
         allowed_places = self.context.get('allowed_places', [])
