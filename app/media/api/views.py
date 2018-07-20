@@ -208,7 +208,7 @@ class FeedContentItemViewSet(ListModelMixin,
 
     queryset = FeedContentItem.objects.all()
     serializer_class = FeedContentItemSerializer
-    pagination_class = StandardResultsSetPagination
+    pagination_class = FeedContentItemPagination
 
     def get_serializer(self, *args, **kwargs):
         """

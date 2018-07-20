@@ -66,16 +66,25 @@ class FeedModel extends Model {
         visibility: {}
     }
 
-    static listItems(feedId, params, collections) {
+    static listItems(feedId, params, collections, offset = 0) {
         return makeJsonRequest(`content/search/`, {
             method: "POST",
-            body: {feed: feedId}
+            body: {feed: feedId},
+            queryParams: params
         })
             .then(jsonResponse)
 
             .then((data) => {
+                let order = 0 + offset
                 // Returns a list of ContentItem model instances
-                return data.results.map((input) => modelInstance(FeedContentItemModel, input, collections))
+                return {
+                    ...data,
+                    results: data.results.map((input) => {
+                        const instance = modelInstance(FeedContentItemModel, input, collections)
+                        instance.order = order++
+                        return instance
+                    })
+                }
             })
     }
 }

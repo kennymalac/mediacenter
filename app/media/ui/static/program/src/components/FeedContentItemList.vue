@@ -32,6 +32,7 @@ export default {
     computed: {
         contentItems() {
             return this.items.filter((item) => {
+                console.log(item.content_type.title)
                 return this.enabledContentTypes.includes(item.content_type.title)
             })
         }

@@ -5,7 +5,8 @@ export default {
             pageSize: 10,
             pageMinOrder: 0,
             pageMaxOrder: 0,
-            itemCount: 0
+            itemCount: 0,
+            isPaginating: false
         }
     },
     computed: {
@@ -18,6 +19,11 @@ export default {
     },
     methods: {
         async selectPage(page) {
+            if (this.isPaginating) {
+                // Paginator is busy
+                return
+            }
+
             this.$router.push({
                 query: {
                     page: page
@@ -34,6 +40,7 @@ export default {
                 this.pageMinOrder = response.results[0].order
                 this.pageMaxOrder = response.results.slice(-1)[0].order
             }
+            this.isPaginating = false
         },
 
         isItemVisibleOnPage(item) {

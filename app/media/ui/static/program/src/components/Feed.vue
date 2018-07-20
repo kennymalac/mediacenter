@@ -23,16 +23,18 @@
                     </button>
                     <p class="description">{{ instance.description }}</p>
 
-                    <h3>Filters</h3>
-                    <feed-filter :specifiers="filters.contentTypes" :filterToggled="toggle" />
-                    <feed-filter :specifiers="filters.subjects" :filterToggled="toggle" />
-                    <feed-filter :specifiers="filters.interests" :filterToggled="toggle" />
-                    <feed-filter :specifiers="filters.tags" :filterToggled="toggle" />
+                    <!-- <h3>Filters</h3> -->
+                    <!-- <feed-filter :specifiers="filters.contentTypes" :filterToggled="toggle" /> -->
+                    <!-- <feed-filter :specifiers="filters.subjects" :filterToggled="toggle" /> -->
+                    <!-- <feed-filter :specifiers="filters.interests" :filterToggled="toggle" /> -->
+                    <!-- <feed-filter :specifiers="filters.tags" :filterToggled="toggle" /> -->
                 </div>
             </section>
 
             <section class="feed" v-if="!params.stashId">
-                <feed-content-item-list :enabledContentTypes="enabledContentTypes" :items="contentItems" />
+                <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
+
+                <feed-content-item-list :enabledContentTypes="enabledContentTypes" :items="pageContent" />
             </section>
             <router-view v-if="params.stashId" :stashId="params.stashId" :feedId="params.feedId"></router-view>
         </template>
@@ -61,6 +63,8 @@
 
 <script>
 import RestfulComponent from "./RestfulComponent"
+import PaginatedComponent from "./PaginatedComponent"
+
 import {FeedModel} from "../models/Feed.js"
 import {feeds, activeUser} from '../store.js'
 import feedDeps from '../dependencies/Feed.js'
@@ -72,29 +76,38 @@ import InterestSelect from './InterestSelect'
 import ActionList from './ActionList'
 import FeedFilter from './FeedFilter'
 
+import PaginationControls from './PaginationControls'
+
 import router from "../router/index.js"
 
 export default {
     name: 'feed',
-    mixins: [RestfulComponent],
+    mixins: [RestfulComponent, PaginatedComponent],
     components: {
         FeedItem,
         FeedContentItemList,
         FeedContentTypeSelect,
         InterestSelect,
         ActionList,
-        FeedFilter
+        FeedFilter,
+        PaginationControls
     },
     computed: {
         enabledContentTypes() {
             return this.filters.contentTypes.map((contentType) => {
                 return contentType.enabled ? contentType.name : false
             })
+        },
+        pageContent() {
+            return this.contentItems.filter((item) => {
+                return this.isItemVisibleOnPage(item)
+            })
         }
     },
     data() {
         return {
             objectName: 'feed',
+            pageSize: 20,
             isActiveUserOwner: false,
             instanceForm: { content_types: [] },
             instance: {
@@ -157,6 +170,18 @@ export default {
             router.push(`/feed/${this.instance.id}/manage`)
         },
 
+        async listChildren(deps = null) {
+            this.isPaginating = true
+            const _deps = deps || await feedDeps()
+
+            const resp = await FeedModel.listItems(this.instance.id, { page: this.currentPage }, _deps, this.contentItems.length)
+            this.contentItems = this.contentItems.concat(resp.results)
+            this.paginate(resp)
+            if (this.query.last) {
+                this.selectPage(this.pageCount)
+            }
+        },
+
         async list(params) {
             const store = await feeds()
             this.objects = store.values.filter((feed) => {
@@ -172,7 +197,7 @@ export default {
 
             try {
                 // TODO optimize
-                this.contentItems = await FeedModel.listItems(this.instance.id, {}, {
+                await this.listChildren({
                     content_type: deps.content_types,
                     comments: deps.comments,
                     places: deps.places,

@@ -16,6 +16,7 @@ export default async function dependencies() {
         places: placeCollection,
         comments: commentCollection,
         stashes: stashCollection,
+        content_type: contentTypeCollection,
         content_types: contentTypeCollection,
         owner: accountCollection,
         profile
