@@ -230,7 +230,7 @@ export default {
             const [owner, members, profile, interestCollection, groupCollection] = await Promise.all(
                 [activeUser(), accounts(), profiles(), interests(), groups()]
             )
-            const ownerAccount = members.getInstance(owner.details.id, {
+            const ownerAccount = await members.fetchInstance(owner.details.id, {
                 groups: groupCollection,
                 members,
                 profile,

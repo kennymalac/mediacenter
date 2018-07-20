@@ -21,7 +21,10 @@ export const visibilityChoices = {
 }
 
 export function choice(input, typeMapping) {
-    return { text: typeMapping[input], value: input }
+    if (typeof input === 'string') {
+        return { text: typeMapping[input], value: input }
+    }
+    return input
 }
 
 export function modelInstance(ModelType, input, collections = {}) {

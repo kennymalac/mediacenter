@@ -25,7 +25,7 @@ export class Singleton {
         this.dependencies = dependencies
     }
 
-    get(deps) {
+    getValue(deps) {
         if (this.value !== null && this.value !== undefined && this.typeCheck(this.value)) {
             return this.value
         }
@@ -33,21 +33,23 @@ export class Singleton {
     }
 
     async resolve(resolveDeps) {
+        if (this.value !== null && this.value !== undefined && this.typeCheck(this.value)) {
+            return this.value
+        }
+
         if (this.value instanceof Promise) {
             return await this.value
         }
 
-        this.value = (async function(create, deps) {
-            if (!deps) {
-                console.log('no deps')
-            }
-            const all = deps ? await deps() : {}
-
-            const value = await create(all)
-            console.log('singleton value', value)
-            return value
-        })(this.create.bind(this), resolveDeps)
         this.created = true
+        this.value = (async () => {
+            //console.log('resolving value ', this.value)
+            const all = resolveDeps ? await resolveDeps() : {}
+
+            const value = await this.create(all)
+            //console.log('singleton value', value)
+            return value
+        })()
         this.value = await this.value
 
         this.deferred = false

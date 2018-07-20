@@ -30,7 +30,7 @@ export default {
             const [accountCollection, profile] = await Promise.all(
                 [this.collection(), profiles()]
             )
-            accountCollection.list({ search: queryParams }, { profile })
+            await accountCollection.list({ search: queryParams }, { profile })
         }, 200)
     }
 }

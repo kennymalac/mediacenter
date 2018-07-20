@@ -340,7 +340,8 @@ export class Collection {
         instance.applyDiff(diffTree)
     }
 
-    resolveChildren(parentInstance, modelField, getter, collections, instance) {
+    resolveChildren(parentInstance, modelField, getter, _collections, instance) {
+        const collections = {..._collections, ...this.collections}
         if (Array.isArray(parentInstance[modelField])) {
             if (parentInstance[modelField].length === 0) {
                 return []
@@ -352,11 +353,23 @@ export class Collection {
 
             return parentInstance[modelField].filter((instance) => {
                 if (!instance.instance) {
-                    // The instance's collection has not been resolved yet
-                    return false
+                    const collection = this.getNestedCollection(modelField, instance, collections)
+                    if (collection instanceof Promise) {
+                        // The instance's collection has not been resolved yet
+                        collection.then((collectionVal) => {
+                            this.collections[modelField] = collectionVal
+                            if (instance.isFake) {
+                                collections[modelField].fetchInstance(instance, {}, () => _getter(instance.id, instance))
+                            }
+                        })
+                        return false
+                    }
+                    // Try to get an instance
+                    instance = collection.getInstance(instance, collections)
                 }
                 return instance.instance._isFake
             }).map((instance) => {
+                //console.log(instance.id)
                 return collections[modelField].fetchInstance(instance, {}, () => _getter(instance.id, instance))
             })
         }

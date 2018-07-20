@@ -33,6 +33,12 @@ class AccountCollection extends Collection {
 
     static resource = 'account'
 
+    constructor(values, collections = {}) {
+        super(values, collections)
+        this.collections.friends = this
+        console.log('AccountCollection created')
+    }
+
     async get(id, collections, instance = null) {
         return await get(this, id, instance, {...collections, friends: this})
     }

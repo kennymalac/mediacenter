@@ -12,7 +12,7 @@ export class Store {
                 get: () => {
                     let singleton = this.state[key]
                     if (singleton instanceof Singleton) {
-                        const value = singleton.get(() => this.resolveSingletonDependencies(singleton, key))
+                        const value = singleton.getValue(() => this.resolveSingletonDependencies(singleton, key))
                         return value
                     }
                     else {
@@ -47,6 +47,9 @@ export class Store {
     }
 
     singleton(field, typeCheck, create = () => {}, dependencies = [], isDeferred = false) {
+        if (this.state[field] instanceof Singleton) {
+            throw new Error(`Can't replace Singleton value, value for field ${field} already exists`)
+        }
         const singleton = new Singleton(typeCheck, create, dependencies)
         singleton.deferred = isDeferred
         this.state[field] = new Proxy(singleton, {
@@ -60,6 +63,7 @@ export class Store {
         })
         // Return a closure that resolves the instance
         return () => {
+            //console.log('closure', field, this.store[field])
             return this.store[field]
         }
     }
@@ -68,12 +72,12 @@ export class Store {
         let singleton = this.state[name]
 
         // if (name === 'activeUser') {
-        console.log('parent: ', requester, 'blacklist', dependencyBlacklist, 'child: ', name)
+        //console.log('parent: ', requester, 'blacklist', dependencyBlacklist, 'child: ', name)
         // }
-        console.log(singleton.dependencies)
+        //console.log(singleton.dependencies)
 
         if (singleton.value !== undefined) {
-            return singleton.get()
+            return singleton.getValue()
         }
 
         const _blacklist = dependencyBlacklist.slice(0)
@@ -100,7 +104,7 @@ export class Store {
                   : dep
 
             if (_blacklist.includes(singletonName)) {
-                console.log(requesterSingleton)
+                //console.log(requesterSingleton)
                 needResolve[depKey] = [singletonName, this.state[singletonName]]
             }
             // this.state[singletonName].deferred && this.state[singletonName].value instanceof Promise
@@ -110,7 +114,7 @@ export class Store {
         }
 
         //console.log('needResolve', needResolve)
-        return singleton.get(async() => {
+        return singleton.getValue(async() => {
             //console.log('resolved', resolved)
             const deps = await resolved
             //console.log('deps', deps)
@@ -119,16 +123,18 @@ export class Store {
             const promisedDeps = {}
             for (const [key, value] of Object.entries(needResolve)) {
                 const [_name, val] = value
-                console.log(name, _name, value)
-                if (name === _name || val.dependencies.includes(name)) {
+                //console.log('blah', name, key, val)
+                if (name !== _name && val.created && !val.deferred) {
+                    deps[key] = await val.getValue()
+                }
+                // 
+                else if (name === _name || val.dependencies.includes(name)) {
                     // Do not resolve circular dependency - resolve ourself first
-                    promisedDeps[key] = val.get
+                    promisedDeps[key] = val.getValue
                 }
-                if (val.created && !val.deferred) {
-                    deps[key] = await val.get()
-                }
+
                 else {
-                    promisedDeps[key] = val.get()
+                    promisedDeps[key] = val.getValue()
                 }
             }
 

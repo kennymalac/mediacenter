@@ -72,8 +72,7 @@ export const accounts = store.deferredCollection(
     makeAccountCollection,
     {
         'member_groups': 'groups',
-        'profile': 'profiles',
-        'friends': 'accounts'
+        'profile': 'profiles'
     }
 )
 

@@ -98,11 +98,11 @@ async function paginateListedResource(uri, collection, params, collections = {},
     }
 }
 
-export async function paginatedList(collection, params, collections = {}, children = []) {
+export function paginatedList(collection, params, collections = {}, children = []) {
     return paginateListedResource(`${collection.constructor.resource}/`, collection, params, collections, children)
 }
 
-export async function paginatedListNested(collection, parentId, params, collections = {}, children = []) {
+export function paginatedListNested(collection, parentId, params, collections = {}, children = []) {
     return paginateListedResource(`${collection.constructor.parentResource}/${parentId}/${collection.constructor.resource}/`, collection, params, collections, children)
 }
 
