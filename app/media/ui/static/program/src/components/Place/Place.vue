@@ -15,8 +15,7 @@
             <place-list :items="objects" />
         </template>
         <template v-if="actions.list && !loading && !isActiveUserConnected">
-            <div class="alert info">
-                This feature requires you to <b>Connect your location</b>
+            <div :class="info" v-html="infoBox.message">
             </div>
 
             <form class="connect-location-form" @submit.prevent="connect">
@@ -62,12 +61,27 @@ export default {
     computed: {
         isActiveUserConnected() {
             return this.instance.id || this.objects.length !== 0
+        },
+        info() {
+            //return Your account was logged in successfully
+            //return error, info
+            return {
+                alert: true,
+                hidden: (this.infoBox.message.length < 1),
+                error: (this.infoBox.status === "error"),
+                info: (this.infoBox.status === "info"),
+                success: (this.infoBox.status === "success")
+            }
         }
     },
     data() {
         return {
             objectName: 'place',
             instance: { id: null },
+            infoBox: {
+                status: "info",
+                message: "This feature requires you to <b>Connect your location</b>"
+            },
             loading: true
         }
     },
@@ -101,11 +115,18 @@ export default {
             const placeCollection = await places()
             const deps = await placeDeps()
 
-            navigator.geolocation.getCurrentPosition((position) => {
+            navigator.geolocation.getCurrentPosition(async(position) => {
                 console.log('Location: ', position)
-                placeCollection.connect({ position: geojsonify(position).geometry }, deps).then((instance) => {
-                    this.instance = instance
+
+                const instance = await placeCollection.connect({ position: geojsonify(position).geometry }, deps).catch(async(error) => {
+                    const message = await error.data
+                    this.infoBox.status = "error"
+                    this.infoBox.message = message.error
                 })
+
+                this.objects = [instance]
+                this.infoBox.status = "success"
+                this.infoBox.message = "Your location has been connected"
             }, () => {
                 console.log('Location retrieval failure')
             }, this.positionOptions)

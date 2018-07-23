@@ -139,9 +139,15 @@ class PlaceViewSet(ListModelMixin,
 
         coords = position['coordinates']
 
-        # Add position to geolocation microservice
-        geo_request = requests.put('{}/location/'.format(settings.GEOLOCATION_API), json={ 'latitude': coords[1], 'longitude': coords[0], 'place_id': home.id })
-        if geo_request.status_code != 201:
+        try:
+            # Add position to geolocation microservice
+            geo_request = requests.put('{}/location/'.format(settings.GEOLOCATION_API), json={ 'latitude': coords[1], 'longitude': coords[0], 'place_id': home.id })
+            if geo_request.status_code != 201:
+                home.delete()
+                return Response({
+                    'error': 'Something went wrong, please try again later'
+                }, status=500)
+        except requests.exceptions.ConnectionError as e:
             home.delete()
             return Response({
                 'error': 'Something went wrong, please try again later'

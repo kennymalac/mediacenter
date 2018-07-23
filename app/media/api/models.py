@@ -165,10 +165,13 @@ class Place(models.Model):
 @receiver(post_delete, sender=Place)
 def post_delete_place(sender, **kwargs):
     instance = kwargs.get('instance')
-    geo_request = requests.delete('{}/location/'.format(settings.GEOLOCATION_API), json={ 'place_id': instance.id })
-    if geo_request.status_code != 200:
-        print(geo_request.status_code)
-
+    try:
+        geo_request = requests.delete('{}/location/'.format(settings.GEOLOCATION_API), json={ 'place_id': instance.id })
+        if geo_request.status_code != 200:
+            print(geo_request.status_code)
+    except requests.exceptions.ConnectionError as e:
+        # TODO admin email
+        pass
 
 class PlaceRestriction(models.Model):
     place = models.ForeignKey(Place, blank=True)

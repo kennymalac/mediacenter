@@ -44,6 +44,7 @@ export function jsonResponse(response) {
     } else {
         var error = new Error(response.statusText)
         error.response = response
+        error.data = response.json()
         console.log(error)
         throw error
     }
