@@ -9,6 +9,7 @@ export default async function dependencies(stashId) {
 
     return {
         ...otherDeps,
+        stashes: stashCollection,
         content_item: stash.collections.content.collections.item
     }
 }

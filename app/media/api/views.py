@@ -332,10 +332,6 @@ class FeedContentStashViewSet(NestedViewSetMixin,
 
         content_pks = request.data.get('content', [])
         content = FeedContentItem.objects.filter(pk__in=content_pks)
-
-        for item in content:
-            FeedContentStashItem.objects.create(item=item, stash=instance)
-
         # All content without an origin stash now default to being shown in this stash
         new_content = content.filter(origin_stash__isnull=True)
 
@@ -357,7 +353,11 @@ class FeedContentStashViewSet(NestedViewSetMixin,
                 log = ActivityLog.objects.create(action='Link00', author=item.owner, context={'instance': get_content_id(item), 'feed': get_feed_id(item), 'stash': item.origin_stash.id}, message="Created post")
                 log.subscribed=[]
 
-        data_content = FeedContentItemSerializer(new_content, many=True)
+        stashed_content = FeedContentStashItem.objects.bulk_create([
+            FeedContentStashItem(item=item, stash=instance) for item in content
+        ])
+
+        data_content = FeedContentStashItemSerializer(stashed_content, many=True)
         return Response({ 'content': data_content.data })
 
 

@@ -59,7 +59,7 @@ class LinkCollection extends Collection {
         })
               .then(jsonResponse)
 
-        await FeedContentStashModel.addContent(stash, feed, [created.content_item])
+        await FeedContentStashModel.addContent(stash, feed, [created.content_item], collections)
 
         const instance = this.addInstance(created, collections)
         this.sync(instance, created, collections)

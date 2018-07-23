@@ -179,13 +179,13 @@ export default {
             if (this.params.stashId) {
                 // TODO replies can be stored on specific stashes
                 // via pubsub
-                this.instanceForm.stash = await stashCollection.getInstance(this.params.stashId)
+                this.instanceForm.stash = await stashCollection.getInstance(parseInt(this.params.stashId))
             }
             this.instanceForm.feed = this.feedId || this.params.feedId
 
             try {
                 const discussionCollection = await discussions()
-                const instance = await discussionCollection.create(this.instanceForm, await this.dependencies())
+                const instance = await discussionCollection.create(this.instanceForm, {...await this.dependencies(), stashes: stashCollection})
                 return instance
             }
             catch (error) {

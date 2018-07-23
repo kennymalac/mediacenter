@@ -80,8 +80,8 @@ class FeedContentStashModel extends Model {
 
             .then((data) => {
                 // Append content ids that were added to the stash's instance list
-                instance.collections.content.sync(instance, {
-                    content: [].concat.apply(serializeIds(instance.content), data.content)
+                collections.stashes.sync(instance, {
+                    content: [].concat.apply(instance.content, data.content)
                 }, collections)
             })
     }
