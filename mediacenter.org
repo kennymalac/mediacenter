@@ -158,7 +158,8 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 ***** TODO Delete
 
 *** User Profiles
-**** TODO group tags are broken
+**** DONE group tags are broken
+     CLOSED: [2018-07-23 Mon 13:48]
 **** DONE basic UI
      CLOSED: [2018-05-08 Tue 16:56]
 **** DONE user profile comments
@@ -256,7 +257,8 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 ***** TODO Delete
 
 *** Groups
-**** TODO FeedContentStashItems comment button is broken
+**** DONE FeedContentStashItems comment button is broken
+     CLOSED: [2018-07-23 Mon 13:49]
 **** TODO hide local Groups from Feeds
 **** TODO tagged content within groups
 **** TODO only members can create new Posts, comment in Group Topic
@@ -376,7 +378,8 @@ checkbox to show on all pages y/n?
 *** FeedContentStash
 **** DONE model, serializer, viewset
      CLOSED: [2018-05-23 Wed 17:29]
-**** TODO sticky/pinned feedcontentitems
+**** DONE sticky/pinned feedcontentitems
+     CLOSED: [2018-07-23 Mon 13:49]
 **** TODO stash privacy
 **** TODO CRUD
 ***** TODO Create

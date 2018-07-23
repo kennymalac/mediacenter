@@ -2,7 +2,7 @@ import {accounts, interests, places, feedContentTypes, comments} from '../store.
 
 export default async function dependencies() {
     const [contentTypeCollection, owner, interestCollection, placeCollection, commentCollection] = await Promise.all(
-        [feedContentTypes(), accounts(), places(), interests(), comments()]
+        [feedContentTypes(), accounts(), interests(), places(), comments()]
     )
 
     return {

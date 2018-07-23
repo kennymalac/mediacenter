@@ -16,14 +16,14 @@ export default async function dependencies(action, stashId) {
     case 'update_topic':
     case 'save_topic':
     case 'delete_topic':
-        return { ...gdeps, groups: await groups(), discussions: await discussions(), content_item: stash.collections.content, content_type: gdeps.content_types }
+        return { ...gdeps, groups: await groups(), discussions: await discussions(), content_item: stash.collections.content.collections.item, content_type: gdeps.content_types }
 
     case 'create_link':
     case 'read_link':
     case 'update_link':
     case 'delete_link':
     case 'save_link':
-        return { ...gdeps, links: await links(), content_item: stash.collections.content, content_type: gdeps.content_types }
+        return { ...gdeps, links: await links(), content_item: stash.collections.content.collections.item, content_type: gdeps.content_types }
 
     default:
         return {}

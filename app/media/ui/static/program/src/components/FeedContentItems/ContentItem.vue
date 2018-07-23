@@ -10,7 +10,7 @@
                 </slot>
 
                 <context-menu v-if="showMenu" :menuItems="menuItems" />
-                <context-menu v-if="!showMenu" :menuItems="[]" />
+                <context-menu v-if="!showMenu" class="hidden" :menuItems="[]" />
             </div>
         </slot>
         <span v-if="isPinned" class="pinned">Pinned</span>
@@ -176,7 +176,10 @@ $title-height: 56px;
         font-weight: lighter;
         width: 100%;
         .header { margin-left: auto; }
-        .context-menu {  margin-left: auto; }
+        .context-menu {
+            &.hidden { visibility: hidden; }
+            margin-left: auto;
+        }
         .content-type {
             display: inline-flex;
             border-radius: 6px;

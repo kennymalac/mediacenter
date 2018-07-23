@@ -89,6 +89,7 @@ export default {
         initialState() {
             this.instance = { id: null }
         },
+
         async list() {
             const placeCollection = await places()
             const owner = await activeUser()

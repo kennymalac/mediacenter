@@ -39,7 +39,7 @@ export default {
                 return
             }
             const interestCollection = await this.collection()
-            interestCollection.list({ search: queryParams })
+            await interestCollection.list({ search: queryParams })
         }, 200)
     }
 }

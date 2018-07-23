@@ -41,7 +41,7 @@ export default {
             return `${this.detailsUrl}`
         },
         detailsUrl() {
-            if (this.item.group_id !== 0) {
+            if (this.item.group_id !== 0 && this.item.group_id !== null) {
                 return `/group/${this.item.group_id}/details/stash/${this.item.origin_stash_id}/details/discussion/${this.item.object_id}/details`
             }
             return `/feed/${this.item.feed_id}/details/stash/${this.item.origin_stash_id}/details/discussion/${this.item.object_id}/details`
