@@ -237,6 +237,10 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 ****** TODO save_interest
 **** TODO
 
+*** FeedContentStashItems
+**** TODO Show action list only for owner of Stash
+**** TODO reordering pinned items
+
 *** FeedContentItems
 **** TODO unlisted feedcontentitems
 **** TODO private feedcontentitems
