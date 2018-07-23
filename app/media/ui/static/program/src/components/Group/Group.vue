@@ -274,8 +274,8 @@ export default {
 
             this.instance = await this.showInstance(params.id, '/group/list', groups, deps)
 
-            let stashId = this.params.stashId
-            if (stashId === undefined) {
+            let stashId = this.params ? this.params.stashId : params.stashId
+            if (stashId === undefined || !this.instance.feed.stashes) {
                 if (this.instance.feed.id === 0) {
                     const groupCollection = await groups()
                     this.instance = await groupCollection.get(this.instance.id, deps, this.instance)
