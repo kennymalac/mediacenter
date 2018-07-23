@@ -244,12 +244,20 @@ class Comment(models.Model):
     text = models.TextField(blank=True)
 
 
+class FeedContentStashItem(TaggedItem):
+    order = models.IntegerField(default=0)
+    is_pinned = models.BooleanField(default=False)
+    item = models.ForeignKey(FeedContentItem, on_delete=models.CASCADE)
+    stash = models.ForeignKey('api.FeedContentStash', on_delete=models.CASCADE)
+
+
 class FeedContentStash(models.Model):
     # TODO "sticky" content - maybe add order?
     name = models.CharField(max_length=140, blank=True)
     description = models.TextField(blank=True)
     max_content = models.IntegerField(default=1000)
-    content = models.ManyToManyField(FeedContentItem, related_name="+")
+    content = models.ManyToManyField(FeedContentItem, through="FeedContentStashItem", related_name="+")
+    # content = models.ManyToManyField(FeedContentItem, through="FeedContentStashItem", related_name="+")
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
