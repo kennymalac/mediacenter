@@ -118,7 +118,7 @@ export default {
 
             return {
                 owner,
-                content_item: stash.collections.content,
+                content_item: stash.collections.content.collections.item,
                 content_type: contentTypeCollection,
                 content_types: contentTypeCollection,
                 profile: profileCollection,

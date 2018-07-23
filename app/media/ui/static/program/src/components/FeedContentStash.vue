@@ -3,7 +3,7 @@
         <template v-if="actions.details && instance.id">
             <router-view :key="$route.name" :feedId="feedId" :stashId="instance.id"></router-view>
             <section class="feed" v-if="!params.discussionAction && !params.linkAction">
-                <feed-content-item-list :stashId="instance.id" :showGroupTag="showGroupTag" :items="content" :enabledContentTypes="enabledContentTypes" />
+                <feed-content-item-list :showMenu="showMenu" @togglePin="togglePin" :stashId="instance.id" :showGroupTag="showGroupTag" :items="content" :enabledContentTypes="enabledContentTypes" />
             </section>
         </template>
         <template v-if="actions.create || actions.manage">
@@ -31,7 +31,8 @@ export default {
     data() {
         return {
             objectName: 'stash',
-            instanceForm: { }
+            instanceForm: { },
+            showMenu: false
         }
     },
     computed: {
@@ -39,7 +40,26 @@ export default {
             return ["Topic", "Link"]
         },
         content() {
-            return this.instance.content
+            const pinned = this.instance.content.filter((instance) => {
+                return instance.is_pinned
+            })
+            const regular = this.instance.content.filter((instance) => {
+                return !instance.is_pinned
+            })
+
+            return pinned.concat(regular).map((instance) => {
+                // TODO refactor
+                return {
+                    is_pinned: instance.is_pinned,
+                    order: instance.order,
+                    ...instance.item.instance,
+                    instance: {
+                        is_pinned: instance.is_pinned,
+                        order: instance.order,
+                        ...instance.item.instance
+                    }
+                }
+            })
         }
     },
     methods: {
@@ -48,8 +68,15 @@ export default {
             this.instanceForm = { }
         },
 
+        async togglePin(item) {
+            this.instance.collections.content.togglePin(
+                this.instance.content.find((instance) => { return instance.item.id === item.id }), this.instance.id, await stashDeps())
+        },
+
         async details(params) {
             this.instance = await this.showInstance(params.id, '/feed/list', stashes, await stashDeps(), this.feedId)
+            // const user = await activeUser()
+            this.showMenu = true
         },
 
         async list(params) {

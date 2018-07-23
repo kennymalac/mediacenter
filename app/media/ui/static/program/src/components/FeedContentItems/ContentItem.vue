@@ -2,10 +2,30 @@
     <div class="content-item">
         <slot name="title">
             <div class="content-title">
-                {{ title }} <a href="#" @click.native="userProfile" class="author">@datboi</a>
+                <slot name="content-type">
+                </slot>
+
+                <slot name="content-link">
+                    <router-link class="header" :to="detailsUrl"> {{ title }}</router-link>
+                </slot>
+
+                <context-menu v-if="showMenu" :menuItems="menuItems" />
+                <context-menu v-if="!showMenu" :menuItems="[]" />
             </div>
-            <span class="date">{{ created.fromNow() }}</span>
         </slot>
+        <span v-if="isPinned" class="pinned">Pinned</span>
+
+        <router-link href="#" :to="userProfile" class="author">{{ owner.profile.display_name }}</router-link>
+
+        <span class="date">
+            {{ created.fromNow() }}
+            <span class="local-tag" v-if="isLocal"><i class="ion-ios-pin"></i> Local</span>
+            <span v-if="groupId && showGroupTag">
+                <span v-html="'&nbsp;in'"></span>
+                <tag-list className="tag-box" :tags="[{name: groupName, id: groupId}]" tagType="group" />
+            </span>
+        </span>
+
         <slot name="embed" :slotProps="embedProps">
         </slot>
         <div class="actions">
@@ -13,22 +33,45 @@
                 <i class="icon ion-md-chatbubbles"></i>
                 <span class="text">Comment</span>
             </router-link>
-            <div class="action">
-                <i class="icon ion-md-star"></i>
-                <span class="text">Save</span>
-            </div>
+            <context-menu style="height: 100%" placement="top" :menuItems="saveActionMenuItems" :button="saveButton" />
         </div>
     </div>
 </template>
 
 <script>
 import FeedContentItem from './mixins/FeedContentItem'
+import TagList from '../TagList'
+import ContextMenu from '../Gui/ContextMenu'
 
 export default {
     name: 'content-item',
+    components: {ContextMenu, TagList},
     mixins: [FeedContentItem],
     props: {
         title: {
+            type: String,
+            default: ""
+        },
+        owner: {
+            type: Object
+        },
+        isPinned: {
+            type: Boolean,
+            default: false
+        },
+        isLocal: {
+            type: Boolean,
+            default: false
+        },
+        groupName: {
+            type: String,
+            default: ""
+        },
+        groupId: {
+            type: Number,
+            default: 0
+        },
+        detailsUrl: {
             type: String,
             default: ""
         },
@@ -36,19 +79,60 @@ export default {
             type: String,
             default: ""
         },
+        showMenu: {
+            type: Boolean,
+            default: false
+        },
+        showGroupTag: {
+            type: Boolean,
+            default: true
+        },
         embedProps: [Object]
     },
+    computed: {
+        saveButton() {
+            return `
+                <div class="action">
+                <i class="icon ion-md-star"></i>
+                <span class="text">Save</span>
+                </div>`
+        },
+        menuItems() {
+            return [
+                {
+                    name: this.isPinned ? "Unpin" : "Pin",
+                    action: this.togglePin.bind(this)
+                },
+                {
+                    name: "Delete",
+                    action: () => {}
+                }
+            ]
+        },
+        saveActionMenuItems() {
+            return [
+                {
+                    name: "Stash 1",
+                    action: () => null
+                }
+            ]
+        },
+        userProfile() {
+            return { name: 'Profile', params: { profileId: this.owner.profile.id, profileAction: 'details' } }
+        }
+    },
     methods: {
-        userProfile(event) {
-            event.preventDefault()
+        togglePin() {
+            this.$emit('togglePin')
+            this.$forceUpdate()
         }
     }
 }
 </script>
 
 <style lang="scss">
-$actions-height: 54px;
-$title-height: 48px;
+$actions-height: 70px;
+$title-height: 56px;
 
 .content-item {
     margin: 10px;
@@ -73,7 +157,7 @@ $title-height: 48px;
     }
 
     .content-title {
-        justify-content: center;
+        justify-content: space-between;
         display: flex;
         flex-direction: row;
 
@@ -85,11 +169,14 @@ $title-height: 48px;
         background: linear-gradient(180deg, #001f3f, rgba(52, 73, 94,1.0));
 
         padding-top: 5px;
+        padding-bottom: 5px;
         height: $title-height;
         font-size: 1.5rem;
         line-height: 1.5rem;
         font-weight: lighter;
         width: 100%;
+        .header { margin-left: auto; }
+        .context-menu {  margin-left: auto; }
         .content-type {
             display: inline-flex;
             border-radius: 6px;
@@ -97,6 +184,7 @@ $title-height: 48px;
             color: white;
             font-weight: normal;
             padding: 4px;
+            margin-left: 8px;
             font-size: .8rem;
         }
         a {
@@ -107,10 +195,22 @@ $title-height: 48px;
             }
         }
     }
+
+    .pinned {
+        color: white;
+        background-color: orange;
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        padding: 4px;
+        font-size: .8rem;
+        display: flex;
+    }
+
     .date {
         display: inline-flex;
         position: relative;
-        padding-top: 1em;
+        padding-top: .25em;
         align-self: center;
         color: grey;
     }
@@ -125,6 +225,7 @@ $title-height: 48px;
             text-align: center;
             justify-content: center;
             display: flex;
+
             flex-direction: column;
             background-color: #1F8DD6;
             box-shadow: 0 0.3rem 0 #26619C;
@@ -136,6 +237,7 @@ $title-height: 48px;
             margin-right: 10px;
             padding: 2px 16px;
             height: 100%;
+            max-height: 48px;
             span.text {
                 font-size: .75rem;
                 line-height: 1rem;

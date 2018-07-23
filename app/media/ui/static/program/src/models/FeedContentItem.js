@@ -1,9 +1,13 @@
 import {Model, Collection} from './Model.js'
 import {AccountCollection} from './Account'
 import {FeedContentTypeCollection} from './FeedContentType.js'
+import {makeJsonRequest, jsonResponse} from '../httputil.js'
 import {momentDate, choice, visibilityChoices} from './converters.js'
 
 class FeedContentItemModel extends Model {
+
+    // NOTE: This can either be a FeedContentItem or FeedContentStashItem
+    // The two primary keys between the two are not interchangeable!
 
     static initialState = {
         id: 0,
@@ -40,9 +44,54 @@ class FeedContentItemModel extends Model {
     }
 }
 
+class FeedContentStashItemModel extends Model {
+    static initialState = {
+        id: 0,
+        order: 0,
+        is_pinned: false,
+        item: {}
+    }
+
+    static fields = {
+        item: Collection
+    }
+}
+
 class FeedContentItemCollection extends Collection {
 
     static Model = FeedContentItemModel
 }
 
-export {FeedContentItemModel, FeedContentItemCollection}
+class FeedContentStashItemCollection extends Collection {
+
+    static Model = FeedContentStashItemModel
+
+    constructor(instance, collections = {}) {
+        const _collections = {
+            item: new FeedContentItemCollection([])
+        }
+        super(instance, {
+            ...collections,
+            ..._collections
+        })
+
+        this.collections = _collections
+    }
+
+    togglePin(instance, stashId, collections = {}) {
+        // Only possible with stashed content
+        return makeJsonRequest(`stash/${stashId}/content/${instance.id}/`, {
+            method: "PATCH",
+            body: { is_pinned: !instance.is_pinned }
+        })
+            .then(jsonResponse)
+
+            .then((data) => {
+                return this.sync(instance, {
+                    ...data
+                }, collections)
+            })
+    }
+}
+
+export {FeedContentItemModel, FeedContentStashItemModel, FeedContentStashItemCollection, FeedContentItemCollection}

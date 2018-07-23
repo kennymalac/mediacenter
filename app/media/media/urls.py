@@ -43,6 +43,16 @@ router.register(
     parents_query_lookups=['content_item']
 )
 
+router.register(
+        r'stash',
+        FeedContentStashViewSet
+    )\
+    .register(
+        r'content',
+        FeedContentStashItemViewSet,
+        base_name='stash-content',
+        parents_query_lookups=['stash']
+    )
 
 router.register(r'feed', FeedViewSet, base_name='feed')\
     .register(

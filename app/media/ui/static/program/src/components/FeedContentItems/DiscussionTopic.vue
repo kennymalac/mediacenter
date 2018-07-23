@@ -1,18 +1,6 @@
 <template>
-    <content-item :embed="embedProps" v-bind="item.instance" :commentsUrl="commentsUrl">
-        <template slot="title" slot-scope="{ slotProps }">
-            <div class="content-title">
-                <span class="content-type">Topic</span>
-                <router-link :to="detailsUrl"> {{ item.title }}</router-link>
-            </div>
-            <span class="date">
-                {{ item.created.fromNow() }}
-                <span v-if="item.group_id && showGroupTag">
-                    <span v-html="'&nbsp;in'"></span>
-                    <tag-list className="tag-box" :tags="[{name: item.group_name, id: item.group_id}]" tagType="group" />
-                </span>
-            </span>
-        </template>
+    <content-item :embed="embedProps" v-bind="item.instance" @togglePin="$emit('togglePin')" :showMenu="showMenu" :showGroupTag="showGroupTag" :detailsUrl="detailsUrl" :commentsUrl="commentsUrl" :groupId="item.group_id" :groupName="item.group_name" :isPinned="item.is_pinned" :owner="item.owner.instance">
+        <span slot="content-type" class="content-type">Topic</span>
         <template slot="embed" slot-scope="{ slotProps }">
             <div class="default-preview topic">
                 <blockquote>
@@ -25,13 +13,18 @@
 
 <script>
 import ContentItem from './ContentItem'
-import TagList from '../TagList'
+
+import ContextMenu from '../Gui/ContextMenu'
 
 export default {
     name: 'feed-discussion-topic',
     props: {
         item: {
             type: Object
+        },
+        showMenu: {
+            type: Boolean,
+            default: false
         },
         showGroupTag: {
             type: Boolean,
@@ -40,7 +33,7 @@ export default {
     },
     components: {
         ContentItem,
-        TagList
+        ContextMenu
     },
     computed: {
         commentsUrl() {
@@ -72,9 +65,7 @@ export default {
         background-color: #1F8DD6;
         color: white;
         font-weight: normal;
-        padding: 4px;
         height: 2rem;
-        margin-right: 4px;
         // align-self: flex-start;
         font-size: .8rem;
     }
@@ -83,7 +74,7 @@ export default {
 .topic {
     blockquote {
         overflow: hidden;
-        max-height: 55%;
+        max-height: 75%;
     }
 }
 </style>

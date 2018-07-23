@@ -4,7 +4,7 @@ import {momentDate} from './converters.js'
 // import {AccountCollection} from './Account'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 import {getNested, manageNested, paginatedListNested} from './generics.js'
-import {FeedContentItemCollection} from './FeedContentItem'
+import {FeedContentStashItemCollection} from './FeedContentItem'
 
 export async function makeFeedContentStashCollection(deps) {
     return new FeedContentStashCollection([], deps)
@@ -27,7 +27,7 @@ class FeedContentStashModel extends Model {
     }
 
     static fields = {
-        content: [FeedContentItemCollection]
+        content: [Collection]
     }
 
     static fieldConverters = {
@@ -39,7 +39,7 @@ class FeedContentStashModel extends Model {
 
     constructor(instance, collections = {}) {
         const _collections = {
-            content: new FeedContentItemCollection([])
+            content: new FeedContentStashItemCollection([])
         }
         super(instance, {
             ...collections,
@@ -95,7 +95,7 @@ class FeedContentStashCollection extends Collection {
     static resource = 'stash'
 
     async get(feedId, id, collections, instance = null) {
-        return await getNested(this, id, feedId, instance, {...collections, ...this.collections})
+        return await getNested(this, id, feedId, instance, {...collections, ...collections})
     }
 
     async manage(instance, form, collections) {

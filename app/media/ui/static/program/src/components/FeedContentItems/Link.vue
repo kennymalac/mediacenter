@@ -1,18 +1,12 @@
 <template>
-    <content-item :embed="embedProps" v-bind="item.instance" :commentsUrl="commentsUrl">
-        <template slot="title" slot-scope="{ slotProps }">
-            <div class="content-title">
-                <i class="ion-ios-link"></i> <a class="external-link" :href="item.nested_object.link">{{ item.title }}</a>
-            </div>
-            <span class="date">
-                {{ item.created.fromNow() }}
-                <span class="local-tag" v-if="item.is_local"><i class="ion-ios-pin"></i> Local</span>
-                <span v-if="item.group_id && showGroupTag">
-                    <span v-html="'&nbsp;in'"></span>
-                    <tag-list className="tag-box" :tags="[{name: item.group_name, id: item.group_id}]" tagType="group" />
-                </span>
-            </span>
+    <content-item :embed="embedProps" v-bind="item.instance" @togglePin="$emit('togglePin')" :showMenu="showMenu" :showGroupTag="showGroupTag" :detailsUrl="detailsUrl" :commentsUrl="commentsUrl" :groupId="item.group_id" :groupName="item.group_name" :isPinned="item.is_pinned" :owner="item.owner.instance">
+        <span slot="content-type">
+            <i class="ion-ios-link"></i>
+        </span>
+        <template slot="content-link">
+            <a class="header external-link" :href="item.nested_object.link">{{ item.title }}</a>
         </template>
+
         <template slot="embed" slot-scope="{ slotProps }">
             <div class="default-preview">
                 <blockquote>
@@ -35,6 +29,10 @@ export default {
             type: Object
         },
         showGroupTag: {
+            type: Boolean,
+            default: true
+        },
+        showMenu: {
             type: Boolean,
             default: true
         }
@@ -66,7 +64,7 @@ export default {
 
 <style scoped lang="scss">
 .content-title {
-    .ion-ios-link { padding-right: 5px; }
+    .ion-ios-link { margin-left: 8px; }
     .content-type {
         display: inline-flex;
         border-radius: 6px;
@@ -81,7 +79,7 @@ export default {
 .topic {
     blockquote {
         overflow: hidden;
-        max-height: 55%;
+        max-height: 75%;
     }
 }
 </style>

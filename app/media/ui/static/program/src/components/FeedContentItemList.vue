@@ -1,8 +1,8 @@
 <template>
     <div class="feed-list">
     <template v-for="item in contentItems">
-        <feed-link v-if="item.content_type.name == 'link'" :showGroupTag="showGroupTag" :item="item" />
-        <feed-discussion-topic v-if="item.content_type.name == 'topic'" :showGroupTag="showGroupTag" :item="item" />
+        <feed-link @togglePin="() => togglePin(item)" v-if="item.content_type.name == 'link'" :showGroupTag="showGroupTag" :showMenu="showMenu" :item="item" />
+        <feed-discussion-topic @togglePin="() => togglePin(item)" v-if="item.content_type.name == 'topic'" :showGroupTag="showGroupTag" :showMenu="showMenu" :item="item" />
         <feed-image v-if="item.content_type.name == 'img'" v-bind="item" />
     </template>
     </div>
@@ -22,6 +22,10 @@ export default {
         showGroupTag: {
             type: Boolean,
             default: true
+        },
+        showMenu: {
+            type: Boolean,
+            default: false
         }
     },
     components: {
@@ -35,6 +39,11 @@ export default {
                 console.log(item.content_type.title)
                 return this.enabledContentTypes.includes(item.content_type.title)
             })
+        }
+    },
+    methods: {
+        togglePin(item) {
+            this.$emit('togglePin', item)
         }
     }
 }

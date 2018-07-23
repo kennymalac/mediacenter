@@ -280,6 +280,19 @@ class FeedContentItemViewSet(ListModelMixin,
         return self.get_paginated_response(serializer.data)
 
 
+class FeedContentStashItemViewSet(NestedViewSetMixin,
+                                  MultipleSerializerMixin,
+                                  ModelViewSet):
+
+    queryset = FeedContentStashItem.objects.all()
+    serializer_classes = {
+        'default': FeedContentStashItemSerializer,
+        'partial_update': FeedContentItemCreateUpdateSerializer,
+        'update': FeedContentStashCreateUpdateSerializer,
+        # 'create': FeedContentStashCreateUpdateSerializer
+    }
+
+
 class FeedContentStashViewSet(NestedViewSetMixin,
                               MultipleSerializerMixin,
                               ModelViewSet):
@@ -314,7 +327,8 @@ class FeedContentStashViewSet(NestedViewSetMixin,
         content_pks = request.data.get('content', [])
         content = FeedContentItem.objects.filter(pk__in=content_pks)
 
-        instance.content.add(*list(content))
+        for item in content:
+            FeedContentStashItem.objects.create(item=item, stash=instance)
 
         # All content without an origin stash now default to being shown in this stash
         new_content = content.filter(origin_stash__isnull=True)
@@ -328,10 +342,10 @@ class FeedContentStashViewSet(NestedViewSetMixin,
 
             content_type = item.content_type.name
             if content_type == FeedContentItemType.TOPIC:
-                log = ActivityLog.objects.create(action='Topic00', author=item.owner, context={'instance': get_content_id(item), 'group': get_group_id(item), 'stash': item.origin_stash.id}, message="Created topic")
+                log = ActivityLog.objects.create(action='Topic00', author=item.owner, context={'instance': get_content_id(item), 'group': get_group_id_name(item)[0], 'stash': item.origin_stash.id}, message="Created topic")
                 log.subscribed=[]
             elif content_type == FeedContentItemType.POST:
-                log = ActivityLog.objects.create(action='Post00', author=item.owner, context={'instance': get_content_id(item), 'group': get_group_id(item), 'stash': item.origin_stash.id}, message="Created post")
+                log = ActivityLog.objects.create(action='Post00', author=item.owner, context={'instance': get_content_id(item), 'group': get_group_id_name(item)[0], 'stash': item.origin_stash.id}, message="Created post")
                 log.subscribed=[]
             elif content_type == FeedContentItemType.LINK:
                 log = ActivityLog.objects.create(action='Link00', author=item.owner, context={'instance': get_content_id(item), 'feed': get_feed_id(item), 'stash': item.origin_stash.id}, message="Created post")

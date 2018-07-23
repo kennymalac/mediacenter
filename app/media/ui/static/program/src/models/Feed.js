@@ -1,4 +1,4 @@
-import {modelInstance, momentDate, choice, visibilityChoices} from './converters.js'
+import {momentDate, choice, visibilityChoices} from './converters.js'
 import {Model, Collection} from './Model.js'
 import {serializeIds} from './serializers.js'
 import {get, manage, paginatedList, resolveInstances} from './generics.js'
@@ -7,7 +7,7 @@ import {FeedContentTypeCollection} from './FeedContentType'
 import {InterestCollection} from './Interest'
 import {FeedContentStashCollection} from './FeedContentStash'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
-import {FeedContentItemModel} from './FeedContentItem'
+import {FeedContentItemCollection} from './FeedContentItem'
 
 export async function makeFilteredFeedCollection(queryset, deps) {
     const {interests, places, comments, owner, stashes} = deps
@@ -75,13 +75,15 @@ class FeedModel extends Model {
             .then(jsonResponse)
 
             .then((data) => {
+                const collection = new FeedContentItemCollection([], collections)
                 let order = 0 + offset
                 // Returns a list of ContentItem model instances
                 return {
                     ...data,
                     results: data.results.map((input) => {
-                        const instance = modelInstance(FeedContentItemModel, input, collections)
+                        const instance = collection.addInstance(input)
                         instance.order = order++
+                        collection.sync(instance, input)
                         return instance
                     })
                 }

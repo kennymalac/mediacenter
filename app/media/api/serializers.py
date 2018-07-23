@@ -28,7 +28,26 @@ class GroupForumBasicSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image')
 
 
-class AccountSerializer(CountryFieldMixin, serializers.ModelSerializer):
+class AccountBasicSerializer(serializers.ModelSerializer):
+    profile = BasicProfileSerializer()
+
+    class Meta:
+        model = Account
+        fields = ('id', 'profile')
+
+    def to_representation(self, obj):
+        if self.context.get('is_anonymous', False):
+            return {
+                'id': -1,
+                'username': 'Anonymous',
+                'country': '',
+                'email': ''
+            }
+
+        return super(AccountBasicSerializer, self).to_representation(obj)
+
+
+class AccountSerializer(CountryFieldMixin, AccountBasicSerializer):
     profile = BasicProfileSerializer()
 
     member_groups = GroupForumBasicSerializer(
@@ -40,16 +59,6 @@ class AccountSerializer(CountryFieldMixin, serializers.ModelSerializer):
         model = Account
         fields = ('id', 'username', 'country', 'email', 'profile', 'friends', 'member_groups'
 )
-    def to_representation(self, obj):
-        if self.context.get('is_anonymous', False):
-            return {
-                'id': -1,
-                'username': 'Anonymous',
-                'country': '',
-                'email': ''
-            }
-
-        return super(AccountSerializer, self).to_representation(obj)
 
 
 class FullAccountSerializer(AccountSerializer):
@@ -476,8 +485,7 @@ def get_feed_id(instance):
 
 
 class FeedContentItemSerializer(FeedContentItemBasicSerializer):
-    owner = serializers.PrimaryKeyRelatedField(
-        queryset=Account.objects.all(),
+    owner = AccountBasicSerializer(
         required=False
     )
     object_id = serializers.SerializerMethodField('get_content_id')
@@ -532,12 +540,28 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
                 return BasicLinkSerializer(instance=Link.objects.get(id=self.get_content_id(instance))).data
 
 
-class FeedContentItemCreateUpdateSerializer(FeedContentItemSerializer):
-    comments = CommentSerializer(
-        many=True,
-        read_only=True,
-        required=False
-    )
+class FeedContentStashItemBasicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FeedContentStashItem
+        fields = ('id', 'is_pinned', 'order')
+
+
+class FeedContentItemCreateUpdateSerializer(FeedContentStashItemBasicSerializer):
+    def update(self, instance, validated_data):
+        if 'item' in validated_data:
+            for k,v in validated_data.pop('item').items():
+                setattr(instance.item, k, v)
+                instance.item.save()
+
+        return super(FeedContentItemCreateUpdateSerializer, self).update(instance, validated_data)
+
+
+class FeedContentStashItemSerializer(FeedContentStashItemBasicSerializer):
+    item = FeedContentItemSerializer()
+
+    class Meta:
+        model = FeedContentStashItem
+        fields = ('id', 'item', 'is_pinned', 'order')
 
 
 class FeedContentItemProfileSerializer(FeedContentItemBasicSerializer):
@@ -563,7 +587,7 @@ class FeedContentStashSerializer(serializers.ModelSerializer):
     def paginated_content(self, instance):
         request = self.context['request']
 
-        content_queryset = instance.content.all()
+        content_queryset = FeedContentStashItem.objects.filter(stash=instance)
         _content_types = request.data.get('content_types', None)
         if _content_types:
             content_queryset = content_queryset.filter(content_type__in=FeedContentType.objects.filter(id__in=_content_types))
@@ -574,7 +598,7 @@ class FeedContentStashSerializer(serializers.ModelSerializer):
 
         paginator = StandardResultsSetPagination()
         page = paginator.paginate_queryset(content_queryset, self.context['request'])
-        serializer = FeedContentItemSerializer(
+        serializer = FeedContentStashItemSerializer(
             page,
             many=True,
             context={'request': self.context['request']}

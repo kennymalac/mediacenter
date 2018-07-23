@@ -256,6 +256,8 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 ***** TODO Delete
 
 *** Groups
+**** TODO FeedContentStashItems comment button is broken
+**** TODO hide local Groups from Feeds
 **** TODO tagged content within groups
 **** TODO only members can create new Posts, comment in Group Topic
 **** DONE Group tags should link to group's stash
