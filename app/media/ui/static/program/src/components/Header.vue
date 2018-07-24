@@ -42,5 +42,4 @@ export default {
 </script>
 
 <style>
-.button.pseudo { height: 100%; }
 </style>
