@@ -1,5 +1,5 @@
 <template>
-    <div class="feed-container">
+    <div class="grid feed-container">
         <template v-if="actions.list">
             <section>
                 <action-list :actions="feedActions" />
@@ -258,14 +258,9 @@ export default {
 
 <style lang="scss">
 .feed-container {
-    display: flex;
-    flex-direction: row;
-    flex-flow: wrap;
-    justify-content: center;
-    // flex-basis: 3;
+    grid-template-columns: 1fr 3fr;
     section.feed .feed-list {
         margin: 10px;
-        flex: 2;
     }
 
     .main-form {

@@ -1,5 +1,5 @@
 <template>
-    <div class="group-container">
+    <div class="grid group-container">
         <template v-if="actions.list">
             <action-list :actions="groupActions" />
 
@@ -15,38 +15,7 @@
             </section>
         </template>
         <template v-if="actions.details && instance.id">
-            <section class="sidebar">
-                <div class="group-info">
-                    <div class="icon-container">
-                        <img height="100%" width="100%" :src="instance.image" />
-                    </div>
-                    <h2>{{ instance.name }}</h2>
-
-                    <div v-if="this.instance.members.length !== 1">{{ this.instance.members.length }} Members</div>
-                    <div v-if="this.instance.members.length === 1">{{ this.instance.members.length }} Member</div>
-
-                    <tag-list :tags="instance.feed.interests" tagType="interest" />
-
-                    <p class="description">{{ instance.description }}</p>
-                    <div class="rules" v-if="instance.rules.length > 0">
-                        <h3>Rules</h3>
-                        <ol>
-                            <li v-for="rule in instance.rules">{{ rule }}</li>
-                        </ol>
-                    </div>
-
-                    <button type="button" v-if="isActiveUserOwner" @click="editGroup">
-                        <i class="ion-md-create"></i> Edit
-                    </button>
-
-                    <button type="button" v-if="!isActiveUserMember && !instance.is_restricted" @click="joinGroup">Join group</button>
-                    <button type="button" v-if="isActiveUserMember" class="warning" @click="leaveGroup">Leave group</button>
-
-                    <!-- <div class="who-is-online"> -->
-                        <!--      <h3><div class="online-circle"></div> {{ onlineMembers.length }} User(s) online now</h3> -->
-                        <!-- </div> -->
-                </div>
-            </section>
+            <group-info-sidebar v-bind="{ isActiveUserMember, isActiveUserOwner, instance}" @editGroup="editGroup" @joinGroup="joinGroup" @leaveGroup="leaveGroup" />
             <div class="group-contents">
                 <div v-if="!params.discussionAction && !params.linkAction && isActiveUserMember">
                     <content-item-form :stash="resolvedStash" :groupId="instance.id" :feedId="instance.feed.id" :contentTypes="allowedContentTypes" @contentTypeSelected="contentTypeSelected" />
@@ -55,6 +24,7 @@
             </div>
         </template>
         <template v-if="actions.create || actions.manage">
+            <group-info-sidebar v-bind="{ isActiveUserMember, isActiveUserOwner, instance}" @editGroup="editGroup" @joinGroup="joinGroup" @leaveGroup="leaveGroup" />
             <form class="main-form" @submit.prevent="save">
                 <fieldset>
                     <legend class="stack">Details</legend>
@@ -123,6 +93,7 @@ import {GroupModel} from '../../models/Group.js'
 import {groups, accounts, profiles, interests, activeUser, filteredGroups} from '../../store.js'
 import groupDeps from '../../dependencies/Group.js'
 
+import GroupInfoSidebar from './GroupInfoSidebar'
 import ContentItemForm from '../ContentItemForm'
 import AccountSelect from '../AccountSelect'
 import InterestSelect from '../InterestSelect'
@@ -139,6 +110,7 @@ import router from "../../router/index.js"
 export default {
     mixins: [RestfulComponent],
     components: {
+        GroupInfoSidebar,
         ContentItemForm,
         AccountSelect,
         InterestSelect,
@@ -395,13 +367,13 @@ $dark-green: #2b9f67;
 $shadow-color: rgba(0, 0, 0, .2);
 
 .group-container {
-    display: flex;
-    flex-basis: 3;
     section.groups {
         margin: 10px;
         text-align: left;
-        flex: 2;
+        height: 100%;
+        overflow-y: scroll;
     }
+    grid-template-columns: 1fr 3fr;
 }
 
 .online-circle {

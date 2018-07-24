@@ -5,7 +5,7 @@
             <!-- <auth-menu></auth-menu> -->
         </header>
 
-        <div class="pure-g">
+        <div>
             <router-view></router-view>
         </div>
     </div>
@@ -50,5 +50,6 @@ $ionicons-font-path: "~ionicons/dist/fonts";
 @import "~ladda/css/ladda.scss";
 @import "classicTheme.scss";
 
+.grid { display: grid }
 </style>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

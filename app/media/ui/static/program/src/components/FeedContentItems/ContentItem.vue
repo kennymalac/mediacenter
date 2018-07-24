@@ -33,12 +33,12 @@
                 <i class="icon ion-md-chatbubbles"></i>
                 <span class="text">Comment</span>
             </router-link>
-            <context-menu style="height: 100%" placement="top" :menuItems="saveActionMenuItems">
-                <div slot="button" class="action">
-                    <i class="icon ion-md-star"></i>
-                    <span class="text">Save</span>
-                </div>
-             </context-menu>
+            <!-- <context-menu style="height: 100%" placement="top" :menuItems="saveActionMenuItems"> -->
+            <!--     <div slot="button" class="action"> -->
+            <!--         <i class="icon ion-md-star"></i> -->
+            <!--         <span class="text">Save</span> -->
+            <!--     </div> -->
+            <!--  </context-menu> -->
         </div>
     </div>
 </template>

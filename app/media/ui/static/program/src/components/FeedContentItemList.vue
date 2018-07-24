@@ -50,4 +50,8 @@ export default {
 </script>
 
 <style lang="scss">
+    .feed-list {
+height: calc(100vh - 220px);
+overflow: scroll;
+}
 </style>

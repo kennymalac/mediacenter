@@ -8,7 +8,7 @@
                 <post v-for="post in posts" v-bind="post.instance" :isActiveUser="activeUserId === post.content_item.owner.id" @editPost="editPost(post.id)" @userProfile="showUserProfile(post.instance.content_item.owner.profile.id)" />
 
                 <div class="reply">
-                    <button @click="quickReplyActive = true" v-if="!quickReplyActive">Quick Reply</button>
+                    <button @click="activateQuickReply" v-if="!quickReplyActive">Quick Reply</button>
                     <button @click="reply" v-if="!quickReplyActive">Reply</button>
                     <discussion @canceled="quickReplyActive = false" @replied="quickReplied" v-if="quickReplyActive" action="create" :quickReply="true" :params="quickReplyParams" />
                 </div>
@@ -72,9 +72,6 @@ export default {
             }
         }
     },
-    mounted() {
-        console.log('remounted')
-    },
     data() {
         return {
             objectName: 'discussion',
@@ -87,6 +84,14 @@ export default {
         initialState() {
             this.instance = { id: null, content_item: { feeds: [] } }
             this.instanceForm = { content_item: {}, text: "" }
+        },
+
+        activateQuickReply() {
+            this.quickReplyActive = true
+            this.$nextTick(() => {
+                const postsContainer = this.$el.querySelector("section.posts")
+                postsContainer.scrollTop = postsContainer.scrollHeight
+            })
         },
 
         quickReplied() {
@@ -238,6 +243,10 @@ export default {
 <style lang="scss">
 textarea {
     min-height: 200px;
+}
+section.posts {
+    height: calc(100vh - 220px);
+    overflow: scroll;
 }
 .reply {
     margin: 10px;
