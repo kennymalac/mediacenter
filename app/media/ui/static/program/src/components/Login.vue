@@ -91,14 +91,18 @@ export default {
                 that.infoBox.message = "Your account was logged in successfully"
                 this.$resetStore()
 
-                this.$store.loggedIn = true
+                setTimeout(() => {
+                    // TODO get Store observable changes working so we don't need to reload
+                    window.location.reload()
+                }, 200)
+
                 //that.$router.replace('/')
                 this.$forceUpdate()
             })
-            .catch((error) => {
-                that.infoBox.status = "error"
-                that.infoBox.message = 'The account could not be logged in for the following reason: ' + error
-            })
+                .catch((error) => {
+                    that.infoBox.status = "error"
+                    that.infoBox.message = 'The account could not be logged in for the following reason: ' + error
+                })
         },
         logout() {
             this.infoBox.status = "info"
@@ -106,6 +110,11 @@ export default {
             console.log('logout')
 
             auth.logout()
+            setTimeout(() => {
+                // TODO get Store observable changes working so we don't need to reload
+                window.location.reload()
+            }, 200)
+
             this.$resetStore()
             this.$forceUpdate()
         }

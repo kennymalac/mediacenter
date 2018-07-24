@@ -1,7 +1,7 @@
 <template>
     <div id="program">
         <header>
-            <header-menu :loggedIn="$store.activeUser.details && $store.activeUser.details.id !== 0" />
+            <header-menu :loggedIn="loggedIn" />
             <!-- <auth-menu></auth-menu> -->
         </header>
 
@@ -20,7 +20,22 @@ import {activeUser} from './store.js'
 export default {
     name: 'program',
     async mounted() {
-        await activeUser()
+        // this.$store.$observe('activeUser', (activeUser) => {
+        //     console.log('huzzah', activeUser)
+
+        // })
+        const user = await activeUser()
+        this.user = user
+    },
+    data() {
+        return {
+            user: {}
+        }
+    },
+    computed: {
+        loggedIn() {
+            return this.user.details && this.user.details.id !== 0
+        }
     },
     components: {
         'header-menu': Header

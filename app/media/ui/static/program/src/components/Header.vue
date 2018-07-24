@@ -8,7 +8,7 @@
         <label for="bmenub" class="burger pseudo button">menu</label>
         
         <div class="menu">
-            <router-link class="button pseudo" to="/login">Login</router-link>
+            <router-link v-if="!loggedIn" class="button pseudo" to="/login">Login</router-link>
             <router-link v-if="!loggedIn" class="button pseudo" to="/register">Register</router-link>
             <router-link class="button pseudo" to="/place/list"><i class="icon ion-ios-compass"></i> Places</router-link>
             <router-link class="button pseudo" to="/feed/list"><i class="ion-ios-list-box"></i> Feeds</router-link>
@@ -17,13 +17,17 @@
             <!-- <router-link class="button pseudo" to="/chat"><i class="ion-ios-chatbubbles"></i> Chat</router-link> -->
             <router-link class="button pseudo" to="/gallery"><i class="ion-ios-image"></i> Media Gallery</router-link>
             <router-link class="button pseudo" to="/album/list"><i class="ion-ios-albums"></i> Albums</router-link>
+            <active-user v-if="loggedIn" />
         </div>
     </nav>
 </template>
 
 <script>
+import ActiveUser from './ActiveUser'
+
 export default {
     name: 'header-menu',
+    components: {ActiveUser},
     props: {
         loggedIn: {
             type: Boolean,
@@ -36,3 +40,7 @@ export default {
     }
 }
 </script>
+
+<style>
+.button.pseudo { height: 100%; }
+</style>

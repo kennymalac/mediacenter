@@ -1,13 +1,19 @@
 <template>
     <div class="context-menu">
-        <popper trigger="click" :options="options">
+        <popper trigger="click" @show="$emit('toggle', true)" @hide="$emit('toggle', false)" :options="options">
             <div class="popper">
                 <div v-for="item in menuItems" @click="item.action" class="button pseudo popover-item">
+                    <div v-html="item.icon" class="icon"></div>
                     {{item.name}}
                 </div>
             </div>
-            <div style="height: 100%" v-html="button" slot="reference">
-            </div>
+            <template slot="reference">
+                <slot name="button">
+                    <button class="icon"><div style="height: 100%">
+                            <i class="ion ion-md-more" />
+                    </div></button>
+                </slot>
+            </template>
         </popper>
     </div>
 </template>
@@ -28,9 +34,7 @@ export default {
         },
         button: {
             type: String,
-            default: `<button class="icon"><div style="height: 100%">
-                    <i class="ion ion-md-more" />
-                </div></button>`
+            default: ``
         }
     },
     components: {
@@ -63,6 +67,7 @@ export default {
     .popper {
         border-radius: 6px 6px 4px 4px;
         background: white;
+        top: 10px;
         border: 1px solid rgba(20, 20, 20, 0.1);
         box-shadow: 0 2px 12px rgba(20, 20, 20, 0.15);
         -webkit-background-clip: padding-box;
@@ -73,7 +78,16 @@ export default {
             padding: 5px 20px;
         }
     }
-
+    .pseudo.popover-item {
+        display: flex;
+        padding-left: 10px;
+        align-items: center;
+        .icon {
+            padding-right: 10px;
+            font-size: 1rem;
+            display: inline-flex;
+        }
+    }
     button.icon {
         justify-content: center;
         padding: .4rem .8rem;

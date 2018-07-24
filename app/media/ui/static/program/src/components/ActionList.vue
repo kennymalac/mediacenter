@@ -52,5 +52,13 @@ $shadow-color: rgba(0, 0, 0, .2);
     transition: $picnic-transition;
 
     box-shadow: 0 3px 8px 0px $shadow-color;
+    &.icon-container-xs {
+        width: 32px;
+        border: 1px solid rgba(52, 73, 94,1.0);
+        height: 32px;
+        i {
+            font-size: 1.25rem
+        }
+    }
 }
 </style>

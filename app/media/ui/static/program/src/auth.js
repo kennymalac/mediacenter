@@ -28,7 +28,7 @@ export class Auth {
     }
 
     getActiveUser() {
-        return this.currentSession.user
+        return new Proxy(this.currentSession.user, {})
     }
 
     getActiveUserSessionToken() {

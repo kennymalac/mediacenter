@@ -16,6 +16,7 @@ import {AlbumCollection, makeFilteredAlbumCollection} from './models/Album.js'
 import {ActivityLogCollection, makeActivityLogCollection, filterActivityLogCollection} from './models/ActivityLog.js'
 
 export const initialState = {
+    loggedIn: false,
     activeUser: {},
     accounts: {},
     comments: {},
@@ -64,6 +65,11 @@ export const activeUser = store.singleton(
     'activeUser',
     value => value.details && typeof value.details.id === "number" && value.details.id !== 0,
     makeActiveUser
+)
+
+store.singleton(
+    'loggedIn',
+    value => value
 )
 
 export const accounts = store.deferredCollection(
@@ -284,6 +290,7 @@ export const filteredActivityLogs = activityLogCollection('filteredActivityLogs'
 export const storePlugin = {
     install(Vue) {
         Vue.prototype.$store = proxiedStore
+        Vue.prototype.$store.$observe = store.observe.bind(store)
         // for debugging
         window.store = store
         Vue.prototype.$resetStore = () => {
