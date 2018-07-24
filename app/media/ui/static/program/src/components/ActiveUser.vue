@@ -59,11 +59,11 @@ export default {
                         })
                     }
                 },
-                {
-                    icon: '<i class="ion ion-md-settings"></i>',
-                    name: 'Settings',
-                    action: () => {}
-                },
+                // {
+                //     icon: '<i class="ion ion-md-settings"></i>',
+                //     name: 'Settings',
+                //     action: () => {}
+                // },
                 {
                     icon: '<i class="ion ion-md-log-out"></i>',
                     name: 'Logout',
