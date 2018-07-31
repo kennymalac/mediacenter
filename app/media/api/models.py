@@ -243,6 +243,7 @@ class Feed(TaggedItem, BackgroundMixin):
     name = models.CharField(max_length=140, blank=True)
     description = models.TextField(blank=True)
     content_types = models.ManyToManyField(FeedContentItemType, related_name='+')
+    icon = models.CharField(max_length=25, blank=True)
     picture = models.URLField(blank=True)
 
     created = models.DateTimeField(auto_now_add=True)

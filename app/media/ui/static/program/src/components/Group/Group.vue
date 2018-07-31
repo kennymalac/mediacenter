@@ -29,13 +29,16 @@
             <group-info-sidebar v-bind="{ isActiveUserMember, isActiveUserOwner, instance}" @editGroup="editGroup" @joinGroup="joinGroup" @leaveGroup="leaveGroup" />
             <form class="main-form" @submit.prevent="save">
                 <fieldset>
+                    <legend class="stack">Appearance</legend>
+                    <label class="stack" for="image">Image</label>
+                    <input class="stack" name="image" v-model="instanceForm.image" type="text" />
+                </fieldset>
+                <fieldset>
                     <legend class="stack">Details</legend>
                     <label class="stack" for="name">Name</label>
                     <input class="stack" name="name" v-model="instanceForm.name" type="text" />
                     <label class="stack" for="description">Description</label>
                     <textarea class="stack" name="description" v-model="instanceForm.description" />
-                    <label class="stack" for="image">Image</label>
-                    <input class="stack" name="image" v-model="instanceForm.image" type="text" />
 
                     <label class="stack" for="members">Members</label>
                     <account-select v-model="instanceForm.members" />

@@ -34,7 +34,9 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
      CLOSED: [2018-07-31 Tue 08:43]
 **** TODO Group backgrounds
 **** TODO Feed backgrounds
-**** TODO feed icons
+**** DONE Feed icons/images
+     CLOSED: [2018-07-31 Tue 11:33]
+**** TODO improve zero states
 
 *** UI/UX fixes
 **** TODO some sort of grid system & layout

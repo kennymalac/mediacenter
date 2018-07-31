@@ -156,7 +156,7 @@ class PlaceViewSet(ListModelMixin,
         PlaceRestriction.objects.create(place=home, max_distance=Decimal("50"))
 
         # Setup a Feed with this Place as its filter
-        feed = Feed.objects.create(name="Home", owner=request.user, description="Content from your local area", visibility='9')
+        feed = Feed.objects.create(name="Home", icon="ion-ios-home", owner=request.user, description="Content from your local area", visibility='9')
         feed.places.add(home)
         home.default_feed = feed
         feed.save()
@@ -187,7 +187,7 @@ class FeedViewSet(NestedViewSetMixin,
     queryset = Feed.objects.filter(groupforum__isnull=True)
     serializer_classes = {
         'default': FeedSerializer,
-        'update': FeedCreateUpdateSerializer,
+        'updaet': FeedCreateUpdateSerializer,
         'partial_update': FeedCreateUpdateSerializer,
         'create': FeedCreateUpdateSerializer
     }

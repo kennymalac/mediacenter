@@ -61,6 +61,8 @@ class FeedModel extends Model {
         created: {},
         name: '',
         description: '',
+        picture: '',
+        icon: '',
         stashes: [],
         places: [],
         interests: [],

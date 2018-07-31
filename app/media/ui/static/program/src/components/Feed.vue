@@ -22,6 +22,12 @@
             <feed-info-sidebar :instance="instance" @editFeed="editFeed" :isActiveUserOwner="isActiveUserOwner" />
             <form class="main-form" @submit.prevent="save">
                 <fieldset>
+                    <legend class="stack">Appearance</legend>
+                    <background-select :colors.sync="colors" />
+                    <label class="stack" for="picture">Picture (URL)</label>
+                    <input class="stack" name="picture" v-model="instanceForm.picture" type="text" />
+                </fieldset>
+                <fieldset>
                     <legend class="stack">Details</legend>
                     <label class="stack" for="name">Name</label>
                     <input class="stack" name="name" v-model="instanceForm.name" type="text" />
@@ -31,8 +37,6 @@
                     <feed-content-type-select v-model="instanceForm.content_types" />
                     <label class="stack" for="interests">Interests</label>
                     <interest-select v-model="instanceForm.interests" />
-
-                    <background-select :colors.sync="colors" />
 
                     <!-- <label class="stack" for="">Tags</label> -->
                     <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->

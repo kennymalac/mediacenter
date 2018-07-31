@@ -58,6 +58,12 @@
             <div class="profile-container">
                 <form class="main-form" @submit.prevent="save">
                     <fieldset>
+                        <legend class="stack">Appearance</legend>
+                        <background-select :colors.sync="colors" />
+                        <label class="stack" for="picture">Profile picture (URL)</label>
+                        <input class="stack" name="picture" v-model="instanceForm.picture" type="text" />
+                    </fieldset>
+                    <fieldset>
                         <legend class="stack">Details</legend>
                         <label class="stack" for="name">Display name</label>
                         <input class="stack" name="name" v-model="instanceForm.display_name" type="text" />
@@ -65,9 +71,6 @@
                         <input class="stack" name="title" v-model="instanceForm.title" type="text" />
                         <label class="stack" for="description">Description</label>
                         <textarea class="stack" name="description" v-model="instanceForm.description" />
-                        <label class="stack" for="picture">Profile picture</label>
-                        <input class="stack" name="picture" v-model="instanceForm.picture" type="text" />
-                        <background-select :colors.sync="colors" />
                         <!-- <label class="stack" for="rules">Rules</label>
                              TODO rules -->
                         <label class="stack" for="interests">Interests</label>

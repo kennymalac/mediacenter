@@ -17,13 +17,17 @@
             </div>
 
             <form class="connect-location-form" @submit.prevent="connect">
-                <i class="icon location-icon ion-ios-compass-outline"></i>
-                <h1>Find your people.</h1>
-                <fieldset>
-                    <!-- <label class="stack" for="">Tags</label> -->
-                    <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->
-                    <input class="stack" type="submit" value="Connect" />
-                </fieldset>
+                <div class="connect-icon">
+                    <i class="icon location-icon ion-ios-compass-outline"></i>
+                </div>
+                <div class="connect-info">
+                    <h1>Find your people.</h1>
+                    <fieldset>
+                        <!-- <label class="stack" for="">Tags</label> -->
+                        <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->
+                        <input class="stack" type="submit" value="Connect" />
+                    </fieldset>
+                </div>
             </form>
         </template>
     </div>
@@ -163,10 +167,21 @@ export default {
 }
 
 .connect-location-form {
-    i.location-icon {
-        font-size: 8rem;
-        display: inline-block;
-        height: 10px;
+    display: flex;
+    flex-direction: column;
+
+    .connect-icon {
+        i.location-icon {
+            font-size: 8rem;
+            display: inline-block;
+            height: 10px;
+        }
+    }
+    input[type=submit] {
+        width: 200px;
+        margin: auto;
+        border-color: #5126ff !important;
+        background: linear-gradient(#666bff 2%, #5126ff 90%, #001f3f);
     }
 }
 </style>
