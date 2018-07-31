@@ -191,7 +191,35 @@ class TaggedItem(models.Model):
         abstract = True
 
 
-class Profile(TaggedItem):
+class BackgroundMixin(models.Model):
+    BACKGROUND_CHOICES = (
+        ("REPEAT", "repeat"),
+        # The background image is repeated both vertically and horizontally.  The last image will be clipped if it does not fit. This is default
+        ("REPEATX", "repeat-x"),
+        # The background image is repeated only horizontally
+        ("REPEATY", "repeat-y"),
+        # The background image is repeated only vertically
+        ("NOREPEAT", "no-repeat"),
+        # The background-image is not repeated. The image will only be shown once
+        ("SPACE", "space"),
+        # The background-image is repeated as much as possible without clipping. The first and last images are pinned to either side of the element, and whitespace is distributed evenly between the images
+        ("ROUND", "round")
+        # The background-image is repeated and squished or stretched to fill the space (no gaps)
+    )
+    background_image = models.URLField(blank=True)
+    # ex: f9f9f9 (hex)
+    background_color = models.CharField(max_length=6, blank=True)
+    background_repeat = models.CharField(
+        choices=BACKGROUND_CHOICES,
+        max_length=6,
+        blank=True
+    )
+
+    class Meta:
+        abstract = True
+
+
+class Profile(TaggedItem, BackgroundMixin):
     display_name = models.CharField(max_length=60, blank=True)
     title = models.CharField(max_length=140, default="Welcome to my profile!")
     description = models.TextField(blank=True)
@@ -208,7 +236,7 @@ VISIBILITY = (
     ('9', 'Private')
 )
 
-class Feed(TaggedItem):
+class Feed(TaggedItem, BackgroundMixin):
     owner = models.ForeignKey(Account, null=True)
     name = models.CharField(max_length=140, blank=True)
     description = models.TextField(blank=True)

@@ -325,13 +325,13 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'display_name', 'account', 'picture', 'title', 'description', 'interests')
+        fields = ('id', 'display_name', 'account', 'picture', 'title', 'description', 'interests', 'background_image', 'background_color', 'background_repeat')
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ('id', 'display_name', 'account', 'picture', 'title', 'description', 'interests')
+        fields = ('id', 'display_name', 'account', 'picture', 'title', 'description', 'interests', 'background_image', 'background_color', 'background_repeat')
 
 
 class FeedCreateUpdateSerializer(serializers.ModelSerializer):

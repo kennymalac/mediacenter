@@ -72,6 +72,7 @@ export default {
 
 <style lang="scss">
 .nested-comments {
+    background-color: white;
     border-left: 1px solid grey;
 
     .comment {
@@ -93,7 +94,12 @@ export default {
         transform: translateY(-30px);
     }
 }
+div.comments {
+    background-color: white;
+    padding: 10px;
+}
 .comment {
+    padding: 5px;
     width: 450px;
     font-size: 1rem;
     text-align: left;

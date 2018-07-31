@@ -1,7 +1,7 @@
 <template>
-    <div class="grid profiles-container">
+    <div :style="profileStyle" :class="profileClass">
         <template v-if="actions.list">
-                <div></div>
+            <div></div>
             <div class="profile-container">
                 <h1>User list</h1>
                 <profile-list :items="objects" />
@@ -36,14 +36,25 @@
                         <tag-list :tags="instance.account.member_groups" tagType="group" />
                     </div>
                 </section>
-                <div>
-                    <h2>Comments</h2>
-                    <router-view :profileId="instance.id" />
-                </div>
+                <h2>Comments</h2>
+                <router-view :profileId="instance.id" />
             </div>
         </template>
 
         <template v-if="actions.manage && instance.id">
+            <section class="sidebar">
+                <div class="group-info">
+                    <div class="icon-container">
+                        <img v-if="instance.picture" :src="instance.picture" />
+                        <i v-if="!instance.picture" class="ion-md-person"></i>
+                    </div>
+                    <h2>{{ instance.display_name }}</h2>
+
+                    <button type="button" v-if="isActiveUser" @click="editProfile">
+                        <i class="ion-md-create"></i> Edit
+                    </button>
+                </div>
+            </section>
             <div class="profile-container">
                 <form class="main-form" @submit.prevent="save">
                     <fieldset>
@@ -56,6 +67,7 @@
                         <textarea class="stack" name="description" v-model="instanceForm.description" />
                         <label class="stack" for="picture">Profile picture</label>
                         <input class="stack" name="picture" v-model="instanceForm.picture" type="text" />
+                        <color-select :colors.sync="colors" />
                         <!-- <label class="stack" for="rules">Rules</label>
                              TODO rules -->
                         <label class="stack" for="interests">Interests</label>
@@ -75,13 +87,14 @@
 import RestfulComponent from "../RestfulComponent"
 import ProfileList from './ProfileList'
 import InterestSelect from '../InterestSelect'
+import ColorSelect from '../Gui/ColorSelect'
 import TagList from '../TagList'
 
 // import {ProfileModel} from '../../models/Profile.js'
 import profileDeps from '../../dependencies/Profile.js'
 import {profiles, activeUser} from '../../store.js'
 
-// import {AccountCollection} from '../models/Account.js'
+// import {AccountColelction} from '../models/Account.js'
 // import {auth} from "../../auth.js"
 import router from "../../router/index.js"
 
@@ -91,7 +104,8 @@ export default {
     components: {
         ProfileList,
         InterestSelect,
-        TagList
+        TagList,
+        ColorSelect
     },
     data() {
         return {
@@ -101,10 +115,22 @@ export default {
             instance: {
                 interests: []
             },
+            colors: { hex: "" },
             isActiveUser: false
         }
     },
     computed: {
+        profileStyle() {
+            return {
+                "background-color": this.colors.hex
+            }
+        },
+        profileClass() {
+            return {
+                grid: true,
+                "profiles-container": true
+            }
+        },
         groups() {
             if (this.instance.id) {
                 //
@@ -134,7 +160,9 @@ export default {
             this.isActiveUser = false
             const deps = await profileDeps()
             this.instance = await this.showInstance(params.id, '/profile/list', profiles, deps)
-
+            if (this.instance.background_color) {
+                this.colors.hex = `#${this.instance.background_color}`
+            }
             // check if certain profile information is missing
             if (!this.instance.title) {
                 const profilesCollection = await profiles()
@@ -160,6 +188,8 @@ export default {
         async manageProfile() {
             try {
                 const profilesCollection = await profiles()
+                this.instanceForm.background_color = this.colors.hex.slice(1)
+                console.log(this.instanceForm)
                 return await profilesCollection.manage(this.instance, this.instanceForm, await profileDeps())
             }
             catch (error) {
@@ -210,6 +240,11 @@ $dark-green: #2b9f67;
     border: 1px solid black;
     padding: 20px;
     text-align: left;
+}
+
+section.comments {
+    margin: auto;
+    width: 75%;
 }
 
 .category {

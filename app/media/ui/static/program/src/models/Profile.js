@@ -5,9 +5,12 @@ import {InterestCollection} from './Interest.js'
 import {AccountCollection} from './Account.js'
 import {fetchAPI, jsonResponse} from '../httputil.js'
 
+import BackgroundMixin from './BackgroundMixin.js'
+
 class ProfileModel extends Model {
 
     static initialState = {
+        ...BackgroundMixin,
         id: 0,
         display_name: "",
         title: "",
