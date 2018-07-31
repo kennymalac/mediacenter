@@ -67,7 +67,7 @@
                         <textarea class="stack" name="description" v-model="instanceForm.description" />
                         <label class="stack" for="picture">Profile picture</label>
                         <input class="stack" name="picture" v-model="instanceForm.picture" type="text" />
-                        <color-select :colors.sync="colors" />
+                        <background-select :colors.sync="colors" />
                         <!-- <label class="stack" for="rules">Rules</label>
                              TODO rules -->
                         <label class="stack" for="interests">Interests</label>
@@ -87,7 +87,7 @@
 import RestfulComponent from "../RestfulComponent"
 import ProfileList from './ProfileList'
 import InterestSelect from '../InterestSelect'
-import ColorSelect from '../Gui/ColorSelect'
+import BackgroundSelect from '../Gui/BackgroundSelect'
 import TagList from '../TagList'
 
 // import {ProfileModel} from '../../models/Profile.js'
@@ -105,7 +105,7 @@ export default {
         ProfileList,
         InterestSelect,
         TagList,
-        ColorSelect
+        BackgroundSelect
     },
     data() {
         return {
@@ -121,7 +121,10 @@ export default {
     },
     computed: {
         profileStyle() {
-            if (!this.params || (this.params && !(["details", "manage"].includes(this.params.profileAction)))) {
+            if (!this.params ||
+                (this.params &&
+                 (!(["details", "manage"].includes(this.params.profileAction)) &&
+                  !(["details", "manage"].includes(this.params.action))))) {
                 return {}
             }
             return {

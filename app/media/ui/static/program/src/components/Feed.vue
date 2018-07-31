@@ -1,5 +1,5 @@
 <template>
-    <div class="grid feed-container">
+    <div :style="feedStyle" class="grid feed-container">
         <template v-if="actions.list">
             <section>
                 <action-list :actions="feedActions" />
@@ -49,6 +49,8 @@
                     <label class="stack" for="interests">Interests</label>
                     <interest-select v-model="instanceForm.interests" />
 
+                    <background-select :colors.sync="colors" />
+
                     <!-- <label class="stack" for="">Tags</label> -->
                     <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->
                     <input v-if="actions.create" class="stack" type="submit" value="Create" />
@@ -71,6 +73,7 @@ import FeedItem from './FeedItem'
 import FeedContentItemList from './FeedContentItemList'
 import FeedContentTypeSelect from './FeedContentTypeSelect'
 import InterestSelect from './InterestSelect'
+import BackgroundSelect from './Gui/BackgroundSelect'
 import ActionList from './ActionList'
 import FeedFilter from './FeedFilter'
 
@@ -88,9 +91,25 @@ export default {
         InterestSelect,
         ActionList,
         FeedFilter,
-        PaginationControls
+        PaginationControls,
+        BackgroundSelect
     },
     computed: {
+        feedStyle() {
+            console.log(!this.params ||
+                        (this.params &&
+                         !(["details", "manage"].includes(this.params.feedAction)) &&
+                         !(["details", "manage"].includes(this.params.action))))
+            if (!this.params ||
+                (this.params &&
+                 !(["details", "manage"].includes(this.params.feedAction)) &&
+                 !(["details", "manage"].includes(this.params.action)))) {
+                return {}
+            }
+            return {
+                "background-color": this.colors.hex
+            }
+        },
         enabledContentTypes() {
             return this.filters.contentTypes.map((contentType) => {
                 return contentType.enabled ? contentType.name : false
@@ -100,6 +119,7 @@ export default {
     data() {
         return {
             objectName: 'feed',
+            colors: { hex: "" },
             isActiveUserOwner: false,
             instanceForm: { content_types: [] },
             instance: {
@@ -156,6 +176,7 @@ export default {
         async manage(params) {
             this.instance = await this.showInstance(params.id, 'feed/list', feeds, await feedDeps())
             this.instanceForm = this.instance.getForm()
+            this.colors.hex = this.instance.background_color ? `#${this.instance.background_color}` : ""
         },
 
         editFeed() {
@@ -181,6 +202,7 @@ export default {
             const deps = await feedDeps()
             this.instance = await this.showInstance(params.id, 'feed/list', feeds, deps)
             this.isActiveUserOwner = this.instance.owner.id === user.details.id
+            this.colors.hex = this.instance.background_color ? `#${this.instance.background_color}` : ""
 
             try {
                 // TODO optimize
@@ -212,6 +234,8 @@ export default {
 
         async manageFeed() {
             const feedCollection = await feeds()
+            this.instanceForm.background_color = this.colors.hex.slice(1)
+
             return feedCollection.manage(this.instance, this.instanceForm, await feedDeps())
                 .then((data) => {
                     this.instance = data

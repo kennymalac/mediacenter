@@ -36,7 +36,7 @@ export default {
 
         paginate(response) {
             this.itemCount = response.count
-            if (this.itemCount !== 0 && response.results[0]) {
+            if (this.itemCount !== 0 && response.results && response.results[0]) {
                 this.pageMinOrder = response.results[0].order
                 this.pageMaxOrder = response.results.slice(-1)[0].order
             }

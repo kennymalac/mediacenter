@@ -360,7 +360,7 @@ class FeedCreateUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Feed
-        fields = ('id', 'name', 'description', 'owner', 'content_types', 'interests', 'places', 'stashes', 'visibility')
+        fields = ('id', 'name', 'description', 'owner', 'content_types', 'interests', 'places', 'stashes', 'visibility', 'background_image', 'background_color', 'background_repeat')
 
     def to_representation(self, obj):
         result = super(FeedCreateUpdateSerializer, self).to_representation(obj)
@@ -385,7 +385,7 @@ class FeedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Feed
-        fields = ('id', 'name', 'description', 'owner', 'content_types', 'created', 'interests', 'stashes', 'visibility')
+        fields = ('id', 'name', 'description', 'owner', 'content_types', 'created', 'interests', 'stashes', 'visibility', 'background_image', 'background_color', 'background_repeat')
 
 
 class CommentBasicSerializer(serializers.ModelSerializer):

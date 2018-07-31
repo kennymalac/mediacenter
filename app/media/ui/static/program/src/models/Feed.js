@@ -9,6 +9,8 @@ import {FeedContentStashCollection} from './FeedContentStash'
 import {makeJsonRequest, makeHeaders, jsonResponse, fetchAPI} from '../httputil.js'
 import {FeedContentItemCollection} from './FeedContentItem'
 
+import BackgroundMixin from './BackgroundMixin.js'
+
 export async function makeFilteredFeedCollection(queryset, deps) {
     const {interests, places, comments, owner, stashes} = deps
     const collection = new FeedCollection([], {
@@ -53,6 +55,7 @@ class FeedModel extends Model {
     static resource = 'feed'
 
     static initialState = {
+        ...BackgroundMixin,
         owner: {},
         id: 0,
         created: {},
