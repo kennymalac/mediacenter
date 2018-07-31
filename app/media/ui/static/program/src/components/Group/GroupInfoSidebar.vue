@@ -42,9 +42,10 @@
 
 <script>
 import ContextMenu from '../Gui/ContextMenu'
+import TagList from '../TagList'
 
 export default {
-    components: {ContextMenu},
+    components: {ContextMenu, TagList},
     props: {
         isActiveUserMember: [Boolean],
         isActiveUserOwner: [Boolean],
