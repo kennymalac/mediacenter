@@ -8,16 +8,16 @@
                 <post v-for="post in posts" v-bind="post.instance" :isActiveUser="activeUserId === post.content_item.owner.id" @editPost="editPost(post.id)" @userProfile="showUserProfile(post.instance.content_item.owner.profile.id)" />
 
                 <div class="reply">
-                    <button @click="activateQuickReply" v-if="!quickReplyActive">Quick Reply</button>
-                    <button @click="reply" v-if="!quickReplyActive">Reply</button>
-                    <discussion @canceled="quickReplyActive = false" @replied="quickReplied" v-if="quickReplyActive" action="create" :quickReply="true" :params="quickReplyParams" />
+                    <button @click="activateQuickReply">Quick Reply</button>
+                    <button @click="reply">Reply</button>
+                    <discussion @canceled="quickReplyActive = false" @replied="quickReplied" :show="quickReplyActive" action="create" :quickReply="true" :params="quickReplyParams" />
                 </div>
             </section>
 
             <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
         </template>
         <template v-if="actions.create">
-            <reply @canceled="quickReply ? $emit('canceled') : $router.go(-1)" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" />
+            <reply @canceled="quickReply ? $emit('canceled') : $router.go(-1)" :show="show" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" />
         </template>
         <template v-if="actions.manage">
             <reply @canceled="$router.go(-1)" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="manage" />
@@ -41,6 +41,10 @@ export default {
     name: 'discussion',
     mixins: [RestfulComponent, PaginatedComponent],
     props: {
+        show: {
+            type: Boolean,
+            default: true
+        },
         quickReply: {
             type: Boolean,
             default: false

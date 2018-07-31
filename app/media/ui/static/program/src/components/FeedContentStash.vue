@@ -1,9 +1,11 @@
 <template>
     <div class="feed-container">
         <template v-if="actions.details && instance.id">
-            <router-view :key="$route.name" :feedId="feedId" :stashId="instance.id"></router-view>
+            <transition name="view-fade" mode="out-in">
+                <router-view :key="$route.name" :feedId="feedId" :stashId="instance.id"></router-view>
+            </transition>
             <section class="feed" v-if="!params.discussionAction && !params.linkAction">
-                <feed-content-item-list :showMenu="showMenu" @togglePin="togglePin" :stashId="instance.id" :showGroupTag="showGroupTag" :items="content" :enabledContentTypes="enabledContentTypes" />
+                <feed-content-item-list :showMenu="showMenu" @listChildren="listContentChildren" @togglePin="togglePin" :stashId="instance.id" :query="query" :showGroupTag="showGroupTag" :items="content" :enabledContentTypes="enabledContentTypes" />
             </section>
         </template>
         <template v-if="actions.create || actions.manage">
@@ -17,9 +19,14 @@
 
 <script>
 import RestfulComponent from "./RestfulComponent"
+// import PaginatedComponent from "./PaginatedComponent"
+
 import FeedContentItemList from './FeedContentItemList'
 import {stashes, activeUser} from '../store.js'
+import {FeedContentStashModel} from '../models/FeedContentStash.js'
 import stashDeps from '../dependencies/FeedContentStash'
+
+//import PaginationControls from './PaginationControls'
 
 export default {
     name: 'feed-content-stash',
@@ -32,49 +39,45 @@ export default {
         return {
             objectName: 'stash',
             instanceForm: { },
+            contentItems: [],
+            content: { results: [] },
             showMenu: false
         }
     },
     computed: {
         enabledContentTypes() {
             return ["Topic", "Link"]
-        },
-        content() {
-            const pinned = this.instance.content.filter((instance) => {
-                return instance.is_pinned
-            })
-            const regular = this.instance.content.filter((instance) => {
-                return !instance.is_pinned
-            })
-
-            return pinned.concat(regular).map((instance) => {
-                // TODO refactor
-                return {
-                    is_pinned: instance.is_pinned,
-                    order: instance.order,
-                    ...instance.item.instance,
-                    instance: {
-                        is_pinned: instance.is_pinned,
-                        order: instance.order,
-                        ...instance.item.instance
-                    }
-                }
-            })
         }
     },
     methods: {
         initialState() {
             this.instance = { id: null }
+            this.contentItems = []
             this.instanceForm = { }
         },
 
         async togglePin(item) {
             this.instance.collections.content.togglePin(
-                this.instance.content.find((instance) => { return instance.item.id === item.id }), this.instance.id, await stashDeps())
+                this.contentItems.find((instance) => { return instance.item.id === item.id }), this.instance.id, await stashDeps())
+        },
+
+        async listContentChildren(currentPage, _deps = null) {
+            const deps = _deps || {...await stashDeps(), stashes: this.$store.stashes}
+
+            const resp = await FeedContentStashModel.listContent(
+                this.instance,
+                this.feedId,
+                {page: currentPage || 1},
+                deps,
+                this.content.length)
+            this.content = resp
         },
 
         async details(params) {
-            this.instance = await this.showInstance(params.id, '/feed/list', stashes, await stashDeps(), this.feedId)
+            const deps = await stashDeps()
+            this.instance = await this.showInstance(params.id, '/feed/list', stashes, deps, this.feedId)
+
+            await this.listContentChildren(this.query.page, {...deps, stashes: this.$store.stashes})
             // const user = await activeUser()
             this.showMenu = true
         },

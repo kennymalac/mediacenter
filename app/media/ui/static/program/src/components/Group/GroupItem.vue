@@ -1,5 +1,5 @@
 <template>
-    <action-button :link="groupLink" :image="image" :title="name" />
+    <action-button size="large" :link="groupLink" :image="image" :title="name" />
 </template>
 
 <script>

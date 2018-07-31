@@ -1,6 +1,7 @@
 <template>
     <div class="grid profiles-container">
         <template v-if="actions.list">
+                <div></div>
             <div class="profile-container">
                 <h1>User list</h1>
                 <profile-list :items="objects" />
@@ -8,20 +9,20 @@
         </template>
 
         <template v-if="actions.details && instance.id">
-            <div class="profile-container">
-                <section class="sidebar">
-                    <div class="group-info">
-                        <div class="icon-container">
-                            <img v-if="instance.picture" :src="instance.picture" />
-                            <i v-if="!instance.picture" class="ion-md-person"></i>
-                        </div>
-                        <h2>{{ instance.display_name }}</h2>
-
-                        <button type="button" v-if="isActiveUser" @click="editProfile">
-                            <i class="ion-md-create"></i> Edit
-                        </button>
+            <section class="sidebar">
+                <div class="group-info">
+                    <div class="icon-container">
+                        <img v-if="instance.picture" :src="instance.picture" />
+                        <i v-if="!instance.picture" class="ion-md-person"></i>
                     </div>
-                </section>
+                    <h2>{{ instance.display_name }}</h2>
+
+                    <button type="button" v-if="isActiveUser" @click="editProfile">
+                        <i class="ion-md-create"></i> Edit
+                    </button>
+                </div>
+            </section>
+            <div class="profile-container">
                 <section class="main-profile">
                     <h2>{{ instance.title }}</h2>
                     <p class="description">{{ instance.description }}</p>
@@ -35,9 +36,11 @@
                         <tag-list :tags="instance.account.member_groups" tagType="group" />
                     </div>
                 </section>
+                <div>
+                    <h2>Comments</h2>
+                    <router-view :profileId="instance.id" />
+                </div>
             </div>
-            <h2>Comments</h2>
-            <router-view :profileId="instance.id" />
         </template>
 
         <template v-if="actions.manage && instance.id">
@@ -61,8 +64,8 @@
                         <!-- <label class="stack" for="">Tags</label> -->
                         <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->
                         <input class="stack" type="submit" value="Save changes" />
-                </fieldset>
-            </form>
+                    </fieldset>
+                </form>
             </div>
         </template>
     </div>
@@ -182,14 +185,13 @@ $dark-green: #2b9f67;
 
 .profiles-container {
     justify-content: center;
+    grid-template-columns: 1fr 3fr;
     .comment-container {
         justify-content: center;
     }
 }
 .profile-container {
-    display: flex;
-    flex-direction: row;
-    flex-flow: wrap;
+    margin: 10px;
     justify-content: center;
     // flex-basis: 3;
     section.feed .feed-list {
@@ -203,7 +205,7 @@ $dark-green: #2b9f67;
 }
 
 .main-profile {
-    min-width: 500px;
+    width: 100%;
     background: linear-gradient(135deg, white, rgb(236, 240, 241));
     border: 1px solid black;
     padding: 20px;

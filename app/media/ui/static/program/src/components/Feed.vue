@@ -32,9 +32,7 @@
             </section>
 
             <section class="feed" v-if="!params.stashId">
-                <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
-
-                <feed-content-item-list :enabledContentTypes="enabledContentTypes" :items="pageContent" />
+                <feed-content-item-list :query="query" @listChildren="listContentChildren" :enabledContentTypes="enabledContentTypes" :items="contentItems" />
             </section>
             <router-view v-if="params.stashId" :stashId="params.stashId" :feedId="params.feedId"></router-view>
         </template>
@@ -97,17 +95,11 @@ export default {
             return this.filters.contentTypes.map((contentType) => {
                 return contentType.enabled ? contentType.name : false
             })
-        },
-        pageContent() {
-            return this.contentItems.filter((item) => {
-                return this.isItemVisibleOnPage(item)
-            })
         }
     },
     data() {
         return {
             objectName: 'feed',
-            pageSize: 20,
             isActiveUserOwner: false,
             instanceForm: { content_types: [] },
             instance: {
@@ -148,13 +140,13 @@ export default {
                 interests: [],
                 tags: []
             },
-            contentItems: []
+            contentItems: {}
         }
     },
     methods: {
         initialState() {
             this.instance = { id: null, content_types: [] }
-            this.contentItems = []
+            this.contentItems = {}
             this.instanceForm = { content_types: [], interests: [], visibility: { value: '0', text: 'Public' } }
         },
 
@@ -170,16 +162,11 @@ export default {
             router.push(`/feed/${this.instance.id}/manage`)
         },
 
-        async listChildren(deps = null) {
-            this.isPaginating = true
-            const _deps = deps || await feedDeps()
+        async listContentChildren(currentPage, _deps = null) {
+            const deps = _deps || await feedDeps()
 
-            const resp = await FeedModel.listItems(this.instance.id, { page: this.currentPage }, _deps, this.contentItems.length)
-            this.contentItems = this.contentItems.concat(resp.results)
-            this.paginate(resp)
-            if (this.query.last) {
-                this.selectPage(this.pageCount)
-            }
+            const resp = await FeedModel.listItems(this.instance.id, { page: currentPage || 1 }, deps, this.contentItems.length)
+            this.contentItems = resp
         },
 
         async list(params) {
@@ -197,7 +184,7 @@ export default {
 
             try {
                 // TODO optimize
-                await this.listChildren({
+                await this.listContentChildren(this.query.page, {
                     content_type: deps.content_types,
                     comments: deps.comments,
                     places: deps.places,

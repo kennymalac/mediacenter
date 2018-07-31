@@ -9,7 +9,7 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.decorators import api_view, list_route, detail_route, parser_classes
+from rest_framework.decorators import api_view, list_route, detail_route, parser_classes, action
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
@@ -298,7 +298,6 @@ class FeedContentStashItemViewSet(NestedViewSetMixin,
         # 'create': FeedContentStashCreateUpdateSerializer
     }
 
-
 class FeedContentStashViewSet(NestedViewSetMixin,
                               MultipleSerializerMixin,
                               ModelViewSet):
@@ -308,11 +307,18 @@ class FeedContentStashViewSet(NestedViewSetMixin,
         'default': FeedContentStashSerializer,
         'partial_update': FeedContentStashCreateUpdateSerializer,
         'update': FeedContentStashCreateUpdateSerializer,
-        'create': FeedContentStashCreateUpdateSerializer
+        'create': FeedContentStashCreateUpdateSerializer,
+        'content': FeedContentStashContentSerializer
     }
 
     pagination_class = StandardResultsSetPagination
 
+
+    @action(methods=['GET'], detail=True, permission_classes=[IsAuthenticated])
+    def content(self, request, pk=None, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
     @detail_route(methods=['POST'], url_path='content/add', permission_classes=[IsAuthenticated])
     def add_content(self, request, pk=None, **kwargs):

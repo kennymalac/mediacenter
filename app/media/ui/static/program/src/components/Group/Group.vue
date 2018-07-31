@@ -20,7 +20,9 @@
                 <div v-if="!params.discussionAction && !params.linkAction && isActiveUserMember">
                     <content-item-form :stash="resolvedStash" :groupId="instance.id" :feedId="instance.feed.id" :contentTypes="allowedContentTypes" @contentTypeSelected="contentTypeSelected" />
                 </div>
-                <router-view v-if="instance.feed.id" :feedId="instance.feed.id" :showGroupTag="false"></router-view>
+                <transition name="view-fade" mode="out-in">
+                    <router-view v-if="instance.feed.id" :feedId="instance.feed.id" :showGroupTag="false"></router-view>
+                </transition>
             </div>
         </template>
         <template v-if="actions.create || actions.manage">
@@ -83,6 +85,7 @@
                 <p v-if="filteredObjects.length == 0">No groups were found, why not <router-link to="create">create one</router-link>?</p>
             </section>
         </template>
+    </transition>
     </div>
 </template>
 

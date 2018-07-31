@@ -31,34 +31,4 @@ $shadow-color: rgba(0, 0, 0, .2);
     display: flex;
     flex-direction: column;
 }
-.icon-container {
-    background: linear-gradient(150deg, white, rgba(0, 31, 63, 0.2));
-    display: inline-flex;
-    width: 140px;
-    height: 140px;
-    align-items: center;
-    justify-content: center;
-    i {
-        font-size: 6rem;
-    }
-    img {
-        transition: $picnic-transition;
-        border-radius: 50%;
-        height: 100%;
-        width: 100%;
-    }
-    border: 2px solid rgba(52, 73, 94,1.0);
-    border-radius: 50%;
-    transition: $picnic-transition;
-
-    box-shadow: 0 3px 8px 0px $shadow-color;
-    &.icon-container-xs {
-        width: 32px;
-        border: 1px solid rgba(52, 73, 94,1.0);
-        height: 32px;
-        i {
-            font-size: 1.25rem
-        }
-    }
-}
 </style>

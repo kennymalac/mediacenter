@@ -17,7 +17,8 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 *** Style overhaul
 **** DONE restyle buttons
      CLOSED: [2018-07-30 Mon 22:35]
-**** TODO make different ActionButton sizes
+**** DONE make different ActionButton sizes
+     CLOSED: [2018-07-31 Tue 05:19]
 **** DONE FeedContentItems
      CLOSED: [2018-07-30 Mon 20:45]
 
@@ -25,6 +26,10 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
      CLOSED: [2018-07-30 Mon 20:50]
 **** DONE Make interest and group tags use gradients
      CLOSED: [2018-07-30 Mon 21:09]
+**** DONE page transition animations
+     CLOSED: [2018-07-31 Tue 05:21]
+**** DONE quick reply transition animation
+     CLOSED: [2018-07-31 Tue 05:21]
 **** TODO User Profile backgrounds
 **** TODO Group backgrounds
 **** TODO Feed backgrounds

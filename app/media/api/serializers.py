@@ -578,11 +578,13 @@ class FeedContentItemProfileSerializer(FeedContentItemBasicSerializer):
 
 
 class FeedContentStashSerializer(serializers.ModelSerializer):
-    content = serializers.SerializerMethodField('paginated_content')
-
     class Meta:
         model = FeedContentStash
-        fields = ('id', 'name', 'description', 'content')
+        fields = ('id', 'name', 'description')
+
+
+class FeedContentStashContentSerializer(serializers.ModelSerializer):
+    content = serializers.SerializerMethodField('paginated_content')
 
     def paginated_content(self, instance):
         request = self.context['request']
@@ -596,14 +598,18 @@ class FeedContentStashSerializer(serializers.ModelSerializer):
         if _interests:
             content_queryset = content_queryset.filter(interests__in=Interest.objects.filter(id__in=_interests))
 
-        paginator = StandardResultsSetPagination()
-        page = paginator.paginate_queryset(content_queryset, self.context['request'])
+        paginator = FeedContentItemPagination()
+        page = paginator.paginate_queryset(content_queryset.order_by('-is_pinned'), self.context['request'])
         serializer = FeedContentStashItemSerializer(
             page,
             many=True,
             context={'request': self.context['request']}
         )
-        return serializer.data
+        return { 'results': serializer.data, 'count': content_queryset.count() }
+
+    class Meta:
+        model = FeedContentStash
+        fields = ('content',)
 
 
 class FeedContentStashCreateUpdateSerializer(serializers.ModelSerializer):

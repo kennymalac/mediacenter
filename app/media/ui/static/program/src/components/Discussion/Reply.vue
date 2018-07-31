@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <form class="reply-form" @submit.prevent="$emit('save')">
+    <transition name="slide-fade">
+        <form :class="replyClass" v-if="show" @submit.prevent="$emit('save')">
             <fieldset>
                 <label class="stack" for="title">Title</label>
                 <input class="stack" name="title" v-model="instanceForm.content_item.title" type="text" />
@@ -29,7 +29,7 @@
                 </div>
             </fieldset>
         </form>
-    </div>
+    </transition>
 </template>
 
 <script>
@@ -70,6 +70,10 @@ export default {
         Editor
     },
     props: {
+        show: {
+            type: Boolean,
+            default: true
+        },
         active: {
             type: Boolean,
             default: false
@@ -90,6 +94,15 @@ export default {
         parentId: {
             type: Number,
             default: 0
+        }
+    },
+    computed: {
+        replyClass() {
+            return {
+                "reply-form": true,
+                "quick-reply": this.quick,
+                hidden: !this.show
+            }
         }
     },
     data() {
@@ -113,6 +126,7 @@ export default {
 </script>
 
 <style lang="scss">
+@import "~picnic/src/themes/default/_theme.scss";
 form.reply-form {
     min-width: 480px;
     width: 100%;
@@ -128,5 +142,16 @@ form.reply-form {
         border-top-left-radius: 0;
         border-bottom-right-radius: .2em;
     }
+}
+
+.slide-fade-enter-active {
+    transition: all .3s ease;
+}
+.slide-fade-leave-active {
+    transition: all .3s ease;
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+   opacity: 0;
 }
 </style>

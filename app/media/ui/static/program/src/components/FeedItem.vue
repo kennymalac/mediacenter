@@ -1,5 +1,5 @@
 <template>
-    <action-button :link="feedLink" :icon="icon" :title="name" />
+    <action-button size="large" :link="feedLink" :icon="icon" :title="name" />
 </template>
 
 <script>

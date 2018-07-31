@@ -57,33 +57,50 @@ class FeedContentStashModel extends Model {
         })
     }
 
-    static listContent(feedId, stashId, params) {
-        console.log(params)
-        return makeJsonRequest(`feed/${feedId}/stash/${stashId}/`, {
-            method: "GET"
-        })
-            .then(jsonResponse)
+    static async listContent(instance, feedId, params, collections = {}, offset = 0) {
+        console.log(instance, params)
+        const stashId = instance.id
 
-            .then((data) => {
-                // Returns a list of ContentItem model instances
-                return data
-                // return data.content.map((input) => modelInstance(FeedContentItemModel, input))
-            })
+        try {
+            const data = await makeJsonRequest(`feed/${feedId}/stash/${stashId}/content/`, {
+                method: "GET",
+                queryParams: params
+            }).then(jsonResponse)
+
+            collections.stashes.sync(instance, {
+                content: [].concat.apply(instance.content, data.content.results)
+            }, collections)
+
+            let order = 0 + offset
+            return {
+                ...data.content,
+                results: instance.collections.content.getInstances(data.content.results).map((item) => {
+                    item.order = order++
+                    return item
+                })
+            }
+        }
+        catch (e) {
+            console.log(e)
+        }
     }
 
-    static addContent(instance, feedId, content, collections = {}) {
-        return makeJsonRequest(`feed/${feedId}/stash/${instance.id}/content/add/`, {
-            method: "POST",
-            body: {content: serializeIds(content)}
-        })
-            .then(jsonResponse)
+    static async addContent(instance, feedId, content, collections = {}) {
+        try {
+            const data = await makeJsonRequest(`feed/${feedId}/stash/${instance.id}/content/add/`, {
+                method: "POST",
+                body: {content: serializeIds(content)}
+            }).then(jsonResponse)
 
-            .then((data) => {
-                // Append content ids that were added to the stash's instance list
-                collections.stashes.sync(instance, {
-                    content: [].concat.apply(instance.content, data.content)
-                }, collections)
-            })
+            collections.stashes.sync(instance, {
+                content: [].concat.apply(instance.content, data.content.results)
+            }, collections)
+
+            return instance.content
+        }
+        catch (e) {
+            console.log(e)
+        }
     }
 }
 

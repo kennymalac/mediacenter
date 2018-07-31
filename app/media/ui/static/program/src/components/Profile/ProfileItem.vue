@@ -1,5 +1,5 @@
 <template>
-    <action-button :link="profileLink" icon="ion-md-person" :title="name" />
+    <action-button size="small" :link="profileLink" icon="ion-md-person" :title="name" />
 </template>
 
 <script>

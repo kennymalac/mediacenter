@@ -5,9 +5,9 @@
             <!-- <auth-menu></auth-menu> -->
         </header>
 
-        <div>
+        <transition name="view-fade" mode="out-in">
             <router-view></router-view>
-        </div>
+        </transition>
     </div>
 </template>
 
@@ -51,5 +51,12 @@ $ionicons-font-path: "~ionicons/dist/fonts";
 @import "classicTheme.scss";
 
 .grid { display: grid }
+
+.view-fade-enter-active, .view-fade-leave-active {
+    transition: opacity .15s ease;
+}
+.view-fade-enter, .view-fade-leave-to {
+    opacity: 0;
+}
 </style>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
