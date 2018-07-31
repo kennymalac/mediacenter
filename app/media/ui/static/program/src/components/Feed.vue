@@ -12,31 +12,14 @@
             </section>
         </template>
         <template v-if="actions.details && instance.id">
-            <section class="sidebar">
-                <div class="group-info">
-                    <div class="icon-container">
-                        <i v-if="instance.icon" :class="instance.icon"></i>
-                    </div>
-                    <h2>{{ instance.name }}</h2>
-                    <button type="button" v-if="isActiveUserOwner" @click="editFeed">
-                        <i class="ion-md-create"></i> Edit
-                    </button>
-                    <p class="description">{{ instance.description }}</p>
-
-                    <!-- <h3>Filters</h3> -->
-                    <!-- <feed-filter :specifiers="filters.contentTypes" :filterToggled="toggle" /> -->
-                    <!-- <feed-filter :specifiers="filters.subjects" :filterToggled="toggle" /> -->
-                    <!-- <feed-filter :specifiers="filters.interests" :filterToggled="toggle" /> -->
-                    <!-- <feed-filter :specifiers="filters.tags" :filterToggled="toggle" /> -->
-                </div>
-            </section>
-
+            <feed-info-sidebar :instance="instance" @editFeed="editFeed" :isActiveUserOwner="isActiveUserOwner" />
             <section class="feed" v-if="!params.stashId">
                 <feed-content-item-list :query="query" @listChildren="listContentChildren" :enabledContentTypes="enabledContentTypes" :items="contentItems" />
             </section>
             <router-view v-if="params.stashId" :stashId="params.stashId" :feedId="params.feedId"></router-view>
         </template>
         <template v-if="actions.create || actions.manage">
+            <feed-info-sidebar :instance="instance" @editFeed="editFeed" :isActiveUserOwner="isActiveUserOwner" />
             <form class="main-form" @submit.prevent="save">
                 <fieldset>
                     <legend class="stack">Details</legend>
@@ -69,6 +52,7 @@ import {FeedModel} from "../models/Feed.js"
 import {feeds, activeUser} from '../store.js'
 import feedDeps from '../dependencies/Feed.js'
 
+import FeedInfoSidebar from './FeedInfoSidebar'
 import FeedItem from './FeedItem'
 import FeedContentItemList from './FeedContentItemList'
 import FeedContentTypeSelect from './FeedContentTypeSelect'
@@ -85,6 +69,7 @@ export default {
     name: 'feed',
     mixins: [RestfulComponent, PaginatedComponent],
     components: {
+        FeedInfoSidebar,
         FeedItem,
         FeedContentItemList,
         FeedContentTypeSelect,

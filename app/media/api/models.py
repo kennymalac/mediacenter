@@ -238,9 +238,13 @@ VISIBILITY = (
 
 class Feed(TaggedItem, BackgroundMixin):
     owner = models.ForeignKey(Account, null=True)
+    # Whether or not this feed is the owner's primary feed (all owned content)
+    default_owner_feed = models.BooleanField(default=False)
     name = models.CharField(max_length=140, blank=True)
     description = models.TextField(blank=True)
     content_types = models.ManyToManyField(FeedContentItemType, related_name='+')
+    picture = models.URLField(blank=True)
+
     created = models.DateTimeField(auto_now_add=True)
     stashes = models.ManyToManyField('api.FeedContentStash', related_name='feeds')
 
@@ -296,8 +300,8 @@ class FeedContentStash(models.Model):
 
 
 def setup_default_feed(user):
-    feed = Feed.objects.create(name="My Feed", description="All of your uploads outside of groups", owner=user)
-    stash = FeedContentStash.objects.create(name="My Content", description="Anything you upload my default will be stored here")
+    feed = Feed.objects.create(name="My Feed".format(user.profile.display_name), description="All of my content".format(user.profile.display_name), picture=user.profile.picture, owner=user, default_owner_feed=True)
+    stash = FeedContentStash.objects.create(name="My Content", description="Anything you upload will be stored here by default")
     feed.content_types.add(*list(FeedContentItemType.objects.all()))
     feed.stashes.add(stash)
 

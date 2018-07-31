@@ -197,7 +197,7 @@ class FeedViewSet(NestedViewSetMixin,
     def list(self, request):
         if 'owner' in request.query_params:
             owner_id = request.query_params['owner']
-            if int(owner_id) == request.user.id and Feed.objects.filter(owner=request.user, name="My Feed").count() == 0:
+            if int(owner_id) == request.user.id and Feed.objects.filter(owner=request.user, default_owner_feed=True).count() == 0:
                 setup_default_feed(request.user)
 
         return super(FeedViewSet, self).list(request)
@@ -237,6 +237,9 @@ class FeedContentItemViewSet(ListModelMixin,
         _feed_id = request.data.get('feed', None)
         if _feed_id:
             feed = get_object_or_404(Feed, pk=_feed_id)
+
+            if feed.default_owner_feed:
+                content_queryset = content_queryset.filter(owner=feed.owner)
 
             if feed.content_types.count() > 0:
                 content_queryset = content_queryset.filter(content_type__in=feed.content_types.all())
