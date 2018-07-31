@@ -121,6 +121,9 @@ export default {
     },
     computed: {
         profileStyle() {
+            if (!this.params || (this.params && !(["details", "manage"].includes(this.params.profileAction)))) {
+                return {}
+            }
             return {
                 "background-color": this.colors.hex
             }
@@ -160,9 +163,7 @@ export default {
             this.isActiveUser = false
             const deps = await profileDeps()
             this.instance = await this.showInstance(params.id, '/profile/list', profiles, deps)
-            if (this.instance.background_color) {
-                this.colors.hex = `#${this.instance.background_color}`
-            }
+            this.colors.hex = this.instance.background_color ? `#${this.instance.background_color}` : ""
             // check if certain profile information is missing
             if (!this.instance.title) {
                 const profilesCollection = await profiles()
