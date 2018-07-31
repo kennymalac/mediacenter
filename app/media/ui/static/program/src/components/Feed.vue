@@ -81,10 +81,6 @@ export default {
     },
     computed: {
         feedStyle() {
-            console.log(!this.params ||
-                        (this.params &&
-                         !(["details", "manage"].includes(this.params.feedAction)) &&
-                         !(["details", "manage"].includes(this.params.action))))
             if (!this.params ||
                 (this.params &&
                  !(["details", "manage"].includes(this.params.feedAction)) &&

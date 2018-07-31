@@ -1,11 +1,9 @@
 <template>
     <div>
         <template v-if="actions.details && instance.id">
-            <section class="sidebar">
-                <div class="group-info">
-                    <button @click="showGroups" class="">Local Groups</button>
-                    <button @click="showPosts" class="">Local Posts</button>
-                </div>
+            <section class="top-navigation">
+                <div @click="showGroups" :class="{ selected: $route.fullPath.includes('group'), xlarge: true }"><i class="ion ion-ios-people"></i> Local Groups</div>
+                <div @click="showPosts" :class="{ selected: $route.fullPath.includes('feed'), xlarge: true }" class="xlarge"><i class="ion-ios-filing"></i> Local Content</div>
             </section>
             <div class="place-contents">
                 <router-view v-if="instance.default_feed.id" :place="instance.instance" :feedId="instance.default_feed.id"></router-view>
@@ -146,6 +144,24 @@ export default {
 </script>
 
 <style lang="scss">
+@import "~picnic/src/themes/default/_theme.scss";
+
+.top-navigation {
+    div {
+        display: inline-block;
+        margin: 10px;
+        margin-right: 20px;
+        border-radius: 0;
+        transition: $picnic-transition;
+        box-shadow: none;
+
+        &.selected, &:hover, &:focus {
+            color: #49637e;
+            box-shadow: 0 0.2rem 0 #49637e;
+        }
+    }
+}
+
 .connect-location-form {
     i.location-icon {
         font-size: 8rem;
