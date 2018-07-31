@@ -65,13 +65,13 @@ export default {
                         this.$emit('prevPhoto')
                     }
                 },
-                {
-                    icon: "ion-ios-play",
-                    action() {
-                        // Play a slideshow
-                        this.$emit('play')
-                    }
-                },
+                // {
+                //     icon: "ion-ios-play",
+                //     action() {
+                //         // Play a slideshow
+                //         this.$emit('play')
+                //     }
+                // },
                 {
                     icon: "ion-ios-skip-forward",
                     action() {
@@ -80,13 +80,20 @@ export default {
                     }
                 },
                 {
-                    icon: "ion-ios-color-wand-outline",
+                    icon: "ion-md-create",
                     action() {
-                        // Apply effects to this photo
-                        // Slideshow has to be paused
-                        this.$emit('applyEffect')
+                        // Go forward in the album
+                        this.$emit('editPhoto')
                     }
                 }
+                // {
+                //     icon: "ion-ios-color-wand-outline",
+                //     action() {
+                //         // Apply effects to this photo
+                //         // Slideshow has to be paused
+                //         this.$emit('applyEffect')
+                //     }
+                // }
             ]
         }
     },

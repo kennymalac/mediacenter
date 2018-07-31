@@ -19,6 +19,16 @@ $classicgreen: #4F8A10;
     padding-top: 60px;
 }
 
+button {
+    background: linear-gradient($classiclightblue 90%, #264d77);
+    &.error {
+        background: linear-gradient(#eb3636 90%, #a73535);
+    }
+    &.warning {
+        background: linear-gradient(#ff851b 90%, #91531e);
+    }
+}
+
 form {
     textarea {
         resize: none;
@@ -31,9 +41,13 @@ form {
     }
 }
 
+.label, [data-tooltip]:after, button, .button, [type=submit], .dropimage {
+    background: linear-gradient($classiclightblue 90%, #264d77);
+}
+
 input[type="submit"].stack  {
     padding: 0.3em 0.6em;
-    border: 1px solid rgb(0, 116, 217);
+    border: 1px solid $classiclightblue;
 }
 
 input, textarea, select {
@@ -50,6 +64,10 @@ label.stack {
     padding: 0.3em 0.6em;
     border: $picnic-border;
     border-bottom: 0;
+}
+
+.align-left {
+    text-align: left;
 }
 
 // TODO remove Pure CSS by Yahoo

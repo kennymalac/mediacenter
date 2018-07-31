@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="grid profiles-container">
         <template v-if="actions.list">
             <div class="profile-container">
                 <h1>User list</h1>
@@ -36,10 +36,8 @@
                     </div>
                 </section>
             </div>
-            <div class="comments-container">
-                <h2>Comments</h2>
-                <router-view :profileId="instance.id" />
-            </div>
+            <h2>Comments</h2>
+            <router-view :profileId="instance.id" />
         </template>
 
         <template v-if="actions.manage && instance.id">
@@ -178,8 +176,16 @@ export default {
 </script>
 
 <style lang="scss">
+@import "~picnic/src/themes/default/_theme.scss";
+
 $dark-green: #2b9f67;
 
+.profiles-container {
+    justify-content: center;
+    .comment-container {
+        justify-content: center;
+    }
+}
 .profile-container {
     display: flex;
     flex-direction: row;
@@ -211,19 +217,23 @@ $dark-green: #2b9f67;
     display: inline-flex;
     border-radius: 10px;
     margin-right: 4px;
-    background-color: #1F8DD6;
+    background: linear-gradient(#35a9e0, rgb(0, 116, 217));
     color: white;
     font-weight: normal;
     padding: 2px 8px;
     font-size: 1rem;
+    transition: $picnic-transition;
+
     &.group-tag {
-        background-color: $dark-green;
+        background: linear-gradient(#61ad10, $dark-green);
     }
-    &:hover, &:focus {
+    &:hover, &:focus, &:active {
         cursor: pointer;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        box-shadow: 1px 1px 5px 0px rgba(0, 0, 0, .35);
     }
     &:active {
-        box-shadow: 0 1px 1px 0px rgba(0, 0, 0, .3);
+
     }
 }
 

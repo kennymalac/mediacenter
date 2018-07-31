@@ -224,7 +224,8 @@ export default {
     }
 
     .album-item-list {
-        display: flex;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        display: grid;
         margin-top: 10px;
     }
     .album-item-editor {

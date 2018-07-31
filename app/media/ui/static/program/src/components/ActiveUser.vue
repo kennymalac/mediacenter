@@ -5,7 +5,7 @@
                 <img v-if="picture" :src="picture" />
                 <i v-if="!picture" class="ion-md-person"></i>
             </div>
-            <span class="display-name">{{name}}</span>
+            <span :class="{ 'display-name': true, 'toggled': toggled }">{{name}}</span>
             <i :class="iconClass"></i>
         </div>
     </context-menu>
@@ -86,10 +86,13 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import "~picnic/src/themes/default/_theme.scss";
     .context-menu {
-    display: inline-block;
+display: inline-block;
+&.hover {
+}
     }
-    .toggled {
+    i.toggled {
     transform: rotateZ(180deg);
     }
 div.profile-embed {
@@ -100,7 +103,13 @@ div.profile-embed {
         padding-right: 5px;
     }
     .display-name {
-        margin-left: 5px;
+box-shadow: none;
+color: black;
+    margin-left: 5px;
+    transition: $picnic-transition;
+&.toggled, &:hover, &:focus {
+            color: #49637e;
+}
     }
     height: 100%;
     padding: 6px;

@@ -89,7 +89,7 @@ export default {
         restAction(to, from) {
             let link = {}
 
-            if (from && to.path.indexOf(from.path) > -1) {
+            if (from && to.path.indexOf(from.path) > -1 && from.params.action && this.isNested) {
                 // Do not rerender a component, this is a nested action
                 // that was redirected from the same route
                 return

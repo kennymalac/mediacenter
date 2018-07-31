@@ -39,7 +39,8 @@ export default {
 .ion-ios-play,
 .ion-ios-color-wand-outline,
 .ion-ios-skip-forward,
-.ion-ios-skip-backward {
+.ion-ios-skip-backward,
+.ion-md-create {
     color: white;
 }
 </style>

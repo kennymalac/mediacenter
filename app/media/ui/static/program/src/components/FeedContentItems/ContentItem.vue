@@ -129,10 +129,12 @@ export default {
 </script>
 
 <style lang="scss">
+@import "~picnic/src/themes/default/_theme.scss";
 $actions-height: 70px;
 $title-height: 56px;
 
 .content-item {
+    background-color: white;
     margin: 10px;
     display: inline-flex;
     flex-direction: column;
@@ -181,7 +183,7 @@ $title-height: 56px;
         .content-type {
             display: inline-flex;
             border-radius: 6px;
-            background-color: #1F8DD6;
+            background: linear-gradient(#2dabff 70%, #1F8DD6);
             color: white;
             font-weight: normal;
             padding: 4px;
@@ -199,11 +201,14 @@ $title-height: 56px;
 
     .pinned {
         color: white;
-        background-color: orange;
+        background: linear-gradient(135deg, #F7DF1E, #F7A31E);
+        padding-top: 5px;
+        padding-bottom: 5px;
+        text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+        font-weight: 600;
         text-align: center;
         justify-content: center;
         align-items: center;
-        padding: 4px;
         font-size: .8rem;
         display: flex;
     }
@@ -223,6 +228,7 @@ $title-height: 56px;
         justify-content: center;
         width: 100%;
         .action {
+            transition: $picnic-transition;
             text-align: center;
             justify-content: center;
             display: flex;

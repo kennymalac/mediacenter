@@ -6,9 +6,9 @@
             {{authError}}
         </div>
 
-        <div class="debug-controls">
-            <ladda-button :isLoading="isLoadingAlbums" @click.native="showAlbums" text="Show Albums" />
-        </div>
+        <!-- <div class="debug-controls"> -->
+        <!--     <ladda-button :isLoading="isLoadingAlbums" @click.native="showAlbums" text="Show Albums" /> -->
+        <!-- </div> -->
 
         <album-grid-item v-for="album in galleryAlbums" @albumSelected="showAlbumGallery" :album="album"/>
 

@@ -29,15 +29,20 @@ export default {
         margin: 3px;
         user-select: none;
         display: inline-block;
-        background-color: #eee;
+        background-color: #f9f9f9;
         min-width: 32px;
         padding: 0 2px;
         font-size: 1.2rem;
-        border: 1px solid #26619C;
+        //border: .1rem solid ;
+        color: #2c3e50;
         border-radius: 5px;
+        border-bottom: 1px solid #eee;
+        box-shadow: 0 0 0.1rem rgba(0,0,0, .8);
         &:focus, &:hover, &.current-page {
+            color: #26619C;
             cursor: pointer;
-            background-color: #ddd;
+            box-shadow: 0 0 0.15rem #26619C;
+            border-bottom: 1px solid #26619C;
         }
     }
 }

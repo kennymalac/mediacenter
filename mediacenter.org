@@ -14,6 +14,22 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 
 * TODOs
 ** Priority 1 (urgent)
+*** Style overhaul
+**** DONE restyle buttons
+     CLOSED: [2018-07-30 Mon 22:35]
+**** TODO make different ActionButton sizes
+**** DONE FeedContentItems
+     CLOSED: [2018-07-30 Mon 20:45]
+
+**** DONE better menu selected/highlight
+     CLOSED: [2018-07-30 Mon 20:50]
+**** DONE Make interest and group tags use gradients
+     CLOSED: [2018-07-30 Mon 21:09]
+**** TODO User Profile backgrounds
+**** TODO Group backgrounds
+**** TODO Feed backgrounds
+**** TODO feed icons
+
 *** UI/UX fixes
 **** TODO some sort of grid system & layout
 **** DONE convert Modal to flexbox
@@ -261,6 +277,7 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 ***** TODO Delete
 
 *** Groups
+**** TODO clickable Group icon in GroupInfoSidebar
 **** DONE FeedContentStashItems comment button is broken
      CLOSED: [2018-07-23 Mon 13:49]
 **** TODO hide local Groups from Feeds
@@ -304,6 +321,7 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 ***** TODO Delete
 
 *** Discussion
+**** TODO Reply should scroll to bottom
 **** TODO is_restricted
 **** DONE anonymous replies
      CLOSED: [2018-06-18 Mon 16:29]
@@ -345,6 +363,7 @@ checkbox to show on all pages y/n?
 ***** TODO Delete
 
 *** Comments
+**** TODO reply should scroll to top, after reply, scroll to comment in question
 **** DONE anonymous comments
      CLOSED: [2018-06-18 Mon 16:49]
 **** DONE nested comments

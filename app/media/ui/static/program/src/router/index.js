@@ -4,6 +4,7 @@ import Feed from 'components/Feed'
 import FeedContentStash from 'components/FeedContentStash'
 import Register from 'components/Register'
 import Login from 'components/Login'
+import MediaUpload from 'components/MediaUpload'
 import Place from 'components/Place/Place'
 import Profile from 'components/Profile/Profile'
 //import Chat from 'components/Chat'
@@ -33,8 +34,17 @@ function restAction(route) {
         }
     }
 
+    if (!isNested && !route.params.action && Object.keys(route.params).length === 1) {
+        return {
+            action: 'list',
+            query: {...route.query},
+            isNested: isNested,
+            id: route.params.id
+        }
+    }
+
     // TODO better isNested detection
-    if (isNested || !route.params.action || !validActions.includes(route.params.action)) {
+    if (isNested || !validActions.includes(route.params.action)) {
         return {
             params: {...route.params},
             query: {...route.query},
@@ -66,7 +76,7 @@ export default new Router({
             component: Home
         },
         {
-            path: '/feed/:action',
+            path: '/feed/:action?',
             name: 'Feed',
             component: Feed,
             props: restAction,
@@ -121,7 +131,18 @@ export default new Router({
             component: Register
         },
         {
-            path: '/place/:action',
+            path: '/media',
+            name: 'MediaUpload',
+            component: MediaUpload
+        },
+        {
+            path: '/place/:action?',
+            name: 'Place',
+            props: restAction,
+            component: Place
+        },
+        {
+            path: '/place/:action?',
             name: 'Place',
             props: restAction,
             component: Place
@@ -151,7 +172,7 @@ export default new Router({
             ]
         },
         {
-            path: '/profile/:action',
+            path: '/profile/:action?',
             name: 'Profiles',
             component: Profile,
             props: restAction,
@@ -184,7 +205,7 @@ export default new Router({
             canReuse: false
         },
         {
-            path: '/group/:action',
+            path: '/group/:action?',
             name: 'Group',
             component: Group,
             props: restAction,
@@ -268,7 +289,7 @@ export default new Router({
             canReuse: false
         },
         {
-            path: '/album/:action',
+            path: '/album/:action?',
             name: 'Album',
             component: Album,
             props: restAction,

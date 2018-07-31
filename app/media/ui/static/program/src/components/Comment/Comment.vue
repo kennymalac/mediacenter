@@ -1,9 +1,11 @@
 <template>
-    <div class="feed-container">
+    <div class="comment-container">
         <template v-if="actions.list && (contentObjectId || profileId)">
             <section class="comments">
-                <comment @created="created" :parent="resolvedParent" :contentObjectId="contentObjectId" :profileId="profileId" action="create" />
-                <comment-list @reply="reply" :activeUserId="activeUserId" :contentObjectId="contentObjectId" :profileId="profileId" :items="objects" />
+                <div class="comment-list">
+                    <comment @created="created" :parent="resolvedParent" :contentObjectId="contentObjectId" :profileId="profileId" action="create" />
+                    <comment-list @reply="reply" :activeUserId="activeUserId" :contentObjectId="contentObjectId" :profileId="profileId" :items="objects" />
+                </div>
             </section>
         </template>
         <template v-if="actions.create || actions.manage">
@@ -173,7 +175,15 @@ export default {
 </script>
 
 <style lang="scss">
-.main-form textarea {
-    min-height: 100px;
+.comment-container {
+    .main-form textarea {
+        min-height: 100px;
+    }
+    section.comments {
+        .comment-list {
+            height: calc(100vh - 320px);
+            overflow: scroll;
+        }
+    }
 }
 </style>

@@ -33,7 +33,7 @@
                     </button>
                 </div>
             </div>
-            <h2>Comments</h2>
+            <h2 class="align-left">Comments</h2>
             <router-view :contentObjectId="instance.content_item.id" />
         </template>
         <template v-if="actions.manage">
