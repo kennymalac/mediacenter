@@ -119,6 +119,7 @@ class FeedContentItemType(models.Model):
     BLOGPOST = 'blgpst'
     TOPIC = 'topic'
     POST = 'post'
+    POLL = 'poll'
     # TODO reverse the order here, LOL!
     CONTENT_TYPES = (
         ('image', IMAGE),
@@ -126,6 +127,7 @@ class FeedContentItemType(models.Model):
         ('link', LINK),
         ('topic', TOPIC),
         ('post', POST),
+        ('poll', POLL),
         ('blogpost', BLOGPOST),
     )
     name = models.CharField(max_length=6, choices=CONTENT_TYPES)
@@ -332,11 +334,23 @@ class Link(models.Model):
     content_item = models.ForeignKey(FeedContentItem, related_name="+")
     link = models.URLField()
 
-
 @receiver(post_delete, sender=Link)
 def pre_delete_link(sender, **kwargs):
     instance = kwargs.get('instance')
     if instance.content_item:
+        instance.content_item.delete()
+
+
+class Image(models.Model):
+    content_item = models.ForeignKey(FeedContentItem, related_name="+")
+    src = models.URLField(blank=True)
+    is_uploaded = models.BooleanField(default=False)
+
+@receiver(post_delete, sender=Image)
+def pre_delete_image(sender, **kwargs):
+    instance = kwargs.get('instance')
+    if instance.content_item:
+        # TODO notify CDN of deletion
         instance.content_item.delete()
 
 

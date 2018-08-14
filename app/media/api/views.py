@@ -361,6 +361,10 @@ class FeedContentStashViewSet(NestedViewSetMixin,
             elif content_type == FeedContentItemType.LINK:
                 log = ActivityLog.objects.create(action='Link00', author=item.owner, context={'instance': get_content_id(item), 'feed': get_feed_id(item), 'stash': item.origin_stash.id}, message="Created post")
                 log.subscribed=[]
+            elif content_type == FeedContentItemType.IMAGE:
+                log = ActivityLog.objects.create(action='Image00', author=item.owner, context={'instance': get_content_id(item), 'feed': get_feed_id(item), 'stash': item.origin_stash.id}, message="Created image")
+                log.subscribed=[]
+
 
         stashed_content = FeedContentStashItem.objects.bulk_create([
             FeedContentStashItem(item=item, stash=instance) for item in content
@@ -413,6 +417,19 @@ class LinkViewSet(NestedViewSetMixin,
         'partial_update': LinkCreateUpdateSerializer,
         'update': LinkCreateUpdateSerializer,
         'create': LinkCreateUpdateSerializer
+    }
+
+
+class ImageViewSet(NestedViewSetMixin,
+                   MultipleSerializerMixin,
+                   ModelViewSet):
+
+    queryset = Image.objects.all()
+    serializer_classes = {
+        'default': ImageSerializer,
+        'partial_update': ImageCreateUpdateSerializer,
+        'update': ImageCreateUpdateSerializer,
+        'create': ImageCreateUpdateSerializer
     }
 
 

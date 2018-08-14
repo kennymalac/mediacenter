@@ -11,12 +11,14 @@ import {FeedContentStashCollection, makeFeedContentStashCollection} from './mode
 import {FeedCollection, makeFilteredFeedCollection} from './models/Feed.js'
 import {DiscussionCollection, makeDiscussionCollection} from './models/Discussion.js'
 import {LinkCollection, makeLinkCollection} from './models/Link.js'
+import {ImageCollection, makeImageCollection} from './models/Image.js'
 import {GroupCollection, makeGroupCollection, filterGroupCollection} from './models/Group.js'
 import {AlbumCollection, makeFilteredAlbumCollection} from './models/Album.js'
 import {ActivityLogCollection, makeActivityLogCollection, filterActivityLogCollection} from './models/ActivityLog.js'
 
 export const initialState = {
     loggedIn: false,
+    activeUserPlaces: {},
     activeUser: {},
     accounts: {},
     comments: {},
@@ -32,6 +34,7 @@ export const initialState = {
     places: {},
     discussions: {},
     links: {},
+    images: {},
     groups: {},
     groupFilterParams: {},
     filteredGroups: {},
@@ -210,6 +213,12 @@ export const links = store.deferredCollection(
     'links',
     LinkCollection,
     makeLinkCollection
+)
+
+export const images = store.deferredCollection(
+    'images',
+    ImageCollection,
+    makeImageCollection
 )
 
 const groupCollection = (field, reducer, dependencies = []) => {

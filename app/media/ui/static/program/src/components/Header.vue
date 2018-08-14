@@ -54,7 +54,7 @@ export default {
 <style lang="scss">
 @import "~picnic/src/themes/default/_theme.scss";
 nav {
-    box-shadow: 0 0 0.2rem rgba(17, 17, 17, 0.2);
+    box-shadow: 0px 1px 2px -1px rgba(0, 0, 0, 0.4);
 }
 
 div.menu .nav-item {

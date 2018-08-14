@@ -17,7 +17,7 @@
         <template v-if="actions.details && instance.id">
             <group-info-sidebar v-bind="{ isActiveUserMember, isActiveUserOwner, instance}" @editGroup="editGroup" @joinGroup="joinGroup" @leaveGroup="leaveGroup" />
             <div class="group-contents">
-                <div v-if="!params.discussionAction && !params.linkAction && isActiveUserMember">
+                <div v-if="!params.discussionAction && !params.linkAction && !params.imageAction && isActiveUserMember">
                     <content-item-form :stash="resolvedStash" :groupId="instance.id" :feedId="instance.feed.id" :contentTypes="allowedContentTypes" @contentTypeSelected="contentTypeSelected" />
                 </div>
                 <transition name="view-fade" mode="out-in">
@@ -182,7 +182,7 @@ export default {
                 }
             ],
             // TODO make dynamic
-            allowedContentTypes: ['Image', 'Video', 'Topic', 'Link'],
+            allowedContentTypes: ['Image', 'Topic', 'Poll', 'Link'],
             contentItems: []
         }
     },

@@ -18,11 +18,14 @@
                 </div>
 
                 <form>
-                    <span class="upload-title">Upload an image</span>
-                    <!-- <input type="text" name="title" /> -->
-                    <!-- <input type="text" name="description" /> -->
+                    <input v-model="form.content_item.title" type="text" name="imageTitle" placeholder="Title" />
+                    <input v-model="form.content_item.description" type="text" name="imageDescription" placeholder="Description" />
+
                     <!-- multiselect -->
-                    <button type="button" @click="showUploadForm = false" class="error"><i class="ion-ios-undo"></i> Cancel</button>
+                    <div class="footer">
+                        <button type="button" @click="showUploadForm = false" class="error"><i class="ion-ios-undo"></i> Cancel</button>
+                        <input type="submit" @click.prevent="submit" value="Continue">
+                    </div>
                 </form>
             </div>
 
@@ -40,7 +43,7 @@
                     <!-- multiselect -->
                     <div class="footer">
                         <button type="button" @click="showUploadForm = false" class="error"><i class="ion-ios-undo"></i> Cancel</button>
-                        <input type="submit" @click.prevent="submit" text="Submit">
+                        <input type="submit" @click.prevent="submit" value="Submit">
                     </div>
                 </form>
             </div>
@@ -49,10 +52,11 @@
 </template>
 
 <script>
-import {links, feedContentTypes} from "../store.js"
+import {links, images, feedContentTypes} from "../store.js"
 import linkDeps from "../dependencies/Link.js"
 import activeUserDeps from "../dependencies/activeUser.js"
 import {LinkModel} from "../models/Link.js"
+import {ImageModel} from "../models/Image.js"
 
 export default {
     props: {
@@ -88,9 +92,13 @@ export default {
         linkCreate(ctype) {
             this.selected = ctype
             this.$emit('contentTypeSelected', ctype)
-            if (ctype.title === "Image" || ctype.title === "Link") {
+            if (ctype.title === "Link") {
                 this.showUploadForm = true
                 this.form = LinkModel.getNewInstance()
+            }
+            else if (ctype.title === "Image") {
+                this.showUploadForm = true
+                this.form = ImageModel.getNewInstance()
             }
             else if (this.selected.title === "Topic") {
                 if (this.groupId) {
@@ -145,6 +153,27 @@ export default {
                             this.$router.push(`/feed/${this.feedId}/details/stash/${this.stash.id}/details/link/${instance.id}/manage`)
                         }
                     })
+            }
+            else if (this.selected.title === "Image") {
+                const imageCollection = await images()
+                console.log(this.form)
+                const instance = await imageCollection.create(this.form, await linkDeps(this.stash.id))
+                if (this.groupId) {
+                    this.$router.push({
+                        name: 'GroupImageNested',
+                        params: {
+                            groupId: this.groupId,
+                            groupAction: 'details',
+                            stashId: this.stash.id,
+                            stashAction: 'details',
+                            imageId: instance.id,
+                            imageAction: 'manage'
+                        }
+                    })
+                }
+                else {
+                    this.$router.push(`/feed/${this.feedId}/details/stash/${this.stash.id}/details/image/${instance.id}/manage`)
+                }
             }
         }
     }

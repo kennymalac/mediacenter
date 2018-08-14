@@ -39,6 +39,7 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 **** TODO improve zero states
 
 *** UI/UX fixes
+**** TODO user list should have profile images
 **** TODO some sort of grid system & layout
 **** DONE convert Modal to flexbox
      CLOSED: [2018-04-30 Mon 18:30]
@@ -65,7 +66,7 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
      CLOSED: [2018-06-19 Tue 16:34]
 **** DONE Account always shows as successfully being logged in even on error
      CLOSED: [2018-07-16 Mon 17:22]
-**** TODO better permission system, login shouldn't require Store reset
+**** TODO login shouldn't require Store reset
 **** TODO user permission system
 **** TODO Secure API
 **** DONE log out should clear store
@@ -113,6 +114,22 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 **** DONE Merge Manage Album and Create Album into "Albums"
      CLOSED: [2018-05-11 Fri 16:47]
 **** TODO full test coverage
+*** Images
+**** DONE model, serializer, viewset
+     CLOSED: [2018-08-14 Tue 16:34]
+**** TODO CRUD
+***** DONE Create
+      CLOSED: [2018-08-14 Tue 16:34]
+***** DONE Read
+      CLOSED: [2018-08-14 Tue 16:34]
+***** DONE Update
+      CLOSED: [2018-08-14 Tue 16:34]
+***** TODO Delete
+
+**** DONE image upload
+     CLOSED: [2018-08-14 Tue 16:34]
+**** DONE add Feed content item
+     CLOSED: [2018-08-14 Tue 16:34]
 *** Groups
 **** TODO make it so you can't add members to Group - only invite them
 *** Account

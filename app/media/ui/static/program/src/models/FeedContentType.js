@@ -27,6 +27,7 @@ class FeedContentTypeCollection extends Collection {
         vid: "Video",
         link: "Link",
         topic: "Topic",
+        poll: "Poll",
         post: "Post",
         blgpst: "Blog post"
     }
@@ -36,6 +37,7 @@ class FeedContentTypeCollection extends Collection {
         vid: "ion-md-videocam",
         link: "ion-ios-link",
         topic: "ion-ios-chatboxes",
+        poll: "ion-ios-pie-outline",
         post: "",
         blgpst: "ion-md-text"
     }

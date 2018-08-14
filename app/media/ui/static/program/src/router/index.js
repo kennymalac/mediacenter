@@ -15,6 +15,7 @@ import Album from 'components/Album'
 import Group from 'components/Group/Group'
 import Discussion from 'components/Discussion/Discussion'
 import Link from 'components/Link'
+import Image from 'components/Image'
 import Comment from 'components/Comment/Comment'
 
 Vue.use(Router)
@@ -114,6 +115,28 @@ export default new Router({
                         {
                             path: 'link/:linkAction',
                             component: Link,
+                            props: restAction
+                        },
+                        {
+                            path: 'image/:imageId/:imageAction',
+                            component: Image,
+                            props: restAction,
+                            children: [
+                                {
+                                    path: 'comment/:commentId/:commentAction',
+                                    component: Comment,
+                                    props: restAction
+                                },
+                                {
+                                    path: 'comment/:commentAction',
+                                    component: Comment,
+                                    props: restAction
+                                }
+                            ]
+                        },
+                        {
+                            path: 'image/:imageAction',
+                            component: Image,
                             props: restAction
                         }
                     ]
@@ -246,6 +269,29 @@ export default new Router({
                         {
                             path: 'link/:linkAction',
                             component: Link,
+                            props: restAction
+                        },
+                        {
+                            name: 'GroupImageNested',
+                            path: 'image/:imageId/:imageAction',
+                            component: Image,
+                            props: restAction,
+                            children: [
+                                {
+                                    path: 'comment/:commentId/:commentAction',
+                                    component: Comment,
+                                    props: restAction
+                                },
+                                {
+                                    path: 'comment/:commentAction',
+                                    component: Comment,
+                                    props: restAction
+                                }
+                            ]
+                        },
+                        {
+                            path: 'image/:imageAction',
+                            component: Image,
                             props: restAction
                         },
                         {

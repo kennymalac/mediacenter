@@ -4,7 +4,7 @@
             <transition name="view-fade" mode="out-in">
                 <router-view :key="$route.name" :feedId="feedId" :stashId="instance.id"></router-view>
             </transition>
-            <section class="feed" v-if="!params.discussionAction && !params.linkAction">
+            <section class="feed" v-if="!params.discussionAction && !params.linkAction && !params.imageAction">
                 <feed-content-item-list :showMenu="showMenu" @listChildren="listContentChildren" @togglePin="togglePin" :stashId="instance.id" :query="query" :showGroupTag="showGroupTag" :items="content" :enabledContentTypes="enabledContentTypes" />
             </section>
         </template>
@@ -46,7 +46,7 @@ export default {
     },
     computed: {
         enabledContentTypes() {
-            return ["Topic", "Link"]
+            return ["Topic", "Link", "Image"]
         }
     },
     methods: {

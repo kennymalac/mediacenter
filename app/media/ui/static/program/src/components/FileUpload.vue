@@ -65,7 +65,7 @@ export default {
         doUpload(id, storedFile) {
             this.uploader.add(storedFile, (val) => { this.$emit('progress', val) })
             // The file has been fully uploaded, send the completed event
-                .then(uri => this.$emit('completed', uri),
+                .then(uri => this.$emit('completed', id, uri),
                       reason => this.$emit('failed', reason))
                 .then(() => {
                     this.fileStore.delete(id)
@@ -98,6 +98,8 @@ export default {
                     fileName = fileName
                         .substring(0, fileName.lastIndexOf('.'))
                         .substring(0, 32-justFileExt.length)
+
+                    fileName = `${fileName}${justFileExt}`
                 }
                 // Get the full upload path from the server side
                 this.requestUpload(fileName).then((object) => {
@@ -118,11 +120,11 @@ export default {
                         vm.$emit('fileReady', e.target.result)
                     }
 
-            reader.readAsDataURL(file)
-          }
+                    reader.readAsDataURL(file)
+                }
+            }
+            return false;
         }
-        return false;
-      }
     }
-  }
+}
 </script>

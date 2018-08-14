@@ -461,8 +461,8 @@ def get_content_id(instance):
         _model = Discussion
     elif instance.content_type.name == FeedContentItemType.LINK:
         _model = Link
-        # elif instance.content_type == FeedContentItemType.IMAGE:
-        #     _model =
+    elif instance.content_type.name == FeedContentItemType.IMAGE:
+        _model = Image
 
     pk = _model.objects.filter(content_item=instance).values_list('id', flat=True).first()
     return pk
@@ -538,6 +538,10 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
             content_id = self.get_content_id(instance)
             if content_id:
                 return BasicLinkSerializer(instance=Link.objects.get(id=self.get_content_id(instance))).data
+        elif instance.content_type.name == FeedContentItemType.IMAGE:
+            content_id = self.get_content_id(instance)
+            if content_id:
+                return BasicImageSerializer(instance=Image.objects.get(id=self.get_content_id(instance))).data
 
 
 class FeedContentStashItemBasicSerializer(serializers.ModelSerializer):
@@ -620,6 +624,20 @@ class FeedContentStashCreateUpdateSerializer(serializers.ModelSerializer):
 
 
 class ContentItemCRUDSerializer(serializers.ModelSerializer):
+    def create_content_item(self, data, content_type):
+        interests = []
+        places = []
+        if 'interests' in data:
+            interests = data.pop('interests')
+        if 'places' in data:
+            places = data.pop('places')
+
+        instance = FeedContentItem.objects.create(**data, content_type=content_type)
+        instance.interests.add(*interests)
+        instance.places.add(*places)
+
+        return instance
+
     def update(self, instance, validated_data):
         if 'content_item' in validated_data:
             for k,v in validated_data.pop('content_item').items():
@@ -676,7 +694,7 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
         else:
             content_type = FeedContentItemType.objects.get(name=FeedContentItemType.TOPIC)
 
-        content_item = FeedContentItem.objects.create(**content_item_data, content_type=content_type)
+        content_item = self.create_content_item(content_item_data, content_type)
 
         discussion = Discussion.objects.create(**validated_data, content_item=content_item, order=order)
         # discussion.members.add(*member
@@ -711,7 +729,7 @@ class LinkCreateUpdateSerializer(ContentItemCRUDSerializer):
         content_item_data = validated_data.pop('content_item')
 
         content_type = FeedContentItemType.objects.get(name=FeedContentItemType.LINK)
-        content_item = FeedContentItem.objects.create(**content_item_data, content_type=content_type)
+        content_item = self.create_content_item(content_item_data, content_type)
 
         link = Link.objects.create(**validated_data, content_item=content_item)
 
@@ -720,6 +738,40 @@ class LinkCreateUpdateSerializer(ContentItemCRUDSerializer):
     class Meta:
         model = Link
         fields = ('id', 'content_item', 'link')
+
+
+class ImageSerializer(serializers.ModelSerializer):
+    content_item = FeedContentItemProfileSerializer()
+
+    class Meta:
+        model = Image
+        fields = ('id', 'content_item', 'src')
+
+class BasicImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image
+        fields = ('id', 'src')
+
+
+class ImageCreateUpdateSerializer(ContentItemCRUDSerializer):
+    content_item = FeedContentItemBasicSerializer(
+        many=False,
+        required=False
+    )
+
+    def create(self, validated_data):
+        content_item_data = validated_data.pop('content_item')
+
+        content_type = FeedContentItemType.objects.get(name=FeedContentItemType.IMAGE)
+        content_item = self.create_content_item(content_item_data, content_type)
+
+        image = Image.objects.create(**validated_data, content_item=content_item)
+
+        return image
+
+    class Meta:
+        model = Image
+        fields = ('id', 'content_item', 'src')
 
 
 class GroupForumSerializer(serializers.ModelSerializer):

@@ -5,7 +5,7 @@
             <div style="display: inline-block" v-for="item in pageContent" :key="item.id">
                 <feed-link @togglePin="() => togglePin(item)" v-if="item.content_type.name == 'link'" :showGroupTag="showGroupTag" :showMenu="showMenu" :item="item" />
                 <feed-discussion-topic @togglePin="() => togglePin(item)" v-if="item.content_type.name == 'topic'" :showGroupTag="showGroupTag" :showMenu="showMenu" :item="item" />
-                <feed-image v-if="item.content_type.name == 'img'" v-bind="item" />
+                <feed-image @togglePin="() => togglePin(item)" v-if="item.content_type.name == 'img'" :showGroupTag="showGroupTag" :showMenu="showMenu" :item="item" />
             </div>
         </transition-group>
     </div>

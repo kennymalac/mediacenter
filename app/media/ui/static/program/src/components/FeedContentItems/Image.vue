@@ -1,8 +1,17 @@
 <template>
-    <content-item :embed="embedProps" :title="title" :created="created">
+    <content-item :embed="embedProps" v-bind="item.instance" @togglePin="$emit('togglePin')" :showMenu="showMenu" :showGroupTag="showGroupTag" :detailsUrl="detailsUrl" :commentsUrl="commentsUrl" :groupId="item.group_id" :groupName="item.group_name" :isPinned="item.is_pinned" :isLocal="item.is_local" :owner="item.owner.instance" style="imageBg">
+        <span slot="content-type">
+            <i class="ion-ios-image"></i>
+        </span>
+        <template slot="content-link">
+            <a class="header external-link" :href="item.nested_object.link">{{ item.title }}</a>
+        </template>
+
         <template slot="embed" slot-scope="{ slotProps }">
-            <div class="default-preview" v-if="!embedProps.src">
-                <i class="ion-ios-image"></i>
+            <div class="default-preview">
+                <blockquote>
+                    {{ item.description }}
+                </blockquote>
             </div>
         </template>
     </content-item>
@@ -10,25 +19,43 @@
 
 <script>
 import ContentItem from './ContentItem'
-//import FeedImageCollection from '../../models/Image.js'
+import TagList from '../TagList'
 
 export default {
     name: 'feed-image',
     props: {
-        title: {
-            type: String,
-            default: ""
+        stashId: [Number],
+        item: {
+            type: Object
         },
-        description: {
-            type: String,
-            default: ""
+        showGroupTag: {
+            type: Boolean,
+            default: true
         },
-        owner: {
-            type: Number
+        showMenu: {
+            type: Boolean,
+            default: true
         }
     },
     components: {
-        ContentItem
+        ContentItem,
+        TagList
+    },
+    computed: {
+        commentsUrl() {
+            return `${this.detailsUrl}/comment/list`
+        },
+        detailsUrl() {
+            if (this.item.group_id !== 0 && this.item.group_id !== null) {
+                return `/group/${this.item.group_id}/details/stash/${this.item.origin_stash_id}/details/image/${this.item.object_id}/details`
+            }
+            return `/feed/${this.item.feed_id}/details/stash/${this.item.origin_stash_id}/details/image/${this.item.object_id}/details`
+        },
+        imageBg() {
+            return {
+                "background-image": `url(${this.nested_object.src})`
+            }
+        }
     },
     data() {
         return {
@@ -40,5 +67,24 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
+.content-title {
+    .ion-ios-image { margin-left: 8px; }
+    .content-type {
+        display: inline-flex;
+        border-radius: 6px;
+        background-color: #1F8DD6;
+        color: white;
+        font-weight: normal;
+        padding: 4px;
+        font-size: 1rem;
+    }
+}
+
+.topic {
+    blockquote {
+        overflow: hidden;
+        max-height: 75%;
+    }
+}
 </style>

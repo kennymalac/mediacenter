@@ -52,7 +52,7 @@ export default {
                 link: "/",
                 extraIcon: "ion-md-add-circle"
             },
-            allowedContentTypes: ['Image', 'Video', 'Topic', 'Link'],
+            allowedContentTypes: ['Image', 'Topic', 'Poll', 'Link'],
             resolvedFeedId: '',
             resolvedStash: {}
         }
