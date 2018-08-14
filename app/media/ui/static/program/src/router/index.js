@@ -4,7 +4,7 @@ import Feed from 'components/Feed'
 import FeedContentStash from 'components/FeedContentStash'
 import Register from 'components/Register'
 import Login from 'components/Login'
-import MediaUpload from 'components/MediaUpload'
+// import MediaUpload from 'components/MediaUpload'
 import Place from 'components/Place/Place'
 import Profile from 'components/Profile/Profile'
 //import Chat from 'components/Chat'
@@ -153,11 +153,11 @@ export default new Router({
             name: 'Register',
             component: Register
         },
-        {
-            path: '/media',
-            name: 'MediaUpload',
-            component: MediaUpload
-        },
+        // {
+        //     path: '/media',
+        //     name: 'MediaUpload',
+        //     component: MediaUpload
+        // },
         {
             path: '/place/:action?',
             name: 'Place',

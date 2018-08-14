@@ -11,7 +11,6 @@
             <router-link v-if="!loggedIn" :class="menuClass" to="/login">Login</router-link>
             <router-link v-if="!loggedIn" :class="menuClass" to="/register">Register</router-link>
             <router-link :class="menuClass" to="/place/"><i class="icon ion-ios-compass"></i> Places</router-link>
-            <router-link :class="menuClass" to="/media/"><i class="icon ion-ios-image"></i> Test Media Upload</router-link>
             <router-link :class="menuClass" to="/feed/"><i class="ion-ios-list-box"></i> Feeds</router-link>
             <router-link :class="menuClass" to="/group/"><i class="ion-ios-people"></i> Groups</router-link>
             <router-link :class="menuClass" to="/profile/"><i class="ion-md-people"></i> Users</router-link>
