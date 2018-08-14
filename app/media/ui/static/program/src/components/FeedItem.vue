@@ -1,12 +1,12 @@
 <template>
-    <action-button size="large" :link="feedLink" :icon="icon" :title="name" />
+    <action-button size="large" :image="image" :link="feedLink" :icon="icon" :title="name" />
 </template>
 
 <script>
 import ActionButton from './ActionButton'
 
 export default {
-    props: ['id', 'icon', 'name'],
+    props: ['id', 'icon', 'image', 'name'],
     components: {
         ActionButton
     },

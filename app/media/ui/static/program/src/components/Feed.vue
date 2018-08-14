@@ -8,7 +8,7 @@
             <section class="feeds">
                 <h1>Your Feeds</h1>
 
-                <feed-item v-for="feed in objects" :id="feed.id" :name="feed.name" />
+                <feed-item v-for="feed in objects" :image="feed.picture" :id="feed.id" :name="feed.name" />
             </section>
         </template>
         <template v-if="actions.details && instance.id">
