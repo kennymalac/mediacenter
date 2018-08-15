@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="places-container">
         <template v-if="actions.details && instance.id">
             <section class="top-navigation">
                 <div @click="showGroups" :class="{ selected: $route.fullPath.includes('group'), xlarge: true }"><i class="ion ion-ios-people"></i> Local Groups</div>
@@ -18,15 +18,19 @@
 
             <form class="connect-location-form" @submit.prevent="connect">
                 <div class="connect-icon">
-                    <i class="icon location-icon ion-ios-compass-outline"></i>
+                    <compass />
+                    <br />
+                    <br />
                 </div>
                 <div class="connect-info">
+
                     <h1>Find your people.</h1>
                     <fieldset>
                         <!-- <label class="stack" for="">Tags</label> -->
                         <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->
                         <input class="stack" type="submit" value="Connect" />
                     </fieldset>
+                    <small class="courtesy">Image courtesy of <a href="https://www.flickr.com/photos/torley/24777146395">TORLEY</a> (<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</a>)</small>
                 </div>
             </form>
         </template>
@@ -38,6 +42,7 @@ import geojsonify from 'geoposition-to-geojson'
 
 import RestfulComponent from "../RestfulComponent"
 import PlaceList from './PlaceList'
+import Compass from './Compass'
 
 import {places, activeUser} from '../../store.js'
 import placeDeps from '../../dependencies/Place.js'
@@ -46,7 +51,8 @@ export default {
     name: 'place',
     mixins: [RestfulComponent],
     components: {
-        PlaceList
+        PlaceList,
+        Compass
     },
     props: {
         positionOptions: {
@@ -149,6 +155,12 @@ export default {
 
 <style lang="scss">
 @import "~picnic/src/themes/default/_theme.scss";
+.places-container {
+    height: 100%;
+    background-image: url("http://127.0.0.1:4242/bucket/1/1E/24777146395_0bbfe03661_o.png");
+    background-size: cover;
+    opacity: .9;
+}
 
 .top-navigation {
     div {
@@ -175,6 +187,30 @@ export default {
             font-size: 8rem;
             display: inline-block;
             height: 10px;
+        }
+    }
+    small.courtesy {
+        position: absolute;
+        top:0;
+        right:0;
+        bottom:0;
+        left:0;
+        margin: auto;
+        top: 90%;
+        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+        a {
+            text-shadow: -1px 0 blue, 0 1px blue, 1px 0 blue, 0 -1px blue;
+        }
+        mix-blend-mode: difference;
+    }
+    .connect-info {
+        color: white;
+        h1 {
+            width: 20rem;
+            margin: auto;
+            //text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+            //text-shadow: 0.1rem 0.15rem 0.25rem rgba(0,0,0,0.95);
+            mix-blend-mode: difference;
         }
     }
     input[type=submit] {

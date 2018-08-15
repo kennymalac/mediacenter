@@ -16,7 +16,8 @@ $classicgreen: #4F8A10;
     -webkit-font-smoothing: antialiased;
     text-align: center;
     color: $subgray;
-    padding-top: 60px;
+    padding-top: 44px;
+    height: 100%;
 }
 .xlarge {
     font-size: 1.25em;
@@ -73,8 +74,6 @@ label.stack {
     text-align: left;
 }
 
-// TODO remove Pure CSS by Yahoo
-//Pure CSS enhancements
 /* Button classes:
  * Standard Error state button
  * Standard Success state button
@@ -82,12 +81,6 @@ label.stack {
  * Primary action
  * Secondary action
 */
-.pure-button-error {
-    background-color: $maroonesque;
- }
-.pure-button-success {
-    background-color: $classicgreen;
-}
 .classic-primary-button {
     background-color: $classicblue;
 }
@@ -107,7 +100,7 @@ label.stack {
     }
     &.info {
         color: #fff;
-        background-color: $classiclightblue;
+        background: linear-gradient($classicblue 90%, #264d77);
     }
     &.error {
         color: #D8000C;
