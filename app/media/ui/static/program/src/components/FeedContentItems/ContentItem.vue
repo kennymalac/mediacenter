@@ -134,7 +134,8 @@ $actions-height: 70px;
 $title-height: 56px;
 
 .content-item {
-    background-color: white;
+    vertical-align: top;
+    position: relative;
     margin: 10px;
     display: inline-flex;
     flex-direction: column;

@@ -15,7 +15,7 @@
             </section>
         </template>
         <template v-if="actions.details && instance.id">
-            <group-info-sidebar v-bind="{ isActiveUserMember, isActiveUserOwner, instance}" @editGroup="editGroup" @joinGroup="joinGroup" @leaveGroup="leaveGroup" />
+            <group-info-sidebar v-bind="{ isActiveUserMember, isActiveUserOwner, instance}" @editGroup="editGroup" @joinGroup="joinGroup" @leaveGroup="leaveGroup" @details="viewGroup" />
             <div class="group-contents">
                 <div v-if="!params.discussionAction && !params.linkAction && !params.imageAction && isActiveUserMember">
                     <content-item-form :stash="resolvedStash" :groupId="instance.id" :feedId="instance.feed.id" :contentTypes="allowedContentTypes" @contentTypeSelected="contentTypeSelected" />
@@ -231,6 +231,10 @@ export default {
         async manage(params) {
             this.instance = await this.showInstance(params.id, `/group/${params.id}/details`, groups, await groupDeps())
             this.instanceForm = this.instance.getForm()
+        },
+
+        viewGroup() {
+            router.push(`/group/${this.instance.id}/details`)
         },
 
         editGroup() {

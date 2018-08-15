@@ -1,11 +1,11 @@
 <template>
     <section class="sidebar">
         <div class="group-info">
-            <div class="icon-container">
+            <div @click="$emit('details')" class="icon-container">
                 <img v-if="instance.picture" height="100%" width="100%" :src="instance.picture" />
                 <i v-if="instance.icon" :class="instance.icon"></i>
             </div>
-            <h2>{{ instance.name }}</h2>
+            <h2 @click="$emit('details')">{{ instance.name }}</h2>
 
             <tag-list :tags="instance.interests" tagType="interest" />
             <!-- <tag-list :tags="instance.contentTypes" tagType="interest" /> -->

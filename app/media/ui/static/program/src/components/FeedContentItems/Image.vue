@@ -1,13 +1,15 @@
 <template>
-    <content-item :embed="embedProps" v-bind="item.instance" @togglePin="$emit('togglePin')" :showMenu="showMenu" :showGroupTag="showGroupTag" :detailsUrl="detailsUrl" :commentsUrl="commentsUrl" :groupId="item.group_id" :groupName="item.group_name" :isPinned="item.is_pinned" :isLocal="item.is_local" :owner="item.owner.instance" style="imageBg">
+    <content-item :embed="embedProps" v-bind="item.instance" @togglePin="$emit('togglePin')" :showMenu="showMenu" :showGroupTag="showGroupTag" :detailsUrl="detailsUrl" :commentsUrl="commentsUrl" :groupId="item.group_id" :groupName="item.group_name" :isPinned="item.is_pinned" :isLocal="item.is_local" :owner="item.owner.instance">
         <span slot="content-type">
             <i class="ion-ios-image"></i>
         </span>
         <template slot="content-link">
-            <a class="header external-link" :href="item.nested_object.link">{{ item.title }}</a>
+            <router-link class="header" :to="detailsUrl">{{ item.title }}</router-link>
         </template>
 
         <template slot="embed" slot-scope="{ slotProps }">
+            <!-- <div :style="imageBg" v-if="item.nested_object.src"> -->
+            <!-- </div> -->
             <div class="default-preview">
                 <blockquote>
                     {{ item.description }}
@@ -52,8 +54,18 @@ export default {
             return `/feed/${this.item.feed_id}/details/stash/${this.item.origin_stash_id}/details/image/${this.item.object_id}/details`
         },
         imageBg() {
+            // TODO generate thumbnails
             return {
-                "background-image": `url(${this.nested_object.src})`
+                opacity: 0.5,
+                'z-index': '-1',
+                top: '46px',
+                left: 0,
+                bottom: 0,
+                right: 0,
+                height: 'calc(100% - 46px)',
+                position: 'absolute',
+                "background-image": `url(${this.item.nested_object.src})`,
+                "background-size": 'cover'
             }
         }
     },

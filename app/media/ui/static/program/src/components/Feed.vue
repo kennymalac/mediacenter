@@ -12,7 +12,7 @@
             </section>
         </template>
         <template v-if="actions.details && instance.id">
-            <feed-info-sidebar :instance="instance" @editFeed="editFeed" :isActiveUserOwner="isActiveUserOwner" />
+            <feed-info-sidebar :instance="instance" @editFeed="editFeed" @details="viewFeed" :isActiveUserOwner="isActiveUserOwner" />
             <section class="feed" v-if="!params.stashId">
                 <feed-content-item-list :query="query" @listChildren="listContentChildren" :enabledContentTypes="enabledContentTypes" :items="contentItems" />
             </section>
@@ -85,15 +85,16 @@ export default {
     },
     computed: {
         feedStyle() {
+            const defaults = { height: '100%' }
             if (!this.params ||
                 (this.params &&
                  !(["details", "manage"].includes(this.params.feedAction)) &&
                  !(["details", "manage"].includes(this.params.action)))) {
-                return {}
+                return Object.assign({}, defaults)
             }
-            return {
+            return Object.assign({}, defaults, {
                 "background-color": this.colors.hex
-            }
+            })
         },
         enabledContentTypes() {
             return this.filters.contentTypes.map((contentType) => {
@@ -162,6 +163,10 @@ export default {
             this.instance = await this.showInstance(params.id, 'feed/list', feeds, await feedDeps())
             this.instanceForm = this.instance.getForm()
             this.colors.hex = this.instance.background_color ? `#${this.instance.background_color}` : ""
+        },
+
+        viewFeed() {
+            router.push(`/feed/${this.instance.id}/details`)
         },
 
         editFeed() {

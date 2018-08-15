@@ -149,4 +149,8 @@ export default {
         text-decoration: underline;
     }
 }
+.link-container {
+    height: calc(100vh - 60px);
+    overflow: scroll;
+}
 </style>

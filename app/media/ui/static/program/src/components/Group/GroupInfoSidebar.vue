@@ -1,10 +1,10 @@
 <template>
     <section class="sidebar">
         <div class="group-info">
-            <div class="icon-container">
+            <div @click="$emit('details')" class="icon-container">
                 <img height="100%" width="100%" :src="instance.image" />
             </div>
-            <h2>{{ instance.name }}</h2>
+            <h2 @click="$emit('details')">{{ instance.name }}</h2>
 
             <div v-if="instance.members.length !== 1">{{ instance.members.length }} Members</div>
             <div v-if="instance.members.length === 1">{{ instance.members.length }} Member</div>
@@ -66,3 +66,34 @@ export default {
     }
 }
 </script>
+
+<style lang="scss">
+.group-info {
+    &:hover, &:focus {
+        .icon-container {
+            cursor: pointer;
+            box-shadow: 0 3px 8px 0px rgba(0, 0, 0, .3);
+            opacity: .9;
+        }
+    }
+    h2 {
+        &:hover, &:focus {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    }
+    .icon-container {
+        &:hover, &:focus {
+            cursor: pointer;
+        }
+        &:active {
+            color: #eee;
+            opacity: .8;
+            border-style: inset;
+            img {
+                opacity: .8;
+            }
+        }
+    }
+}
+</style>
