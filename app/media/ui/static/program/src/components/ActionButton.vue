@@ -1,7 +1,7 @@
 <template>
     <router-link :class="actionClass" :to="link">
         <div class="icon-container">
-            <i v-if="icon" :class="icon"></i>
+            <i v-if="icon && !image" :class="icon"></i>
             <img v-if="image" height="100%" width="100%" :src="image" />
         </div>
         <h2><i v-if="extraIcon" :class="extraIcon"></i> {{ title }}</h2>
@@ -55,6 +55,7 @@ $dark-green: #2b9f67;
 $shadow-color: rgba(0, 0, 0, .2);
 
 .action-button {
+    vertical-align: top;
     background: linear-gradient(135deg, white, rgb(236, 240, 241));
     color: rgb(52, 73, 94);
     display: inline-flex;
@@ -162,7 +163,7 @@ $shadow-color: rgba(0, 0, 0, .2);
         border: 1px solid rgba(52, 73, 94,1.0);
         height: 32px;
         i {
-            font-size: 1.25rem
+            font-size: 1.25rem;
         }
     }
 }

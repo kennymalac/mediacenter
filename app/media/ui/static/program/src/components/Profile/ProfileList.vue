@@ -1,6 +1,6 @@
 <template>
     <div class="profile-list">
-        <profile-item v-for="profile in items" :id="profile.id" :name="profile.display_name" />
+        <profile-item v-for="profile in items" :image="profile.picture" :id="profile.id" :name="profile.display_name" />
     </div>
 </template>
 
