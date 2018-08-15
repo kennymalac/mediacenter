@@ -87,14 +87,15 @@ export default {
 
 <style scoped lang="scss">
 @import "~picnic/src/themes/default/_theme.scss";
-    .context-menu {
-display: inline-block;
-&.hover {
+.context-menu {
+    vertical-align: middle;
+    display: inline-block;
+    &.hover {
+    }
 }
-    }
-    i.toggled {
+i.toggled {
     transform: rotateZ(180deg);
-    }
+}
 div.profile-embed {
     .ion-md-arrow-dropdown {
         transition:all .25s ease-in-out;
@@ -103,13 +104,13 @@ div.profile-embed {
         padding-right: 5px;
     }
     .display-name {
-box-shadow: none;
-color: black;
-    margin-left: 5px;
-    transition: $picnic-transition;
-&.toggled, &:hover, &:focus {
+        box-shadow: none;
+        color: black;
+        margin-left: 5px;
+        transition: $picnic-transition;
+        &.toggled, &:hover, &:focus {
             color: #49637e;
-}
+        }
     }
     height: 100%;
     padding: 6px;
