@@ -12,7 +12,7 @@
                         </context-menu>
                         <input class="order" min="0" :max="maxOrder" type="number" v-model="option.order" />
                         <label>
-                            <span contentEditable class="checkable">{{ option.title }}</span>
+                            <span contentEditable @blur="(e) => option.title = e.target.textContent" class="checkable">{{ option.title }}</span>
                         </label>
                     </li>
                 </transition-group>

@@ -1,6 +1,6 @@
 <template>
     <content-item :embed="embedProps" v-bind="item.instance" @togglePin="$emit('togglePin')" :showMenu="showMenu" :showGroupTag="showGroupTag" :detailsUrl="detailsUrl" :commentsUrl="commentsUrl" :groupId="item.group_id" :groupName="item.group_name" :isPinned="item.is_pinned" :isLocal="item.is_local" :owner="item.owner.instance">
-        <span slot="content-type" class="content-type">Topic</span>
+        <span slot="content-type" :class="{ 'content-type': true, [subtype.toLowerCase()]: true }">{{ subtype }}</span>
         <template slot="embed" slot-scope="{ slotProps }">
             <div class="default-preview topic">
                 <blockquote>
@@ -21,6 +21,10 @@ export default {
     props: {
         item: {
             type: Object
+        },
+        subtype: {
+            type: String,
+            default: "Topic"
         },
         showMenu: {
             type: Boolean,
@@ -57,7 +61,7 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .content-title {
     .content-type {
         display: inline-flex;
@@ -68,6 +72,10 @@ export default {
         height: 2rem;
         // align-self: flex-start;
         font-size: .8rem;
+        &.poll {
+            background-color: #eb3636;
+            background: linear-gradient(#eb3636 90%, #a73535);
+        }
     }
 }
 

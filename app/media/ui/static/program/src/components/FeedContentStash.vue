@@ -46,7 +46,7 @@ export default {
     },
     computed: {
         enabledContentTypes() {
-            return ["Topic", "Link", "Image"]
+            return ["Topic", "Poll", "Link", "Image"]
         }
     },
     methods: {

@@ -99,6 +99,16 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 *** Gallery
 **** TODO 
 **** TODO full test coverage
+*** Polls
+**** DONE model, serializer, viewset
+     CLOSED: [2018-08-15 Wed 19:17]
+**** TODO CRUD
+***** DONE Create
+      CLOSED: [2018-08-15 Wed 19:17]
+***** DONE Read
+      CLOSED: [2018-08-15 Wed 19:17]
+***** TODO Update
+***** TODO Delete
 *** Album
 **** DONE owner should be Account
      CLOSED: [2018-05-21 Mon 15:41]

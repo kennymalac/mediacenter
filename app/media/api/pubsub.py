@@ -76,6 +76,17 @@ TOPIC_DEF = (
 [TOPIC_ACTIONS, TOPIC_MESSAGES] = to_representations(TOPIC_DEF)
 
 
+POLL_DEF = (
+    ('Poll00', 'create_poll', '{{action.author}} created a poll{% if group %} in {{group.title}}{% endif %}.'),
+    ('Poll01', 'read_poll', '{{action.author}} viewed a poll{% if group %} in {{group.title}}{% endif %}.'),
+    ('Poll02', 'update_poll', '{{action.author}} updated a poll{% if group %} in {{group.title}}{% endif %}.'),
+    ('Poll03', 'delete_poll', '{{action.author}} deleted a poll{% if group %} in {{group.title}}{% endif %}.'),
+    ('Poll05', 'save_poll', '{{action.author}} saved a poll{% if stash %} into {{stash.title}}{% endif %}.' ),
+    ('Poll06', 'vote_poll', '{{action.author}} voted in a poll{% if group %} in {{group.title}}{% endif %}.')
+)
+[POLL_ACTIONS, POLL_MESSAGES] = to_representations(POLL_DEF)
+
+
 POST_DEF = (
     ('Post00', 'create_post', '{{action.author}} replied to {{parent.content_item.title}}{% if group %} in {{group.title}}{% endif %}.'),
     ('Post02', 'update_post', '{{action.author}} updated a post{% if group %} in {{group.title}}{% endif %}.'),
@@ -100,6 +111,7 @@ CONTENT_ACTIONS += IMAGE_ACTIONS
 CONTENT_ACTIONS += LINK_ACTIONS
 CONTENT_ACTIONS += TOPIC_ACTIONS
 CONTENT_ACTIONS += POST_ACTIONS
+CONTENT_ACTIONS += POLL_ACTIONS
 CONTENT_ACTIONS += BLOGPOST_ACTIONS
 
 ALL_ACTIONS = []

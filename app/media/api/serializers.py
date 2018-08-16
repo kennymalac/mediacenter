@@ -457,7 +457,8 @@ class FeedContentItemBasicSerializer(serializers.ModelSerializer):
 def get_content_id(instance):
     _model = None
     if instance.content_type.name == FeedContentItemType.TOPIC or \
-       instance.content_type.name == FeedContentItemType.POST:
+       instance.content_type.name == FeedContentItemType.POST or \
+       instance.content_type.name == FeedContentItemType.POLL:
         _model = Discussion
     elif instance.content_type.name == FeedContentItemType.LINK:
         _model = Link
@@ -704,8 +705,6 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
     def create(self, validated_data):
         content_item_data = validated_data.pop('content_item')
         poll_data = None
-        if 'poll' in validated_data:
-            poll_data = validated_data.pop('poll')
         order = 0
 
         if validated_data.get('parent', 0):
@@ -715,6 +714,9 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
                 order = posts.aggregate(Max('order'))['order__max'] + 1
             else:
                 order = 1
+        elif validated_data.get('poll', 0):
+            content_type = FeedContentItemType.objects.get(name=FeedContentItemType.POLL)
+            poll_data = validated_data.pop('poll')
         else:
             content_type = FeedContentItemType.objects.get(name=FeedContentItemType.TOPIC)
 

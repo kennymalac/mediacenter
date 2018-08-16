@@ -235,7 +235,7 @@ export default {
         savePoll(_options) {
             let options = _options
             if (this.actions.manage) {
-                // TO78DO
+                // TODO
             }
             if (this.actions.create) {
                 // don't use the ids here, because the ids are not real

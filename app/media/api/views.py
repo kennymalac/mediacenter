@@ -358,6 +358,9 @@ class FeedContentStashViewSet(NestedViewSetMixin,
             elif content_type == FeedContentItemType.POST:
                 log = ActivityLog.objects.create(action='Post00', author=item.owner, context={'instance': get_content_id(item), 'group': get_group_id_name(item)[0], 'stash': item.origin_stash.id}, message="Created post")
                 log.subscribed=[]
+            elif content_type == FeedContentItemType.POLL:
+                log = ActivityLog.objects.create(action='Poll00', author=item.owner, context={'instance': get_content_id(item), 'group': get_group_id_name(item)[0], 'stash': item.origin_stash.id}, message="Created poll")
+                log.subscribed=[]
             elif content_type == FeedContentItemType.LINK:
                 log = ActivityLog.objects.create(action='Link00', author=item.owner, context={'instance': get_content_id(item), 'feed': get_feed_id(item), 'stash': item.origin_stash.id}, message="Created post")
                 log.subscribed=[]
