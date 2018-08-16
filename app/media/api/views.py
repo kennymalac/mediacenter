@@ -33,8 +33,12 @@ class MultipleSerializerMixin(object):
 
 class ActionPermissionClassesMixin(object):
     def get_permissions(self):
-        if self.action_permission_classes and self.action in self.action_permission_classes:
-            permissions = self.action_permission_classes[self.action]
+        if self.action_permission_classes:
+            if self.action in self.action_permission_classes:
+                permissions = self.action_permission_classes[self.action]
+            else:
+                permissions = self.action_permission_classes['default']
+
             return [permission() for permission in permissions]
 
         return super(ActionPermissionClassesMixin, self).get_permissions()
@@ -42,13 +46,19 @@ class ActionPermissionClassesMixin(object):
 
 class VisibilityViewSetMixin(object):
     def get_queryset(self):
-        # Either the user owns these objects or it is NOT private
-        qs = super(VisibilityViewSetMixin, self).get_queryset().\
-            filter(Q(owner=self.request.user) | ~Q(visibility='9'))
+        qs = super(VisibilityViewSetMixin, self).get_queryset()
+        if self.request.user.is_authenticated():
+            # Either the user owns these objects or it is NOT private
+            qs = qs.filter(Q(owner=self.request.user) | ~Q(visibility='9'))
 
-        if self.action == 'list':
-            # Either the user owns these objects or it is public
-            qs = qs.filter(Q(owner=self.request.user) | Q(visibility='0'))
+            if self.action == 'list':
+                # Either the user owns these objects or it is public
+                qs = qs.filter(Q(owner=self.request.user) | Q(visibility='0'))
+        else:
+            qs = qs.filter(~Q(visibility='9'))
+
+            if self.action == 'list':
+                qs = qs.filter(Q(visibility='0'))
 
         return qs
 
@@ -209,14 +219,13 @@ class FeedViewSet(NestedViewSetMixin,
         'create': FeedCreateUpdateSerializer
     }
     action_permission_classes = {
-        'default': [IsAuthenticated, IsPublicOrGroupMemberOrOwner],
+        'default': [IsAuthenticated, IsOwnerOrPublicOrGroupMemberOrUnlisted],
         'update': [IsAuthenticated, IsOwner],
         'partial_update': [IsAuthenticated, IsOwner],
         'create': [IsAuthenticated],
         'destroy': [IsAuthenticated, IsOwner]
     }
     filter_class = FeedFilter
-    permission_classes = [IsAuthenticated, IsPublicOrGroupMemberOrOwner]
     pagination_class = FeedContentItemPagination
 
     def list(self, request):
