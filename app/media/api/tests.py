@@ -485,32 +485,108 @@ class FeedPermissionsTests(APITestCase):
 
 
 class FeedContentStashPermissionsTests(APITestCase):
+    def setUp(self):
+        self.user = make_random_user()
+        self.stash_data = dict(
+            name="Example stash"
+        )
+
     def test_unauthenticated_create(self):
-        pass
+        data = {}
+        self.client.force_authenticate(user=None)
+
+        response = self.client.post('/api/stash/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(FeedContentStash.objects.count(), 0)
 
     def test_unauthenticated_read(self):
-        pass
+        data = {}
+        stash = FeedContentStash.objects.create(**self.stash_data)
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get('/api/stash/')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.get('/api/stash/{}/'.format(stash.id))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_visibility_public_read(self):
-        pass
+        stash = FeedContentStash.objects.create(**self.stash_data)
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get('/api/stash/')
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Stash should show up in the response
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['id'], stash.id)
+
+        response = self.client.get('/api/stash/{}/'.format(stash.id))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_visibility_unlisted_read(self):
-        pass
+        # Create unlisted stash
+        stash = FeedContentStash.objects.create(**self.stash_data, visibility='1')
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get('/api/stash/')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Stash should NOT show up in the response
+        self.assertEqual(len(response.data['results']), 0)
+
+        response = self.client.get('/api/stash/{}/'.format(stash.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_visibility_private_read(self):
-        pass
+        # Create private stash
+        stash = FeedContentStash.objects.create(**self.stash_data, visibility='9')
+        user = make_random_user()
+
+        self.client.force_authenticate(user=user)
+        response = self.client.get('/api/stash/')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Stash should NOT show up in the response
+        self.assertEqual(len(response.data['results']), 0)
+
+        response = self.client.get('/api/stash/{}/'.format(stash.id))
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_unauthenticated_partial_update(self):
-        pass
+        stash = FeedContentStash.objects.create(**self.stash_data)
+        data = {
+            'name': 'depito'
+        }
+        self.client.force_authenticate(user=None)
 
-    def test_non_owner_partial_update(self):
-        pass
+        response = self.client.patch('/api/stash/{}/'.format(stash.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEqual(FeedContentStash.objects.get(id=stash.id).name, 'depito')
+
+    # def test_non_owner_partial_update(self):
+    #     pass
 
     def test_unauthenticated_delete(self):
-        pass
+        stash = FeedContentStash.objects.create(**self.stash_data)
 
-    def test_non_owner_delete(self):
-        pass
+        self.client.force_authenticate(user=None)
+        response = self.client.delete('/api/stash/{}/'.format(stash.id))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(FeedContentStash.objects.count(), 1)
+
+
+    # def test_non_owner_delete(self):
+    #     pass
+
+    # TODO content stash search tests
 
 
 class InterestPermissionsTests(APITestCase):

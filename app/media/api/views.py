@@ -336,6 +336,7 @@ class FeedContentStashItemViewSet(NestedViewSetMixin,
     }
 
 class FeedContentStashViewSet(NestedViewSetMixin,
+                              ActionPermissionClassesMixin,
                               MultipleSerializerMixin,
                               ModelViewSet):
 
@@ -346,6 +347,13 @@ class FeedContentStashViewSet(NestedViewSetMixin,
         'update': FeedContentStashCreateUpdateSerializer,
         'create': FeedContentStashCreateUpdateSerializer,
         'content': FeedContentStashContentSerializer
+    }
+    action_permission_classes = {
+        'default': [IsAuthenticated, IsPublicOrUnlisted],
+        'update': [IsAuthenticated], # TODO
+        'partial_update': [IsAuthenticated], # TODO
+        'create': [IsAuthenticated],
+        'destroy': [IsAuthenticated] # TODO
     }
 
     pagination_class = StandardResultsSetPagination

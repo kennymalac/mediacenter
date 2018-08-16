@@ -296,6 +296,7 @@ class FeedContentStash(models.Model):
     max_content = models.IntegerField(default=1000)
     content = models.ManyToManyField(FeedContentItem, through="FeedContentStashItem", related_name="+")
     # content = models.ManyToManyField(FeedContentItem, through="FeedContentStashItem", related_name="+")
+    visibility = models.CharField(max_length=2, choices=VISIBILITY, default='0')
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

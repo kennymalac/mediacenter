@@ -17,9 +17,9 @@ class IsOwnerOrPublicOrGroupMemberOrUnlisted(permissions.BasePermission):
             else:
                 return False
 
-# class IsPublicOrGroupMemberOrOwner(permissions.BasePermission):
-#     pass
-
+class IsPublicOrUnlisted(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.visibility in ('0', '1')
 
 # TODO
 class IsGroupModeratorOrOwner(permissions.BasePermission):
