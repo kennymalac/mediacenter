@@ -20,7 +20,7 @@
                     <button type="button" class="warning" @click="addOption" style="margin-right: .3rem"><i class="ion ion-ios-create"></i> Add option</button>
                 </div>
                 <br />
-                <button type="button" @click="$emit('save', options)" style="margin-right: .3rem">{{ submitBtnText }}</button>
+                <button type="button" @click="$emit('save', choices)" style="margin-right: .3rem">{{ submitBtnText }}</button>
             </div>
         </transition>
     </form>

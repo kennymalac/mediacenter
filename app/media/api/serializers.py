@@ -653,9 +653,9 @@ class ContentItemCRUDSerializer(serializers.ModelSerializer):
 class PollOptionSerializer(serializers.ModelSerializer):
     value = serializers.SerializerMethodField('get_vote_count')
 
-    class Model:
+    class Meta:
         model = PollOption
-        fields = ('title', 'value')
+        fields = ('title', 'value', 'order')
 
     def get_vote_count(self, instance):
         return instance.votes.count()
@@ -664,9 +664,9 @@ class PollOptionSerializer(serializers.ModelSerializer):
 class PollSerializer(serializers.ModelSerializer):
     options = PollOptionSerializer(many=True)
 
-    class Model:
+    class Meta:
         model = Poll
-        fields = ('id', 'title', 'options')
+        fields = ('id', 'options')
 
 
 class DiscussionSerializer(serializers.ModelSerializer):
@@ -703,6 +703,9 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
 
     def create(self, validated_data):
         content_item_data = validated_data.pop('content_item')
+        poll_data = None
+        if 'poll' in validated_data:
+            poll_data = validated_data.pop('poll')
         order = 0
 
         if validated_data.get('parent', 0):
@@ -718,6 +721,18 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
         content_item = self.create_content_item(content_item_data, content_type)
 
         discussion = Discussion.objects.create(**validated_data, content_item=content_item, order=order)
+
+        if poll_data:
+            # create Poll
+            options_data = poll_data.pop('options')
+            poll = Poll.objects.create(**poll_data)
+            options = PollOption.objects.bulk_create([
+                PollOption(**option, poll=poll) for option in options_data
+            ])
+
+            discussion.poll = poll
+            discussion.save()
+
         # discussion.members.add(*member
 
         return discussion

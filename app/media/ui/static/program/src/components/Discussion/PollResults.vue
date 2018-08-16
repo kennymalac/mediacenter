@@ -17,7 +17,7 @@
                 </transition-group>
                 <p style="text-align: center">
                     Total votes: {{ totalVotes }}
-                    <br>
+                    <br />
                     <button v-if="!voted" type="button" @click="() => showResults = false">
                         <i class="ion-ios-undo"></i> Cast vote
                     </button>
@@ -60,7 +60,7 @@ export default {
         },
         results() {
             return this.options.map((option) => {
-                return ((option.value / this.totalVotes) * 100).toFixed(2)
+                return option.value === 0 ? option.value : ((option.value / this.totalVotes) * 100).toFixed(2)
             })
         },
         totalVotes() {

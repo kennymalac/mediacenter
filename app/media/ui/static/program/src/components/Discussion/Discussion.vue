@@ -4,7 +4,7 @@
             <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
 
             <section class="posts">
-                <poll-results title="Do you like Flatlanders?" :options="pollOptions" />
+                <poll-results v-if="instance.poll" :title="instance.content_item.title" :options="instance.poll.options" />
 
                 <post v-if="currentPage === 1" v-bind="instance.instance" @editPost="editPost(instance.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" :isActiveUser="activeUserId === instance.content_item.owner.id" />
                 <post v-for="post in posts" v-bind="post.instance" :isActiveUser="activeUserId === post.content_item.owner.id" @editPost="editPost(post.id)" @userProfile="showUserProfile(post.instance.content_item.owner.profile.id)" />
@@ -19,9 +19,9 @@
             <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
         </template>
         <template v-if="actions.create">
-            <reply v-if="!query.poll" @canceled="quickReply ? $emit('canceled') : $router.go(-1)" :show="show" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" />
-            <reply v-if="query.poll && query.step !== 2" @canceled="quickReply ? $emit('canceled') : $router.go(-1)" :show="show" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" replyBtnText="Continue" />
-            <poll-form v-if="query.poll && query.step === 2" :title="instanceForm.content_item.title" />
+            <reply v-if="!query || !query.poll" @canceled="quickReply ? $emit('canceled') : $router.go(-1)" :show="show" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" />
+            <reply v-if="query && query.poll && query.step !== 2" @canceled="quickReply ? $emit('canceled') : $router.go(-1)" :show="show" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" replyBtnText="Continue" />
+            <poll-form v-if="query && query.poll && query.step === 2" :title="instanceForm.content_item.title" @save="savePoll" />
         </template>
         <template v-if="actions.manage">
             <reply @canceled="$router.go(-1)" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="manage" />
@@ -89,24 +89,7 @@ export default {
             objectName: 'discussion',
             quickReplyActive: false,
             activeUserId: 0,
-            pollOptions: [
-                {
-                    title: "Option 1",
-                    value: 9
-                },
-                {
-                    title: "Option 2",
-                    value: 3
-                },
-                {
-                    title: "Option 3",
-                    value: 11
-                },
-                {
-                    title: "Option 4",
-                    value: 0
-                }
-            ],
+            pollOptions: [],
             instanceForm: { content_item: {} }
         }
     },
@@ -247,6 +230,23 @@ export default {
                     feedId: this.params.feedId
                 }
             })
+        },
+
+        savePoll(_options) {
+            let options = _options
+            if (this.actions.manage) {
+                // TO78DO
+            }
+            if (this.actions.create) {
+                // don't use the ids here, because the ids are not real
+                options = _options.map((item) => {
+                    const {order, title} = item
+                    return {order, title}
+                })
+            }
+            this.instanceForm.poll = { options }
+
+            this.save()
         },
 
         save() {

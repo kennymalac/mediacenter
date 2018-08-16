@@ -310,7 +310,6 @@ def setup_default_feed(user):
 
 
 class Poll(models.Model):
-    title = models.CharField(max_length=255)
     created = models.DateTimeField(auto_now_add=True)
 
 
