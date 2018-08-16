@@ -27,13 +27,17 @@
                 <transition-group name="options" tag="ul">
                     <li :key="index" v-for="(option, index) in options">
                         <label>
-                            <input type="radio" name="poll-option" />
+                            <input type="radio" v-model="checked" :value="option.id" name="poll-option" />
                             <span class="checkable">{{ option.title }}</span>
                         </label>
                     </li>
                 </transition-group>
                 <div style="display: flex">
-                    <button type="button" style="margin-right: .3rem">Vote</button>
+                    <button type="button" v-if="checked" @click="$emit('vote', checked)" style="margin-right: .3rem">Vote</button>
+                    <button disabled v-else type="button">
+                        Vote
+                    </button>
+
                     <button type="button" @click="() => showResults = true" class="warning">View Results</button>
                 </div>
             </div>
@@ -50,6 +54,7 @@ export default {
     },
     data() {
         return {
+            checked: false,
             showResults: false
         }
     },

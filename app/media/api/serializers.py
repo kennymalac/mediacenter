@@ -656,7 +656,7 @@ class PollOptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PollOption
-        fields = ('title', 'value', 'order')
+        fields = ('id', 'title', 'value', 'order')
 
     def get_vote_count(self, instance):
         return instance.votes.count()

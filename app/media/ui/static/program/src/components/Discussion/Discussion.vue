@@ -4,7 +4,7 @@
             <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
 
             <section class="posts">
-                <poll-results v-if="instance.poll" :title="instance.content_item.title" :options="instance.poll.options" />
+                <poll-results v-if="instance.poll" :title="instance.content_item.title" :options="instance.poll.options" @vote="votePoll" />
 
                 <post v-if="currentPage === 1" v-bind="instance.instance" @editPost="editPost(instance.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" :isActiveUser="activeUserId === instance.content_item.owner.id" />
                 <post v-for="post in posts" v-bind="post.instance" :isActiveUser="activeUserId === post.content_item.owner.id" @editPost="editPost(post.id)" @userProfile="showUserProfile(post.instance.content_item.owner.profile.id)" />
@@ -230,6 +230,10 @@ export default {
                     feedId: this.params.feedId
                 }
             })
+        },
+
+        votePoll() {
+
         },
 
         savePoll(_options) {

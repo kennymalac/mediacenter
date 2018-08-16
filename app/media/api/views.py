@@ -409,6 +409,26 @@ class DiscussionViewSet(NestedViewSetMixin,
     pagination_class = DiscussionPagination
     filter_class = DiscussionFilter
 
+    @action(methods=['GET'], detail=True, permission_classes=[IsAuthenticated])
+    def vote(self, request, pk=None, **kwargs):
+        instance = self.get_instance(pk)
+        if not instance.poll:
+            return Response({
+                'error': 'This discussion has no poll'
+            }, status=400)
+
+        vote = PollOptionVote.objects.get_or_create(owner=request.user, poll=poll)
+        options = PollOptionVote.objects.filter(id__in=request.data.get('options', []))
+
+        # TODO Polls that allow multiple votes versus only a single vote
+        vote.options = [*list(options)]
+        vote.save()
+
+        serializer = PollOptionVoteSerializer(vote.options, many=True)
+        return JsonResponse({
+            'options': serializer.data
+        }, status=200)
+
 
 class LinkViewSet(NestedViewSetMixin,
                   MultipleSerializerMixin,
