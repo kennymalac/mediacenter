@@ -31,12 +31,27 @@ class MultipleSerializerMixin(object):
         except (KeyError, AttributeError):
             return super(MultipleSerializerMixin, self).get_serializer_class()
 
-# class AccessLevelsMixin(ModelViewSet):
-#     def __init__(self):
-#         self.access_level = ''
+class ActionPermissionClassesMixin(object):
+    def get_permissions(self):
+        if self.action_permission_classes and self.action in self.action_permission_classes:
+            permissions = self.action_permission_classes[self.action]
+            return [permission() for permission in permissions]
 
-#     def set_privilege(self, request):
-#         if request.user ==
+        return super(ActionPermissionClassesMixin, self).get_permissions()
+
+
+class VisibilityViewSetMixin(object):
+    def get_queryset(self):
+        # Either the user owns these objects or it is NOT private
+        qs = super(VisibilityViewSetMixin, self).get_queryset().\
+            filter(Q(owner=self.request.user) | ~Q(visibility='9'))
+
+        if self.action == 'list':
+            # Either the user owns these objects or it is public
+            qs = qs.filter(Q(owner=self.request.user) | Q(visibility='0'))
+
+        return qs
+
 
 class AccountViewSet(MultipleSerializerMixin, ModelViewSet):
     """An API for viewing and editing accounts"""
@@ -180,6 +195,8 @@ class ProfileViewSet(MultipleSerializerMixin,
 
 
 class FeedViewSet(NestedViewSetMixin,
+                  VisibilityViewSetMixin,
+                  ActionPermissionClassesMixin,
                   MultipleSerializerMixin,
                   ModelViewSet):
     # TODO Federated - users seize the means of feed production
@@ -190,6 +207,13 @@ class FeedViewSet(NestedViewSetMixin,
         'update': FeedCreateUpdateSerializer,
         'partial_update': FeedCreateUpdateSerializer,
         'create': FeedCreateUpdateSerializer
+    }
+    action_permission_classes = {
+        'default': [IsAuthenticated, IsPublicOrGroupMemberOrOwner],
+        'update': [IsAuthenticated, IsOwner],
+        'partial_update': [IsAuthenticated, IsOwner],
+        'create': [IsAuthenticated],
+        'destroy': [IsAuthenticated, IsOwner]
     }
     filter_class = FeedFilter
     permission_classes = [IsAuthenticated, IsPublicOrGroupMemberOrOwner]

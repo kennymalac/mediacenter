@@ -439,7 +439,7 @@ class FeedPermissionsTests(APITestCase):
 
         response = self.client.get('/api/feed/{}/'.format(feed.id))
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_unauthenticated_partial_update(self):
         feed = Feed.objects.create(**self.feed_data)
