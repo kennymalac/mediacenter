@@ -10,7 +10,7 @@ from rest_framework.test import APIRequestFactory, APITestCase, force_authentica
 from channels import Channel
 from channels.tests import ChannelTestCase
 
-from api.models import Account, Profile, ActivityLog, BlogPost, Interest, Place, PlaceRestriction, Feed, FeedContentItem, FeedContentStash, Discussion, Link, GroupForum
+from api.models import Account, Profile, ActivityLog, BlogPost, Interest, Place, PlaceRestriction, Feed, FeedContentItem, FeedContentItemType, FeedContentStash, Discussion, Link, GroupForum
 
 api_request = APIRequestFactory()
 
@@ -18,6 +18,10 @@ api_request = APIRequestFactory()
 def gen_random_string(n):
     return ''.join(random.SystemRandom().choice(string.ascii_lowercase + string.digits) for _ in range(n))
 
+
+def make_content_types():
+    for ctype in FeedContentItemType.CONTENT_TYPES:
+        FeedContentItemType.objects.get_or_create(name=ctype[1])
 
 # TODO: separate endpoint tests from the tests describing mainly model
 # functionality
@@ -614,56 +618,168 @@ class ProfilePermissionsTests(APITestCase):
 
 
 class DiscussionPermissionsTest(APITestCase):
+    def setUp(self):
+        make_content_types()
+        self.user = make_random_user()
+        self.discussion_data = dict(
+            content_item=dict(
+                title="Example discussion",
+                owner=self.user,
+                content_type=FeedContentItemType.objects.get(name=FeedContentItemType.TOPIC)
+            )
+        )
+        self.default_discussion_data = dict(
+            content_item=FeedContentItem.objects.create(**self.discussion_data['content_item'])
+        )
+
     def test_unauthenticated_create(self):
-        pass
+        data = {}
+        self.client.force_authenticate(user=None)
+
+        response = self.client.post('/api/discussion/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Discussion.objects.count(), 0)
 
     def test_unauthenticated_create_in_group(self):
         pass
 
-    def test_unauthenticated_read(self):
-        pass
+    def test_unauthenticated_private_read(self):
+        data = {}
+        # Only private discussions cannot be read, besides those that are in groups with view restrictions in place
+        discussion = Discussion.objects.create(**{
+            **self.discussion_data,
+            'content_item': FeedContentItem.objects.create(**{**self.discussion_data['content_item'], 'visibility': '9'})
+        })
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get('/api/discussion/')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.get('/api/discussion/{}/'.format(discussion.id))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_unauthenticated_read_in_group(self):
         pass
 
     def test_visibility_public_read(self):
-        pass
+        discussion = Discussion.objects.create(**self.default_discussion_data)
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get('/api/discussion/')
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Discussion should show up in the response
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['id'], discussion.id)
+
+        response = self.client.get('/api/discussion/{}/'.format(discussion.id))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_visibility_public_read_in_group(self):
         pass
 
     def test_visibility_unlisted_read(self):
-        pass
+        # Create unlisted discussion
+        discussion = Discussion.objects.create(**{
+            **self.discussion_data,
+            'content_item': FeedContentItem.objects.create(**{**self.discussion_data['content_item'], 'visibility': '1'})
+        })
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get('/api/discussion/')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Discussion should NOT show up in the response
+        self.assertEqual(len(response.data['results']), 0)
+
+        response = self.client.get('/api/discussion/{}/'.format(discussion.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_visibility_unlisted_read_in_group(self):
         pass
 
     def test_visibility_private_read(self):
-        pass
+        # Create private discussion
+        discussion = Discussion.objects.create(**{
+            **self.discussion_data,
+            'content_item': FeedContentItem.objects.create(**{**self.discussion_data['content_item'], 'visibility': '9'})
+        })
+        user = make_random_user()
+
+        self.client.force_authenticate(user=user)
+        response = self.client.get('/api/discussion/')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Discussion should NOT show up in the response
+        self.assertEqual(len(response.data['results']), 0)
+
+        response = self.client.get('/api/discussion/{}/'.format(discussion.id))
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_visibility_private_read_in_group(self):
         pass
 
     def test_unauthenticated_partial_update(self):
-        pass
+        discussion = Discussion.objects.create(**self.default_discussion_data)
+        data = {
+            'content_item': {
+                'title': 'depito'
+            }
+        }
+        self.client.force_authenticate(user=None)
+
+        response = self.client.patch('/api/discussion/{}/'.format(discussion.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEqual(Discussion.objects.get(id=discussion.id).content_item.title, 'depito')
 
     def test_unauthenticated_partial_update_in_group(self):
         pass
 
     def test_non_owner_partial_update(self):
-        pass
+        discussion = Discussion.objects.create(**self.default_discussion_data)
+        data = {
+            'content_item': {
+                'title': 'depito'
+            }
+        }
+        user = make_random_user()
+
+        self.client.force_authenticate(user=user)
+        response = self.client.patch('/api/discussion/{}/'.format(discussion.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEqual(Discussion.objects.get(id=discussion.id).content_item.title, 'depito')
 
     def test_non_owner_partial_update_in_group(self):
         pass
 
     def test_unauthenticated_delete(self):
-        pass
+        discussion = Discussion.objects.create(**self.default_discussion_data)
+
+        self.client.force_authenticate(user=None)
+        response = self.client.delete('/api/discussion/{}/'.format(discussion.id))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Discussion.objects.count(), 1)
+
 
     def test_unauthenticated_delete_in_group(self):
         pass
 
     def test_non_owner_delete(self):
-        pass
+        discussion = Discussion.objects.create(**self.default_discussion_data)
+        user = make_random_user()
+
+        self.client.force_authenticate(user=user)
+        response = self.client.delete('/api/discussion/{}/'.format(discussion.id))
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Discussion.objects.count(), 1)
 
     def test_non_owner_delete_in_group(self):
         pass

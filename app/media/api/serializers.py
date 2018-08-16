@@ -676,8 +676,9 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
     )
 
     def save(self):
-        text = self.validated_data['text']
-        self.validated_data['text'] = cleaner.clean(text)
+        if 'text' in self.validated_data:
+            text = self.validated_data['text']
+            self.validated_data['text'] = cleaner.clean(text)
         super(DiscussionCreateUpdateSerializer, self).save()
 
     def create(self, validated_data):
