@@ -187,12 +187,13 @@ class FeedViewSet(NestedViewSetMixin,
     queryset = Feed.objects.filter(groupforum__isnull=True)
     serializer_classes = {
         'default': FeedSerializer,
-        'updaet': FeedCreateUpdateSerializer,
+        'update': FeedCreateUpdateSerializer,
         'partial_update': FeedCreateUpdateSerializer,
         'create': FeedCreateUpdateSerializer
     }
     filter_class = FeedFilter
     permission_classes = [IsAuthenticated, IsPublicOrGroupMemberOrOwner]
+    pagination_class = FeedContentItemPagination
 
     def list(self, request):
         if 'owner' in request.query_params:

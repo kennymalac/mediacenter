@@ -1,13 +1,16 @@
 import string
 import random
 
+import logging
+logger = logging.getLogger(__name__)
+
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, APITestCase, force_authenticate
 from channels import Channel
 from channels.tests import ChannelTestCase
 
-from api.models import Account, ActivityLog, Log, BlogPost
+from api.models import Account, Profile, ActivityLog, BlogPost, Interest, Place, PlaceRestriction, Feed, FeedContentItem, FeedContentStash, Discussion, Link, GroupForum
 
 api_request = APIRequestFactory()
 
@@ -359,3 +362,377 @@ class MediaTests(APITestCase):
         album_request_data = {
             
         }
+
+
+class FeedPermissionsTests(APITestCase):
+    def setUp(self):
+        self.user = make_random_user()
+        self.feed_data = dict(
+            owner=self.user,
+            name="Example feed"
+        )
+
+    def test_unauthenticated_create(self):
+        data = {}
+        self.client.force_authenticate(user=None)
+
+        response = self.client.post('/api/feed/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Feed.objects.count(), 0)
+
+    def test_unauthenticated_read(self):
+        data = {}
+        feed = Feed.objects.create(**self.feed_data)
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get('/api/feed/')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.get('/api/feed/{}/'.format(feed.id))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_visibility_public_read(self):
+        feed = Feed.objects.create(**self.feed_data)
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get('/api/feed/')
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Feed should show up in the response
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['id'], feed.id)
+
+        response = self.client.get('/api/feed/{}/'.format(feed.id))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_visibility_unlisted_read(self):
+        # Create unlisted feed
+        feed = Feed.objects.create(**self.feed_data, visibility='1')
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get('/api/feed/')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Feed should NOT show up in the response
+        self.assertEqual(len(response.data['results']), 0)
+
+        response = self.client.get('/api/feed/{}/'.format(feed.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_visibility_private_read(self):
+        # Create private feed
+        feed = Feed.objects.create(**self.feed_data, visibility='9')
+        user = make_random_user()
+
+        self.client.force_authenticate(user=user)
+        response = self.client.get('/api/feed/')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Feed should NOT show up in the response
+        self.assertEqual(len(response.data['results']), 0)
+
+        response = self.client.get('/api/feed/{}/'.format(feed.id))
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_unauthenticated_partial_update(self):
+        feed = Feed.objects.create(**self.feed_data)
+        data = {
+            'name': 'depito'
+        }
+        self.client.force_authenticate(user=None)
+
+        response = self.client.patch('/api/feed/{}/'.format(feed.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEqual(Feed.objects.get(id=feed.id).name, 'depito')
+
+    def test_non_owner_partial_update(self):
+        feed = Feed.objects.create(**self.feed_data)
+        data = {
+            'name': 'depito'
+        }
+        user = make_random_user()
+
+        self.client.force_authenticate(user=user)
+        response = self.client.patch('/api/feed/{}/'.format(feed.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEqual(Feed.objects.get(id=feed.id).name, 'depito')
+
+    def test_unauthenticated_delete(self):
+        feed = Feed.objects.create(**self.feed_data)
+
+        self.client.force_authenticate(user=None)
+        response = self.client.delete('/api/feed/{}/'.format(feed.id))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Feed.objects.count(), 1)
+
+
+    def test_non_owner_delete(self):
+        feed = Feed.objects.create(**self.feed_data)
+        user = make_random_user()
+
+        self.client.force_authenticate(user=user)
+        response = self.client.delete('/api/feed/{}/'.format(feed.id))
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Feed.objects.count(), 1)
+
+
+class FeedContentStashPermissionsTests(APITestCase):
+    def test_unauthenticated_create(self):
+        pass
+
+    def test_unauthenticated_read(self):
+        pass
+
+    def test_visibility_public_read(self):
+        pass
+
+    def test_visibility_unlisted_read(self):
+        pass
+
+    def test_visibility_private_read(self):
+        pass
+
+    def test_unauthenticated_partial_update(self):
+        pass
+
+    def test_non_owner_partial_update(self):
+        pass
+
+    def test_unauthenticated_delete(self):
+        pass
+
+    def test_non_owner_delete(self):
+        pass
+
+
+class InterestPermissionsTests(APITestCase):
+    def test_unauthenticated_create(self):
+        pass
+
+    def test_unauthenticated_read(self):
+        pass
+
+    def test_partial_update(self):
+        # Interests cannot be updated
+        pass
+
+    def test_delete(self):
+        # Interests cannot be deleted
+        pass
+
+
+class AccountPermissionsTests(APITestCase):
+    pass
+
+
+class ProfilePermissionsTests(APITestCase):
+    pass
+
+
+class DiscussionPermissionsTest(APITestCase):
+    def test_unauthenticated_create(self):
+        pass
+
+    def test_unauthenticated_create_in_group(self):
+        pass
+
+    def test_unauthenticated_read(self):
+        pass
+
+    def test_unauthenticated_read_in_group(self):
+        pass
+
+    def test_visibility_public_read(self):
+        pass
+
+    def test_visibility_public_read_in_group(self):
+        pass
+
+    def test_visibility_unlisted_read(self):
+        pass
+
+    def test_visibility_unlisted_read_in_group(self):
+        pass
+
+    def test_visibility_private_read(self):
+        pass
+
+    def test_visibility_private_read_in_group(self):
+        pass
+
+    def test_unauthenticated_partial_update(self):
+        pass
+
+    def test_unauthenticated_partial_update_in_group(self):
+        pass
+
+    def test_non_owner_partial_update(self):
+        pass
+
+    def test_non_owner_partial_update_in_group(self):
+        pass
+
+    def test_unauthenticated_delete(self):
+        pass
+
+    def test_unauthenticated_delete_in_group(self):
+        pass
+
+    def test_non_owner_delete(self):
+        pass
+
+    def test_non_owner_delete_in_group(self):
+        pass
+
+
+class LinkPermissionsTest(APITestCase):
+    def test_unauthenticated_create(self):
+        pass
+
+    def test_unauthenticated_create_in_group(self):
+        pass
+
+    def test_unauthenticated_read(self):
+        pass
+
+    def test_unauthenticated_read_in_group(self):
+        pass
+
+    def test_visibility_public_read(self):
+        pass
+
+    def test_visibility_public_read_in_group(self):
+        pass
+
+    def test_visibility_unlisted_read(self):
+        pass
+
+    def test_visibility_unlisted_read_in_group(self):
+        pass
+
+    def test_visibility_private_read(self):
+        pass
+
+    def test_visibility_private_read_in_group(self):
+        pass
+
+    def test_unauthenticated_partial_update(self):
+        pass
+
+    def test_unauthenticated_partial_update_in_group(self):
+        pass
+
+    def test_non_owner_partial_update(self):
+        pass
+
+    def test_non_owner_partial_update_in_group(self):
+        pass
+
+    def test_unauthenticated_delete(self):
+        pass
+
+    def test_unauthenticated_delete_in_group(self):
+        pass
+
+    def test_non_owner_delete(self):
+        pass
+
+    def test_non_owner_delete_in_group(self):
+        pass
+
+
+class ImagePermissionsTest(APITestCase):
+    def test_unauthenticated_create(self):
+        pass
+
+    def test_unauthenticated_create_in_group(self):
+        pass
+
+    def test_unauthenticated_read(self):
+        pass
+
+    def test_unauthenticated_read_in_group(self):
+        pass
+
+    def test_visibility_public_read(self):
+        pass
+
+    def test_visibility_public_read_in_group(self):
+        pass
+
+    def test_visibility_unlisted_read(self):
+        pass
+
+    def test_visibility_unlisted_read_in_group(self):
+        pass
+
+    def test_visibility_private_read(self):
+        pass
+
+    def test_visibility_private_read_in_group(self):
+        pass
+
+    def test_unauthenticated_partial_update(self):
+        pass
+
+    def test_unauthenticated_partial_update_in_group(self):
+        pass
+
+    def test_non_owner_partial_update(self):
+        pass
+
+    def test_non_owner_partial_update_in_group(self):
+        pass
+
+    def test_unauthenticated_delete(self):
+        pass
+
+    def test_unauthenticated_delete_in_group(self):
+        pass
+
+    def test_non_owner_delete(self):
+        pass
+
+    def test_non_owner_delete_in_group(self):
+        pass
+
+
+class GroupForumPermissionsTest(APITestCase):
+    def test_unauthenticated_create(self):
+        pass
+
+    def test_unauthenticated_read(self):
+        pass
+
+    def test_visibility_public_read(self):
+        pass
+
+    def test_visibility_unlisted_read(self):
+        pass
+
+    def test_visibility_private_read(self):
+        pass
+
+    def test_unauthenticated_partial_update(self):
+        pass
+
+    def test_non_owner_partial_update(self):
+        pass
+
+    def test_unauthenticated_delete(self):
+        pass
+
+    def test_non_owner_delete(self):
+        pass
+
+
+class PlacePermissionsTest(APITestCase):
+    pass
