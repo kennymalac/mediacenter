@@ -23,9 +23,11 @@
                 <div style="display: flex;">
                     <button class="stack error" type="button" @click="$emit('canceled')"><i class="ion-ios-undo"></i> Cancel</button>
 
-                    <input v-if="action === 'create' && !parentId" class="stack" type="submit" value="Create" />
-                    <input v-if="action === 'create' && parentId" class="stack" type="submit" value="Reply" />
-                    <input v-if="action === 'manage'" class="stack" type="submit" value="Save changes" />
+
+                    <input v-if="replyBtnText" class="stack" type="submit" :value="replyBtnText" />
+                    <input v-if="!replyBtnText && action === 'create' && !parentId" class="stack" type="submit" value="Create" />
+                    <input v-if="!replyBtnText && action === 'create' && parentId" class="stack" type="submit" value="Reply" />
+                    <input v-if="!replyBtnText && action === 'manage'" class="stack" type="submit" value="Save changes" />
                 </div>
             </fieldset>
         </form>
@@ -94,6 +96,10 @@ export default {
         parentId: {
             type: Number,
             default: 0
+        },
+        replyBtnText: {
+            type: String,
+            required: false
         }
     },
     computed: {

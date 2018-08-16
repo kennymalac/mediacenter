@@ -650,16 +650,36 @@ class ContentItemCRUDSerializer(serializers.ModelSerializer):
         abstract = True
 
 
+class PollOptionSerializer(serializers.ModelSerializer):
+    value = serializers.SerializerMethodField('get_vote_count')
+
+    class Model:
+        model = PollOption
+        fields = ('title', 'value')
+
+    def get_vote_count(self, instance):
+        return instance.votes.count()
+
+
+class PollSerializer(serializers.ModelSerializer):
+    options = PollOptionSerializer(many=True)
+
+    class Model:
+        model = Poll
+        fields = ('id', 'title', 'options')
+
+
 class DiscussionSerializer(serializers.ModelSerializer):
     content_item = FeedContentItemProfileSerializer()
     text_last_edited = serializers.DateTimeField(
         required=False,
         read_only=True
     )
+    poll = PollSerializer()
 
     class Meta:
         model = Discussion
-        fields = ('id', 'parent', 'order', 'content_item', 'text', 'text_last_edited')
+        fields = ('id', 'parent', 'order', 'content_item', 'text', 'text_last_edited', 'poll')
 
 
 cleaner = Cleaner(['a', 'p', 'abbr', 'acronym', 'b', 'code', 'pre', 'blockqote', 'span', 'sub', 'sup', 'code', 'em', 'i', 'ul', 'li', 'ol', 'strong', 'l', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'thead', 'caption', 'tbody', 'col', 'colgroup', 'tfoot', 'th', 'tr', 'td'], attributes={'*': ['style', 'alt', 'width', 'height'], 'a': ['href', 'title'], 'abbr': ['title'], 'acronym': ['title'], 'table': ['align', 'cellpadding', 'cellspacing'], 'th': ['scope'], 'colgroup': ['span'], 'caption': ['align']}, styles=['color', 'font-weight', 'text-decoration', 'background-color', 'color', 'text-align', 'border-style', 'border', 'border-width', 'border-color'])
@@ -674,6 +694,7 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
         required=False,
         read_only=True
     )
+    poll = PollSerializer()
 
     def save(self):
         text = self.validated_data['text']
@@ -703,7 +724,7 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
 
     class Meta:
         model = Discussion
-        fields = ('id', 'parent', 'order', 'content_item', 'text', 'text_last_edited')
+        fields = ('id', 'parent', 'order', 'content_item', 'text', 'text_last_edited', 'poll')
 
 
 class LinkSerializer(serializers.ModelSerializer):

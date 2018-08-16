@@ -9,7 +9,7 @@
             </div>
             <template slot="reference">
                 <slot name="button">
-                    <button class="icon"><div style="height: 100%">
+                    <button type="button" class="icon"><div style="height: 100%">
                             <i class="ion ion-md-more" />
                     </div></button>
                 </slot>

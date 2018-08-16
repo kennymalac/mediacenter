@@ -135,6 +135,7 @@ $title-height: 56px;
 
 .content-item {
     vertical-align: top;
+    background-color: white;
     position: relative;
     margin: 10px;
     display: inline-flex;

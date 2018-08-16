@@ -100,7 +100,7 @@ export default {
                 this.showUploadForm = true
                 this.form = ImageModel.getNewInstance()
             }
-            else if (this.selected.title === "Topic") {
+            else if (["Topic", "Poll"].includes(this.selected.title)) {
                 if (this.groupId) {
                     this.$router.push({
                         name: 'GroupDiscussion',
@@ -110,6 +110,9 @@ export default {
                             stashId: this.stash.id,
                             stashAction: 'details',
                             discussionAction: 'create'
+                        },
+                        query: {
+                            poll: this.selected.title === "Poll"
                         }
                     })
                 }
