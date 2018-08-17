@@ -459,6 +459,7 @@ class CommentViewSet(NestedViewSetMixin,
 
 
 class DiscussionViewSet(NestedViewSetMixin,
+                        ActionPermissionClassesMixin,
                         MultipleSerializerMixin,
                         ModelViewSet):
 
@@ -469,11 +470,20 @@ class DiscussionViewSet(NestedViewSetMixin,
         'update': DiscussionCreateUpdateSerializer,
         'create': DiscussionCreateUpdateSerializer
     }
+    action_permission_classes = {
+        'default': [IsAuthenticated, IsContentItemOwnerOrPublicOrGroupMemberOrUnlisted],
+        'update': [IsAuthenticated, IsOwner],
+        'partial_update': [IsAuthenticated, IsOwner],
+        # TODO create in group should check if group member
+        'create': [IsAuthenticated],
+        'destroy': [IsAuthenticated, IsOwner]
+    }
     pagination_class = DiscussionPagination
     filter_class = DiscussionFilter
 
 
 class LinkViewSet(NestedViewSetMixin,
+                  ActionPermissionClassesMixin,
                   MultipleSerializerMixin,
                   ModelViewSet):
 
@@ -484,9 +494,18 @@ class LinkViewSet(NestedViewSetMixin,
         'update': LinkCreateUpdateSerializer,
         'create': LinkCreateUpdateSerializer
     }
+    action_permission_classes = {
+        'default': [IsAuthenticated, IsContentItemOwnerOrPublicOrGroupMemberOrUnlisted],
+        'update': [IsAuthenticated, IsOwner],
+        'partial_update': [IsAuthenticated, IsOwner],
+        # TODO create in group should check if group member
+        'create': [IsAuthenticated],
+        'destroy': [IsAuthenticated, IsOwner]
+    }
 
 
 class ImageViewSet(NestedViewSetMixin,
+                   ActionPermissionClassesMixin,
                    MultipleSerializerMixin,
                    ModelViewSet):
 
@@ -496,6 +515,14 @@ class ImageViewSet(NestedViewSetMixin,
         'partial_update': ImageCreateUpdateSerializer,
         'update': ImageCreateUpdateSerializer,
         'create': ImageCreateUpdateSerializer
+    }
+    action_permission_classes = {
+        'default': [IsAuthenticated, IsContentItemOwnerOrPublicOrGroupMemberOrUnlisted],
+        'update': [IsAuthenticated, IsOwner],
+        'partial_update': [IsAuthenticated, IsOwner],
+        # TODO create in group should check if group member
+        'create': [IsAuthenticated],
+        'destroy': [IsAuthenticated, IsOwner]
     }
 
 

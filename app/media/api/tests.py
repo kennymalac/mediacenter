@@ -920,7 +920,7 @@ class DiscussionPermissionsTest(DefaultContentItemPermissionsTest, APITestCase):
     model = Discussion
 
     def setUp(self):
-        super(DiscussionPermissionsTests, self).setUp()
+        super(DiscussionPermissionsTest, self).setUp()
         self.endpoint = '/api/discussion/'
         self.create_data = dict(
             content_item=dict(
