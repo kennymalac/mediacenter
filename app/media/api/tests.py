@@ -594,19 +594,45 @@ class FeedContentStashPermissionsTests(APITestCase):
 
 
 class InterestPermissionsTests(APITestCase):
+    def setUp(self):
+        self.user = make_random_user()
+        self.interest_data = dict(
+            name="Example stash"
+        )
+
     def test_unauthenticated_create(self):
-        pass
+        data = {}
+        self.client.force_authenticate(user=None)
+
+        response = self.client.post('/api/interest/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Interest.objects.count(), 0)
 
     def test_unauthenticated_read(self):
-        pass
+        interest = Interest.objects.create(**self.interest_data)
+        self.client.force_authenticate(user=None)
+
+        # Unauthenticated users are allowed to view interests
+        response = self.client.get('/api/interest/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_partial_update(self):
         # Interests cannot be updated
-        pass
+        self.client.force_authenticate(user=self.user)
+        interest = Interest.objects.create(**self.interest_data)
+
+        response = self.client.patch('/api/interest/{}/'.format(interest.id), dict(name="new name"), format='json')
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertNotEqual(Interest.objects.first().name, "new name")
 
     def test_delete(self):
         # Interests cannot be deleted
-        pass
+        self.client.force_authenticate(user=self.user)
+        interest = Interest.objects.create(**self.interest_data)
+
+        response = self.client.delete('/api/interest/')
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(Interest.objects.count(), 1)
 
 
 class AccountPermissionsTests(APITestCase):

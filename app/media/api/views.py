@@ -134,7 +134,8 @@ class FeedContentTypeViewSet(ListModelMixin,
     serializer_class = FeedContentItemTypeSerializer
 
 
-class InterestViewSet(ListModelMixin,
+class InterestViewSet(ActionPermissionClassesMixin,
+                      ListModelMixin,
                       RetrieveModelMixin,
                       CreateModelMixin,
                       GenericViewSet):
@@ -142,6 +143,11 @@ class InterestViewSet(ListModelMixin,
     serializer_class = InterestSerializer
     filter_backends = (SearchFilter,)
     search_fields = ('name',)
+    action_permission_classes = {
+        'default': [IsAuthenticated],
+        'list': [],
+        'retrieve': []
+    }
 
 
 class PlaceViewSet(ActionPermissionClassesMixin,
