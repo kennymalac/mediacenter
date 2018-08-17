@@ -973,32 +973,133 @@ class ImagePermissionsTest(DefaultContentItemPermissionsTest, APITestCase):
 
 
 class GroupForumPermissionsTest(APITestCase):
+    def setUp(self):
+        self.user = make_random_user()
+        self.create_data = dict(
+            owner=self.user,
+            name="Example group",
+            feed=dict(owner=self.user, name="Example feed")
+        )
+        self.group_data = dict(
+            **self.create_data
+        )
+        self.group_data['feed'] = Feed.objects.create(**self.create_data['feed'])
+
     def test_unauthenticated_create(self):
-        pass
+        data = {}
+        self.client.force_authenticate(user=None)
+
+        response = self.client.post('/api/group/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(GroupForum.objects.count(), 0)
 
     def test_unauthenticated_read(self):
-        pass
+        data = {}
+        group = GroupForum.objects.create(**self.group_data)
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get('/api/group/')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.get('/api/group/{}/'.format(group.id))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_visibility_public_read(self):
-        pass
+        group = GroupForum.objects.create(**self.group_data)
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get('/api/group/')
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # GroupForum should show up in the response
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['id'], group.id)
+
+        response = self.client.get('/api/group/{}/'.format(group.id))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_visibility_unlisted_read(self):
-        pass
+        # Create unlisted group
+        group = GroupForum.objects.create(**{
+            **self.create_data,
+            'feed': Feed.objects.create(**{**self.create_data['feed'], 'visibility': '1'})
+        })
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get('/api/group/')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # GroupForum should NOT show up in the response
+        self.assertEqual(len(response.data['results']), 0)
+
+        response = self.client.get('/api/group/{}/'.format(group.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_visibility_private_read(self):
-        pass
+        # Create private group
+        group = GroupForum.objects.create(**{
+            **self.create_data,
+            'feed': Feed.objects.create(**{**self.create_data['feed'], 'visibility': '9'})
+        })
+        user = make_random_user()
+
+        self.client.force_authenticate(user=user)
+        response = self.client.get('/api/group/')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # GroupForum should NOT show up in the response
+        self.assertEqual(len(response.data['results']), 0)
+
+        response = self.client.get('/api/group/{}/'.format(group.id))
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_unauthenticated_partial_update(self):
-        pass
+        group = GroupForum.objects.create(**self.group_data)
+        data = {
+            'name': 'depito'
+        }
+        self.client.force_authenticate(user=None)
+
+        response = self.client.patch('/api/group/{}/'.format(group.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEqual(GroupForum.objects.get(id=group.id).name, 'depito')
 
     def test_non_owner_partial_update(self):
-        pass
+        group = GroupForum.objects.create(**self.group_data)
+        data = {
+            'name': 'depito'
+        }
+        user = make_random_user()
+
+        self.client.force_authenticate(user=user)
+        response = self.client.patch('/api/group/{}/'.format(group.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEqual(GroupForum.objects.get(id=group.id).name, 'depito')
 
     def test_unauthenticated_delete(self):
-        pass
+        group = GroupForum.objects.create(**self.group_data)
+
+        self.client.force_authenticate(user=None)
+        response = self.client.delete('/api/group/{}/'.format(group.id))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(GroupForum.objects.count(), 1)
 
     def test_non_owner_delete(self):
-        pass
+        group = GroupForum.objects.create(**self.group_data)
+        user = make_random_user()
+
+        self.client.force_authenticate(user=user)
+        response = self.client.delete('/api/group/{}/'.format(group.id))
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(GroupForum.objects.count(), 1)
 
 
 class PlacePermissionsTest(APITestCase):
