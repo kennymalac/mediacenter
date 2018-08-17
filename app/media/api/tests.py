@@ -927,4 +927,47 @@ class GroupForumPermissionsTest(APITestCase):
 
 
 class PlacePermissionsTest(APITestCase):
-    pass
+    def setUp(self):
+        make_content_types()
+        self.user = make_random_user()
+        self.place_data = dict(
+            owner=self.user,
+            name="Example place"
+        )
+
+    def test_unauthenticated_create(self):
+        data = {}
+        self.client.force_authenticate(user=None)
+
+        response = self.client.post('/api/place/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Place.objects.count(), 0)
+
+    def test_unauthenticated_read(self):
+        data = {}
+        place = Place.objects.create(**self.place_data)
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get('/api/place/')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.get('/api/place/{}/'.format(place.id))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_unauthenticated_delete(self):
+        place = Place.objects.create(**self.place_data)
+
+        self.client.force_authenticate(user=None)
+        response = self.client.delete('/api/place/{}/'.format(place.id))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Place.objects.count(), 1)
+
+    def test_non_owner_delete(self):
+        place = Place.objects.create(**self.place_data)
+        user = make_random_user()
+
+        self.client.force_authenticate(user=user)
+        response = self.client.delete('/api/place/{}/'.format(place.id))
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Place.objects.count(), 1)

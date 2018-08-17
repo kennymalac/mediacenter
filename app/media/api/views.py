@@ -144,12 +144,18 @@ class InterestViewSet(ListModelMixin,
     search_fields = ('name',)
 
 
-class PlaceViewSet(ListModelMixin,
+class PlaceViewSet(ActionPermissionClassesMixin,
+                   ListModelMixin,
                    RetrieveModelMixin,
                    GenericViewSet):
     queryset = Place.objects.all()
     serializer_class = PlaceSerializer
     filter_class = PlaceFilter
+    action_permission_classes = {
+        'default': [IsAuthenticated, IsOwner],
+        'create': [IsAuthenticated],
+        'destroy': [IsAuthenticated, IsOwner]
+    }
 
     @list_route(methods=['POST'], url_path='connect')
     def connect(self, request, *args, **kwargs):
