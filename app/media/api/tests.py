@@ -636,11 +636,51 @@ class InterestPermissionsTests(APITestCase):
 
 
 class AccountPermissionsTests(APITestCase):
-    pass
+    # def test_unauthenticated_read(self):
+    #     pass
+
+    def test_visibility_public_read(self):
+        pass
+
+    # TODO unlisted Accounts?
+    # def test_visibility_unlisted_read(self):
+    #     pass
+
+    def test_unauthenticated_partial_update(self):
+        pass
+
+    def test_non_owner_partial_update(self):
+        pass
+
+    def test_unauthenticated_delete(self):
+        pass
+
+    def test_non_owner_delete(self):
+        pass
 
 
 class ProfilePermissionsTests(APITestCase):
-    pass
+    # def test_unauthenticated_read(self):
+    #     pass
+
+    def test_visibility_public_read(self):
+        pass
+
+    # TODO unlisted Profiles?
+    # def test_visibility_unlisted_read(self):
+    #     pass
+
+    def test_unauthenticated_partial_update(self):
+        pass
+
+    def test_non_owner_partial_update(self):
+        pass
+
+    def test_unauthenticated_delete(self):
+        pass
+
+    def test_non_owner_delete(self):
+        pass
 
 
 class DiscussionPermissionsTest(APITestCase):
