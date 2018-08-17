@@ -5,13 +5,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 from django.test import TestCase
-from unittest import skip
 from rest_framework import status
 from rest_framework.test import APIRequestFactory, APITestCase, force_authenticate
 from channels import Channel
 from channels.tests import ChannelTestCase
 
-from api.models import Account, Profile, ActivityLog, BlogPost, Interest, Place, PlaceRestriction, Feed, FeedContentItem, FeedContentItemType, FeedContentStash, Discussion, Link, GroupForum
+from api.models import Account, Profile, ActivityLog, BlogPost, Interest, Place, PlaceRestriction, Feed, FeedContentItem, FeedContentItemType, FeedContentStash, Discussion, Link, Image, GroupForum
 
 api_request = APIRequestFactory()
 
@@ -759,7 +758,7 @@ class ProfilePermissionsTests(APITestCase):
         self.assertEqual(Profile.objects.filter(account=user).count(), 1)
 
 
-class DefaultContentItemPermissionsTest(APITestCase):
+class DefaultContentItemPermissionsTest(object):
     def setUp(self):
         make_content_types()
         self.user = make_random_user()
@@ -802,6 +801,7 @@ class DefaultContentItemPermissionsTest(APITestCase):
         print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+        # TODO only list Discussions, not other content items
         # Content Item should show up in the response
         self.assertEqual(len(response.data['results']), 1)
         self.assertEqual(response.data['results'][0]['id'], content_obj.id)
@@ -916,7 +916,7 @@ class DefaultContentItemPermissionsTest(APITestCase):
         pass
 
 
-class DiscussionPermissionsTests(DefaultContentItemPermissionsTest):
+class DiscussionPermissionsTest(DefaultContentItemPermissionsTest, APITestCase):
     model = Discussion
 
     def setUp(self):
@@ -934,116 +934,42 @@ class DiscussionPermissionsTests(DefaultContentItemPermissionsTest):
         )
 
 
-class LinkPermissionsTest(APITestCase):
-    def test_unauthenticated_create(self):
-        pass
+class LinkPermissionsTest(DefaultContentItemPermissionsTest, APITestCase):
+    model = Link
 
-    def test_unauthenticated_create_in_group(self):
-        pass
-
-    def test_unauthenticated_read(self):
-        pass
-
-    def test_unauthenticated_read_in_group(self):
-        pass
-
-    def test_visibility_public_read(self):
-        pass
-
-    def test_visibility_public_read_in_group(self):
-        pass
-
-    def test_visibility_unlisted_read(self):
-        pass
-
-    def test_visibility_unlisted_read_in_group(self):
-        pass
-
-    def test_visibility_private_read(self):
-        pass
-
-    def test_visibility_private_read_in_group(self):
-        pass
-
-    def test_unauthenticated_partial_update(self):
-        pass
-
-    def test_unauthenticated_partial_update_in_group(self):
-        pass
-
-    def test_non_owner_partial_update(self):
-        pass
-
-    def test_non_owner_partial_update_in_group(self):
-        pass
-
-    def test_unauthenticated_delete(self):
-        pass
-
-    def test_unauthenticated_delete_in_group(self):
-        pass
-
-    def test_non_owner_delete(self):
-        pass
-
-    def test_non_owner_delete_in_group(self):
-        pass
+    def setUp(self):
+        super(LinkPermissionsTest, self).setUp()
+        self.endpoint = '/api/link/'
+        self.create_data = dict(
+            link="http://example.com",
+            content_item=dict(
+                title="Example link",
+                owner=self.user,
+                content_type=FeedContentItemType.objects.get(name=FeedContentItemType.LINK)
+            )
+        )
+        self.default_data = dict(
+            content_item=FeedContentItem.objects.create(**self.create_data['content_item'])
+        )
 
 
-class ImagePermissionsTest(APITestCase):
-    def test_unauthenticated_create(self):
-        pass
+class ImagePermissionsTest(DefaultContentItemPermissionsTest, APITestCase):
+    model = Image
 
-    def test_unauthenticated_create_in_group(self):
-        pass
-
-    def test_unauthenticated_read(self):
-        pass
-
-    def test_unauthenticated_read_in_group(self):
-        pass
-
-    def test_visibility_public_read(self):
-        pass
-
-    def test_visibility_public_read_in_group(self):
-        pass
-
-    def test_visibility_unlisted_read(self):
-        pass
-
-    def test_visibility_unlisted_read_in_group(self):
-        pass
-
-    def test_visibility_private_read(self):
-        pass
-
-    def test_visibility_private_read_in_group(self):
-        pass
-
-    def test_unauthenticated_partial_update(self):
-        pass
-
-    def test_unauthenticated_partial_update_in_group(self):
-        pass
-
-    def test_non_owner_partial_update(self):
-        pass
-
-    def test_non_owner_partial_update_in_group(self):
-        pass
-
-    def test_unauthenticated_delete(self):
-        pass
-
-    def test_unauthenticated_delete_in_group(self):
-        pass
-
-    def test_non_owner_delete(self):
-        pass
-
-    def test_non_owner_delete_in_group(self):
-        pass
+    def setUp(self):
+        super(ImagePermissionsTest, self).setUp()
+        self.endpoint = '/api/image/'
+        self.create_data = dict(
+            src="http://example.com/test.jpg",
+            content_item=dict(
+                title="Example image",
+                owner=self.user,
+                content_type=FeedContentItemType.objects.get(name=FeedContentItemType.IMAGE)
+            )
+        )
+        self.default_data = dict(
+            content_item=FeedContentItem.objects.create(**self.create_data['content_item'])
+        )
 
 
 class GroupForumPermissionsTest(APITestCase):
