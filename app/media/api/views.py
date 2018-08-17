@@ -63,7 +63,9 @@ class VisibilityViewSetMixin(object):
         return qs
 
 
-class AccountViewSet(MultipleSerializerMixin, ModelViewSet):
+class AccountViewSet(ActionPermissionClassesMixin,
+                     MultipleSerializerMixin,
+                     ModelViewSet):
     """An API for viewing and editing accounts"""
     queryset = Account.objects.filter(profile__isnull=False)
     serializer_classes = {
@@ -74,13 +76,14 @@ class AccountViewSet(MultipleSerializerMixin, ModelViewSet):
 
     filter_backends = (SearchFilter,)
     search_fields = ('username',)
-    # permission_classes
-
-    def get_permissions(self):
-        if self.action == 'create':
-            return [AllowAny()]
-
-        return super(AccountViewSet, self).get_permissions()
+    action_permission_classes = {
+        'default': [IsAuthenticated],
+        'retrieve': [AllowAny],
+        'partial_update': [IsThisUser],
+        'update': [IsThisUser],
+        'create': [AllowAny],
+        'destroy': [IsThisUser]
+    }
 
     @detail_route(methods=['POST', 'GET'], url_path='profile')
     @parser_classes((JSONParser,))

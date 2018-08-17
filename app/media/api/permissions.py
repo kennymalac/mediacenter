@@ -17,13 +17,19 @@ class IsOwnerOrPublicOrGroupMemberOrUnlisted(permissions.BasePermission):
             else:
                 return False
 
+
 class IsPublicOrUnlisted(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.visibility in ('0', '1')
 
-# TODO
+# TODO moderation system
 class IsGroupModeratorOrOwner(permissions.BasePermission):
     pass
+
+
+class IsThisUser(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj == request.user
 
 
 class IsOwner(permissions.BasePermission):

@@ -136,10 +136,16 @@ class AuthTests(APITestCase):
 
 
 def make_random_user():
-    user = Account(
+    user = Account.objects.create(
         username='test' + gen_random_string(5),
         password=gen_random_string(10)
     )
+    profile = Profile.objects.create(
+        display_name="ok",
+        description="Depito 2",
+        account=user
+    )
+    user.profile = profile
     user.save()
     return user
 
@@ -613,6 +619,9 @@ class InterestPermissionsTests(APITestCase):
         self.client.force_authenticate(user=None)
 
         # Unauthenticated users are allowed to view interests
+        response = self.client.get('/api/interest/{}/'.format(interest.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         response = self.client.get('/api/interest/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -636,27 +645,59 @@ class InterestPermissionsTests(APITestCase):
 
 
 class AccountPermissionsTests(APITestCase):
-    # def test_unauthenticated_read(self):
-    #     pass
+    def test_unauthenticated_read(self):
+        # Unauthenticated users should be able to retrieve an account, but not list them
+        user = make_random_user()
+        self.client.force_authenticate(user=None)
 
-    def test_visibility_public_read(self):
-        pass
+        response = self.client.get('/api/account/{}/'.format(user.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get('/api/account/'.format(user.id))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     # TODO unlisted Accounts?
     # def test_visibility_unlisted_read(self):
     #     pass
 
     def test_unauthenticated_partial_update(self):
-        pass
+        user = make_random_user()
+        data = {
+            'email': 'hacker@example.com'
+        }
+        self.client.force_authenticate(user=None)
+
+        response = self.client.patch('/api/account/{}/'.format(user.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEqual(Account.objects.get(id=user.id).email, 'hacker@example.com')
 
     def test_non_owner_partial_update(self):
-        pass
+        user = make_random_user()
+        data = {
+            'email': 'hacker@example.com'
+        }
+        self.client.force_authenticate(user=make_random_user())
+
+        response = self.client.patch('/api/account/{}/'.format(user.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEqual(Account.objects.get(id=user.id).email, 'hacker@example.com')
 
     def test_unauthenticated_delete(self):
-        pass
+        user = make_random_user()
+
+        self.client.force_authenticate(user=None)
+        response = self.client.delete('/api/account/{}/'.format(user.id))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Account.objects.count(), 2)
 
     def test_non_owner_delete(self):
-        pass
+        user = make_random_user()
+
+        self.client.force_authenticate(user=make_random_user())
+        response = self.client.delete('/api/account/{}/'.format(user.id))
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Account.objects.count(), 3)
 
 
 class ProfilePermissionsTests(APITestCase):
@@ -677,9 +718,11 @@ class ProfilePermissionsTests(APITestCase):
         pass
 
     def test_unauthenticated_delete(self):
+        # Profiles cannot be deleted independently of Accounts
         pass
 
     def test_non_owner_delete(self):
+        # Profiles cannot be deleted independently of Accounts
         pass
 
 
@@ -832,7 +875,6 @@ class DiscussionPermissionsTest(APITestCase):
         response = self.client.delete('/api/discussion/{}/'.format(discussion.id))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Discussion.objects.count(), 1)
-
 
     def test_unauthenticated_delete_in_group(self):
         pass
