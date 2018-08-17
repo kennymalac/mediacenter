@@ -2,8 +2,10 @@ from rest_framework import permissions
 
 class IsOwnerOrPublicOrGroupMemberOrUnlisted(permissions.BasePermission):
 
+    account_field_name = 'owner'
+
     def has_object_permission(self, request, view, obj):
-        if obj.visibility == '0' or obj.owner == request.user:
+        if obj.visibility == '0' or getattr(obj, self.account_field_name) == request.user:
             return True
         else:
             # TODO better roles mechanism
@@ -33,8 +35,16 @@ class IsThisUser(permissions.BasePermission):
 
 
 class IsOwner(permissions.BasePermission):
+    account_field_name = 'owner'
 
     def has_object_permission(self, request, view, obj):
         if hasattr(obj, 'content_item'):
             return obj.content_item.owner == request.user
-        return obj.owner == request.user
+        return getattr(obj, self.account_field_name) == request.user
+
+
+class IsOwnerAccount(IsOwner):
+    account_field_name = 'account'
+
+
+

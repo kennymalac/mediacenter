@@ -653,7 +653,7 @@ class AccountPermissionsTests(APITestCase):
         response = self.client.get('/api/account/{}/'.format(user.id))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        response = self.client.get('/api/account/'.format(user.id))
+        response = self.client.get('/api/account/')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     # TODO unlisted Accounts?
@@ -701,29 +701,61 @@ class AccountPermissionsTests(APITestCase):
 
 
 class ProfilePermissionsTests(APITestCase):
-    # def test_unauthenticated_read(self):
-    #     pass
+    def test_unauthenticated_read(self):
+        # Unauthenticated users should be able to retrieve an profile, but not list them
+        user = make_random_user()
+        self.client.force_authenticate(user=None)
 
-    def test_visibility_public_read(self):
-        pass
+        response = self.client.get('/api/profile/{}/'.format(user.profile.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get('/api/profile/')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     # TODO unlisted Profiles?
     # def test_visibility_unlisted_read(self):
     #     pass
 
     def test_unauthenticated_partial_update(self):
-        pass
+        user = make_random_user()
+        data = {
+            'display_name': 'XD'
+        }
+        self.client.force_authenticate(user=None)
+
+        response = self.client.patch('/api/profile/{}/'.format(user.profile.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEqual(Profile.objects.get(id=user.profile.id).display_name, 'XD')
 
     def test_non_owner_partial_update(self):
-        pass
+        user = make_random_user()
+        data = {
+            'display_name': 'XD'
+        }
+        self.client.force_authenticate(user=make_random_user())
+
+        response = self.client.patch('/api/profile/{}/'.format(user.profile.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEqual(Profile.objects.get(id=user.profile.id).display_name, 'XD')
 
     def test_unauthenticated_delete(self):
-        # Profiles cannot be deleted independently of Accounts
-        pass
+        # Profiles cannot be deleted independently of Profiles
+        user = make_random_user()
+
+        self.client.force_authenticate(user=user)
+        response = self.client.delete('/api/profile/{}/'.format(user.profile.id))
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(Profile.objects.filter(account=user).count(), 1)
 
     def test_non_owner_delete(self):
-        # Profiles cannot be deleted independently of Accounts
-        pass
+        # Profiles cannot be deleted independently of Profiles
+        user = make_random_user()
+
+        self.client.force_authenticate(user=make_random_user())
+        response = self.client.delete('/api/profile/{}/'.format(user.profile.id))
+
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(Profile.objects.filter(account=user).count(), 1)
 
 
 class DiscussionPermissionsTest(APITestCase):

@@ -205,7 +205,8 @@ class PlaceViewSet(ActionPermissionClassesMixin,
         return Response(self.get_serializer(home).data)
 
 
-class ProfileViewSet(MultipleSerializerMixin,
+class ProfileViewSet(ActionPermissionClassesMixin,
+                     MultipleSerializerMixin,
                      ListModelMixin,
                      RetrieveModelMixin,
                      UpdateModelMixin,
@@ -216,6 +217,14 @@ class ProfileViewSet(MultipleSerializerMixin,
         'update': ProfileUpdateSerializer,
         'partial_update': ProfileUpdateSerializer,
     }
+    action_permission_classes = {
+        'default': [IsAuthenticated, IsOwnerAccount],
+        'list': [IsAuthenticated],
+        'retrieve': [AllowAny],
+        'update': [IsAuthenticated, IsOwnerAccount],
+        'partial_update': [IsAuthenticated, IsOwnerAccount]
+    }
+
     filter_fields = ('interests',)
 
 
