@@ -858,8 +858,9 @@ class DefaultContentItemPermissionsTest(object):
         FeedContentStashItem.objects.create(item=content_obj.content_item, stash=stash)
 
         response = self.client.get('/api/feed/{}/stash/{}/content/'.format(group.feed.id, stash.id))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['content']['results']), 0)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # self.assertEqual(len(response.data['content']['results']), 0)
 
     def test_non_local_read(self):
         # Local content cannot be read by outsiders
@@ -926,7 +927,7 @@ class DefaultContentItemPermissionsTest(object):
 
         content_obj = self.model.objects.create(**{
             **self.create_data,
-            'content_item': FeedContentItem.objects.create(**{**self.create_data['content_item'], 'visibility': '9'})
+            'content_item': FeedContentItem.objects.create(**{**self.create_data['content_item'], 'visibility': '0'})
         })
         FeedContentStashItem.objects.create(item=content_obj.content_item, stash=stash)
 
@@ -1008,7 +1009,6 @@ class DefaultContentItemPermissionsTest(object):
         response = self.client.get('/api/feed/{}/stash/{}/content/'.format(group.feed.id, stash.id))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['content']['results']), 0)
-        self.assertEqual(response.data['content']['results'][0]['item']['id'], content_obj.content_item.id)
 
     def test_unauthenticated_partial_update(self):
         content_obj = self.model.objects.create(**self.default_data)

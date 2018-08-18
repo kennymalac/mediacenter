@@ -10,15 +10,16 @@ class IsOwnerOrPublicOrGroupMemberOrUnlisted(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if attrgetter(self.visibility_field_attr)(obj) == '0' or attrgetter(self.account_field_attr)(obj) == request.user:
             return True
-        elif self.group_check:
-            # TODO better roles mechanism
+
+        # TODO better roles mechanism
+        if self.group_check and obj.groupforum_set.count():
             groups = obj.groupforum_set
-            if groups.count():
-                if request.user in groups.first().members:
-                    return True
-            # Unlisted is viewable
-            elif attrgetter(self.visibility_field_attr)(obj) != '9':
+            if groups.filter(members__in=[request.user]).count():
                 return True
+
+        # Unlisted is viewable
+        elif attrgetter(self.visibility_field_attr)(obj) != '9':
+            return True
 
         return False
 

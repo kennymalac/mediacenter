@@ -1,6 +1,6 @@
 from bleach.sanitizer import Cleaner
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Max
+from django.db.models import Max, Q
 from django.conf import settings
 from api.paginators import *
 from django_countries.serializers import CountryFieldMixin
@@ -594,6 +594,13 @@ class FeedContentStashContentSerializer(serializers.ModelSerializer):
         request = self.context['request']
 
         content_queryset = FeedContentStashItem.objects.filter(stash=instance)
+
+        if request.user and request.user.is_authenticated():
+            # Either the user owns these objects or it is NOT private
+            content_queryset = content_queryset.filter(Q(item__owner=request.user) | ~Q(item__visibility='9'))
+        else:
+            content_queryset = content_queryset.exclude(item__visibility='9')
+
         _content_types = request.data.get('content_types', None)
         if _content_types:
             content_queryset = content_queryset.filter(content_type__in=FeedContentType.objects.filter(id__in=_content_types))

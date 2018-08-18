@@ -426,10 +426,24 @@ class FeedContentStashViewSet(NestedViewSetMixin,
         instance = self.queryset.get(pk=pk)
         feed_parent_pk = kwargs.get('parent_lookup_feeds', False)
         require_private = False
+
+        content = None
         if feed_parent_pk:
             # All content must be private
-            print(Feed.objects.get(id=feed_parent_pk).visibility)
-            require_private = Feed.objects.filter(id=feed_parent_pk, visibility='9').count() > 0
+            feed = Feed.objects.get(id=feed_parent_pk)
+            require_private = feed.visibility == '9'
+
+            if feed.default_owner_feed and feed.owner != request.user:
+                return Response({
+                    'error': 'You do not have permission to add content to this stash'
+                }, status=403)
+
+            elif feed.groupforum_set.count():
+                # Check if this feed has at least one group that can accept this content
+                if not feed.groupforum_set.filter(members__in=[self.request.user]).count():
+                    return Response({
+                        'error': 'You do not have permission to add content to this stash'
+                    }, status=403)
 
         # TODO get feed, verify feed membership/post permission
         # if instance.owner:
@@ -491,6 +505,7 @@ class CommentViewSet(NestedViewSetMixin,
 
 
 class DiscussionViewSet(NestedViewSetMixin,
+                        FeedContentItemVisibilityViewSetMixin,
                         ActionPermissionClassesMixin,
                         MultipleSerializerMixin,
                         ModelViewSet):
