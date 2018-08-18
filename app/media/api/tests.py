@@ -890,7 +890,7 @@ class DefaultContentItemPermissionsTest(object):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         print('content', response.data['content']['results'])
         self.assertEqual(len(response.data['content']['results']), 1)
-        self.assertEqual(response.data['content']['results'][0]['id'], content_obj.id)
+        self.assertEqual(response.data['content']['results'][0]['item']['id'], content_obj.content_item.id)
 
     def test_visibility_unlisted_read(self):
         # Create unlisted content_item
@@ -927,7 +927,7 @@ class DefaultContentItemPermissionsTest(object):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Unlisted content items are shown in a group but not visible outside of its stash
         self.assertEqual(len(response.data['content']['results']), 1)
-        self.assertEqual(response.data['content']['results'][0]['id'], content_obj.id)
+        self.assertEqual(response.data['content']['results'][0]['item']['id'], content_obj.content_item.id)
 
     def test_visibility_private_read(self):
         # Create private content_item
@@ -964,7 +964,7 @@ class DefaultContentItemPermissionsTest(object):
         response = self.client.get('/api/feed/{}/stash/{}/content/'.format(group.feed.id, stash.id))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['content']['results']), 0)
-        self.assertEqual(response.data['content']['results'][0]['id'], content_obj.id)
+        self.assertEqual(response.data['content']['results'][0]['item']['id'], content_obj.content_item.id)
 
     def test_unauthenticated_partial_update(self):
         content_obj = self.model.objects.create(**self.default_data)

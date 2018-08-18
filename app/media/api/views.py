@@ -46,6 +46,13 @@ class ActionPermissionClassesMixin(object):
 
 class VisibilityViewSetMixin(object):
     visibility_field = 'visibility'
+    owner_field = 'owner'
+
+    def __request_owner(self):
+        '''Returns dict to fitler by the request user'''
+        _d = {}
+        _d[self.owner_field] = self.request.user
+        return _d
 
     def __visibility(self, visibility='9'):
         '''Returns dict to fitler by a certain visibility'''
@@ -58,11 +65,11 @@ class VisibilityViewSetMixin(object):
 
         if self.request.user.is_authenticated():
             # Either the user owns these objects or it is NOT private
-            qs = qs.filter(Q(owner=self.request.user) | ~Q(**self.__visibility()))
+            qs = qs.filter(Q(**self.__request_owner()) | ~Q(**self.__visibility()))
 
             if self.action == 'list':
                 # Either the user owns these objects or it is public
-                qs = qs.filter(Q(owner=self.request.user) | Q(**self.__visibility('0')))
+                qs = qs.filter(Q(**self.__request_owner()) | Q(**self.__visibility('0')))
         else:
             qs = qs.filter(~Q(**self.__visibility()))
 
@@ -70,6 +77,11 @@ class VisibilityViewSetMixin(object):
                 qs = qs.filter(Q(**self.__visibility('0')))
 
         return qs
+
+
+class FeedContentItemVisibilityViewSetMixin(VisibilityViewSetMixin):
+    owner_field = 'content_item__owner'
+    visibility_field = 'content_item__visibility'
 
 
 class GroupVisibilityViewSetMixin(VisibilityViewSetMixin):
@@ -80,6 +92,7 @@ class AccountViewSet(ActionPermissionClassesMixin,
                      MultipleSerializerMixin,
                      ModelViewSet):
     """An API for viewing and editing accounts"""
+    # TODO paginate
     queryset = Account.objects.filter(profile__isnull=False)
     serializer_classes = {
         'default': AccountSerializer,
@@ -490,7 +503,7 @@ class DiscussionViewSet(NestedViewSetMixin,
         'create': DiscussionCreateUpdateSerializer
     }
     action_permission_classes = {
-        'default': [IsAuthenticated, IsContentItemOwnerOrPublicOrGroupMemberOrUnlisted],
+        'default': [IsAuthenticated, IsContentItemOwnerOrPublicOrUnlisted],
         'update': [IsAuthenticated, IsOwner],
         'partial_update': [IsAuthenticated, IsOwner],
         # TODO create in group should check if group member
@@ -502,11 +515,12 @@ class DiscussionViewSet(NestedViewSetMixin,
 
 
 class LinkViewSet(NestedViewSetMixin,
+                  FeedContentItemVisibilityViewSetMixin,
                   ActionPermissionClassesMixin,
                   MultipleSerializerMixin,
                   ModelViewSet):
 
-    queryset = Link.objects.all()
+    queryset = Link.objects.all().order_by('content_item__created')
     serializer_classes = {
         'default': LinkSerializer,
         'partial_update': LinkCreateUpdateSerializer,
@@ -514,21 +528,23 @@ class LinkViewSet(NestedViewSetMixin,
         'create': LinkCreateUpdateSerializer
     }
     action_permission_classes = {
-        'default': [IsAuthenticated, IsContentItemOwnerOrPublicOrGroupMemberOrUnlisted],
+        'default': [IsAuthenticated, IsContentItemOwnerOrPublicOrUnlisted],
         'update': [IsAuthenticated, IsOwner],
         'partial_update': [IsAuthenticated, IsOwner],
         # TODO create in group should check if group member
         'create': [IsAuthenticated],
         'destroy': [IsAuthenticated, IsOwner]
     }
+    pagination_class = FeedContentItemPagination
 
 
 class ImageViewSet(NestedViewSetMixin,
+                   FeedContentItemVisibilityViewSetMixin,
                    ActionPermissionClassesMixin,
                    MultipleSerializerMixin,
                    ModelViewSet):
 
-    queryset = Image.objects.all()
+    queryset = Image.objects.all().order_by('content_item__created')
     serializer_classes = {
         'default': ImageSerializer,
         'partial_update': ImageCreateUpdateSerializer,
@@ -536,13 +552,14 @@ class ImageViewSet(NestedViewSetMixin,
         'create': ImageCreateUpdateSerializer
     }
     action_permission_classes = {
-        'default': [IsAuthenticated, IsContentItemOwnerOrPublicOrGroupMemberOrUnlisted],
+        'default': [IsAuthenticated, IsContentItemOwnerOrPublicOrUnlisted],
         'update': [IsAuthenticated, IsOwner],
         'partial_update': [IsAuthenticated, IsOwner],
         # TODO create in group should check if group member
         'create': [IsAuthenticated],
         'destroy': [IsAuthenticated, IsOwner]
     }
+    pagination_class = FeedContentItemPagination
 
 
 class GroupForumViewSet(NestedViewSetMixin,

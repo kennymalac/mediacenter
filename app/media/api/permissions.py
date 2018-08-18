@@ -5,11 +5,12 @@ class IsOwnerOrPublicOrGroupMemberOrUnlisted(permissions.BasePermission):
 
     account_field_attr = 'owner'
     visibility_field_attr = 'visibility'
+    group_check = True
 
     def has_object_permission(self, request, view, obj):
         if attrgetter(self.visibility_field_attr)(obj) == '0' or attrgetter(self.account_field_attr)(obj) == request.user:
             return True
-        else:
+        elif self.group_check:
             # TODO better roles mechanism
             groups = obj.groupforum_set
             if groups.count():
@@ -18,13 +19,14 @@ class IsOwnerOrPublicOrGroupMemberOrUnlisted(permissions.BasePermission):
             # Unlisted is viewable
             elif attrgetter(self.visibility_field_attr)(obj) != '9':
                 return True
-            else:
-                return False
+
+        return False
 
 
-class IsContentItemOwnerOrPublicOrGroupMemberOrUnlisted(IsOwnerOrPublicOrGroupMemberOrUnlisted):
+class IsContentItemOwnerOrPublicOrUnlisted(IsOwnerOrPublicOrGroupMemberOrUnlisted):
     account_field_attr = 'content_item.owner'
     visibility_field_attr = 'content_item.visibility'
+    group_check = False
 
 
 class IsPublicOrUnlisted(permissions.BasePermission):
