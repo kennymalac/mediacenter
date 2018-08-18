@@ -863,7 +863,7 @@ class DefaultContentItemPermissionsTest(object):
 
     def test_non_local_read(self):
         # Local content cannot be read by outsiders
-        # NOTE this test requires the GeoSpace microservice to be running in order to pass
+        # NOTE this test does NOT require the GeoSpace microservice to be running in order to pass
         place = Place.objects.create(**self.place_data)
         content_obj = self.model.objects.create(**self.default_data)
         content_obj.content_item.places.add(place)
@@ -884,7 +884,7 @@ class DefaultContentItemPermissionsTest(object):
 
     def test_non_local_read_in_group(self):
         # Local content cannot be read by outsiders
-        # NOTE this test requires the GeoSpace microservice to be running in order to pass
+        # NOTE this test does NOT require the GeoSpace microservice to be running in order to pass
         group = make_random_group()
         user = make_random_user()
         self.client.force_authenticate(user=user)
@@ -1145,7 +1145,24 @@ class GroupForumPermissionsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_non_local_read(self):
-        pass
+        data = {}
+        place = Place.objects.create(**dict(
+            owner=self.user,
+            name="Example place"
+        ))
+        group = GroupForum.objects.create(**self.group_data)
+        group.feed.places.add(place)
+
+        self.client.force_authenticate(user=make_random_user())
+
+        response = self.client.get('/api/group/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # GroupForum should NOT show up in the response
+        self.assertEqual(len(response.data['results']), 0)
+
+        response = self.client.get('/api/group/{}/'.format(group.id))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_visibility_public_read(self):
         group = GroupForum.objects.create(**self.group_data)
