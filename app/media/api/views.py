@@ -48,14 +48,14 @@ class VisibilityViewSetMixin(object):
     visibility_field = 'visibility'
     owner_field = 'owner'
 
-    def __request_owner(self):
-        '''Returns dict to fitler by the request user'''
+    def _request_owner(self):
+        '''Returns dict to filter by the request user'''
         _d = {}
         _d[self.owner_field] = self.request.user
         return _d
 
-    def __visibility(self, visibility='9'):
-        '''Returns dict to fitler by a certain visibility'''
+    def _visibility(self, visibility='9'):
+        '''Returns dict to filter by a certain visibility'''
         _d = {}
         _d[self.visibility_field] = visibility
         return _d
@@ -65,16 +65,16 @@ class VisibilityViewSetMixin(object):
 
         if self.request.user.is_authenticated():
             # Either the user owns these objects or it is NOT private
-            qs = qs.filter(Q(**self.__request_owner()) | ~Q(**self.__visibility()))
+            qs = qs.filter(Q(**self._request_owner()) | ~Q(**self._visibility()))
 
             if self.action == 'list':
                 # Either the user owns these objects or it is public
-                qs = qs.filter(Q(**self.__request_owner()) | Q(**self.__visibility('0')))
+                qs = qs.filter(Q(**self._request_owner()) | Q(**self._visibility('0')))
         else:
-            qs = qs.filter(~Q(**self.__visibility()))
+            qs = qs.filter(~Q(**self._visibility()))
 
             if self.action == 'list':
-                qs = qs.filter(Q(**self.__visibility('0')))
+                qs = qs.filter(Q(**self._visibility('0')))
 
         return qs
 
@@ -86,6 +86,16 @@ class FeedContentItemVisibilityViewSetMixin(VisibilityViewSetMixin):
 
 class GroupVisibilityViewSetMixin(VisibilityViewSetMixin):
     visibility_field = 'feed__visibility'
+
+
+class FeedContentStashVisibilityViewSetMixin(VisibilityViewSetMixin):
+    owner_field = 'feeds__owner__in'
+
+    def _request_owner(self):
+        '''Returns dict to filter by the request user'''
+        _d = {}
+        _d[self.owner_field] = (self.request.user,)
+        return _d
 
 
 class AccountViewSet(ActionPermissionClassesMixin,
@@ -392,6 +402,7 @@ class FeedContentStashItemViewSet(NestedViewSetMixin,
     }
 
 class FeedContentStashViewSet(NestedViewSetMixin,
+                              FeedContentStashVisibilityViewSetMixin,
                               ActionPermissionClassesMixin,
                               MultipleSerializerMixin,
                               ModelViewSet):

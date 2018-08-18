@@ -1125,6 +1125,10 @@ class GroupForumPermissionsTest(APITestCase):
         )
         self.group_data['feed'] = Feed.objects.create(**self.create_data['feed'])
 
+    def test_group_search(self):
+        # TODO
+        pass
+
     def test_unauthenticated_create(self):
         data = {}
         self.client.force_authenticate(user=None)
