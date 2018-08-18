@@ -625,6 +625,10 @@ class FeedContentStashCreateUpdateSerializer(serializers.ModelSerializer):
 
 class ContentItemCRUDSerializer(serializers.ModelSerializer):
     def create_content_item(self, data, content_type):
+        if 'content_type' in data:
+            # Content type is already provided and is not overrideable
+            data.pop('content_type')
+
         interests = []
         places = []
         if 'interests' in data:

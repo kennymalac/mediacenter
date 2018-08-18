@@ -150,6 +150,21 @@ def make_random_user():
     return user
 
 
+def make_random_group(visibility='0'):
+    owner = make_random_user()
+    feed = Feed.objects.create(owner=owner, name="Example feed", visibility=visibility)
+    stash = FeedContentStash.objects.create(name="Default", description="Stored content for this group", visibility=visibility)
+    feed.stashes.add(*(stash,))
+
+    group = GroupForum.objects.create(
+        owner=owner,
+        name="Example group",
+        feed=feed
+    )
+    group.members.add(group.owner)
+    return group
+
+
 class ActivityLogTests(APITestCase):
     # def setUp(self):
     #     super(self).setUp()
@@ -763,6 +778,27 @@ class DefaultContentItemPermissionsTest(object):
         make_content_types()
         self.user = make_random_user()
 
+    def _create_request_data(self):
+        _request_data = {}
+        for k,v in self.create_data.items():
+            if not k in ['owner', 'content_item']:
+                _request_data[k] = v
+
+        _item_data = {}
+        for k,v in self.create_data['content_item'].items():
+            if not k in ['owner', 'content_type']:
+                _item_data[k] = v
+
+        return {
+            **_request_data,
+            'owner': self.user.id,
+            'content_item': {
+                **_item_data,
+                'content_type': self.create_data['content_item']['content_type'].id,
+                'owner': self.user.id
+            }
+        }
+
     def test_unauthenticated_create(self):
         data = {}
         self.client.force_authenticate(user=None)
@@ -771,8 +807,28 @@ class DefaultContentItemPermissionsTest(object):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(self.model.objects.count(), 0)
 
-    def test_unauthenticated_create_in_group(self):
-        pass
+    def test_non_member_create_in_group(self):
+        self.client.force_authenticate(user=self.user)
+
+        group = make_random_group()
+        stash = group.feed.stashes.first()
+
+        create_request_data = self._create_request_data()
+        print(create_request_data)
+
+        response = self.client.post(self.endpoint, create_request_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(self.model.objects.count(), 1)
+        content_item_id = self.model.objects.first().content_item.id
+
+        # Now attempting to add the content to the group stash should fail,
+        # regardless of its visibility
+        add_request_data = {
+            'content': [content_item_id]
+        }
+        response = self.client.post('/api/feed/{}/stash/{}/content/add/'.format(group.feed.id, stash.id), add_request_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(stash.content.count(), 0)
 
     def test_unauthenticated_private_read(self):
         data = {}
@@ -789,7 +845,7 @@ class DefaultContentItemPermissionsTest(object):
         response = self.client.get('{}{}/'.format(self.endpoint, content_obj.id))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_unauthenticated_read_in_group(self):
+    def test_unauthenticated_private_read_in_group(self):
         pass
 
     def test_visibility_public_read(self):
