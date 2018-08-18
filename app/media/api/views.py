@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.shortcuts import render, get_object_or_404
 from django.conf import settings
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, list_route, detail_route, parser_classes, action
@@ -156,6 +156,7 @@ class InterestViewSet(ActionPermissionClassesMixin,
 class PlaceViewSet(ActionPermissionClassesMixin,
                    ListModelMixin,
                    RetrieveModelMixin,
+                   DestroyModelMixin,
                    GenericViewSet):
     queryset = Place.objects.all()
     serializer_class = PlaceSerializer
@@ -165,6 +166,11 @@ class PlaceViewSet(ActionPermissionClassesMixin,
         'create': [IsAuthenticated],
         'destroy': [IsAuthenticated, IsOwner]
     }
+
+    def get_queryset(self):
+        qs = super(PlaceViewSet, self).get_queryset()
+
+        return qs.filter(owner=self.request.user)
 
     @list_route(methods=['POST'], url_path='connect')
     def connect(self, request, *args, **kwargs):

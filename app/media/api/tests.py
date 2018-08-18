@@ -1130,6 +1130,19 @@ class PlacePermissionsTest(APITestCase):
         response = self.client.get('/api/place/{}/'.format(place.id))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_non_owner_read(self):
+        # Non owners cannot read someone else's Places
+        data = {}
+        place = Place.objects.create(**self.place_data)
+        self.client.force_authenticate(user=make_random_user())
+
+        response = self.client.get('/api/place/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 0)
+
+        response = self.client.get('/api/place/{}/'.format(place.id))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_unauthenticated_delete(self):
         place = Place.objects.create(**self.place_data)
 
@@ -1145,5 +1158,5 @@ class PlacePermissionsTest(APITestCase):
         self.client.force_authenticate(user=user)
         response = self.client.delete('/api/place/{}/'.format(place.id))
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(Place.objects.count(), 1)
