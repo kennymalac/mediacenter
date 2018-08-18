@@ -775,6 +775,10 @@ class DefaultContentItemPermissionsTest(object):
     def setUp(self):
         make_content_types()
         self.user = make_random_user()
+        self.place_data = dict(
+            owner=self.user,
+            name="Example place"
+        )
 
     def _create_request_data(self):
         _request_data = {}
@@ -860,12 +864,42 @@ class DefaultContentItemPermissionsTest(object):
     def test_non_local_read(self):
         # Local content cannot be read by outsiders
         # NOTE this test requires the GeoSpace microservice to be running in order to pass
-        pass
+        place = Place.objects.create(**self.place_data)
+        content_obj = self.model.objects.create(**self.default_data)
+        content_obj.content_item.places.add(place)
+
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get(self.endpoint)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Content object should NOT show up in the response
+        self.assertEqual(len(response.data['results']), 0)
+
+        response = self.client.get('{}{}/'.format(self.endpoint, content_obj.id))
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_non_local_read_in_group(self):
         # Local content cannot be read by outsiders
         # NOTE this test requires the GeoSpace microservice to be running in order to pass
-        pass
+        group = make_random_group()
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+        stash = group.feed.stashes.first()
+
+        place = Place.objects.create(**self.place_data)
+        content_obj = self.model.objects.create(**self.default_data)
+        content_obj.content_item.places.add(place)
+
+        FeedContentStashItem.objects.create(item=content_obj.content_item, stash=stash)
+
+        response = self.client.get('/api/feed/{}/stash/{}/content/'.format(group.feed.id, stash.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['content']['results']), 0)
+        self.assertEqual(response.data['content']['results'][0]['item']['id'], content_obj.content_item.id)
 
     def test_visibility_public_read(self):
         content_obj = self.model.objects.create(**self.default_data)
