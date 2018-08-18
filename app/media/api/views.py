@@ -45,22 +45,35 @@ class ActionPermissionClassesMixin(object):
 
 
 class VisibilityViewSetMixin(object):
+    visibility_field = 'visibility'
+
+    def __visibility(self, visibility='9'):
+        '''Returns dict to fitler by a certain visibility'''
+        _d = {}
+        _d[self.visibility_field] = visibility
+        return _d
+
     def get_queryset(self):
         qs = super(VisibilityViewSetMixin, self).get_queryset()
+
         if self.request.user.is_authenticated():
             # Either the user owns these objects or it is NOT private
-            qs = qs.filter(Q(owner=self.request.user) | ~Q(visibility='9'))
+            qs = qs.filter(Q(owner=self.request.user) | ~Q(**self.__visibility()))
 
             if self.action == 'list':
                 # Either the user owns these objects or it is public
-                qs = qs.filter(Q(owner=self.request.user) | Q(visibility='0'))
+                qs = qs.filter(Q(owner=self.request.user) | Q(**self.__visibility('0')))
         else:
-            qs = qs.filter(~Q(visibility='9'))
+            qs = qs.filter(~Q(**self.__visibility()))
 
             if self.action == 'list':
-                qs = qs.filter(Q(visibility='0'))
+                qs = qs.filter(Q(**self.__visibility('0')))
 
         return qs
+
+
+class GroupVisibilityViewSetMixin(VisibilityViewSetMixin):
+    visibility_field = 'feed__visibility'
 
 
 class AccountViewSet(ActionPermissionClassesMixin,
@@ -533,17 +546,27 @@ class ImageViewSet(NestedViewSetMixin,
 
 
 class GroupForumViewSet(NestedViewSetMixin,
+                        GroupVisibilityViewSetMixin,
+                        ActionPermissionClassesMixin,
                         MultipleSerializerMixin,
                         ModelViewSet):
 
-    queryset = GroupForum.objects.all()
+    queryset = GroupForum.objects.all().order_by('feed__created')
     serializer_classes = {
         'default': GroupForumSerializer,
         'partial_update': GroupForumCreateUpdateSerializer,
         'update': GroupForumCreateUpdateSerializer,
         'create': GroupForumCreateUpdateSerializer
     }
+    # NOTE we should probably allow private groups to be listed if the user is a member
+    action_permission_classes = {
+        'default': [IsAuthenticated, IsOwner],
+        'retrieve': [AllowAny],
+        'list': [IsAuthenticated],
+        'create': [IsAuthenticated]
+    }
     filter_class = GroupForumFilter
+    pagination_class = DiscussionPagination
 
     @list_route(methods=['POST'], url_path='search', permission_classes=[IsAuthenticated])
     def search(self, request):

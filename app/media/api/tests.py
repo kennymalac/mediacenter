@@ -1098,7 +1098,7 @@ class GroupForumPermissionsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         response = self.client.get('/api/group/{}/'.format(group.id))
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_visibility_public_read(self):
         group = GroupForum.objects.create(**self.group_data)
