@@ -10,7 +10,7 @@ from rest_framework.test import APIRequestFactory, APITestCase, force_authentica
 from channels import Channel
 from channels.tests import ChannelTestCase
 
-from api.models import Account, Profile, ActivityLog, BlogPost, Interest, Place, PlaceRestriction, Feed, FeedContentItem, FeedContentItemType, FeedContentStash, Discussion, Link, Image, GroupForum
+from api.models import Account, Profile, ActivityLog, BlogPost, Interest, Place, PlaceRestriction, Feed, FeedContentItem, FeedContentStashItem, FeedContentItemType, FeedContentStash, Discussion, Link, Image, GroupForum
 
 api_request = APIRequestFactory()
 
@@ -422,7 +422,6 @@ class FeedPermissionsTests(APITestCase):
         self.client.force_authenticate(user=user)
 
         response = self.client.get('/api/feed/')
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Feed should show up in the response
@@ -541,7 +540,6 @@ class FeedContentStashPermissionsTests(APITestCase):
         self.client.force_authenticate(user=user)
 
         response = self.client.get('/api/stash/')
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Stash should show up in the response
@@ -814,7 +812,6 @@ class DefaultContentItemPermissionsTest(object):
         stash = group.feed.stashes.first()
 
         create_request_data = self._create_request_data()
-        print(create_request_data)
 
         response = self.client.post(self.endpoint, create_request_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -846,7 +843,19 @@ class DefaultContentItemPermissionsTest(object):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_unauthenticated_private_read_in_group(self):
-        pass
+        group = make_random_group()
+        self.client.force_authenticate(user=None)
+        stash = group.feed.stashes.first()
+
+        content_obj = self.model.objects.create(**{
+            **self.create_data,
+            'content_item': FeedContentItem.objects.create(**{**self.create_data['content_item'], 'visibility': '9'})
+        })
+        FeedContentStashItem.objects.create(item=content_obj.content_item, stash=stash)
+
+        response = self.client.get('/api/feed/{}/stash/{}/content/'.format(group.feed.id, stash.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['content']['results']), 0)
 
     def test_visibility_public_read(self):
         content_obj = self.model.objects.create(**self.default_data)
@@ -854,7 +863,6 @@ class DefaultContentItemPermissionsTest(object):
         self.client.force_authenticate(user=user)
 
         response = self.client.get(self.endpoint)
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # TODO only list Discussions, not other content items
@@ -867,7 +875,22 @@ class DefaultContentItemPermissionsTest(object):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_visibility_public_read_in_group(self):
-        pass
+        group = make_random_group()
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+        stash = group.feed.stashes.first()
+
+        content_obj = self.model.objects.create(**{
+            **self.create_data,
+            'content_item': FeedContentItem.objects.create(**{**self.create_data['content_item'], 'visibility': '9'})
+        })
+        FeedContentStashItem.objects.create(item=content_obj.content_item, stash=stash)
+
+        response = self.client.get('/api/feed/{}/stash/{}/content/'.format(group.feed.id, stash.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        print('content', response.data['content']['results'])
+        self.assertEqual(len(response.data['content']['results']), 1)
+        self.assertEqual(response.data['content']['results'][0]['id'], content_obj.id)
 
     def test_visibility_unlisted_read(self):
         # Create unlisted content_item
@@ -889,7 +912,22 @@ class DefaultContentItemPermissionsTest(object):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_visibility_unlisted_read_in_group(self):
-        pass
+        group = make_random_group()
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+        stash = group.feed.stashes.first()
+
+        content_obj = self.model.objects.create(**{
+            **self.create_data,
+            'content_item': FeedContentItem.objects.create(**{**self.create_data['content_item'], 'visibility': '1'})
+        })
+        FeedContentStashItem.objects.create(item=content_obj.content_item, stash=stash)
+
+        response = self.client.get('/api/feed/{}/stash/{}/content/'.format(group.feed.id, stash.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Unlisted content items are shown in a group but not visible outside of its stash
+        self.assertEqual(len(response.data['content']['results']), 1)
+        self.assertEqual(response.data['content']['results'][0]['id'], content_obj.id)
 
     def test_visibility_private_read(self):
         # Create private content_item
@@ -904,7 +942,7 @@ class DefaultContentItemPermissionsTest(object):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # self.model should NOT show up in the response
+        # Content object should NOT show up in the response
         self.assertEqual(len(response.data['results']), 0)
 
         response = self.client.get('{}{}/'.format(self.endpoint, content_obj.id))
@@ -912,7 +950,21 @@ class DefaultContentItemPermissionsTest(object):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_visibility_private_read_in_group(self):
-        pass
+        group = make_random_group()
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+        stash = group.feed.stashes.first()
+
+        content_obj = self.model.objects.create(**{
+            **self.create_data,
+            'content_item': FeedContentItem.objects.create(**{**self.create_data['content_item'], 'visibility': '9'})
+        })
+        FeedContentStashItem.objects.create(item=content_obj.content_item, stash=stash)
+
+        response = self.client.get('/api/feed/{}/stash/{}/content/'.format(group.feed.id, stash.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['content']['results']), 0)
+        self.assertEqual(response.data['content']['results'][0]['id'], content_obj.id)
 
     def test_unauthenticated_partial_update(self):
         content_obj = self.model.objects.create(**self.default_data)
@@ -926,9 +978,6 @@ class DefaultContentItemPermissionsTest(object):
         response = self.client.patch('{}{}/'.format(self.endpoint, content_obj.id), data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertNotEqual(self.model.objects.get(id=content_obj.id).content_item.title, 'depito')
-
-    def test_unauthenticated_partial_update_in_group(self):
-        pass
 
     def test_non_owner_partial_update(self):
         content_obj = self.model.objects.create(**self.default_data)
@@ -944,9 +993,6 @@ class DefaultContentItemPermissionsTest(object):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertNotEqual(self.model.objects.get(id=content_obj.id).content_item.title, 'depito')
 
-    def test_non_owner_partial_update_in_group(self):
-        pass
-
     def test_unauthenticated_delete(self):
         content_obj = self.model.objects.create(**self.default_data)
 
@@ -954,9 +1000,6 @@ class DefaultContentItemPermissionsTest(object):
         response = self.client.delete('{}{}/'.format(self.endpoint, content_obj.id))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(self.model.objects.count(), 1)
-
-    def test_unauthenticated_delete_in_group(self):
-        pass
 
     def test_non_owner_delete(self):
         content_obj = self.model.objects.create(**self.default_data)
@@ -967,9 +1010,6 @@ class DefaultContentItemPermissionsTest(object):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(self.model.objects.count(), 1)
-
-    def test_non_owner_delete_in_group(self):
-        pass
 
 
 class DiscussionPermissionsTest(DefaultContentItemPermissionsTest, APITestCase):
@@ -1066,7 +1106,6 @@ class GroupForumPermissionsTest(APITestCase):
         self.client.force_authenticate(user=user)
 
         response = self.client.get('/api/group/')
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # GroupForum should show up in the response
