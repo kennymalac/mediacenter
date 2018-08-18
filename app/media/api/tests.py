@@ -857,6 +857,16 @@ class DefaultContentItemPermissionsTest(object):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['content']['results']), 0)
 
+    def test_non_local_read(self):
+        # Local content cannot be read by outsiders
+        # NOTE this test requires the GeoSpace microservice to be running in order to pass
+        pass
+
+    def test_non_local_read_in_group(self):
+        # Local content cannot be read by outsiders
+        # NOTE this test requires the GeoSpace microservice to be running in order to pass
+        pass
+
     def test_visibility_public_read(self):
         content_obj = self.model.objects.create(**self.default_data)
         user = make_random_user()
@@ -1099,6 +1109,9 @@ class GroupForumPermissionsTest(APITestCase):
 
         response = self.client.get('/api/group/{}/'.format(group.id))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_non_local_read(self):
+        pass
 
     def test_visibility_public_read(self):
         group = GroupForum.objects.create(**self.group_data)
