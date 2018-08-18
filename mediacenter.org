@@ -14,6 +14,20 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 
 * TODOs
 ** Priority 1 (urgent)
+*** Security
+**** DONE Account permissions tests pass
+     CLOSED: [2018-08-18 Sat 15:03]
+**** DONE Profile permissions tests pass
+     CLOSED: [2018-08-18 Sat 15:03]
+**** TODO Content item permissions tests pass
+**** DONE Place permissions tests pass
+     CLOSED: [2018-08-18 Sat 15:06]
+**** TODO GroupForum permissions tests pass
+**** DONE Feed permissions tests pass
+     CLOSED: [2018-08-18 Sat 15:03]
+**** TODO FeedContentItem permissions tests pass
+**** TODO FeedContentStash permissions tests pass
+
 *** Style overhaul
 **** DONE restyle buttons
      CLOSED: [2018-07-30 Mon 22:35]
