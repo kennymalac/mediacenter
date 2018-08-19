@@ -775,6 +775,10 @@ class ProfilePermissionsTests(APITestCase):
         self.assertEqual(Profile.objects.filter(account=user).count(), 1)
 
 
+class FeedContentItemPermissionsTest(APITestCase):
+    pass
+
+
 class DefaultContentItemPermissionsTest(object):
     def setUp(self):
         make_content_types()
@@ -904,7 +908,6 @@ class DefaultContentItemPermissionsTest(object):
         response = self.client.get('/api/feed/{}/stash/{}/content/'.format(group.feed.id, stash.id))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['content']['results']), 0)
-        self.assertEqual(response.data['content']['results'][0]['item']['id'], content_obj.content_item.id)
 
     def test_visibility_public_read(self):
         content_obj = self.model.objects.create(**self.default_data)

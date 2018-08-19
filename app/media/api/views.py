@@ -84,6 +84,12 @@ class FeedContentItemVisibilityViewSetMixin(VisibilityViewSetMixin):
     owner_field = 'content_item__owner'
     visibility_field = 'content_item__visibility'
 
+    def get_queryset(self, **kwargs):
+        qs = super(FeedContentItemVisibilityViewSetMixin, self).get_queryset()
+
+        return qs.restrict_local(
+            user=self.request.user, allowed_places=[])
+
 
 class GroupVisibilityViewSetMixin(VisibilityViewSetMixin):
     visibility_field = 'feed__visibility'
@@ -92,7 +98,7 @@ class GroupVisibilityViewSetMixin(VisibilityViewSetMixin):
         qs = super(GroupVisibilityViewSetMixin, self).get_queryset()
 
         if kwargs.get('restrict_places', True):
-            return qs.viewable_groups(
+            return qs.restrict_local(
                 user=self.request.user, allowed_places=[])
         return qs
 
@@ -604,7 +610,6 @@ class GroupForumViewSet(NestedViewSetMixin,
                 place = user_places.first()
                 restriction = PlaceRestriction.objects.filter(place=place).first()
                 allowed_places = Place.objects.other_places(place, restriction)
-                print(allowed_places)
 
                 if len(allowed_places) == 0:
                     group_queryset = group_queryset.filter(feed__places__isnull=True)

@@ -288,6 +288,8 @@ class FeedContentStashItem(TaggedItem):
     item = models.ForeignKey(FeedContentItem, on_delete=models.CASCADE)
     stash = models.ForeignKey('api.FeedContentStash', on_delete=models.CASCADE)
 
+    objects = api.managers.FeedContentStashItemQuerySet.as_manager()
+
 
 class FeedContentStash(models.Model):
     # TODO "sticky" content - maybe add order?
@@ -317,6 +319,9 @@ class Discussion(models.Model):
     text = models.TextField(blank=True)
     text_last_edited = models.DateTimeField(null=True)
 
+    objects = api.managers.FeedContentItemQuerySet.as_manager()
+
+
 @receiver(post_delete, sender=Discussion)
 def pre_delete_discussion(sender, **kwargs):
     instance = kwargs.get('instance')
@@ -335,6 +340,8 @@ class Link(models.Model):
     content_item = models.ForeignKey(FeedContentItem, related_name="+")
     link = models.URLField()
 
+    objects = api.managers.FeedContentItemQuerySet.as_manager()
+
 @receiver(post_delete, sender=Link)
 def pre_delete_link(sender, **kwargs):
     instance = kwargs.get('instance')
@@ -346,6 +353,9 @@ class Image(models.Model):
     content_item = models.ForeignKey(FeedContentItem, related_name="+")
     src = models.URLField(blank=True)
     is_uploaded = models.BooleanField(default=False)
+
+    objects = api.managers.FeedContentItemQuerySet.as_manager()
+
 
 @receiver(post_delete, sender=Image)
 def pre_delete_image(sender, **kwargs):

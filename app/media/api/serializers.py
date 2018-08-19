@@ -609,7 +609,7 @@ class FeedContentStashContentSerializer(serializers.ModelSerializer):
     def paginated_content(self, instance):
         request = self.context['request']
 
-        content_queryset = FeedContentStashItem.objects.filter(stash=instance)
+        content_queryset = FeedContentStashItem.objects.filter(stash=instance).restrict_local(user=request.user)
 
         if request.user and request.user.is_authenticated():
             # Either the user owns these objects or it is NOT private

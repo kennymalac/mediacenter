@@ -1,4 +1,6 @@
 import requests
+
+from django.apps import apps
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
@@ -19,25 +21,44 @@ class PlaceManager(models.Manager):
         allowed_places.append(place.id)
         return allowed_places
 
-
-class GroupForumQuerySet(models.QuerySet):
-    def viewable_groups(self, **kwargs):
+class LocalQuerySet(object):
+    def restrict_local(self, **kwargs):
         allowed_places = kwargs.get('allowed_places', None)
 
         if allowed_places == None:
             allowed_places = []
+
             user = kwargs.get('user', None)
             if user and user.is_authenticated():
                 # Find applicable places to this user's local area if they have one configured
-                user_places = Place.objects.filter(owner=request.user)
+                Place = apps.get_model('api.Place')
+                PlaceRestriction = apps.get_model('api.PlaceRestriction')
+
+                user_places = Place.objects.filter(owner=user)
                 if user_places.count() > 0:
                     # TODO configurable place distance, multiple places
                     place = user_places.first()
                     restriction = PlaceRestriction.objects.filter(place=place).first()
                     allowed_places = Place.objects.other_places(place, restriction)
 
+        qs_filter = {}
+        qs_filter['{}__isnull'.format(self.places_field_name)] = True
+        qs_filter2 = {}
+        qs_filter2['{}__in'.format(self.places_field_name)] = allowed_places
         return self.filter(
-            Q(feed__places__isnull=True) | Q(feed__places__in=allowed_places))
+            Q(**qs_filter) | Q(**qs_filter2))
+
+
+class GroupForumQuerySet(LocalQuerySet, models.QuerySet):
+    places_field_name = 'feed__places'
+
+
+class FeedContentItemQuerySet(LocalQuerySet, models.QuerySet):
+    places_field_name = 'content_item__places'
+
+
+class FeedContentStashItemQuerySet(LocalQuerySet, models.QuerySet):
+    places_field_name = 'item__places'
 
 
 class AccountManager(UserManager):
