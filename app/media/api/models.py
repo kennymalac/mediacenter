@@ -268,6 +268,8 @@ class FeedContentItem(TaggedItem):
 
     visibility = models.CharField(max_length=2, choices=VISIBILITY, default='0')
 
+    objects = api.managers.FeedContentItemQuerySet.as_manager()
+
     def __str__(self):
         return self.title
 
@@ -319,7 +321,7 @@ class Discussion(models.Model):
     text = models.TextField(blank=True)
     text_last_edited = models.DateTimeField(null=True)
 
-    objects = api.managers.FeedContentItemQuerySet.as_manager()
+    objects = api.managers.ContentItemQuerySet.as_manager()
 
 
 @receiver(post_delete, sender=Discussion)
@@ -340,7 +342,7 @@ class Link(models.Model):
     content_item = models.ForeignKey(FeedContentItem, related_name="+")
     link = models.URLField()
 
-    objects = api.managers.FeedContentItemQuerySet.as_manager()
+    objects = api.managers.ContentItemQuerySet.as_manager()
 
 @receiver(post_delete, sender=Link)
 def pre_delete_link(sender, **kwargs):
@@ -354,7 +356,7 @@ class Image(models.Model):
     src = models.URLField(blank=True)
     is_uploaded = models.BooleanField(default=False)
 
-    objects = api.managers.FeedContentItemQuerySet.as_manager()
+    objects = api.managers.ContentItemQuerySet.as_manager()
 
 
 @receiver(post_delete, sender=Image)

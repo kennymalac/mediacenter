@@ -776,7 +776,82 @@ class ProfilePermissionsTests(APITestCase):
 
 
 class FeedContentItemPermissionsTest(APITestCase):
-    pass
+    def setUp(self):
+        make_content_types()
+        self.user = make_random_user()
+        self.place_data = dict(
+            owner=self.user,
+            name="Example place"
+        )
+        self.create_data = dict(
+            link="http://example.com",
+            content_item=dict(
+                title="Example link",
+                owner=self.user,
+                content_type=FeedContentItemType.objects.get(name=FeedContentItemType.LINK)
+            )
+        )
+        self.default_data = dict(
+            content_item=FeedContentItem.objects.create(**self.create_data['content_item'])
+        )
+
+    def test_unauthenticated_search(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.post('/api/content/search/', {}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_search_non_local_content(self):
+        # Local content cannot be read by outsiders
+        # NOTE this test does NOT require the GeoSpace microservice to be running in order to pass
+        place = Place.objects.create(**self.place_data)
+        content_obj = Link.objects.create(**self.default_data)
+        content_obj.content_item.places.add(place)
+
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post('/api/content/search/', {}, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Content object should NOT show up in the response
+        self.assertEqual(len(response.data['results']), 0)
+
+    def test_search_unlisted_content(self):
+        # Create unlisted content_item
+        content_obj = Link.objects.create(**{
+            **self.create_data,
+            'content_item': FeedContentItem.objects.create(**{**self.create_data['content_item'], 'visibility': '1'})
+        })
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post('/api/content/search/', {}, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Content Item should NOT show up in the response
+        print(response.data['results'], FeedContentItem.objects.all())
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertNotEqual(response.data['results'][0]['id'], content_obj.content_item.id)
+
+    def test_search_private_content(self):
+        # Create private content_item
+        content_obj = Link.objects.create(**{
+            **self.create_data,
+            'content_item': FeedContentItem.objects.create(**{**self.create_data['content_item'], 'visibility': '9'})
+        })
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post('/api/content/search/', {}, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Content Item should NOT show up in the response
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertNotEqual(response.data['results'][0]['id'], content_obj.content_item.id)
 
 
 class DefaultContentItemPermissionsTest(object):

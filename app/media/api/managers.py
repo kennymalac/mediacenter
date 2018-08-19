@@ -54,6 +54,10 @@ class GroupForumQuerySet(LocalQuerySet, models.QuerySet):
 
 
 class FeedContentItemQuerySet(LocalQuerySet, models.QuerySet):
+    places_field_name = 'places'
+
+
+class ContentItemQuerySet(LocalQuerySet, models.QuerySet):
     places_field_name = 'content_item__places'
 
 

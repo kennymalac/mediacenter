@@ -322,32 +322,17 @@ class FeedViewSet(NestedViewSetMixin,
         return super(FeedViewSet, self).create(request)
 
 
-class FeedContentItemViewSet(ListModelMixin,
-                             RetrieveModelMixin,
-                             CreateModelMixin,
-                             GenericViewSet):
+class FeedContentItemViewSet(GenericViewSet):
 
-    queryset = FeedContentItem.objects.all()
+    queryset = FeedContentItem.objects.all().order_by('created')
     serializer_class = FeedContentItemSerializer
     pagination_class = FeedContentItemPagination
 
-    def get_serializer(self, *args, **kwargs):
-        """
-        Return the serializer instance that should be used for validating and
-        deserializing input, and for serializing output.
-        """
-        serializer_class = self.get_serializer_class()
-        if 'extra_context' in kwargs:
-            # Put this into the serializer
-            extra_context = kwargs.pop('extra_context')
-        else:
-            extra_context = {}
-        kwargs['context'] = {**self.get_serializer_context(), **extra_context}
-        return serializer_class(*args, **kwargs)
-
     @list_route(methods=['POST'], url_path='search', permission_classes=[IsAuthenticated])
     def search(self, request):
-        content_queryset = self.get_queryset().filter(Q(visibility='0') | Q(owner=request.user))
+        content_queryset = self.get_queryset().\
+            filter(Q(visibility='0') | Q(owner=request.user)).\
+            restrict_local()
 
         _feed_id = request.data.get('feed', None)
         if _feed_id:
@@ -370,8 +355,7 @@ class FeedContentItemViewSet(ListModelMixin,
             if _interests:
                 content_queryset = content_queryset.filter(interests__in=Interest.objects.filter(id__in=_interests))
 
-        serializer = self.get_serializer(self.paginate_queryset(content_queryset), many=True, extra_context={'allowed_places': allowed_places})
-
+        serializer = self.get_serializer(self.paginate_queryset(content_queryset), many=True)
 
         return self.get_paginated_response(serializer.data)
 
