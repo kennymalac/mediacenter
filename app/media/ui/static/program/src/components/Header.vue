@@ -1,7 +1,7 @@
 <template>
     <nav>
         <router-link class="brand" to="/">
-            <label>MEDIA SERVER</label>
+            <label>FLATLANDERS</label>
         </router-link>
         <!-- responsive-->
         <input id="bmenub" type="checkbox" class="show">

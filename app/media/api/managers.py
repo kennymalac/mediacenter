@@ -1,6 +1,7 @@
 import requests
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth.models import UserManager
 #from django.contrib.gis.db.models.functions import Distance, AsGeoJSON
 
@@ -17,6 +18,26 @@ class PlaceManager(models.Manager):
         print(allowed_places)
         allowed_places.append(place.id)
         return allowed_places
+
+
+class GroupForumQuerySet(models.QuerySet):
+    def viewable_groups(self, **kwargs):
+        allowed_places = kwargs.get('allowed_places', None)
+
+        if allowed_places == None:
+            allowed_places = []
+            user = kwargs.get('user', None)
+            if user and user.is_authenticated():
+                # Find applicable places to this user's local area if they have one configured
+                user_places = Place.objects.filter(owner=request.user)
+                if user_places.count() > 0:
+                    # TODO configurable place distance, multiple places
+                    place = user_places.first()
+                    restriction = PlaceRestriction.objects.filter(place=place).first()
+                    allowed_places = Place.objects.other_places(place, restriction)
+
+        return self.filter(
+            Q(feed__places__isnull=True) | Q(feed__places__in=allowed_places))
 
 
 class AccountManager(UserManager):

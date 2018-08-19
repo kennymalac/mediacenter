@@ -6,7 +6,8 @@
             <section class="groups" v-if="isLocalGroups">
                 <h1>Your Local Groups</h1>
                 <group-list :link="localGroupRedirectLink" :items="items" />
-                <p v-if="items.length == 0">You are not a member of any local groups, <router-link to="search">discover your location</router-link>.</p>
+                <p v-if="items.length == 0">You are not a member of any local groups, <router-link to="search">discover your location</router-link>.<br />
+                None of the local groups that you join will be visible to users not within your local area (< 100 miles).</p>
             </section>
             <section class="groups" v-if="!isLocalGroups">
                 <h1>Your Groups</h1>

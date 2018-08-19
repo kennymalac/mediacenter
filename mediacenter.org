@@ -22,7 +22,8 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 **** TODO Content item permissions tests pass
 **** DONE Place permissions tests pass
      CLOSED: [2018-08-18 Sat 15:06]
-**** TODO GroupForum permissions tests pass
+**** DONE GroupForum permissions tests pass
+     CLOSED: [2018-08-18 Sat 22:39]
 **** DONE Feed permissions tests pass
      CLOSED: [2018-08-18 Sat 15:03]
 **** TODO FeedContentItem permissions tests pass
@@ -48,6 +49,9 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 **** DONE User Profile backgrounds
      CLOSED: [2018-07-31 Tue 08:43]
 **** TODO Group backgrounds
+**** TODO add a footer
+**** TODO Profile backgrounds don't show if their instance
+was created by a less specific serialized endpoint
 **** TODO Feed backgrounds
 **** DONE Feed icons/images
      CLOSED: [2018-07-31 Tue 11:33]
@@ -221,6 +225,7 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 **** DONE user profile comments
      CLOSED: [2018-06-08 Fri 13:35]
 **** TODO cross-network profiles
+**** TODO hide local user groups to non-locals
 **** DONE get list of Group tags working
      CLOSED: [2018-05-24 Thu 14:38]
 **** DONE model, serializer, viewset
@@ -564,6 +569,7 @@ collection that references that same collection?
 **** TODO improve Show Albums look and feel
 
 ** Priority 4 (enhancements)
+*** Audio sharing
 *** Notification system
 *** Gallery
 **** 

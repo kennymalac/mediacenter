@@ -28,6 +28,23 @@ class GroupForumBasicSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image')
 
 
+class GroupForumField(serializers.RelatedField):
+    def get_queryset(self):
+        request = self.context.get('request', None)
+        allowed_places = self.context.get('allowed_places', None)
+        user = request.user if request and request.user else None
+
+        return super(GroupForumField, self).get_queryset().\
+            viewable_groups(user=user, allowed_places=allowed_places)
+
+    def to_native(self, value):
+        serialized = {}
+        for k in GroupForumBasicSerializer.fields:
+            serialized[k] = getattr(value, k)
+
+        return serialized
+
+
 class AccountBasicSerializer(serializers.ModelSerializer):
     profile = BasicProfileSerializer()
 
@@ -50,15 +67,14 @@ class AccountBasicSerializer(serializers.ModelSerializer):
 class AccountSerializer(CountryFieldMixin, AccountBasicSerializer):
     profile = BasicProfileSerializer()
 
-    member_groups = GroupForumBasicSerializer(
+    member_groups = GroupForumField(
         many=True,
         read_only=True
     )
 
     class Meta:
         model = Account
-        fields = ('id', 'username', 'country', 'email', 'profile', 'friends', 'member_groups'
-)
+        fields = ('id', 'username', 'country', 'email', 'profile', 'friends', 'member_groups')
 
 
 class FullAccountSerializer(AccountSerializer):
@@ -786,7 +802,7 @@ class ImageCreateUpdateSerializer(ContentItemCRUDSerializer):
         fields = ('id', 'content_item', 'src')
 
 
-class GroupForumSerializer(serializers.ModelSerializer):
+class GroupForumSerializer(GroupForumBasicSerializer):
     owner = serializers.PrimaryKeyRelatedField(
         queryset=Account.objects.all(),
         required=False
@@ -796,17 +812,22 @@ class GroupForumSerializer(serializers.ModelSerializer):
         read_only=False
     )
 
+    members_count = serializers.SerializerMethodField()
+
     is_local = serializers.SerializerMethodField()
 
     class Meta:
         model = GroupForum
-        fields = ('id', 'name', 'image', 'description', 'feed', 'owner', 'is_restricted', 'is_local', 'members', 'rules')
+        fields = ('id', 'name', 'image', 'description', 'feed', 'owner', 'is_restricted', 'is_local', 'members_count', 'rules')
 
     def get_is_local(self, instance):
         return instance.feed.places.count() != 0
 
+    def get_members_count(self, instance):
+        return instance.members.count()
 
-class GroupForumCreateUpdateSerializer(serializers.ModelSerializer):
+
+class GroupForumCreateUpdateSerializer(GroupForumSerializer):
     owner = serializers.PrimaryKeyRelatedField(
         queryset=Account.objects.all(),
         required=False

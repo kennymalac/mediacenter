@@ -63,7 +63,8 @@ class VisibilityViewSetMixin(object):
     def get_queryset(self):
         qs = super(VisibilityViewSetMixin, self).get_queryset()
 
-        if self.request.user.is_authenticated():
+        self._is_authenticated = self.request.user.is_authenticated()
+        if self._is_authenticated:
             # Either the user owns these objects or it is NOT private
             qs = qs.filter(Q(**self._request_owner()) | ~Q(**self._visibility()))
 
@@ -86,6 +87,14 @@ class FeedContentItemVisibilityViewSetMixin(VisibilityViewSetMixin):
 
 class GroupVisibilityViewSetMixin(VisibilityViewSetMixin):
     visibility_field = 'feed__visibility'
+
+    def get_queryset(self, **kwargs):
+        qs = super(GroupVisibilityViewSetMixin, self).get_queryset()
+
+        if kwargs.get('restrict_places', True):
+            return qs.viewable_groups(
+                user=self.request.user, allowed_places=[])
+        return qs
 
 
 class FeedContentStashVisibilityViewSetMixin(VisibilityViewSetMixin):
@@ -355,34 +364,6 @@ class FeedContentItemViewSet(ListModelMixin,
             if _interests:
                 content_queryset = content_queryset.filter(interests__in=Interest.objects.filter(id__in=_interests))
 
-        # Find applicable places to this user's local area if they have one configured
-        allowed_places = []
-        user_places = Place.objects.filter(owner=request.user)
-        if user_places.count() > 0:
-            # TODO configurable place distance, multiple places
-            place = user_places.first()
-            restriction = PlaceRestriction.objects.filter(place=place).first()
-            allowed_places = Place.objects.other_places(place, restriction)
-
-            if len(allowed_places) == 0:
-                # Only include posts without geolocation
-                content_queryset = content_queryset.filter(places__isnull=True)
-
-                # return Response({
-                #     'error': 'Something went wrong, please try again later'
-                # }, status=500)
-            else:
-                # Either the content has no configured Place, or the place is within the place restriction's radius
-                # TODO verify place in user_places
-                if feed.place_set.count():
-                    # This is a Place feed so only show content from this local area
-                    content_queryset = content_queryset.filter(places__in=allowed_places)
-                else:
-                    content_queryset = content_queryset.filter(Q(places__in=allowed_places) | Q(places__isnull=True))
-        else:
-            # Only include posts without geolocation
-            content_queryset = content_queryset.filter(places__isnull=True)
-
         serializer = self.get_serializer(self.paginate_queryset(content_queryset), many=True, extra_context={'allowed_places': allowed_places})
 
 
@@ -613,7 +594,7 @@ class GroupForumViewSet(NestedViewSetMixin,
 
     @list_route(methods=['POST'], url_path='search', permission_classes=[IsAuthenticated])
     def search(self, request):
-        group_queryset = self.get_queryset()
+        group_queryset = self.get_queryset(restrict_places=False)
 
         place_id = request.data.get('place', 0)
         if place_id:

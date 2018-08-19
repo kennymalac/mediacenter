@@ -673,6 +673,10 @@ class AccountPermissionsTests(APITestCase):
     # def test_visibility_unlisted_read(self):
     #     pass
 
+    def test_read_account_local_groups(self):
+        # TODO non-local should not see user's local groups
+        pass
+
     def test_unauthenticated_partial_update(self):
         user = make_random_user()
         data = {

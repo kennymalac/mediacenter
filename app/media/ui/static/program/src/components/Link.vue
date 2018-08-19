@@ -152,5 +152,8 @@ export default {
 .link-container {
     height: calc(100vh - 60px);
     overflow: scroll;
+    .post p.text {
+        padding: 10px 20px
+    }
 }
 </style>

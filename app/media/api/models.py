@@ -374,6 +374,8 @@ class GroupForum(models.Model):
     # invite_policy = models.CharField()
     members = models.ManyToManyField(Account, 'member_groups')
 
+    objects = api.managers.GroupForumQuerySet.as_manager()
+
     def __str__(self):
         return self.name
 
