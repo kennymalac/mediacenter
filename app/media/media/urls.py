@@ -25,7 +25,7 @@ router.register(r'place', PlaceViewSet, base_name='place')
 router.register(r'profile', ProfileViewSet, base_name='profile')\
 .register(
     r'comment',
-    CommentViewSet,
+    ProfileCommentViewSet,
     base_name='comments',
     parents_query_lookups=['user_profile']
 )

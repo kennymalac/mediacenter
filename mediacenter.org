@@ -27,9 +27,11 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
      CLOSED: [2018-08-18 Sat 22:39]
 **** DONE Feed permissions tests pass
      CLOSED: [2018-08-18 Sat 15:03]
-**** TODO Comment permissions tests pass
+**** DONE Comment permissions tests pass
+     CLOSED: [2018-08-19 Sun 15:54]
 **** DONE FeedContentItem permissions tests pass
      CLOSED: [2018-08-19 Sun 00:05]
+**** TODO FeedContentStashItem tests pass
 **** DONE FeedContentStash permissions tests pass
      CLOSED: [2018-08-18 Sat 16:48]
 

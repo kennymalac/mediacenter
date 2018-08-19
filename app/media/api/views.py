@@ -322,17 +322,29 @@ class FeedViewSet(NestedViewSetMixin,
         return super(FeedViewSet, self).create(request)
 
 
-class FeedContentItemViewSet(GenericViewSet):
+class FeedContentItemViewSet(RetrieveModelMixin,
+                             GenericViewSet):
 
     queryset = FeedContentItem.objects.all().order_by('created')
     serializer_class = FeedContentItemSerializer
     pagination_class = FeedContentItemPagination
 
+    def get_queryset(self):
+        print("FeedContentItemViewSet queryset ")
+        qs = super(FeedContentItemViewSet, self).get_queryset()
+
+        if self.request.user.is_authenticated():
+            # Either the user owns these objects or it is NOT private
+            qs = qs.filter(Q(owner=self.request.user) | ~Q(visibility='9'))
+
+        else:
+            qs = qs.filter(~Q(visibility='9'))
+
+        return qs.restrict_local(user=request.user)
+
     @list_route(methods=['POST'], url_path='search', permission_classes=[IsAuthenticated])
     def search(self, request):
-        content_queryset = self.get_queryset().\
-            filter(Q(visibility='0') | Q(owner=request.user)).\
-            restrict_local()
+        content_queryset = self.get_queryset()
 
         _feed_id = request.data.get('feed', None)
         if _feed_id:
@@ -468,9 +480,10 @@ class FeedContentStashViewSet(NestedViewSetMixin,
         return Response({ 'content': data_content.data })
 
 
-class CommentViewSet(NestedViewSetMixin,
-                     MultipleSerializerMixin,
-                     ModelViewSet):
+class BaseCommentViewSet(NestedViewSetMixin,
+                         ActionPermissionClassesMixin,
+                         MultipleSerializerMixin,
+                         ModelViewSet):
 
     queryset = Comment.objects.all().order_by('created')
     serializer_classes = {
@@ -479,11 +492,29 @@ class CommentViewSet(NestedViewSetMixin,
         'update': CommentCreateUpdateSerializer,
         'create': CommentCreateUpdateSerializer
     }
+    action_permission_classes = {
+        'default': [IsAuthenticated],
+        'list': [AllowAny],
+        'retrieve': [AllowAny],
+        'update': [IsAuthenticated, IsOwner],
+        'partial_update': [IsAuthenticated, IsOwner],
+        'destroy': [IsAuthenticated, IsOwner]
+    }
 
-    # def create(self, request):
+
+class CommentViewSet(BaseCommentViewSet):
+    action_permission_classes = {
+        'default': [IsAuthenticated, IsParentFeedContentItemNotPrivateOrOwner],
+        'list': [IsParentFeedContentItemNotPrivateOrOwner],
+        'retrieve': [IsParentFeedContentItemNotPrivateOrOwner],
+        'update': [IsAuthenticated, IsOwner],
+        'partial_update': [IsAuthenticated, IsOwner],
+        'destroy': [IsAuthenticated, IsOwner]
+    }
 
 
-    #     super(CommentViewSet, self).create(request)
+class ProfileCommentViewSet(BaseCommentViewSet):
+    pass
 
 
 class DiscussionViewSet(NestedViewSetMixin,

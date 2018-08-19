@@ -1,5 +1,10 @@
 from operator import attrgetter
+
+from django.db.models import Q
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 from rest_framework import permissions
+from api.models import FeedContentItem, Profile
 
 class IsOwnerOrPublicOrGroupMemberOrUnlisted(permissions.BasePermission):
 
@@ -28,6 +33,34 @@ class IsContentItemOwnerOrPublicOrUnlisted(IsOwnerOrPublicOrGroupMemberOrUnliste
     account_field_attr = 'content_item.owner'
     visibility_field_attr = 'content_item.visibility'
     group_check = False
+
+
+class IsParentNotPrivateOrParentOwner(object):
+    def has_permission(self, request, view):
+        qs_params = None
+        parent_pk = view.kwargs.get('parent_lookup_{}'.format(self.parent_lookup), None)
+
+        if not parent_pk:
+            return False
+
+        if request.user.is_authenticated():
+            qs_params = Q(owner=request.user) | ~Q(visibility='9')
+        else:
+            qs_params = ~Q(visibility='9')
+
+        if self.parent_model.objects.filter(Q(pk=parent_pk) & qs_params).exists():
+            return True
+        else:
+            raise Http404
+
+    def has_object_permission(self, request, view, obj):
+        return self.has_permission(request, view)
+
+
+class IsParentFeedContentItemNotPrivateOrOwner(IsParentNotPrivateOrParentOwner,
+                                               permissions.BasePermission):
+    parent_model = FeedContentItem
+    parent_lookup = "content_item"
 
 
 class IsPublicOrUnlisted(permissions.BasePermission):

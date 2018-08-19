@@ -10,7 +10,7 @@ from rest_framework.test import APIRequestFactory, APITestCase, force_authentica
 from channels import Channel
 from channels.tests import ChannelTestCase
 
-from api.models import Account, Profile, ActivityLog, BlogPost, Interest, Place, PlaceRestriction, Feed, FeedContentItem, FeedContentStashItem, FeedContentItemType, FeedContentStash, Discussion, Link, Image, GroupForum
+from api.models import Account, Profile, ActivityLog, BlogPost, Interest, Place, PlaceRestriction, Feed, FeedContentItem, FeedContentStashItem, FeedContentItemType, FeedContentStash, Discussion, Link, Image, GroupForum, Comment
 
 api_request = APIRequestFactory()
 
@@ -832,7 +832,6 @@ class FeedContentItemPermissionsTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Content Item should NOT show up in the response
-        print(response.data['results'], FeedContentItem.objects.all())
         self.assertEqual(len(response.data['results']), 1)
         self.assertNotEqual(response.data['results'][0]['id'], content_obj.content_item.id)
 
@@ -852,6 +851,41 @@ class FeedContentItemPermissionsTest(APITestCase):
         # Content Item should NOT show up in the response
         self.assertEqual(len(response.data['results']), 1)
         self.assertNotEqual(response.data['results'][0]['id'], content_obj.content_item.id)
+
+
+class FeedContentItemPermissionsTest(APITestCase):
+    def setUp(self):
+        make_content_types()
+        self.user = make_random_user()
+        self.place_data = dict(
+            owner=self.user,
+            name="Example place"
+        )
+        self.create_data = dict(
+            link="http://example.com",
+            content_item=dict(
+                title="Example link",
+                owner=self.user,
+                content_type=FeedContentItemType.objects.get(name=FeedContentItemType.LINK)
+            )
+        )
+        # self.default_data = dict(
+        #     content_item=FeedContentStashItem.objects.create(item=self.create_data['content_item'])
+        # )
+
+    def test_unauthenticated_search(self):
+        pass
+
+    def test_search_non_local_content(self):
+        # Local content cannot be read by outsiders
+        # NOTE this test does NOT require the GeoSpace microservice to be running in order to pass
+        pass
+
+    def test_search_unlisted_content(self):
+        pass
+
+    def test_search_private_content(self):
+        pass
 
 
 class DefaultContentItemPermissionsTest(object):
@@ -1405,3 +1439,118 @@ class PlacePermissionsTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(Place.objects.count(), 1)
+
+
+class CommentPermissionsTest(APITestCase):
+    def setUp(self):
+        make_content_types()
+        self.user = make_random_user()
+        self.content_object = FeedContentItem.objects.create(
+            title="Example link",
+            owner=self.user,
+            content_type=FeedContentItemType.objects.get(name=FeedContentItemType.LINK)
+        )
+        self.comment_data = dict(
+            owner=self.user,
+            text="Example comment",
+            content_item=self.content_object
+        )
+
+    def test_unauthenticated_create(self):
+        data = {}
+        self.client.force_authenticate(user=None)
+
+        response = self.client.post('/api/content/{}/comment/'.format(self.content_object.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Comment.objects.count(), 0)
+
+    def test_unauthenticated_read(self):
+        data = {}
+        comment = Comment.objects.create(**self.comment_data)
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get('/api/content/{}/comment/'.format(self.content_object.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get('/api/content/{}/comment/{}/'.format(self.content_object.id, comment.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+    def test_unlisted_content_comments_read(self):
+        data = {}
+        c_data = {**self.comment_data}
+        c_data['owner'] = make_random_user()
+        c_data['content_item'] = FeedContentItem.objects.create(
+            title="Example link",
+            owner=make_random_user(),
+            content_type=FeedContentItemType.objects.get(name=FeedContentItemType.LINK),
+            visibility='1'
+        )
+        comment = Comment.objects.create(**c_data)
+        self.client.force_authenticate(user=make_random_user())
+
+        response = self.client.get('/api/content/{}/comment/'.format(c_data['content_item'].id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get('/api/content/{}/comment/{}/'.format(c_data['content_item'].id, comment.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_private_content_comments_read(self):
+        data = {}
+        c_data = {**self.comment_data}
+        c_data['owner'] = make_random_user()
+        c_data['content_item'] = FeedContentItem.objects.create(
+            title="Example link",
+            owner=make_random_user(),
+            content_type=FeedContentItemType.objects.get(name=FeedContentItemType.LINK),
+            visibility='9'
+        )
+        comment = Comment.objects.create(**c_data)
+        self.client.force_authenticate(user=make_random_user())
+
+        response = self.client.get('/api/content/{}/comment/'.format(comment.content_item.id))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        response = self.client.get('/api/content/{}/comment/{}/'.format(comment.content_item.id, comment.id))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_unauthenticated_partial_update(self):
+        comment = Comment.objects.create(**self.comment_data)
+        data = {
+            'text': 'depito'
+        }
+        self.client.force_authenticate(user=None)
+
+        response = self.client.patch('/api/content/{}/comment/{}/'.format(self.content_object.id, comment.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEqual(Comment.objects.get(id=comment.id).text, 'depito')
+
+    def test_non_owner_partial_update(self):
+        comment = Comment.objects.create(**self.comment_data)
+        data = {
+            'text': 'depito'
+        }
+        user = make_random_user()
+
+        self.client.force_authenticate(user=user)
+        response = self.client.patch('/api/content/{}/comment/{}/'.format(self.content_object.id, comment.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEqual(Comment.objects.get(id=comment.id).text, 'depito')
+
+    def test_unauthenticated_delete(self):
+        comment = Comment.objects.create(**self.comment_data)
+
+        self.client.force_authenticate(user=None)
+        response = self.client.delete('/api/content/{}/comment/{}/'.format(self.content_object.id, comment.id))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Comment.objects.count(), 1)
+
+    def test_non_owner_delete(self):
+        comment = Comment.objects.create(**self.comment_data)
+        user = make_random_user()
+
+        self.client.force_authenticate(user=user)
+        response = self.client.delete('/api/content/{}/comment/{}/'.format(self.content_object.id, comment.id).format(comment.id))
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Comment.objects.count(), 1)
