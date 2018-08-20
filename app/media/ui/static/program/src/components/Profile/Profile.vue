@@ -137,7 +137,8 @@ export default {
         profileClass() {
             return {
                 grid: true,
-                "profiles-container": true
+                "profiles-container": true,
+                "grid-1-3": this.action ? this.action !== 'list' : this.params.profileAction !== 'list'
             }
         },
         groups() {
@@ -222,7 +223,9 @@ $dark-green: #2b9f67;
 
 .profiles-container {
     justify-content: center;
-    grid-template-columns: 1fr 3fr;
+    &.grid-1-3 {
+        grid-template-columns: 1fr 3fr;
+    }
     .comment-container {
         justify-content: center;
     }

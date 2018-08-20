@@ -43,6 +43,7 @@ class GroupModel extends Model {
         description: "",
         rules: [],
         members: [],
+        members_count: 0,
         image: "",
         is_restricted: false,
         is_local: false
@@ -94,6 +95,9 @@ class GroupCollection extends Collection {
             queryParams: params
         })
             .then(jsonResponse)
+            .then((data) => {
+                return data.results
+            })
     }
 
     static searchGroups(data) {

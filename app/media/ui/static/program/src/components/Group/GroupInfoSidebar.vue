@@ -6,8 +6,8 @@
             </div>
             <h2 @click="$emit('details')">{{ instance.name }}</h2>
 
-            <div v-if="instance.members.length !== 1">{{ instance.members.length }} Members</div>
-            <div v-if="instance.members.length === 1">{{ instance.members.length }} Member</div>
+            <div v-if="instance.members_count !== 1">{{ instance.members_count }} Members</div>
+            <div v-if="instance.members_count === 1">{{ instance.members_count }} Member</div>
 
             <tag-list :tags="instance.feed.interests" tagType="interest" />
 

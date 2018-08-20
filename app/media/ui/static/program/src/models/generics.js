@@ -83,7 +83,8 @@ export async function resolveInstances(collection, items, collections = {}, chil
 async function paginateListedResource(uri, collection, params, collections = {}, children = []) {
     let data = await fetchAPI(`${uri}`, {
         method: "GET",
-        queryParams: params
+        queryParams: params,
+        headers: makeHeaders({})
     })
           .then(jsonResponse)
 

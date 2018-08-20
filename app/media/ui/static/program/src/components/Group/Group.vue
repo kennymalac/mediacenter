@@ -379,10 +379,12 @@ $shadow-color: rgba(0, 0, 0, .2);
 
 .group-container {
     section.groups {
-        margin: 10px;
         text-align: left;
-        height: 100%;
-        overflow-y: scroll;
+        margin: 10px;
+        .group-list {
+            height: 100%;
+            overflow-y: scroll;
+        }
     }
     grid-template-columns: 1fr 3fr;
 }
@@ -419,4 +421,5 @@ section.sidebar {
 .group-info {
     flex: 1;
 }
+
 </style>

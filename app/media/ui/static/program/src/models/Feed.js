@@ -151,6 +151,9 @@ class FeedCollection extends Collection {
             queryParams: params
         })
             .then(jsonResponse)
+            .then((data) => {
+                return data.results
+            })
     }
 
     async list(params, collections) {

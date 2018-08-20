@@ -39,6 +39,7 @@ import Post from './Post'
 import Reply from './Reply'
 import PollResults from './PollResults'
 import PollForm from './PollForm'
+
 import PaginationControls from '../PaginationControls'
 
 import router from "../../router/index.js"
@@ -122,7 +123,7 @@ export default {
         },
 
         async create() {
-            if (this.query.step && this.query.step !== 2) {
+            if (this.query && this.query.step && this.query.step !== 2) {
                 // Prevent lack of redirect to step 2 when user reloads on poll creation screen
                 router.replace({
                     query: {

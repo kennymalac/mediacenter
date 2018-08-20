@@ -37,6 +37,9 @@ class GroupForumField(serializers.RelatedField):
         return super(GroupForumField, self).get_queryset().\
             viewable_groups(user=user, allowed_places=allowed_places)
 
+    def to_representation(self, obj):
+        return dict(id=obj.id, name=obj.name, image=obj.image)
+
     def to_native(self, value):
         serialized = {}
         for k in GroupForumBasicSerializer.fields:
@@ -549,11 +552,11 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
         if instance.content_type.name == FeedContentItemType.LINK:
             content_id = self.get_content_id(instance)
             if content_id:
-                return BasicLinkSerializer(instance=Link.objects.get(id=self.get_content_id(instance))).data
+                return BasicLinkSerializer(instance=Link.objects.get(id=content_id)).data
         elif instance.content_type.name == FeedContentItemType.IMAGE:
             content_id = self.get_content_id(instance)
             if content_id:
-                return BasicImageSerializer(instance=Image.objects.get(id=self.get_content_id(instance))).data
+                return BasicImageSerializer(instance=Image.objects.get(id=content_id)).data
 
 
 class FeedContentStashItemBasicSerializer(serializers.ModelSerializer):
@@ -698,7 +701,7 @@ class DiscussionSerializer(serializers.ModelSerializer):
         required=False,
         read_only=True
     )
-    poll = PollSerializer()
+    poll = PollSerializer(required=False)
 
     class Meta:
         model = Discussion
@@ -717,7 +720,7 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
         required=False,
         read_only=True
     )
-    poll = PollSerializer()
+    poll = PollSerializer(required=False)
 
     def save(self):
         if 'text' in self.validated_data:

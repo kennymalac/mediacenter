@@ -17,6 +17,7 @@ export default {
 
 <style lang="scss">
 .profile-list {
-
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
 }
 </style>

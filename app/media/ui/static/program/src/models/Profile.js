@@ -3,7 +3,7 @@ import {serializeIds} from './serializers.js'
 import {resolveInstances, paginatedList, get, manage} from './generics.js'
 import {InterestCollection} from './Interest.js'
 import {AccountCollection} from './Account.js'
-import {fetchAPI, jsonResponse} from '../httputil.js'
+import {fetchAPI, jsonResponse, makeHeaders} from '../httputil.js'
 
 import BackgroundMixin from './BackgroundMixin.js'
 
@@ -72,10 +72,10 @@ class ProfileCollection extends Collection {
     }
 
     static searchProfiles(params) {
-        console.log(params)
         return fetchAPI(`profile/`, {
             method: "GET",
-            queryParams: params
+            queryParams: params,
+            headers: makeHeaders({})
         })
             .then(jsonResponse)
     }
