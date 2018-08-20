@@ -21,7 +21,8 @@ class DiscussionModel extends Model {
         order: 0,
         parent: 0,
         text_last_edited: {},
-        edited: false
+        edited: false,
+        poll: null
     }
 
     static fields = {

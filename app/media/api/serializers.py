@@ -473,7 +473,8 @@ class FeedContentItemBasicSerializer(serializers.ModelSerializer):
 def get_content_id(instance):
     _model = None
     if instance.content_type.name == FeedContentItemType.TOPIC or \
-       instance.content_type.name == FeedContentItemType.POST:
+       instance.content_type.name == FeedContentItemType.POST or \
+       instance.content_type.name == FeedContentItemType.POLL:
         _model = Discussion
     elif instance.content_type.name == FeedContentItemType.LINK:
         _model = Link
@@ -672,16 +673,36 @@ class ContentItemCRUDSerializer(serializers.ModelSerializer):
         abstract = True
 
 
+class PollOptionSerializer(serializers.ModelSerializer):
+    value = serializers.SerializerMethodField('get_vote_count')
+
+    class Meta:
+        model = PollOption
+        fields = ('id', 'title', 'value', 'order')
+
+    def get_vote_count(self, instance):
+        return instance.votes.count()
+
+
+class PollSerializer(serializers.ModelSerializer):
+    options = PollOptionSerializer(many=True)
+
+    class Meta:
+        model = Poll
+        fields = ('id', 'options')
+
+
 class DiscussionSerializer(serializers.ModelSerializer):
     content_item = FeedContentItemProfileSerializer()
     text_last_edited = serializers.DateTimeField(
         required=False,
         read_only=True
     )
+    poll = PollSerializer()
 
     class Meta:
         model = Discussion
-        fields = ('id', 'parent', 'order', 'content_item', 'text', 'text_last_edited')
+        fields = ('id', 'parent', 'order', 'content_item', 'text', 'text_last_edited', 'poll')
 
 
 cleaner = Cleaner(['a', 'p', 'abbr', 'acronym', 'b', 'code', 'pre', 'blockqote', 'span', 'sub', 'sup', 'code', 'em', 'i', 'ul', 'li', 'ol', 'strong', 'l', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'thead', 'caption', 'tbody', 'col', 'colgroup', 'tfoot', 'th', 'tr', 'td'], attributes={'*': ['style', 'alt', 'width', 'height'], 'a': ['href', 'title'], 'abbr': ['title'], 'acronym': ['title'], 'table': ['align', 'cellpadding', 'cellspacing'], 'th': ['scope'], 'colgroup': ['span'], 'caption': ['align']}, styles=['color', 'font-weight', 'text-decoration', 'background-color', 'color', 'text-align', 'border-style', 'border', 'border-width', 'border-color'])
@@ -696,6 +717,7 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
         required=False,
         read_only=True
     )
+    poll = PollSerializer()
 
     def save(self):
         if 'text' in self.validated_data:
@@ -705,6 +727,7 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
 
     def create(self, validated_data):
         content_item_data = validated_data.pop('content_item')
+        poll_data = None
         order = 0
 
         if validated_data.get('parent', 0):
@@ -714,19 +737,34 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
                 order = posts.aggregate(Max('order'))['order__max'] + 1
             else:
                 order = 1
+        elif validated_data.get('poll', 0):
+            content_type = FeedContentItemType.objects.get(name=FeedContentItemType.POLL)
+            poll_data = validated_data.pop('poll')
         else:
             content_type = FeedContentItemType.objects.get(name=FeedContentItemType.TOPIC)
 
         content_item = self.create_content_item(content_item_data, content_type)
 
         discussion = Discussion.objects.create(**validated_data, content_item=content_item, order=order)
+
+        if poll_data:
+            # create Poll
+            options_data = poll_data.pop('options')
+            poll = Poll.objects.create(**poll_data)
+            options = PollOption.objects.bulk_create([
+                PollOption(**option, poll=poll) for option in options_data
+            ])
+
+            discussion.poll = poll
+            discussion.save()
+
         # discussion.members.add(*member
 
         return discussion
 
     class Meta:
         model = Discussion
-        fields = ('id', 'parent', 'order', 'content_item', 'text', 'text_last_edited')
+        fields = ('id', 'parent', 'order', 'content_item', 'text', 'text_last_edited', 'poll')
 
 
 class LinkSerializer(serializers.ModelSerializer):

@@ -318,12 +318,31 @@ def setup_default_feed(user):
     feed.stashes.add(stash)
 
 
+class Poll(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+
+
+class PollOption(models.Model):
+    poll = models.ForeignKey(Poll, related_name="options")
+    title = models.CharField(max_length=255)
+    order = models.IntegerField()
+
+    class Meta:
+        ordering = ('order',)
+
+
+class PollOptionVote(models.Model):
+    options = models.ManyToManyField(PollOption, blank=True, related_name='votes')
+    owner = models.ForeignKey(Account, blank=True)
+
+
 class Discussion(models.Model):
     content_item = models.ForeignKey(FeedContentItem, related_name="+")
     parent = models.ForeignKey('self', null=True)
     order = models.IntegerField(default=0)
     text = models.TextField(blank=True)
     text_last_edited = models.DateTimeField(null=True)
+    poll = models.ForeignKey(Poll, null=True)
 
     objects = api.managers.ContentItemQuerySet.as_manager()
 

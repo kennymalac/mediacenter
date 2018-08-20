@@ -483,6 +483,9 @@ class FeedContentStashViewSet(NestedViewSetMixin,
             elif content_type == FeedContentItemType.POST:
                 log = ActivityLog.objects.create(action='Post00', author=item.owner, context={'instance': get_content_id(item), 'group': get_group_id_name(item)[0], 'stash': item.origin_stash.id}, message="Created post")
                 log.subscribed=[]
+            elif content_type == FeedContentItemType.POLL:
+                log = ActivityLog.objects.create(action='Poll00', author=item.owner, context={'instance': get_content_id(item), 'group': get_group_id_name(item)[0], 'stash': item.origin_stash.id}, message="Created poll")
+                log.subscribed=[]
             elif content_type == FeedContentItemType.LINK:
                 log = ActivityLog.objects.create(action='Link00', author=item.owner, context={'instance': get_content_id(item), 'feed': get_feed_id(item), 'stash': item.origin_stash.id}, message="Created post")
                 log.subscribed=[]
@@ -559,6 +562,26 @@ class DiscussionViewSet(NestedViewSetMixin,
     }
     pagination_class = DiscussionPagination
     filter_class = DiscussionFilter
+
+    @action(methods=['GET'], detail=True, permission_classes=[IsAuthenticated])
+    def vote(self, request, pk=None, **kwargs):
+        instance = self.get_instance(pk)
+        if not instance.poll:
+            return Response({
+                'error': 'This discussion has no poll'
+            }, status=400)
+
+        vote = PollOptionVote.objects.get_or_create(owner=request.user, poll=poll)
+        options = PollOptionVote.objects.filter(id__in=request.data.get('options', []))
+
+        # TODO Polls that allow multiple votes versus only a single vote
+        vote.options = [*list(options)]
+        vote.save()
+
+        serializer = PollOptionVoteSerializer(vote.options, many=True)
+        return JsonResponse({
+            'options': serializer.data
+        }, status=200)
 
 
 class LinkViewSet(NestedViewSetMixin,

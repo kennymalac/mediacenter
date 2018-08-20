@@ -4,6 +4,8 @@
             <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
 
             <section class="posts">
+                <poll-results v-if="instance.poll" :title="instance.content_item.title" :options="instance.poll.options" @vote="votePoll" />
+
                 <post v-if="currentPage === 1" v-bind="instance.instance" @editPost="editPost(instance.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" :isActiveUser="activeUserId === instance.content_item.owner.id" />
                 <post v-for="post in posts" v-bind="post.instance" :isActiveUser="activeUserId === post.content_item.owner.id" @editPost="editPost(post.id)" @userProfile="showUserProfile(post.instance.content_item.owner.profile.id)" />
 
@@ -17,7 +19,9 @@
             <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
         </template>
         <template v-if="actions.create">
-            <reply @canceled="quickReply ? $emit('canceled') : $router.go(-1)" :show="show" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" />
+            <reply v-if="!query || !query.poll" @canceled="quickReply ? $emit('canceled') : $router.go(-1)" :show="show" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" />
+            <reply v-if="query && query.poll && query.step !== 2" @canceled="quickReply ? $emit('canceled') : $router.go(-1)" :show="show" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" replyBtnText="Continue" />
+            <poll-form v-if="query && query.poll && query.step === 2" :title="instanceForm.content_item.title" @save="savePoll" />
         </template>
         <template v-if="actions.manage">
             <reply @canceled="$router.go(-1)" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="manage" />
@@ -33,6 +37,8 @@ import {activeUser, discussions, accounts, groups, interests, places, stashes, p
 import activeUserDeps from "../../dependencies/activeUser.js"
 import Post from './Post'
 import Reply from './Reply'
+import PollResults from './PollResults'
+import PollForm from './PollForm'
 import PaginationControls from '../PaginationControls'
 
 import router from "../../router/index.js"
@@ -57,6 +63,8 @@ export default {
     components: {
         Post,
         Reply,
+        PollResults,
+        PollForm,
         PaginationControls
     },
     computed: {
@@ -81,6 +89,7 @@ export default {
             objectName: 'discussion',
             quickReplyActive: false,
             activeUserId: 0,
+            pollOptions: [],
             instanceForm: { content_item: {} }
         }
     },
@@ -113,6 +122,15 @@ export default {
         },
 
         async create() {
+            if (this.query.step && this.query.step !== 2) {
+                // Prevent lack of redirect to step 2 when user reloads on poll creation screen
+                router.replace({
+                    query: {
+                        poll: true
+                    }
+                })
+            }
+
             await discussions()
             if (this.params.parentTitle) {
                 this.instanceForm = {...this.instanceForm, content_item: {...this.instanceForm.content_item, title: `Re: ${this.params.parentTitle}`}}
@@ -214,6 +232,27 @@ export default {
             })
         },
 
+        votePoll() {
+
+        },
+
+        savePoll(_options) {
+            let options = _options
+            if (this.actions.manage) {
+                // TODO
+            }
+            if (this.actions.create) {
+                // don't use the ids here, because the ids are not real
+                options = _options.map((item) => {
+                    const {order, title} = item
+                    return {order, title}
+                })
+            }
+            this.instanceForm.poll = { options }
+
+            this.save()
+        },
+
         save() {
             if (this.actions.manage) {
                 this.manageDiscussion().then(() => {
@@ -221,6 +260,16 @@ export default {
                 })
             }
             else if (this.actions.create) {
+                if (!this.params.parentId && this.query && this.query.step !== 2 && this.query.poll) {
+                    // Redirect to the poll creation screen
+                    router.push({
+                        query: {
+                            poll: true,
+                            step: 2
+                        }
+                    })
+                    return
+                }
                 this.createDiscussion().then(data => this.$nextTick(() => {
                     if (!this.quickReply) {
                         router.replace({
