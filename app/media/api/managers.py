@@ -21,6 +21,7 @@ class PlaceManager(models.Manager):
         allowed_places.append(place.id)
         return allowed_places
 
+
 class LocalQuerySet(object):
     def restrict_local(self, **kwargs):
         allowed_places = kwargs.get('allowed_places', None)

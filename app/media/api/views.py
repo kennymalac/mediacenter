@@ -104,13 +104,7 @@ class GroupVisibilityViewSetMixin(VisibilityViewSetMixin):
 
 
 class FeedContentStashVisibilityViewSetMixin(VisibilityViewSetMixin):
-    owner_field = 'feeds__owner__in'
-
-    def _request_owner(self):
-        '''Returns dict to filter by the request user'''
-        _d = {}
-        _d[self.owner_field] = (self.request.user,)
-        return _d
+    owner_field = 'origin_feed__owner'
 
 
 class AccountViewSet(ActionPermissionClassesMixin,
@@ -330,7 +324,6 @@ class FeedContentItemViewSet(RetrieveModelMixin,
     pagination_class = FeedContentItemPagination
 
     def get_queryset(self):
-        print("FeedContentItemViewSet queryset ")
         qs = super(FeedContentItemViewSet, self).get_queryset()
 
         if self.request.user.is_authenticated():
@@ -340,11 +333,12 @@ class FeedContentItemViewSet(RetrieveModelMixin,
         else:
             qs = qs.filter(~Q(visibility='9'))
 
-        return qs.restrict_local(user=request.user)
+        return qs.restrict_local(user=self.request.user)
 
     @list_route(methods=['POST'], url_path='search', permission_classes=[IsAuthenticated])
     def search(self, request):
-        content_queryset = self.get_queryset()
+        content_queryset = self.get_queryset().\
+            filter(Q(owner=self.request.user) | Q(visibility='0'))
 
         _feed_id = request.data.get('feed', None)
         if _feed_id:
@@ -373,10 +367,14 @@ class FeedContentItemViewSet(RetrieveModelMixin,
 
 
 class FeedContentStashItemViewSet(NestedViewSetMixin,
+                                  ActionPermissionClassesMixin,
                                   MultipleSerializerMixin,
-                                  ModelViewSet):
+                                  RetrieveModelMixin,
+                                  UpdateModelMixin,
+                                  DestroyModelMixin,
+                                  GenericViewSet):
 
-    queryset = FeedContentStashItem.objects.all()
+    queryset = FeedContentStashItem.objects.all().order_by('created')
     serializer_classes = {
         'default': FeedContentStashItemSerializer,
         'partial_update': FeedContentItemCreateUpdateSerializer,
@@ -384,12 +382,24 @@ class FeedContentStashItemViewSet(NestedViewSetMixin,
         # 'create': FeedContentStashCreateUpdateSerializer
     }
     action_permission_classes = {
-        'default': [IsAuthenticated, IsPublicOrUnlisted],
-        'update': [IsAuthenticated], # TODO
-        'partial_update': [IsAuthenticated], # TODO
-        'create': [IsAuthenticated],
-        'destroy': [IsAuthenticated] # TODO
+        'default': [IsAuthenticated, IsParentFeedContentStashNotPrivateOrOwner, IsFeedContentStashItemOwnerOrPublicOrUnlisted],
+        'update': [IsAuthenticated, IsFeedContentStashItemOwner],
+        'partial_update': [IsAuthenticated, IsFeedContentStashItemOwner],
+        'destroy': [IsAuthenticated, IsFeedContentStashItemOwner]
     }
+    pagination_class = FeedContentItemPagination
+
+    def get_queryset(self):
+        qs = super(FeedContentStashItemViewSet, self).get_queryset()
+
+        if self.request.user.is_authenticated():
+            # Either the user owns these objects or it is NOT private
+            qs = qs.filter(Q(item__owner=self.request.user) | ~Q(item__visibility='9'))
+
+        else:
+            qs = qs.filter(~Q(item__visibility='9'))
+
+        return qs.restrict_local(user=self.request.user)
 
 
 class FeedContentStashViewSet(NestedViewSetMixin,
@@ -421,6 +431,7 @@ class FeedContentStashViewSet(NestedViewSetMixin,
     def content(self, request, pk=None, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
+
         return Response(serializer.data)
 
     @detail_route(methods=['POST'], url_path='content/add', permission_classes=[IsAuthenticated])

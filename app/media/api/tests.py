@@ -153,7 +153,7 @@ def make_random_user():
 def make_random_group(visibility='0'):
     owner = make_random_user()
     feed = Feed.objects.create(owner=owner, name="Example feed", visibility=visibility)
-    stash = FeedContentStash.objects.create(name="Default", description="Stored content for this group", visibility=visibility)
+    stash = FeedContentStash.objects.create(name="Default", description="Stored content for this group", visibility=visibility, origin_feed=feed)
     feed.stashes.add(*(stash,))
 
     group = GroupForum.objects.create(
@@ -512,7 +512,8 @@ class FeedContentStashPermissionsTests(APITestCase):
     def setUp(self):
         self.user = make_random_user()
         self.stash_data = dict(
-            name="Example stash"
+            name="Example stash",
+#            origin_feed=Feed.objects.create()
         )
 
     def test_unauthenticated_create(self):
@@ -866,7 +867,7 @@ class FeedContentItemPermissionsTest(APITestCase):
         self.assertNotEqual(response.data['results'][0]['id'], content_obj.content_item.id)
 
 
-class FeedContentItemPermissionsTest(APITestCase):
+class FeedContentStashItemPermissionsTests(APITestCase):
     def setUp(self):
         make_content_types()
         self.user = make_random_user()
@@ -886,19 +887,117 @@ class FeedContentItemPermissionsTest(APITestCase):
         #     content_item=FeedContentStashItem.objects.create(item=self.create_data['content_item'])
         # )
 
-    def test_unauthenticated_search(self):
-        pass
+    def _create_content_obj(self, content_item_visiblity='0', stash_visibility='0'):
+        self.content_obj = Link.objects.create(**{
+            **self.create_data,
+            'content_item': FeedContentItem.objects.create(**{**self.create_data['content_item'], 'visibility': content_item_visiblity})
+        })
+        self.feed = Feed.objects.create(owner=self.user, name="Example feed", visibility='0')
+        self.stash = FeedContentStash.objects.create(name="Default", description="Stored content for this group", visibility=stash_visibility, origin_feed=self.feed)
+        self.content_obj.origin_stash = self.stash
+        self.feed.stashes.add(*(self.stash,))
 
-    def test_search_non_local_content(self):
+        return FeedContentStashItem.objects.create(item=self.content_obj.content_item, stash=self.stash)
+
+    def test_unauthenticated_read(self):
+        data = {}
+        #  ?? ? Only private content items cannot be read, besides those that are in groups with view restrictions in place ? ?
+        stash_item = self._create_content_obj()
+
+        # Make the stash item for this content object
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get('/api/stash/{}/content/'.format(self.stash.id))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client.get('/api/stash/{}/content/{}/'.format(self.stash.id, stash_item.id))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_item_visibility_unlisted_read(self):
+        # Create unlisted content_item
+        stash_item = self._create_content_obj(content_item_visiblity='1')
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get('/api/stash/{}/content/'.format(self.stash.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Unlisted content items are still shown in their stash (?)
+        self.assertEqual(len(response.data['content']['results']), 1)
+        self.assertEqual(response.data['content']['results'][0]['id'], stash_item.id)
+
+        response = self.client.get('/api/stash/{}/content/{}/'.format(self.stash.id, stash_item.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_item_visibility_private_read(self):
+        # Create private content_item
+        stash_item = self._create_content_obj(content_item_visiblity='9')
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get('/api/stash/{}/content/'.format(self.stash.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['content']['results']), 0)
+
+        response = self.client.get('/api/stash/{}/content/{}/'.format(self.stash.id, stash_item.id))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_stash_visibility_private_read(self):
+        # Create content_item in private feed
+        stash_item = self._create_content_obj(stash_visibility='9')
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get('/api/stash/{}/content/'.format(self.stash.id))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        response = self.client.get('/api/stash/{}/content/{}/'.format(self.stash.id, stash_item.id))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_unauthenticated_partial_update(self):
+        stash_item = self._create_content_obj()
+        data = {
+            'item': {
+                'title': 'depito'
+            }
+        }
+        self.client.force_authenticate(user=None)
+
+        response = self.client.patch('/api/stash/{}/content/{}/'.format(self.stash.id, stash_item.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEqual(FeedContentStashItem.objects.get(id=stash_item.id).item.title, 'depito')
+
+    def test_non_owner_partial_update(self):
+        stash_item = self._create_content_obj()
+        data = {
+            'item': {
+                'title': 'depito'
+            }
+        }
+        self.client.force_authenticate(user=make_random_user())
+
+        response = self.client.patch('/api/stash/{}/content/{}/'.format(self.stash.id, stash_item.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEqual(FeedContentStashItem.objects.get(id=stash_item.id).item.title, 'depito')
+
+    def test_non_local_content_read(self):
         # Local content cannot be read by outsiders
         # NOTE this test does NOT require the GeoSpace microservice to be running in order to pass
-        pass
+        place = Place.objects.create(**self.place_data)
+        stash_item = self._create_content_obj()
+        self.content_obj.content_item.places.add(place)
 
-    def test_search_unlisted_content(self):
-        pass
+        user = make_random_user()
+        self.client.force_authenticate(user=user)
 
-    def test_search_private_content(self):
-        pass
+        response = self.client.get('/api/stash/{}/content/'.format(self.stash.id))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Content object should NOT show up in the response
+        self.assertEqual(len(response.data['content']['results']), 0)
+
+        response = self.client.get('/api/stash/{}/content/{}/'.format(self.stash.id, stash_item.id))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
 
 class DefaultContentItemPermissionsTest(object):
     def setUp(self):

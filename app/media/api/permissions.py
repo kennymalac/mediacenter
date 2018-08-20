@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions
-from api.models import FeedContentItem, Profile
+from api.models import FeedContentItem, FeedContentStash, Profile
 
 class IsOwnerOrPublicOrGroupMemberOrUnlisted(permissions.BasePermission):
 
@@ -35,7 +35,15 @@ class IsContentItemOwnerOrPublicOrUnlisted(IsOwnerOrPublicOrGroupMemberOrUnliste
     group_check = False
 
 
+class IsFeedContentStashItemOwnerOrPublicOrUnlisted(IsOwnerOrPublicOrGroupMemberOrUnlisted):
+    account_field_attr = 'item.owner'
+    visibility_field_attr = 'item.visibility'
+    group_check = False
+
+
 class IsParentNotPrivateOrParentOwner(object):
+    owner_field_name = 'owner'
+
     def has_permission(self, request, view):
         qs_params = None
         parent_pk = view.kwargs.get('parent_lookup_{}'.format(self.parent_lookup), None)
@@ -44,7 +52,9 @@ class IsParentNotPrivateOrParentOwner(object):
             return False
 
         if request.user.is_authenticated():
-            qs_params = Q(owner=request.user) | ~Q(visibility='9')
+            owner_params = {}
+            owner_params[self.owner_field_name] = request.user
+            qs_params = Q(**owner_params) | ~Q(visibility='9')
         else:
             qs_params = ~Q(visibility='9')
 
@@ -61,6 +71,13 @@ class IsParentFeedContentItemNotPrivateOrOwner(IsParentNotPrivateOrParentOwner,
                                                permissions.BasePermission):
     parent_model = FeedContentItem
     parent_lookup = "content_item"
+
+
+class IsParentFeedContentStashNotPrivateOrOwner(IsParentNotPrivateOrParentOwner,
+                                                permissions.BasePermission):
+    parent_model = FeedContentStash
+    parent_lookup = "stash"
+    owner_field_name = "origin_feed__owner"
 
 
 class IsPublicOrUnlisted(permissions.BasePermission):
@@ -89,6 +106,11 @@ class IsOwner(permissions.BasePermission):
 class IsOriginFeedOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.origin_feed and obj.origin_feed.owner == request.user
+
+
+class IsFeedContentStashItemOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.item.owner and obj.item.owner == request.user
 
 
 class IsOwnerAccount(IsOwner):
