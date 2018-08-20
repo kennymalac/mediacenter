@@ -8,6 +8,7 @@
             :options="options"
             :multiple="multiple"
             :custom-label="optionLabel"
+            placeholder="Select option or type to search"
             :taggable="taggable"
             track-by="id"
             />
@@ -21,6 +22,7 @@
             :options="options"
             :multiple="multiple"
             :custom-label="optionLabel"
+            placeholder="Select option or type to search"
             :taggable="taggable"
             track-by="id"
             @search-change="asyncSearch"

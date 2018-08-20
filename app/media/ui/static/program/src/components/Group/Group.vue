@@ -382,7 +382,6 @@ $shadow-color: rgba(0, 0, 0, .2);
         text-align: left;
         margin: 10px;
         .group-list {
-            height: 100%;
             overflow-y: scroll;
         }
     }

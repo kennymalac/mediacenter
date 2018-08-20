@@ -2,7 +2,8 @@
     <section class="sidebar">
         <div class="group-info">
             <div @click="$emit('details')" class="icon-container">
-                <img height="100%" width="100%" :src="instance.image" />
+                <img v-if="instance.image" height="100%" width="100%" :src="instance.image" />
+                <i v-if="instance.feed.icon" :class="instance.feed.icon"></i>
             </div>
             <h2 @click="$emit('details')">{{ instance.name }}</h2>
 

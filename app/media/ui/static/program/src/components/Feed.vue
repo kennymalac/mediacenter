@@ -260,13 +260,13 @@ export default {
 <style lang="scss">
 .feed-container {
     grid-template-columns: 1fr 3fr;
+    .feed-content-item-list {
+        height: calc(100vh - 80px) !important;
+        overflow-y: scroll;
+    }
     section.feeds {
         text-align: left;
         margin: 10px;
-        .feed-list {
-            height: 100%;
-            overflow-y: scroll;
-        }
     }
 
     .main-form {

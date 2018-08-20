@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="content-item-form-container">
         <div v-if="!showUploadForm" class="content-types effect7">
             <div v-for="ctype in contentTypeOptions" @click="linkCreate(ctype)" class="content-type-choice">
                 <div class="icon">
@@ -187,6 +187,11 @@ export default {
 @import "~picnic/src/themes/default/_theme.scss";
 
 $choice-width: 112px;
+
+.content-item-form-container {
+    display: flex;
+    justify-content: center;
+}
 
 .content-types {
     display: flex;

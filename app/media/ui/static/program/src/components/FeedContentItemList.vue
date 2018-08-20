@@ -1,5 +1,5 @@
 <template>
-    <div class="feed-list">
+    <div class="feed-content-item-list">
         <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
         <transition-group name="list" tag="div">
             <div style="display: inline-block" v-for="item in pageContent" :key="item.id">
@@ -121,7 +121,7 @@ export default {
 </script>
 
 <style lang="scss">
-.feed-list {
+.feed-content-item-list {
     height: calc(100vh - 220px);
     overflow: scroll;
     .list-item {
