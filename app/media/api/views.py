@@ -383,6 +383,14 @@ class FeedContentStashItemViewSet(NestedViewSetMixin,
         'update': FeedContentStashCreateUpdateSerializer,
         # 'create': FeedContentStashCreateUpdateSerializer
     }
+    action_permission_classes = {
+        'default': [IsAuthenticated, IsPublicOrUnlisted],
+        'update': [IsAuthenticated], # TODO
+        'partial_update': [IsAuthenticated], # TODO
+        'create': [IsAuthenticated],
+        'destroy': [IsAuthenticated] # TODO
+    }
+
 
 class FeedContentStashViewSet(NestedViewSetMixin,
                               FeedContentStashVisibilityViewSetMixin,
@@ -390,7 +398,7 @@ class FeedContentStashViewSet(NestedViewSetMixin,
                               MultipleSerializerMixin,
                               ModelViewSet):
 
-    queryset = FeedContentStash.objects.all()
+    queryset = FeedContentStash.objects.all().order_by('created')
     serializer_classes = {
         'default': FeedContentStashSerializer,
         'partial_update': FeedContentStashCreateUpdateSerializer,
@@ -400,10 +408,10 @@ class FeedContentStashViewSet(NestedViewSetMixin,
     }
     action_permission_classes = {
         'default': [IsAuthenticated, IsPublicOrUnlisted],
-        'update': [IsAuthenticated], # TODO
-        'partial_update': [IsAuthenticated], # TODO
+        'update': [IsAuthenticated, IsOriginFeedOwner],
+        'partial_update': [IsAuthenticated, IsOriginFeedOwner],
         'create': [IsAuthenticated],
-        'destroy': [IsAuthenticated] # TODO
+        'destroy': [IsAuthenticated, IsOriginFeedOwner]
     }
 
     pagination_class = StandardResultsSetPagination

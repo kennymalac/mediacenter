@@ -86,6 +86,11 @@ class IsOwner(permissions.BasePermission):
         return getattr(obj, self.account_field_attr) == request.user
 
 
+class IsOriginFeedOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.origin_feed and obj.origin_feed.owner == request.user
+
+
 class IsOwnerAccount(IsOwner):
     account_field_attr = 'account'
 

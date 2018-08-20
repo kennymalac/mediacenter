@@ -301,6 +301,10 @@ class FeedContentStash(models.Model):
     content = models.ManyToManyField(FeedContentItem, through="FeedContentStashItem", related_name="+")
     # content = models.ManyToManyField(FeedContentItem, through="FeedContentStashItem", related_name="+")
     visibility = models.CharField(max_length=2, choices=VISIBILITY, default='0')
+
+    # A Feed content stash is associated with an "origin" Feed
+    origin_feed = models.ForeignKey(Feed, null=True, related_name="owned_stashes")
+
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -594,8 +594,16 @@ class FeedContentStashPermissionsTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertNotEqual(FeedContentStash.objects.get(id=stash.id).name, 'depito')
 
-    # def test_non_owner_partial_update(self):
-    #     pass
+    def test_non_owner_partial_update(self):
+        stash = FeedContentStash.objects.create(**self.stash_data)
+        data = {
+            'name': 'depito'
+        }
+        self.client.force_authenticate(user=make_random_user())
+
+        response = self.client.patch('/api/stash/{}/'.format(stash.id), data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertNotEqual(FeedContentStash.objects.get(id=stash.id).name, 'depito')
 
     def test_unauthenticated_delete(self):
         stash = FeedContentStash.objects.create(**self.stash_data)
@@ -606,8 +614,13 @@ class FeedContentStashPermissionsTests(APITestCase):
         self.assertEqual(FeedContentStash.objects.count(), 1)
 
 
-    # def test_non_owner_delete(self):
-    #     pass
+    def test_non_owner_delete(self):
+        stash = FeedContentStash.objects.create(**self.stash_data)
+
+        self.client.force_authenticate(user=make_random_user())
+        response = self.client.delete('/api/stash/{}/'.format(stash.id))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(FeedContentStash.objects.count(), 1)
 
     # TODO content stash search tests
 
@@ -886,7 +899,6 @@ class FeedContentItemPermissionsTest(APITestCase):
 
     def test_search_private_content(self):
         pass
-
 
 class DefaultContentItemPermissionsTest(object):
     def setUp(self):

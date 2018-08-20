@@ -484,16 +484,11 @@ def get_content_id(instance):
     return pk
 
 def get_group_id_name(instance):
-    # TODO optimize...
-    valid_stashes = FeedContentStash.objects.filter(owned_content__in=(instance,), feeds__isnull=False)
-    if valid_stashes.count() > 0:
-        valid_feeds = Feed.objects.filter(stashes__in=valid_stashes, groupforum__isnull=False)
-
-        if valid_feeds.count() > 0:
-            feed = valid_feeds.first()
-            group = feed.groupforum_set.first()
-            return [group.id, group.name]
-
+    # TODO optimize
+    if instance.origin_stash:
+        groups = instance.origin_stash.origin_feed.groupforum_set
+        if groups.count():
+            return [groups.first().id, groups.first().name]
 
 def get_feed_id(instance):
     if instance.origin_stash:
@@ -870,7 +865,7 @@ class GroupForumCreateUpdateSerializer(GroupForumSerializer):
             # NOTE only Places owned by this user can be added to the Group's feed
             feed.places.add(*places)
 
-        stash = FeedContentStash.objects.create(name="Default", description="Stored content for this group")
+        stash = FeedContentStash.objects.create(name="Default", description="Stored content for this group", origin_feed=feed)
         feed.stashes.add(*(stash,))
 
         members = validated_data.pop('members')
