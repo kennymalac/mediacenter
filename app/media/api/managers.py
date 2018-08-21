@@ -25,6 +25,7 @@ class PlaceManager(models.Manager):
 class LocalQuerySet(object):
     def restrict_local(self, **kwargs):
         allowed_places = kwargs.get('allowed_places', None)
+        only_local = kwargs.get('only_local', False)
 
         if allowed_places == None:
             allowed_places = []
@@ -42,12 +43,16 @@ class LocalQuerySet(object):
                     restriction = PlaceRestriction.objects.filter(place=place).first()
                     allowed_places = Place.objects.other_places(place, restriction)
 
-        qs_filter = {}
-        qs_filter['{}__isnull'.format(self.places_field_name)] = True
-        qs_filter2 = {}
-        qs_filter2['{}__in'.format(self.places_field_name)] = allowed_places
-        return self.filter(
-            Q(**qs_filter) | Q(**qs_filter2))
+        qs_filter1 = {}
+        qs_filter1['{}__in'.format(self.places_field_name)] = allowed_places
+        qs_filters = Q(**qs_filter1)
+
+        if not only_local:
+            qs_filter2 = {}
+            qs_filter2['{}__isnull'.format(self.places_field_name)] = True
+            qs_filters = qs_filters | Q(**qs_filter2)
+
+        return self.filter(qs_filters)
 
 
 class GroupForumQuerySet(LocalQuerySet, models.QuerySet):

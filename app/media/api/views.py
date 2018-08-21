@@ -88,7 +88,7 @@ class FeedContentItemVisibilityViewSetMixin(VisibilityViewSetMixin):
         qs = super(FeedContentItemVisibilityViewSetMixin, self).get_queryset()
 
         return qs.restrict_local(
-            user=self.request.user, allowed_places=[])
+            user=self.request.user)
 
 
 class GroupVisibilityViewSetMixin(VisibilityViewSetMixin):
@@ -100,7 +100,7 @@ class GroupVisibilityViewSetMixin(VisibilityViewSetMixin):
         has_restrict_places = hasattr(self, '_restrict_places')
         if not has_restrict_places or not self._restrict_places:
             return qs.restrict_local(
-                user=self.request.user, allowed_places=[])
+                user=self.request.user)
         return qs
 
 
@@ -357,7 +357,9 @@ class FeedContentItemViewSet(RetrieveModelMixin,
         else:
             qs = qs.filter(~Q(visibility='9'))
 
-        return qs.restrict_local(user=self.request.user)
+        _feed_id = self.request.data.get('feed', None)
+        only_local = False if not _feed_id or not get_object_or_404(Feed, pk=_feed_id).places.count() else True
+        return qs.restrict_local(user=self.request.user, only_local=only_local)
 
     @list_route(methods=['POST'], url_path='search', permission_classes=[IsAuthenticated])
     def search(self, request):

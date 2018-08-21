@@ -68,7 +68,7 @@
         <template v-if="actions.search">
             <section class="sidebar" style="height: 300px;">
                 <form class="search-form">
-                    <restriction-widget :place="place" v-if="isLocalGroups" />
+                    <!-- <restriction-widget :place="place" v-if="isLocalGroups" /> -->
                     <fieldset>
                         <label class="stack" for="interests">Interests</label>
                         <interest-select v-model="filteredInterests" />

@@ -157,7 +157,7 @@ export default {
 @import "~picnic/src/themes/default/_theme.scss";
 .places-container {
     height: 100%;
-    background-image: url("http://127.0.0.1:4242/bucket/1/1E/24777146395_0bbfe03661_o.png");
+    background-image: url("https://flatlanders.net/img/24777146395_0bbfe03661_o.png");
     background-size: cover;
     opacity: .9;
 }
