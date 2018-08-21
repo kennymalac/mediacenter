@@ -222,7 +222,25 @@ ACCEPT_MIMES = {
     'V': ['video/webm', 'video/mp4', 'video/avi']
 }
 
-MAX_FILE_SIZE = {
-    'P': 12582912, #12mb
-    'V': 146800640 # 140mb
+PLANS = {
+    'free': dict(
+        name="free",
+        title="Free",
+        max_places=1,
+        max_feeds=5,
+        max_owned_groups=3,
+        invites_per_month=0,
+        max_feed_interests=10,
+        max_upload_file_size=5.0, # 5mb
+    ),
+    'premium': dict(
+        name="premium",
+        title="Premium",
+        max_places=5,
+        max_feeds=10,
+        max_owned_groups=8,
+        invites_per_month=3,
+        max_feed_interests=25,
+        max_upload_file_size=50.0, # 50mb
+    )
 }

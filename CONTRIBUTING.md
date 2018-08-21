@@ -33,6 +33,9 @@ GRANT ALL PRIVILEGES ON DATABASE <DB_NAME> TO <DB_USER>;
 > exit
 # create the database
 python manage.py migrate --settings=media.settings.local
+# initialize content types and plans
+python manage.py init_content_types --settings=media.settings.local
+python manage.py init_plans --settings=media.settings.local
 # create an admin
 python manage.py createsuperuser --settings=media.settings.local
 # Now we have to build the frontend

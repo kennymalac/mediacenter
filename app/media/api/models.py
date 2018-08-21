@@ -26,6 +26,7 @@ class Account(AbstractUser, GuardianUserMixin):
     # Default settings are assigned on account creation
     profile = models.OneToOneField('api.Profile', null=True, on_delete=models.CASCADE)
     friends = models.ManyToManyField('self', blank=True)
+    plan = models.ForeignKey('api.Plan', null=True)
 
     account_settings = JSONField(null=True, blank=True)
     REQUIRED_FIELDS = ['display_name', 'email', 'password']
@@ -267,6 +268,28 @@ class InviteCode(models.Model):
     max_uses = models.IntegerField(default=1)
     uses = models.IntegerField(default=0)
     invitees = models.ManyToManyField(Account, related_name='+')
+
+
+class Plan(models.Model):
+    FREE = 'free'
+    PREMIUM = 'premium'
+
+    PLAN_CHOICES = (
+        (FREE, 'Free'),
+        (PREMIUM, 'Premium')
+    )
+
+    name = models.CharField(max_length=8, choices=PLAN_CHOICES)
+    title = models.CharField(max_length=16)
+    max_places = models.IntegerField(default=0)
+    max_feeds = models.IntegerField(default=0)
+    max_owned_groups = models.IntegerField(default=0)
+    invites_per_month = models.IntegerField(default=0)
+    max_feed_interests = models.IntegerField(default=0)
+    max_upload_file_size = models.DecimalField(max_digits=7, decimal_places=2, default=0.0)
+
+    def __str__(self):
+        return "<{}> {}".format(self.name, self.title)
 
 
 class FeedContentItem(TaggedItem):
