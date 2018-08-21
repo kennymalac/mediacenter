@@ -148,7 +148,7 @@ export default {
                                     stashId: this.stash.id,
                                     stashAction: 'details',
                                     linkId: instance.id,
-                                    linkAction: 'details'
+                                    linkAction: 'manage'
                                 }
                             })
                         }

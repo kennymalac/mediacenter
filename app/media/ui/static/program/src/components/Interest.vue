@@ -1,14 +1,11 @@
 <template>
-    <div>
+    <div class="profiles-container grid">
         <template v-if="actions.details && instance.id">
-            <section class="groups">
+            <div class="profile-container">
                 <h1>{{ instance.name }}</h1>
-
-                <template v-if="interestedUsers.length">
-                    <p>{{ interestedUsers.length }} User(s) have this interest</p>
-                    <profile-list :items="interestedUsers" />
-                </template>
-            </section>
+                <p>{{ interestedUsers.length }} User(s) have this interest</p>
+                <profile-list v-if="interestedUsers.length" :items="interestedUsers" />
+            </div>
         </template>
     </div>
 </template>

@@ -1,5 +1,5 @@
 import {Model, Collection} from './Model.js'
-import {serializeContentItem} from './serializers.js'
+import {serializeContentItem, serializeIds} from './serializers.js'
 import {makeJsonRequest, jsonResponse, fetchAPI} from '../httputil.js'
 import {get, manage, paginatedList} from './generics.js'
 import {FeedContentItemCollection} from './FeedContentItem'
@@ -56,7 +56,7 @@ class DiscussionCollection extends Collection {
         const created = await makeJsonRequest("discussion/", {
             method: "POST",
             body: {
-                ...data, content_item: {...data.content_item, owner: data.content_item.owner.id}
+                ...data, content_item: {...data.content_item, interests: serializeIds(data.content_item.interests), owner: data.content_item.owner.id}
             }
         })
               .then(jsonResponse)

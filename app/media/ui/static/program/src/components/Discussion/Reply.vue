@@ -14,15 +14,18 @@
 
                 <!-- <label class="stack" for="">Tags</label> -->
                 <!-- <input class="stack" name="tags" v-model="instance.tags_raw" type="text" /> -->
+                <div v-if="!parentId">
+                    <label class="stack" for="interests">Interests</label>
+                    <interest-select v-model="instanceForm.content_item.interests" />
+                </div>
+
                 <label class="stack">
                     <input v-model="instanceForm.content_item.is_anonymous" name="is_anonymous" type="checkbox">
                     <span class="checkable">Post Anonymously</span>
                 </label>
 
-
                 <div style="display: flex;">
                     <button class="stack error" type="button" @click="$emit('canceled')"><i class="ion-ios-undo"></i> Cancel</button>
-
 
                     <input v-if="replyBtnText" class="stack" type="submit" :value="replyBtnText" />
                     <input v-if="!replyBtnText && action === 'create' && !parentId" class="stack" type="submit" value="Create" />
@@ -65,11 +68,13 @@ import 'tinymce/plugins/help'
 import 'tinymce/plugins/wordcount'
 
 import Editor from '@tinymce/tinymce-vue'
+import InterestSelect from '../InterestSelect'
 
 export default {
     name: 'reply',
     components: {
-        Editor
+        Editor,
+        InterestSelect
     },
     props: {
         show: {

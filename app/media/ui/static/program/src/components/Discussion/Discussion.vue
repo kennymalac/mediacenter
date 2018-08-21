@@ -19,9 +19,9 @@
             <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
         </template>
         <template v-if="actions.create">
-            <reply v-if="!query || !query.poll" @canceled="quickReply ? $emit('canceled') : $router.go(-1)" :show="show" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" />
-            <reply v-if="query && query.poll && query.step !== 2" @canceled="quickReply ? $emit('canceled') : $router.go(-1)" :show="show" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" replyBtnText="Continue" />
-            <poll-form v-if="query && query.poll && query.step === 2" :title="instanceForm.content_item.title" @save="savePoll" />
+            <reply v-if="!creatingPoll" @canceled="quickReply ? $emit('canceled') : $router.go(-1)" :show="show" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" />
+            <reply v-if="creatingPoll && query.step !== 2" @canceled="quickReply ? $emit('canceled') : $router.go(-1)" :show="show" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="create" replyBtnText="Continue" />
+            <poll-form v-if="creatingPoll && query.step === 2" :title="instanceForm.content_item.title" @save="savePoll" />
         </template>
         <template v-if="actions.manage">
             <reply @canceled="$router.go(-1)" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="manage" />
@@ -69,6 +69,9 @@ export default {
         PaginationControls
     },
     computed: {
+        creatingPoll() {
+            return this.query && ['true', true].includes(this.query.poll)
+        },
         discussionLink() {
         },
         posts() {
@@ -135,6 +138,13 @@ export default {
             await discussions()
             if (this.params.parentTitle) {
                 this.instanceForm = {...this.instanceForm, content_item: {...this.instanceForm.content_item, title: `Re: ${this.params.parentTitle}`}}
+            }
+
+            if (this.params && this.params.groupId) {
+                const groupCollection = await groups()
+                // Default to using Group's interests
+                const group = await groupCollection.fetchInstance({id: parseInt(this.params.groupId)})
+                this.instanceForm.content_item.interests = group.feed.interests.slice()
             }
         },
 
@@ -261,7 +271,7 @@ export default {
                 })
             }
             else if (this.actions.create) {
-                if (!this.params.parentId && this.query && this.query.step !== 2 && this.query.poll) {
+                if (!this.params.parentId && this.query && this.query.step !== 2 && this.creatingPoll) {
                     // Redirect to the poll creation screen
                     router.push({
                         query: {

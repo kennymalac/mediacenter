@@ -10,7 +10,7 @@
                         </div>
                         <div class="author-details">
                             <span class="display-name">{{ instance.content_item.owner.profile.display_name }}</span>
-                            <span class="user-title">Sr. Poster</span>
+                            <span class="user-title">User</span>
                         </div>
                     </div>
                     <div class="post-details">
@@ -72,7 +72,7 @@
 
 <script>
 import RestfulComponent from "./RestfulComponent"
-import {activeUser, images} from '../store.js'
+import {activeUser, images, groups} from '../store.js'
 //import {ImageModel} from '../models/Image.js'
 import imageDeps from '../dependencies/Link.js'
 
@@ -123,6 +123,12 @@ export default {
 
             this.instance = await this.showInstance(params.id, fallthrough, images, await imageDeps(this.stashId))
             this.instanceForm = this.instance.getForm()
+            if (this.instance.content_item.interests.length === 0 && this.params && this.params.groupId) {
+                const groupCollection = await groups()
+                // Default to using Group's interests
+                const group = await groupCollection.fetchInstance({id: parseInt(this.params.groupId)})
+                this.instanceForm.content_item.interests = group.feed.interests.slice()
+            }
         },
 
         async details(params) {
