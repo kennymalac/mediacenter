@@ -7,9 +7,12 @@
         <input id="bmenub" type="checkbox" class="show">
         <label for="bmenub" class="burger pseudo button">menu</label>
 
-        <div class="menu">
+        <div v-if="!loggedIn" class="menu">
             <router-link v-if="!loggedIn" :class="menuClass" to="/login">Login</router-link>
             <router-link v-if="!loggedIn" :class="menuClass" to="/register">Register</router-link>
+        </div>
+
+        <div v-else class="menu">
             <router-link :class="menuClass" to="/place/"><i class="icon ion-ios-compass"></i> Places</router-link>
             <router-link :class="menuClass" to="/feed/"><i class="ion-ios-list-box"></i> Feeds</router-link>
             <router-link :class="menuClass" to="/group/"><i class="ion-ios-people"></i> Groups</router-link>
@@ -17,7 +20,7 @@
             <!-- <router-link :class="menuClass" to="/chat"><i class="ion-ios-chatbubbles"></i> Chat</router-link> -->
             <router-link :class="menuClass" to="/gallery/"><i class="ion-ios-image"></i> Gallery</router-link>
             <router-link :class="menuClass" to="/album/"><i class="ion-ios-albums"></i> Albums</router-link>
-            <active-user v-if="loggedIn" />
+            <active-user />
         </div>
     </nav>
 </template>

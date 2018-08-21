@@ -1,31 +1,33 @@
 <template>
     <div>
-        <div :class="info">
-            {{ infoBox.message }}
+        <div :class="info" v-html="infoBox.message">
         </div>
-        
+
         <Modal :isOpen="isModalOpen" :onClose="closeModal" justifyContent="center" :titleProps="{ title: 'Register' }">
             <form id="register-form" @submit.prevent="register">
                 <fieldset>
-                    <legend>User details</legend>
+                    <legend>Details</legend>
                     <label class="stack" for="name">Username</label>
-                    <input class="stack" v-model="instanceForm.username" type="text" placeholder="Username">
+                    <input class="stack" v-model="instanceForm.username" type="text" placeholder="Username" required>
                     <label class="stack" for="name">Display Name</label>
-                    <input class="stack" v-model="instanceForm.display_name" type="text" placeholder="Display Name">
+                    <input class="stack" v-model="instanceForm.display_name" type="text" placeholder="Display Name" required>
                     <label class="stack" for="password">Password</label>
-                    <input class="stack" v-model="instanceForm.password" id="password" type="password" placeholder="Password">
-                    <label class="stack" for="retype-password">Re-type Password</label>
-                    <input class="stack" v-model="instanceForm.retype_password" id="retype-password" type="password" placeholder="Password">
+                    <input class="stack" v-model="instanceForm.password" id="password" type="password" placeholder="Password" required>
+                    <!-- <label class="stack" for="retype-password">Re-type Password</label> -->
+                    <!-- <input class="stack" v-model="instanceForm.retype_password" id="retype-password" type="password" placeholder="Password" required> -->
                     <label class="stack" for="email">Email Address</label>
-                    <input class="stack" autocomplete="email" v-model="instanceForm.email" id="email" type="email" placeholder="Email Address">
-                    
+                    <input class="stack" autocomplete="email" v-model="instanceForm.email" id="email" type="email" placeholder="Email Address" required>
+
+                    <label class="stack" for="invite_code">Invite Code</label>
+                    <input class="stack" v-model="instanceForm.invite_code" type="text" placeholder="Invite Code" required>
+
                     <label class="stack">
                         <input name="subscribe" class="stack" v-model="instanceForm.subscribe" id="subscribe" type="checkbox">
                         <span class="checkable">I wish to subscribe to the mailing list</span>
                     </label>
-                    
+
                     <!-- TODO must be over 13 -->
-                    <input type="submit" class="stack" value="Submit" />
+                    <input type="submit" class="stack" value="Submit" :disabled="registered" />
                 </fieldset>
             </form>
         </Modal>
@@ -54,7 +56,8 @@ export default {
                 retype_password: "",
                 email: "",
                 subscribe: ""
-            }
+            },
+            registered: false
         }
     },
     computed: {
@@ -75,10 +78,12 @@ export default {
             this.isModalOpen = false
         },
         register() {
+            this.registered = true
             AccountCollection.create({
                 username: this.instanceForm.username,
                 email: this.instanceForm.email,
                 country: this.instanceForm.country,
+                invite_code: this.instanceForm.invite_code,
                 // display_name: this.instanceForm.display_name,
                 password: this.instanceForm.password,
                 profile: {
@@ -91,9 +96,22 @@ export default {
                     this.infoBox.message = 'Your account was successfully created. Please login.'
                     //this.router.navigate home
                 })
-                .catch((error) => {
+                .catch(async (error) => {
                     this.infoBox.status = "error"
-                    this.infoBox.message = 'The account could not be created for the following reason: ' + error
+                    const errorData = await error.data
+
+                    if (errorData.error) {
+                        this.infoBox.message = 'The account could not be created for the following reason: ' + errorData.error
+                    }
+                    else {
+                        let errorText = "<ul>"
+                        for (let [key, value] of Object.entries(errorData)) {
+                            errorText += `<li><b>${key}</b>: ${value}</li>`
+                        }
+                        errorText += "</ul>"
+                        this.infoBox.message = `The account could not be created for the following reasons: <br> ${errorText}`
+                    }
+                    this.registered = false
                 })
             //"Please enter the following information below."
         }
@@ -111,4 +129,3 @@ export default {
     }
 }
 </style>
-

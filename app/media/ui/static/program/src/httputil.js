@@ -19,7 +19,6 @@ export function makeJsonRequest(uri, params, baseUrl) {
         method: method,
         headers: makeHeaders(defaultJsonHeaders, needsAuth)
     }
-    console.log(_params)
     if (queryParams !== undefined) {
         _params.queryParams = queryParams
     }
@@ -32,7 +31,7 @@ export function makeJsonRequest(uri, params, baseUrl) {
 
 export function makeHeaders(headers, needsAuthentication = true) {
     if (needsAuthentication) {
-        auth.authenticate(headers)
+        return auth.authenticate(headers)
     }
     return headers
 }
@@ -41,8 +40,9 @@ export function jsonResponse(response) {
     // TODO better error handling
     if (response.status >= 200 && response.status < 300) {
         return response.json()
-    } else {
-        var error = new Error(response.statusText)
+    }
+    else {
+        const error = new Error(response.statusText)
         error.response = response
         error.data = response.json()
         console.log(error)
@@ -56,5 +56,13 @@ export function fetchAPI(uri, params, baseUrl = `${API_URL}/api/`) {
         delete params.queryParams
     }
 
-    return fetch(`${baseUrl}${uri}`, params)
+    return fetch(`${baseUrl}${uri}`, params).then(async (response) => {
+        if (response.status === 403 && params.headers['Authorization']) {
+            // Token refresh and retry
+            await auth.getToken(true)
+            params.headers = auth.authenticate(params.headers)
+            return await fetch(`${baseUrl}${uri}`, params)
+        }
+        return response
+    })
 }

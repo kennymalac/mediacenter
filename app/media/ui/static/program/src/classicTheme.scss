@@ -16,7 +16,7 @@ $classicgreen: #4F8A10;
     -webkit-font-smoothing: antialiased;
     text-align: center;
     color: $subgray;
-    padding-top: 44px;
+    padding-top: 54px;
     height: 100%;
 }
 .xlarge {
@@ -103,12 +103,12 @@ label.stack {
         background: linear-gradient($classicblue 90%, #264d77);
     }
     &.error {
-        color: #D8000C;
-        background-color: #FFBABA;
+        color: #fff;
+        background: linear-gradient(#eb3636 90%, #a73535);
     }
     &.success {
-        color: $classicgreen;
-        background-color: #DFF2BF;
+        color: #fff;
+        background: linear-gradient($classicgreen 90%, #013220);
     }
 }
 

@@ -16,9 +16,12 @@ export class Auth {
 
         let [persistedToken, username] = this.getActiveUserSessionToken()
         try {
-            if (persistedToken.length > 1 && username.length > 1) {
-                this.currentSession.user.username = username
-                this.currentSession.user.token = persistedToken
+            if (persistedToken && username) {
+                this.getPersistedToken = async () => {
+                    await this.refreshToken(persistedToken)
+                    this.currentSession.user.details.username = username
+                }
+                this.getPersistedToken()
             }
         }
         catch (e) {
@@ -35,7 +38,7 @@ export class Auth {
         let activeUser = localStorage.getItem(this.storageKey + "activeUser")
         if (activeUser) {
             console.log(activeUser)
-            // return the token that is being stored
+            // return the refresh token that is being stored
             return [localStorage.getItem(this.storageKey + activeUser), activeUser]
         }
         else {
@@ -64,16 +67,37 @@ export class Auth {
         // redirect to login
 
         if (refresh) {
-            //this.refreshToken(this.getActiveUser.username)
-            return localStorage.getItem(this.storageKey + this.currentSession.user.username)
+            return this.refreshToken(localStorage.getItem(this.storageKey + this.currentSession.user.details.username))
         }
+        // return localStorage.getItem(this.storageKey + this.currentSession.user.username)
 
         return this.currentSession.user.token
+    }
+    refreshToken(token) {
+        return makeJsonRequest('api-token-refresh/', {
+            method: 'POST',
+            authenticated: false,
+            headers: {
+                'Cache': 'no-cache'
+            },
+            body: {
+                refresh: token
+            }
+        }, `${API_URL}/`)
+            .then(jsonResponse)
+            .then((data) => {
+                let token = data.access
+                this.currentSession.user.token = token
+            })
     }
 
     login(username, password) {
         return makeJsonRequest('api-token-auth/', {
             method: 'POST',
+            authenticated: false,
+            headers: {
+                'Cache': 'no-cache'
+            },
             body: {
                 username: username,
                 password: password
@@ -81,11 +105,11 @@ export class Auth {
         }, `${API_URL}/`)
             .then(jsonResponse)
             .then((data) => {
-                let token = data.token
+                let token = data.access
                 this.currentSession.user.token = token
                 this.currentSession.user.details.username = username
                 localStorage.setItem(this.storageKey + "activeUser", username)
-                localStorage.setItem(this.storageKey + username, token)
+                localStorage.setItem(this.storageKey + username, data.refresh)
             })
     }
 
@@ -106,7 +130,7 @@ export class Auth {
 
     getProfile(errorCallback) {
         let headers = {}
-        this.authenticate(headers)
+        headers = this.authenticate(headers)
         return fetchAPI('account/current-user/', {
             method: 'GET',
             // Get authentication headers
@@ -114,7 +138,7 @@ export class Auth {
         })
             .then(jsonResponse)
             .then((data) => {
-                this.currentSession.user.details = data
+                this.currentSession.user.details = {...this.currentSession.user.details, ...data}
             })
             .catch((error) => {
                 errorCallback(error)
@@ -122,13 +146,18 @@ export class Auth {
     }
 
     authenticate(headers) {
-        headers["Authorization"] = 'JWT ' + this.currentSession.user.token
+        return Object.assign({}, headers, {
+            "Authorization": 'Bearer ' + this.currentSession.user.token
+        })
     }
 }
 
 export const auth = new Auth()
 
-export function makeActiveUser() {
+export async function makeActiveUser() {
+    if (auth.getPersistedToken) {
+        await auth.getPersistedToken()
+    }
     return auth.getProfile((error) => {
         // TODO better error callback
         console.log('auth error')

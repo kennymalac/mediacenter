@@ -67,9 +67,6 @@ export default {
             }
         }
     },
-    mounted() {
-        console.log('mounted')
-    },
     methods: {
         closeModal() {
             this.isModalOpen = false
@@ -99,9 +96,21 @@ export default {
                 //that.$router.replace('/')
                 this.$forceUpdate()
             })
-                .catch((error) => {
+                .catch(async (error) => {
                     that.infoBox.status = "error"
-                    that.infoBox.message = 'The account could not be logged in for the following reason: ' + error
+                    const errorData = await error.data
+
+                    if (errorData.error) {
+                        this.infoBox.message = 'The account could not be created for the following reason: ' + errorData.error
+                    }
+                    else {
+                        let errorText = "<ul>"
+                        for (let [key, value] of Object.entries(errorData)) {
+                            errorText += `<li><b>${key}</b>: ${value}</li>`
+                        }
+                        errorText += "</ul>"
+                        this.infoBox.message = `The account could not be created for the following reasons: <br> ${errorText}`
+                    }
                 })
         },
         logout() {

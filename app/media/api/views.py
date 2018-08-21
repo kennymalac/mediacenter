@@ -130,6 +130,29 @@ class AccountViewSet(ActionPermissionClassesMixin,
         'destroy': [IsThisUser]
     }
 
+    def create(self, request, *args, **kwargs):
+        code = request.data.get('invite_code', None)
+        if not code:
+            return Response({
+                'error': 'No invite code provided'
+            }, status=400)
+
+        _codes = InviteCode.objects.filter(code=code)
+        if not _codes.count():
+            return Response({
+                'error': 'Invalid invite code!'
+            }, status=400)
+
+        invite_code = _codes.first()
+        if invite_code.max_uses <= invite_code.uses:
+            return Response({
+                'error': 'Invite code has already been used!'
+            }, status=400)
+
+        request.data['invite_code'] = invite_code
+
+        return super(AccountViewSet, self).create(request, *args, **kwargs)
+
     @detail_route(methods=['POST', 'GET'], url_path='profile')
     @parser_classes((JSONParser,))
     def profile(self, request, *args, **kwargs):

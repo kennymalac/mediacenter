@@ -85,6 +85,8 @@ class FullAccountSerializer(AccountSerializer):
     account_settings = serializers.JSONField(read_only=False)
 
     def create(self, validated_data):
+        invite_code = self.context['request'].data.get('invite_code')
+
         profile_data = {}
         if 'profile' in validated_data:
             profile_data = validated_data.pop('profile')
@@ -92,6 +94,10 @@ class FullAccountSerializer(AccountSerializer):
         password = validated_data.pop('password')
         account = Account.objects.create(**validated_data)
         account.set_password(password)
+
+        invite_code.invitees.add(account)
+        invite_code.uses += 1
+        invite_code.save()
 
         profile = Profile.objects.create(**profile_data, account=account)
         account.profile = profile

@@ -64,8 +64,10 @@ was created by a less specific serialized endpoint
 **** TODO improve zero states
 
 *** UI/UX fixes
-**** TODO user list should have profile images
-**** TODO some sort of grid system & layout
+**** DONE user list should have profile images
+     CLOSED: [2018-08-20 Mon 20:32]
+**** DONE some sort of grid system & layout
+     CLOSED: [2018-08-20 Mon 20:32]
 **** DONE convert Modal to flexbox
      CLOSED: [2018-04-30 Mon 18:30]
 **** TODO remove Pure CSS
@@ -86,7 +88,8 @@ was created by a less specific serialized endpoint
 **** DONE closeModal
      CLOSED: [2018-04-30 Mon 18:43]
 *** Authentication
-**** TODO Invite-only registration
+**** DONE Invite-only registration
+     CLOSED: [2018-08-20 Mon 20:32]
 **** DONE don't require refresh for authentication
      CLOSED: [2018-06-19 Tue 16:34]
 **** DONE Account always shows as successfully being logged in even on error
@@ -106,7 +109,8 @@ was created by a less specific serialized endpoint
      CLOSED: [2017-05-13 Sat 12:39]
 ***** DONE persistent
       CLOSED: [2017-05-13 Sat 12:39]
-**** TODO refreshToken
+**** DONE refreshToken
+     CLOSED: [2018-08-20 Mon 20:32]
 **** TODO getPrivileges
 **** DONE fix auth on dev server
      CLOSED: [2018-05-03 Thu 09:34]
@@ -241,7 +245,8 @@ was created by a less specific serialized endpoint
 **** DONE user profile comments
      CLOSED: [2018-06-08 Fri 13:35]
 **** TODO cross-network profiles
-**** TODO hide local user groups to non-locals
+**** DONE hide local user groups to non-locals
+     CLOSED: [2018-08-20 Mon 20:33]
 **** DONE get list of Group tags working
      CLOSED: [2018-05-24 Thu 14:38]
 **** DONE model, serializer, viewset

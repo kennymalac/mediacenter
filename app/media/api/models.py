@@ -5,9 +5,10 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField, ArrayField
+from django.db import models
 from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
-from django.db import models
+from django.utils.crypto import get_random_string
 from django.contrib.auth.models import AbstractUser
 from django.contrib.gis.db.models import GeometryField
 
@@ -255,6 +256,17 @@ class Feed(TaggedItem, BackgroundMixin):
 
     def __str__(self):
         return self.name
+
+
+def get_default_code():
+    return get_random_string(16)
+
+class InviteCode(models.Model):
+    owner = models.ForeignKey(Account, null=True)
+    code = models.CharField(max_length=16, unique=True, default=get_default_code)
+    max_uses = models.IntegerField(default=1)
+    uses = models.IntegerField(default=0)
+    invitees = models.ManyToManyField(Account, related_name='+')
 
 
 class FeedContentItem(TaggedItem):

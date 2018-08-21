@@ -10,13 +10,15 @@ import Profile from 'components/Profile/Profile'
 //import Chat from 'components/Chat'
 import Home from 'components/Home'
 import Interest from 'components/Interest'
-import Gallery from 'components/Gallery'
-import Album from 'components/Album'
+//import Gallery from 'components/Gallery'
+//import Album from 'components/Album'
 import Group from 'components/Group/Group'
 import Discussion from 'components/Discussion/Discussion'
 import Link from 'components/Link'
 import Image from 'components/Image'
 import Comment from 'components/Comment/Comment'
+
+import ComingSoon from 'components/ComingSoon'
 
 Vue.use(Router)
 
@@ -319,7 +321,7 @@ export default new Router({
         {
             path: '/gallery',
             name: 'Gallery',
-            component: Gallery
+            component: ComingSoon
             // children: [
             //     {
             //         path: 'album/:id',
@@ -330,16 +332,16 @@ export default new Router({
         {
             path: '/album/:id/:action',
             name: 'Album',
-            component: Album,
-            props: restAction,
-            canReuse: false
+            component: ComingSoon
+            // props: restAction,
+            // canReuse: false
         },
         {
             path: '/album/:action?',
             name: 'Album',
-            component: Album,
-            props: restAction,
-            canReuse: false
+            component: ComingSoon
+            // props: restAction,
+            // canReuse: false
         }
             // children: [
                 // {

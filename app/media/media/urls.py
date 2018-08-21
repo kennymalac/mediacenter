@@ -3,7 +3,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from rest_framework.routers import DefaultRouter
 from rest_framework_extensions.routers import ExtendedDefaultRouter
-from rest_framework_jwt.views import obtain_jwt_token
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from api.views import *
 from ui.views import *
@@ -77,6 +77,7 @@ urlpatterns = [
     # url(r'^chat/', ChatView.as_view()),
     # url(r'^feed/', FeedView.as_view()),
     # url(r'^media/', MediaView.as_view()),
-    url(r'^api-token-auth/', obtain_jwt_token),
-    url(r'^api/', include(router.urls)),
+    url(r'^api-token-auth/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    url(r'^api-token-refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    url(r'^api/', include(router.urls))
 ]
