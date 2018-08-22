@@ -854,16 +854,23 @@ class GroupForumSerializer(GroupForumBasicSerializer):
         read_only=False
     )
 
+    members = serializers.SerializerMethodField()
     members_count = serializers.SerializerMethodField()
 
     is_local = serializers.SerializerMethodField()
 
     class Meta:
         model = GroupForum
-        fields = ('id', 'name', 'image', 'description', 'feed', 'owner', 'is_restricted', 'is_local', 'members_count', 'rules')
+        fields = ('id', 'name', 'image', 'description', 'feed', 'owner', 'is_restricted', 'is_local', 'members', 'members_count', 'rules')
 
     def get_is_local(self, instance):
         return instance.feed.places.count() != 0
+
+    def get_members(self, instance):
+        # Only show members to Group owner
+        if self.context['request'] and self.context['request'].user == instance.owner:
+            return AccountSerializer(instance.members, many=True).data
+        return []
 
     def get_members_count(self, instance):
         return instance.members.count()
