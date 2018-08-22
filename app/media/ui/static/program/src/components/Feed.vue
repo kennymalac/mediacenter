@@ -107,7 +107,7 @@ export default {
         preErrorMessage() {
             const feedAction = this.action || this.feedAction
 
-            if (['manage', 'create'].includes(feedAction)) {
+            if (!['manage', 'create'].includes(feedAction)) {
                 return ""
             }
 

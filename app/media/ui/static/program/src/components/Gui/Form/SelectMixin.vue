@@ -4,7 +4,7 @@
         @input="$emit('input', $event)"
         :options="options"
         :multiple="false"
-        :allow-empty="false"
+        :allow-empty="!required"
         :custom-label="optionLabel"
         />
 </template>
@@ -18,6 +18,10 @@ export default {
         search: {
             type: Boolean,
             default: false
+        },
+        required: {
+            type: Boolean,
+            default: false
         }
     },
     methods: {
@@ -25,7 +29,7 @@ export default {
             if (typeof option === 'string') {
                 return option
             }
-            const { text } = option
+            const {text} = option
             return text
         }
     }

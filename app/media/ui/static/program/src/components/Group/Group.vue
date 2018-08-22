@@ -58,7 +58,7 @@
                     </label>
                     <!-- <label class="stack" for="interests">Invite Policy</label> -->
                     <label class="stack" for="visibility">Visibility</label>
-                    <visibility-select v-model="instanceForm.feed.visibility" />
+                    <visibility-select :required="true" v-model="instanceForm.feed.visibility" />
                     <!-- <label class="stack" for="rules">Rules</label>
                          TODO rules -->
                     <input v-if="actions.create" class="stack" type="submit" value="Create" />
@@ -164,7 +164,7 @@ export default {
         preErrorMessage() {
             const groupAction = this.action || this.groupAction
 
-            if (['manage', 'create'].includes(groupAction)) {
+            if (!['manage', 'create'].includes(groupAction)) {
                 return ""
             }
 
@@ -222,7 +222,7 @@ export default {
 
         async create() {
             this.instanceForm = GroupModel.getNewInstance()
-            this.instanceForm.feed = { interests: [], content_types: [] }
+            this.instanceForm.feed = { interests: [], content_types: [], visibility: {title: 'Public', value: '0'} }
 
             const [owner, members, profile, interestCollection, groupCollection] = await Promise.all(
                 [activeUser(), accounts(), profiles(), interests(), groups()]
@@ -336,9 +336,6 @@ export default {
                 .then((data) => {
                     user.details.member_groups.push(data.id)
                     return data
-                })
-                .catch((error) => {
-                    console.log(error)
                 })
         },
 
