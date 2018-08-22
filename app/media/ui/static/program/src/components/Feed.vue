@@ -21,6 +21,7 @@
         <template v-if="actions.create || actions.manage">
             <feed-info-sidebar :instance="instance" @editFeed="editFeed" :isActiveUserOwner="isActiveUserOwner" />
             <form class="main-form" @submit.prevent="save">
+                <info-box :preErrorMessage="preErrorMessage" :message="infoBoxMessage" :errorData="infoBoxErrorData" :status="infoBoxStatus" />
                 <fieldset>
                     <legend class="stack">Appearance</legend>
                     <background-select :colors.sync="colors" />
@@ -56,6 +57,7 @@ import {FeedModel} from "../models/Feed.js"
 import {feeds, activeUser} from '../store.js'
 import feedDeps from '../dependencies/Feed.js'
 
+import InfoBox from './Gui/InfoBox'
 import FeedInfoSidebar from './FeedInfoSidebar'
 import FeedItem from './FeedItem'
 import FeedContentItemList from './FeedContentItemList'
@@ -73,6 +75,7 @@ export default {
     name: 'feed',
     mixins: [RestfulComponent, PaginatedComponent],
     components: {
+        InfoBox,
         FeedInfoSidebar,
         FeedItem,
         FeedContentItemList,
@@ -100,6 +103,15 @@ export default {
             return this.filters.contentTypes.map((contentType) => {
                 return contentType.enabled ? contentType.name : false
             })
+        },
+        preErrorMessage() {
+            const feedAction = this.action || this.feedAction
+
+            if (['manage', 'create'].includes(feedAction)) {
+                return ""
+            }
+
+            return feedAction === 'create' ? "The feed could not created" : "The feed could not be updated"
         }
     },
     data() {
@@ -146,7 +158,10 @@ export default {
                 interests: [],
                 tags: []
             },
-            contentItems: {}
+            contentItems: {},
+            infoBoxStatus: "",
+            infoBoxMessage: "",
+            infoBoxErrorData: {}
         }
     },
     methods: {
@@ -154,6 +169,9 @@ export default {
             this.instance = { id: null, content_types: [] }
             this.contentItems = {}
             this.instanceForm = { content_types: [], interests: [], visibility: { value: '0', text: 'Public' } }
+            this.infoBoxStatus = ""
+            this.infoBoxMessage = ""
+            this.infoBoxErrorData = {}
         },
 
         create() {
@@ -231,9 +249,6 @@ export default {
                     this.instance = data
                     return data
                 })
-                .catch((error) => {
-                    console.log(error)
-                })
         },
 
         save() {
@@ -242,14 +257,21 @@ export default {
                     console.log(data)
                     router.push(`/feed/${this.instance.id}/details`)
                 })
+                    .catch(async (error) => {
+                        console.log(error)
+                        this.infoBoxStatus = "error"
+                        this.infoBoxErrorData = await error.data
+                    })
             }
             else if (this.actions.create) {
                 this.createFeed()
                     .then(data => this.$nextTick(() => {
                         router.replace('/feed/' + data.id + '/manage')
                     }))
-                    .catch((error) => {
+                    .catch(async (error) => {
                         console.log(error)
+                        this.infoBoxStatus = "error"
+                        this.infoBoxErrorData = await error.data
                     })
             }
         }

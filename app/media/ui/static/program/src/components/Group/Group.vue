@@ -7,8 +7,8 @@
                 <h1>Your Local Groups</h1>
                 <group-list :link="localGroupRedirectLink" :items="items" />
                 <p v-if="items.length == 0">You are not a member of any local groups, <router-link to="search">discover your location</router-link>.<br />
-                None of the local groups that you join will be visible to users not within your local area (< 100 miles).</p>
-            </section>
+                    None of the local groups that you join will be visible to users not within your local area (< 100 miles).</p>
+                                                                                                                  </section>
             <section class="groups" v-if="!isLocalGroups">
                 <h1>Your Groups</h1>
                 <group-list :items="items" />
@@ -29,6 +29,7 @@
         <template v-if="actions.create || actions.manage">
             <group-info-sidebar v-bind="{ isActiveUserMember, isActiveUserOwner, instance}" @editGroup="editGroup" @joinGroup="joinGroup" @leaveGroup="leaveGroup" />
             <form class="main-form" @submit.prevent="save">
+                <info-box :preErrorMessage="preErrorMessage" :message="infoBoxMessage" :errorData="infoBoxErrorData" :status="infoBoxStatus" />
                 <fieldset>
                     <legend class="stack">Appearance</legend>
                     <label class="stack" for="image">Image</label>
@@ -100,6 +101,7 @@ import {GroupModel} from '../../models/Group.js'
 import {groups, accounts, profiles, interests, activeUser, filteredGroups} from '../../store.js'
 import groupDeps from '../../dependencies/Group.js'
 
+import InfoBox from '../Gui/InfoBox'
 import GroupInfoSidebar from './GroupInfoSidebar'
 import ContentItemForm from '../ContentItemForm'
 import AccountSelect from '../AccountSelect'
@@ -117,6 +119,7 @@ import router from "../../router/index.js"
 export default {
     mixins: [RestfulComponent],
     components: {
+        InfoBox,
         GroupInfoSidebar,
         ContentItemForm,
         AccountSelect,
@@ -157,6 +160,15 @@ export default {
                     return this.$store.activeUser.details.member_groups.includes(group.id)
                 })
             }
+        },
+        preErrorMessage() {
+            const groupAction = this.action || this.groupAction
+
+            if (['manage', 'create'].includes(groupAction)) {
+                return ""
+            }
+
+            return groupAction === 'create' ? "The group could not created" : "The group could not be updated"
         }
     },
     data() {
@@ -184,7 +196,10 @@ export default {
             ],
             // TODO make dynamic
             allowedContentTypes: ['Image', 'Topic', 'Poll', 'Link'],
-            contentItems: []
+            contentItems: [],
+            infoBoxStatus: "",
+            infoBoxMessage: "",
+            infoBoxErrorData: {}
         }
     },
     methods: {
@@ -192,6 +207,9 @@ export default {
             this.instance = GroupModel.initialState
             this.instanceForm = { members: [], feed: {} }
             this.contentItems = []
+            this.infoBoxStatus = ""
+            this.infoBoxMessage = ""
+            this.infoBoxErrorData = {}
         },
 
         async contentTypeSelected() {
@@ -300,19 +318,19 @@ export default {
 
         async manageGroup() {
             const groupCollection = await groups()
+            this.instanceForm.feed.name = this.instanceForm.name
+
             return groupCollection.manage(
                 this.instance,
                 this.instanceForm,
                 await groupDeps()
             )
-                .catch((error) => {
-                    console.log(error)
-                })
         },
 
         async createGroup() {
             const user = await activeUser()
 
+            this.instanceForm.feed.name = this.instanceForm.name
             const groupCollection = await groups()
             return groupCollection.create(this.instanceForm, await groupDeps())
                 .then((data) => {
@@ -357,13 +375,25 @@ export default {
         save() {
             if (this.actions.manage) {
                 this.manageGroup().then(() => {
+                    this.infoBoxStatus = "success"
+                    this.infoBoxMessage = "Your changes have been saved"
                     router.go(-1)
                 })
+                    .catch(async (error) => {
+                        console.log(error)
+                        this.infoBoxStatus = "error"
+                        this.infoBoxErrorData = await error.data
+                    })
             }
             else if (this.actions.create) {
                 this.createGroup().then(data => this.$nextTick(() => {
                     router.replace('/group/' + data.id + '/manage')
                 }))
+                    .catch(async (error) => {
+                        console.log(error)
+                        this.infoBoxStatus = "error"
+                        this.infoBoxErrorData = await error.data
+                    })
             }
         }
     }

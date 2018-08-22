@@ -1,7 +1,6 @@
 <template>
     <div>
-        <div :class="info" v-html="infoBox.message">
-        </div>
+        <info-box preErrorMessage="The account could not be created" :message="infoBoxMessage" :errorData="infoBoxErrorData" :status="infoBoxStatus" />
 
         <Modal :isOpen="isModalOpen" :onClose="closeModal" justifyContent="center" :titleProps="{ title: 'Register' }">
             <form id="register-form" @submit.prevent="register">
@@ -37,18 +36,19 @@
 <script>
 import {AccountCollection} from '../models/Account.js'
 import Modal from './Gui/Modal/Modal'
+import InfoBox from './Gui/InfoBox'
 
 export default {
     components: {
-        Modal
+        Modal,
+        InfoBox
     },
     data() {
         return {
             isModalOpen: true,
-            infoBox: {
-                status: "",
-                message: ""
-            },
+            infoBoxStatus: "",
+            infoBoxMessage: "",
+            infoBoxErrorData: {},
             instanceForm: {
                 username: "",
                 display_name: "",
@@ -92,26 +92,14 @@ export default {
                 account_settings: {}
             })
                 .then(() => {
-                    this.infoBox.status = "success"
-                    this.infoBox.message = 'Your account was successfully created. Please login.'
+                    this.infoBoxStatus = "success"
+                    this.infoBoxMessage = 'Your account was successfully created. Please login.'
                     //this.router.navigate home
                 })
                 .catch(async (error) => {
-                    this.infoBox.status = "error"
-                    const errorData = await error.data
-
-                    if (errorData.error) {
-                        this.infoBox.message = 'The account could not be created for the following reason: ' + errorData.error
-                    }
-                    else {
-                        let errorText = "<ul>"
-                        for (let [key, value] of Object.entries(errorData)) {
-                            errorText += `<li><b>${key}</b>: ${value}</li>`
-                        }
-                        errorText += "</ul>"
-                        this.infoBox.message = `The account could not be created for the following reasons: <br> ${errorText}`
-                    }
                     this.registered = false
+                    this.infoBoxStatus = "error"
+                    this.infoBoxErrorData = await error.data
                 })
             //"Please enter the following information below."
         }

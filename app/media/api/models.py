@@ -4,6 +4,7 @@ import requests
 from datetime import datetime
 
 from django.conf import settings
+from django.core.validators import MinLengthValidator
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django.db import models
 from django.db.models.signals import post_delete, pre_save
@@ -71,8 +72,8 @@ class ActivityLog(models.Model):
 
 
 class BlogPost(models.Model):
-    slug = models.SlugField()
-    title = models.CharField(max_length=100)
+    slug = models.SlugField(validators=[MinLengthValidator(5)])
+    title = models.CharField(max_length=100, validators=[MinLengthValidator(1)])
     authors = models.ManyToManyField(Account)
     body = models.TextField()
     objects = api.managers.BlogPostManager()
@@ -94,7 +95,7 @@ USER_ACCESS_LEVELS = (
 )
 
 class Album(models.Model):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, validators=[MinLengthValidator(1)])
     description = models.TextField()
     owner = models.ForeignKey(Account)
     access_level = models.CharField(
@@ -156,7 +157,7 @@ class Interest(ContentTag):
 
 class Place(models.Model):
     owner = models.ForeignKey(Account, null=True)
-    name = models.CharField(max_length=140, blank=True)
+    name = models.CharField(max_length=140, blank=False)
     description = models.TextField(blank=True)
     default_feed = models.ForeignKey('api.Feed', null=True)
     objects = api.managers.PlaceManager()
@@ -224,7 +225,7 @@ class BackgroundMixin(models.Model):
 
 
 class Profile(TaggedItem, BackgroundMixin):
-    display_name = models.CharField(max_length=60, blank=True)
+    display_name = models.CharField(max_length=60)
     title = models.CharField(max_length=140, default="Welcome to my profile!")
     description = models.TextField(blank=True)
     picture = models.URLField(blank=True)
@@ -244,7 +245,7 @@ class Feed(TaggedItem, BackgroundMixin):
     owner = models.ForeignKey(Account, null=True)
     # Whether or not this feed is the owner's primary feed (all owned content)
     default_owner_feed = models.BooleanField(default=False)
-    name = models.CharField(max_length=140, blank=True)
+    name = models.CharField(max_length=140)
     description = models.TextField(blank=True)
     content_types = models.ManyToManyField(FeedContentItemType, related_name='+')
     icon = models.CharField(max_length=25, blank=True)
@@ -297,7 +298,7 @@ class FeedContentItem(TaggedItem):
     owner = models.ForeignKey(Account, blank=True)
     is_anonymous = models.BooleanField(default=False)
     content_type = models.ForeignKey(FeedContentItemType, related_name="+")
-    title = models.CharField(max_length=140, blank=True)
+    title = models.CharField(max_length=140)
     description = models.TextField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -430,7 +431,7 @@ def pre_delete_image(sender, **kwargs):
 
 class GroupForum(models.Model):
     owner = models.ForeignKey(Account, related_name="owned_groups")
-    name = models.CharField(max_length=140, blank=True)
+    name = models.CharField(max_length=140)
     description = models.TextField(blank=True)
     rules = ArrayField(
         models.TextField(blank=True),
