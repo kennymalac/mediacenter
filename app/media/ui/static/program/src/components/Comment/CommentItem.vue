@@ -15,7 +15,7 @@
 
         <p class="text">{{ text }}</p>
         <transition name="list">
-            <div v-if="!minimized" class="nested-comments">
+            <div v-if="!minimized" :class="nestedCommentsClass">
                 <comment-list @reply="reply" :activeUserId="activeUserId" :contentObjectId="contentObjectId" :profileId="profileId" :parentId="id" :items="comments" />
             </div>
         </transition>
@@ -58,6 +58,11 @@ export default {
         }
     },
     computed: {
+        nestedCommentsClass() {
+            return {
+                'nested-comments': this.comments.length
+            }
+        },
         editCommentUrl() {
             return `${this.id}/manage`
         },
