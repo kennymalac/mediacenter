@@ -701,7 +701,7 @@ class GroupForumViewSet(NestedViewSetMixin,
                 'error': 'You have reached the maximum number of Groups for the {} plan'.format(plan.title)
             }, status=400)
 
-        return super(self, GroupForumViewSet).create(request, args, kwargs)
+        return super(GroupForumViewSet, self).create(request, *args, **kwargs)
 
     @list_route(methods=['POST'], url_path='search', permission_classes=[IsAuthenticated])
     def search(self, request):
