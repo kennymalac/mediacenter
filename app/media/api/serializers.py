@@ -894,6 +894,12 @@ class GroupForumCreateUpdateSerializer(GroupForumSerializer):
         required=False
     )
 
+    members = serializers.PrimaryKeyRelatedField(
+        queryset=Account.objects.all(),
+        required=False,
+        many=True
+    )
+
     feed = FeedCreateUpdateSerializer(
         read_only=False
     )
@@ -913,7 +919,7 @@ class GroupForumCreateUpdateSerializer(GroupForumSerializer):
         interests = None
         content_types = None
         places = None
-        print(feed_data)
+        print(validated_data, feed_data)
 
         if 'interests' in feed_data:
             interests = feed_data.pop('interests')

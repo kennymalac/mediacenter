@@ -9,6 +9,9 @@
                 <feed-image @togglePin="() => togglePin(item)" v-if="item.content_type.name == 'img'" :showGroupTag="showGroupTag" :showMenu="showMenu" :item="item" />
             </div>
         </transition-group>
+        <div v-if="pageContent.length == 0">
+            There are no posts here! Check back later.
+        </div>
     </div>
 </template>
 

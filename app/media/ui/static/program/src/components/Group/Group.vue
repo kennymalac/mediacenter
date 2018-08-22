@@ -384,7 +384,7 @@ export default {
             }
             else if (this.actions.create) {
                 this.createGroup().then(data => this.$nextTick(() => {
-                    router.replace('/group/' + data.id + '/manage')
+                    router.replace('/group/' + data.id + '/details')
                 }))
                     .catch(async (error) => {
                         console.log(error)
