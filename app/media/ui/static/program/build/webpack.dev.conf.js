@@ -40,6 +40,7 @@ module.exports = merge(baseWebpackConfig, {
               to: './static/skins'
           }
       ]),
-    new FriendlyErrorsPlugin()
+    new FriendlyErrorsPlugin(),
+    new BundleAnalyzerPlugin()
   ]
 })

@@ -880,7 +880,7 @@ class GroupForumSerializer(GroupForumBasicSerializer):
 
     def get_members(self, instance):
         # Only show members to Group owner
-        if self.context['request'] and self.context['request'].user == instance.owner:
+        if 'request' in self.context and self.context['request'].user == instance.owner:
             return AccountSerializer(instance.members, many=True).data
         return []
 
