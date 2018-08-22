@@ -4,7 +4,7 @@
             <header-menu :loggedIn="loggedIn" />
             <!-- <auth-menu></auth-menu> -->
         </header>
-
+        <intro-modal />
         <transition name="view-fade" mode="out-in">
             <router-view></router-view>
         </transition>
@@ -16,9 +16,14 @@ import Header from './components/Header.vue'
 //import Pager from './pager.js'
 //import 'pure-css'
 import {activeUser} from './store.js'
+import IntroModal from './components/IntroModal'
 
 export default {
     name: 'program',
+    components: {
+        'header-menu': Header,
+        IntroModal
+    },
     async mounted() {
         // this.$store.$observe('activeUser', (activeUser) => {
         //     console.log('huzzah', activeUser)
@@ -36,9 +41,6 @@ export default {
         loggedIn() {
             return this.user.details && this.user.details.id !== 0
         }
-    },
-    components: {
-        'header-menu': Header
     }
 }
 </script>

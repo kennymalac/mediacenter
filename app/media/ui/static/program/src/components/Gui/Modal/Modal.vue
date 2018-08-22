@@ -1,5 +1,5 @@
 <template>
-    <div class="modal" v-show="isOpen">
+    <div class="gui-modal" v-show="isOpen">
         <div class="modal-title">
             <slot name="title" :slotProps="titleProps">
                 <label class="modal-title-text">
@@ -66,7 +66,7 @@ export default {
 
 $modal-title-height: 2.75rem;
 
-.modal {
+.gui-modal {
     border-radius: 3px/2px;
     display: block;
     position: absolute;
@@ -159,7 +159,7 @@ $modal-title-height: 2.75rem;
 /*  /\* icon = camcorder *\/ */
 /* } */
 
-.modal {
+.gui-modal {
     .modal-content {
         display: flex;
         height: calc(100% - #{$modal-title-height});

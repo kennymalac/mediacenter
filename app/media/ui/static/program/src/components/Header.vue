@@ -21,6 +21,7 @@
             <router-link :class="menuClass" to="/gallery/"><i class="ion-ios-image"></i> Gallery</router-link>
             <router-link :class="menuClass" to="/album/"><i class="ion-ios-albums"></i> Albums</router-link>
             <active-user />
+            <label for="modal_1" style="border-radius: 50%; line-height: 1.5rem;" class="button"><i style="font-size: 1.5rem;" class="ion ion-ios-help"></i></label>
         </div>
     </nav>
 </template>
