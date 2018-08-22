@@ -101,6 +101,10 @@ class FullAccountSerializer(AccountSerializer):
 
         profile = Profile.objects.create(**profile_data, account=account)
         account.profile = profile
+
+        plan = Plan.objects.get(name='free')
+        account.plan = plan
+
         account.save()
 
         return account

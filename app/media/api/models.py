@@ -38,6 +38,13 @@ class Account(AbstractUser, GuardianUserMixin):
         verbose_name_plural = 'accounts'
         abstract = False
 
+    def get_plan(self):
+        if not self.plan:
+            self.plan = Plan.objects.get(name='free')
+            self.save()
+
+        return self.plan
+
     def change_profile_details(self, details):
         '''Changes user account profile settings with provided details.'''
         self.profile_details = details

@@ -249,6 +249,12 @@ class PlaceViewSet(ActionPermissionClassesMixin,
                 'error': 'No position provided'
             }, status=400)
 
+        plan = self.request.user.get_plan()
+        if Place.objects.filter(owner=self.request.user).count() >= plan.max_places:
+            return Response({
+                'error': 'You have reached the maximum number of Places for the {} plan'.format(plan.title)
+            }, status=400)
+
         home = Place.objects.create(name="Home", owner=request.user)
         home.save()
 
@@ -335,9 +341,15 @@ class FeedViewSet(NestedViewSetMixin,
 
         return super(FeedViewSet, self).list(request)
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         request.data['owner'] = request.user.id
-        return super(FeedViewSet, self).create(request)
+        plan = self.request.user.get_plan()
+        if Feed.objects.filter(owner=self.request.user, groupforum__isnull=True).count() >= plan.max_feeds:
+            return Response({
+                'error': 'You have reached the maximum number of Feeds for the {} plan'.format(plan.title)
+            }, status=400)
+
+        return super(FeedViewSet, self).create(request, args, kwargs)
 
 
 class FeedContentItemViewSet(RetrieveModelMixin,
@@ -597,7 +609,7 @@ class DiscussionViewSet(NestedViewSetMixin,
                 'error': 'This discussion has no poll'
             }, status=400)
 
-        vote = PollOptionVote.objects.get_or_create(owner=request.user, poll=instance.poll)[0]
+        vote = PollOptionVote.objects.get_or_create(owner=self.request.user, poll=instance.poll)[0]
         options = PollOption.objects.filter(id__in=request.data.get('options', []))
 
         # TODO Polls that allow multiple votes versus only a single vote
@@ -681,6 +693,15 @@ class GroupForumViewSet(NestedViewSetMixin,
     }
     filter_class = GroupForumFilter
     pagination_class = DiscussionPagination
+
+    def create(self, request, *args, **kwargs):
+        plan = self.request.user.get_plan()
+        if GroupForum.objects.filter(owner=self.request.user).count() >= plan.max_owned_groups:
+            return Response({
+                'error': 'You have reached the maximum number of Groups for the {} plan'.format(plan.title)
+            }, status=400)
+
+        return super(self, GroupForumViewSet).create(request, args, kwargs)
 
     @list_route(methods=['POST'], url_path='search', permission_classes=[IsAuthenticated])
     def search(self, request):
