@@ -343,7 +343,7 @@ class FeedViewSet(NestedViewSetMixin,
 class FeedContentItemViewSet(RetrieveModelMixin,
                              GenericViewSet):
 
-    queryset = FeedContentItem.objects.all().order_by('created')
+    queryset = FeedContentItem.objects.all().order_by('-created')
     serializer_class = FeedContentItemSerializer
     pagination_class = FeedContentItemPagination
 
@@ -400,7 +400,7 @@ class FeedContentStashItemViewSet(NestedViewSetMixin,
                                   DestroyModelMixin,
                                   GenericViewSet):
 
-    queryset = FeedContentStashItem.objects.all().order_by('created')
+    queryset = FeedContentStashItem.objects.all().order_by('-item__created')
     serializer_classes = {
         'default': FeedContentStashItemSerializer,
         'partial_update': FeedContentItemCreateUpdateSerializer,
@@ -434,7 +434,7 @@ class FeedContentStashViewSet(NestedViewSetMixin,
                               MultipleSerializerMixin,
                               ModelViewSet):
 
-    queryset = FeedContentStash.objects.all().order_by('created')
+    queryset = FeedContentStash.objects.all().order_by('-created')
     serializer_classes = {
         'default': FeedContentStashSerializer,
         'partial_update': FeedContentStashCreateUpdateSerializer,
@@ -533,7 +533,7 @@ class BaseCommentViewSet(NestedViewSetMixin,
                          MultipleSerializerMixin,
                          ModelViewSet):
 
-    queryset = Comment.objects.all().order_by('created')
+    queryset = Comment.objects.all().order_by('-created')
     serializer_classes = {
         'default': CommentSerializer,
         'partial_update': CommentCreateUpdateSerializer,
@@ -616,7 +616,7 @@ class LinkViewSet(NestedViewSetMixin,
                   MultipleSerializerMixin,
                   ModelViewSet):
 
-    queryset = Link.objects.all().order_by('content_item__created')
+    queryset = Link.objects.all().order_by('-content_item__created')
     serializer_classes = {
         'default': LinkSerializer,
         'partial_update': LinkCreateUpdateSerializer,
@@ -640,7 +640,7 @@ class ImageViewSet(NestedViewSetMixin,
                    MultipleSerializerMixin,
                    ModelViewSet):
 
-    queryset = Image.objects.all().order_by('content_item__created')
+    queryset = Image.objects.all().order_by('-content_item__created')
     serializer_classes = {
         'default': ImageSerializer,
         'partial_update': ImageCreateUpdateSerializer,
@@ -664,7 +664,7 @@ class GroupForumViewSet(NestedViewSetMixin,
                         MultipleSerializerMixin,
                         ModelViewSet):
 
-    queryset = GroupForum.objects.all().order_by('feed__created')
+    queryset = GroupForum.objects.all().order_by('-feed__created')
     serializer_classes = {
         'default': GroupForumSerializer,
         'partial_update': GroupForumCreateUpdateSerializer,

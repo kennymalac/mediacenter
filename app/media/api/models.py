@@ -317,7 +317,7 @@ class Comment(models.Model):
     user_profile = models.ForeignKey(Profile, related_name="comments", null=True)
     is_anonymous = models.BooleanField(default=False)
     parent = models.ForeignKey('self', null=True)
-    text = models.TextField(blank=True)
+    text = models.TextField()
 
 
 class FeedContentStashItem(TaggedItem):

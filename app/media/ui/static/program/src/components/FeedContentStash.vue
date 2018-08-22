@@ -39,7 +39,6 @@ export default {
         return {
             objectName: 'stash',
             instanceForm: { },
-            contentItems: [],
             content: { results: [] },
             showMenu: false
         }
@@ -52,13 +51,12 @@ export default {
     methods: {
         initialState() {
             this.instance = { id: null }
-            this.contentItems = []
             this.instanceForm = { }
         },
 
         async togglePin(item) {
             this.instance.collections.content.togglePin(
-                this.contentItems.find((instance) => { return instance.item.id === item.id }), this.instance.id, await stashDeps())
+                this.content.results.find((instance) => { return instance.item.id === item.id }), this.instance.id, await stashDeps())
         },
 
         async listContentChildren(currentPage, _deps = null) {

@@ -438,7 +438,7 @@ class CommentBasicSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(CommentBasicSerializer):
     owner = AccountSerializer(
-        read_only=True
+        read_only=True,
     )
 
 
@@ -631,7 +631,7 @@ class FeedContentStashContentSerializer(serializers.ModelSerializer):
             content_queryset = content_queryset.filter(interests__in=Interest.objects.filter(id__in=_interests))
 
         paginator = FeedContentItemPagination()
-        page = paginator.paginate_queryset(content_queryset.order_by('-is_pinned'), self.context['request'])
+        page = paginator.paginate_queryset(content_queryset.order_by('-is_pinned', '-item__created'), self.context['request'])
         serializer = FeedContentStashItemSerializer(
             page,
             many=True,
