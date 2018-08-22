@@ -4,7 +4,7 @@
             <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
 
             <section class="posts">
-                <poll-results v-if="instance.poll" :title="instance.content_item.title" :options="instance.poll.options" @vote="votePoll" />
+                <poll-results v-if="instance.poll" :title="instance.content_item.title" :options="instance.poll.options" :userVotes="instance.poll.user_votes" @vote="votePoll" />
 
                 <post v-if="currentPage === 1" v-bind="instance.instance" @editPost="editPost(instance.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" :isActiveUser="activeUserId === instance.content_item.owner.id" />
                 <post v-for="post in posts" v-bind="post.instance" :isActiveUser="activeUserId === post.content_item.owner.id" @editPost="editPost(post.id)" @userProfile="showUserProfile(post.instance.content_item.owner.profile.id)" />
@@ -243,8 +243,9 @@ export default {
             })
         },
 
-        votePoll() {
-
+        async votePoll(selectedOption) {
+            const discussionCollection = await discussions()
+            discussionCollection.votePoll(this.instance, selectedOption, await this.dependencies())
         },
 
         savePoll(_options) {

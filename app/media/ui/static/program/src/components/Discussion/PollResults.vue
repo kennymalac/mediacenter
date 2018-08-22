@@ -5,10 +5,12 @@
             <div class="results" key="0" v-if="showResults">
                 <transition-group name="options" tag="ul" class="result-options">
                     <li :key="index" v-for="(option, index) in options">
-                        <div class="option-title">{{ option.title }} ({{ option.value }} votes)</div>
+                        <div v-if="userVotes.includes(option.id)" class="option-title"><b>{{ option.title }} ({{ option.value }} votes)</b></div>
+                        <div v-else class="option-title">{{ option.title }} ({{ option.value }} votes)</div>
                         <div class="result">
-                            <span :style="{ width: results[index].toString() + '%' }">
-                                <span>{{ results[index].toString() + '%' }}</span>
+                            <span :style="{ width: Math.min(99, results[index]).toString() + '%' }">
+                                <span v-if="userVotes.includes(option.id)"><b>{{ results[index].toString() + '%' }}</b></span>
+                                <span v-else>{{ results[index].toString() + '%' }}</span>
                             </span>
                             <span v-if="results[index] <= 0" :style="{ width: (99 - results[index]).toString() + '%', 'border-top-left-radius': '3px', 'border-bottom-left-radius': '3px'}"></span>
                             <span v-if="results[index] > 0" :style="{ width: (99 - results[index]).toString() + '%' }"></span>
@@ -50,12 +52,25 @@ export default {
     name: 'poll-results',
     props: {
         title: String,
-        options: Array
+        options: Array,
+        userVotes: Array
     },
     data() {
         return {
             checked: false,
             showResults: false
+        }
+    },
+    mounted() {
+        if (this.userVotes.length) {
+            this.showResults = true
+        }
+    },
+    watch: {
+        userVotes(oldVal, newVal) {
+            if (oldVal.length !== newVal) {
+                this.showResults = true
+            }
         }
     },
     computed: {
@@ -121,11 +136,11 @@ export default {
                     position: relative;
                     height: 1.5rem;
                     padding: 0;
+                    border-top-right-radius: 3px;
+                    border-bottom-right-radius: 3px;
                 }
                 span:last-child {
                     background: rgba(0,0,0,0.1);
-                    border-top-right-radius: 3px;
-                    border-bottom-right-radius: 3px;
                 }
                 span:first-child {
                     background: linear-gradient(to right, #ff7600, #ffb819);

@@ -695,10 +695,18 @@ class PollOptionSerializer(serializers.ModelSerializer):
 
 class PollSerializer(serializers.ModelSerializer):
     options = PollOptionSerializer(many=True)
+    user_votes = serializers.SerializerMethodField()
 
     class Meta:
         model = Poll
-        fields = ('id', 'options')
+        fields = ('id', 'options', 'user_votes')
+
+    def get_user_votes(self, instance):
+        if self.context['request'].user.is_authenticated():
+            vote = PollOptionVote.objects.filter(owner=self.context['request'].user, poll=instance)
+            if vote.exists():
+                return [choice.id for choice in list(vote.first().options.all())]
+        return []
 
 
 class DiscussionSerializer(serializers.ModelSerializer):

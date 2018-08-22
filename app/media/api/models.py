@@ -368,6 +368,7 @@ class PollOption(models.Model):
 
 
 class PollOptionVote(models.Model):
+    poll = models.ForeignKey(Poll, related_name="votes")
     options = models.ManyToManyField(PollOption, blank=True, related_name='votes')
     owner = models.ForeignKey(Account, blank=True)
 

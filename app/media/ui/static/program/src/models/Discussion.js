@@ -97,6 +97,21 @@ class DiscussionCollection extends Collection {
             })
     }
 
+    async votePoll(instance, choice, collections) {
+        // TODO multiple choices
+        // const options = instance.options.filter((option) => {
+        //     return option.id !== choice.id
+        // })
+        const newOptions = await makeJsonRequest(`discussion/${instance.id}/vote/`, {
+            method: "POST",
+            body: {
+                options: [choice]
+            }
+        })
+              .then(jsonResponse)
+
+        this.sync(instance, {poll: newOptions}, collections)
+    }
 }
 
 export {DiscussionCollection, DiscussionModel}
