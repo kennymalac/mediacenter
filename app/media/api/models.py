@@ -356,7 +356,7 @@ class FeedContentStash(models.Model):
 
 def setup_default_feed(user):
     feed = Feed.objects.create(name="My Feed".format(user.profile.display_name), description="All of my content".format(user.profile.display_name), picture=user.profile.picture, owner=user, default_owner_feed=True)
-    stash = FeedContentStash.objects.create(name="My Content", description="Anything you upload will be stored here by default")
+    stash = FeedContentStash.objects.create(name="My Content", description="Anything you upload will be stored here by default", origin_feed=feed)
     feed.content_types.add(*list(FeedContentItemType.objects.all()))
     feed.stashes.add(stash)
 
