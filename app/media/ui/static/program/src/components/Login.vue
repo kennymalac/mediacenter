@@ -29,6 +29,7 @@
 
 <script>
 import {auth} from "../auth.js"
+import {activeUser} from "../store"
 //import router from '../router/index.js'
 
 import Modal from './Gui/Modal/Modal'
@@ -53,6 +54,9 @@ export default {
             }
         }
     },
+    async mounted() {
+        this.user = (await activeUser()).details
+    },
     methods: {
         closeModal() {
             this.isModalOpen = false
@@ -60,9 +64,6 @@ export default {
         loggedIn() {
             if (auth.hasActiveUser()) {
                 //TODO this.user=
-                const {username} = auth.getActiveUser().details
-                this.user = {...this.user, username}
-
                 return true
             }
             else {

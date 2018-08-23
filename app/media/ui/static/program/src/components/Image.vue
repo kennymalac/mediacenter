@@ -54,7 +54,7 @@
                         <button @click="instanceForm.src = ''" type="button"><i class="ion ion-ios-camera"></i> Reupload</button>
                     </div>
                     <div v-if="!instanceForm.src">
-                        <file-upload-container @uploaded="(val) => instanceForm.src = val" :instance="instance" mediaType="image" logUploadUri="" :uploader="uploader" :contentForm="instanceForm" :stashId="stashId" />
+                        <file-upload-container @uploaded="(val) => instanceForm.src = val" :instance="instance" mediaType="image" logUploadUri="" :contentForm="instanceForm" :stashId="stashId" />
                     </div>
 
                     <label class="stack" for="interests">Interests</label>
@@ -81,7 +81,6 @@ import InterestSelect from './InterestSelect'
 import PlaceSelect from './PlaceSelect'
 import TagList from './TagList'
 import FileUploadContainer from './FileUploadContainer'
-import Uploader from '../fileUpload.js'
 
 import router from "../router/index.js"
 
@@ -100,8 +99,7 @@ export default {
         return {
             objectName: 'image',
             isActiveUser: false,
-            instanceForm: { content_item: {} },
-            uploader: new Uploader({ baseUrl: "http://localhost:4242" })
+            instanceForm: { content_item: {} }
         }
     },
     methods: {

@@ -22,6 +22,8 @@ import '../progress-polyfill.js'
 import {makeJsonRequest} from '../httputil.js'
 import {ImageModel, ImageCollection} from '../models/Image.js'
 import {images} from '../store.js'
+import {UPLOAD_API_URL} from '../config.js'
+import Uploader from '../fileUpload.js'
 
 import linkDeps from '../dependencies/Link.js'
 
@@ -36,7 +38,6 @@ export default {
             required: false
         },
         stashId: Number,
-        uploader: Object,
         // TODO contentForm should support multiple image uploads
         contentForm: {
             type: Object,
@@ -56,6 +57,7 @@ export default {
     },
     data() {
         return {
+            uploader: new Uploader({ baseUrl: UPLOAD_API_URL }),
             instances: new Map(),
             contentCollection: null,
             progressVal: 0,
