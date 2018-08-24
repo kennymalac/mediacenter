@@ -73,18 +73,20 @@ class DiscussionCollection extends Collection {
     }
 
     async manage(instance, form, collections) {
-        const options = form.poll.options.map((option) => {
-            console.log(option)
-            if (option.id !== undefined && option.value === undefined) {
-                delete option.id
+        if (form.poll) {
+            const options = form.poll.options.map((option) => {
+                if (option.id !== undefined && option.value === undefined) {
+                    delete option.id
+                    return option
+                }
                 return option
-            }
-            return option
-        })
+            })
+            form.poll = { ...form.poll, options }
+        }
         return manage(
             this,
             instance,
-            {...form, poll: { ...form.poll, options }, content_item: serializeContentItem(form)},
+            {...form, content_item: serializeContentItem(form)},
             collections
         )
     }
