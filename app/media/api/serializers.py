@@ -693,6 +693,7 @@ class ContentItemCRUDSerializer(serializers.ModelSerializer):
 
 class PollOptionSerializer(serializers.ModelSerializer):
     value = serializers.SerializerMethodField('get_vote_count')
+    id = serializers.ModelField(model_field=PollOption()._meta.get_field('id'), required=False)
 
     class Meta:
         model = PollOption
@@ -787,6 +788,33 @@ class DiscussionCreateUpdateSerializer(ContentItemCRUDSerializer):
         # discussion.members.add(*member
 
         return discussion
+
+    def update(self, instance, validated_data):
+        if 'poll' in validated_data:
+            poll_data = validated_data.pop('poll')
+            if 'options' in poll_data:
+                poll_options = []
+                serializer = None
+                for option_data in poll_data.pop('options'):
+                    if 'id' in option_data:
+                        option = PollOption.objects.filter(id=option_data.pop('id'))
+                        if not option.count():
+                            continue
+                        option = option.first()
+
+                        serializer = PollOptionSerializer(data=option_data, instance=option)
+                    else:
+                        serializer = PollOptionSerializer(data=option_data)
+
+                    if serializer.is_valid():
+                        serializer.validated_data['poll'] = instance.poll
+                        option = serializer.save()
+                        poll_options.append(option.id)
+                        print(serializer.errors)
+
+                PollOption.objects.filter(poll=instance.poll).exclude(id__in=poll_options).delete()
+
+        return super(DiscussionCreateUpdateSerializer, self).update(instance, validated_data)
 
     class Meta:
         model = Discussion

@@ -20,10 +20,14 @@
                 <p style="text-align: center">
                     Total votes: {{ totalVotes }}
                     <br />
+                    <button v-if="isOwner" type="button" @click="$emit('editPoll')">
+                        <i class="ion-md-create"></i> Edit
+                    </button>
                     <button v-if="!voted" type="button" @click="() => showResults = false">
                         <i class="ion-ios-undo"></i> Cast vote
                     </button>
                 </p>
+
             </div>
             <div class="results" key="1" v-else>
                 <transition-group name="options" tag="ul">
@@ -53,7 +57,8 @@ export default {
     props: {
         title: String,
         options: Array,
-        userVotes: Array
+        userVotes: Array,
+        isOwner: Boolean
     },
     data() {
         return {
@@ -84,6 +89,9 @@ export default {
             })
         },
         totalVotes() {
+            if (!this.options.length) {
+                return 0
+            }
             return this.options.map((i) => { return i.value })
                 .reduce((accumulator, result) => {
                     return accumulator + result

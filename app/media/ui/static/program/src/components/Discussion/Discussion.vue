@@ -4,7 +4,7 @@
             <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
 
             <section class="posts">
-                <poll-results v-if="instance.poll" :title="instance.content_item.title" :options="instance.poll.options" :userVotes="instance.poll.user_votes" @vote="votePoll" />
+                <poll-results v-if="instance.poll" :title="instance.content_item.title" :options="instance.poll.options" :userVotes="instance.poll.user_votes" :isOwner="activeUserId === instance.content_item.owner.id" @vote="votePoll" @editPoll="editPoll" />
 
                 <post v-if="currentPage === 1" v-bind="instance.instance" @editPost="editPost(instance.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" :isActiveUser="activeUserId === instance.content_item.owner.id" />
                 <post v-for="post in posts" v-bind="post.instance" :isActiveUser="activeUserId === post.content_item.owner.id" @editPost="editPost(post.id)" @userProfile="showUserProfile(post.instance.content_item.owner.profile.id)" />
@@ -24,7 +24,8 @@
             <poll-form v-if="creatingPoll && query.step === 2" :title="instanceForm.content_item.title" @save="savePoll" />
         </template>
         <template v-if="actions.manage">
-            <reply @canceled="$router.go(-1)" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="manage" />
+            <poll-form v-if="creatingPoll" :options="instance.poll.options" @save="savePoll" />
+            <reply v-else @canceled="$router.go(-1)" :quick="quickReply" @save="save" :instance="instance" :instanceForm="instanceForm" :parentId="params.parentId" action="manage" />
         </template>
     </div>
 
@@ -120,6 +121,10 @@ export default {
 
         editPost(id) {
             router.push(`../${id}/manage`)
+        },
+
+        editPoll() {
+            router.push(`../${this.instance.id}/manage?poll=true`)
         },
 
         showUserProfile(id) {
