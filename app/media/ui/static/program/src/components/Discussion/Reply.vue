@@ -123,9 +123,9 @@ export default {
                 plugins: [
                     'advlist autolink lists charmap print preview anchor textcolor',
                     'searchreplace visualblocks code fullscreen',
-                    'insertdatetime media table contextmenu paste code help wordcount'
+                    'insertdatetime media image table contextmenu paste code help wordcount'
                 ],
-                toolbar: 'undo redo |  formatselect | bold italic backcolor charmap  | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table | removeformat',
+                toolbar: 'undo redo |  formatselect | bold italic backcolor charmap  | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image table | removeformat',
                 skin: 'lightgray',
                 menubar: false,
                 skin_url: 'static/skins/lightgray',
