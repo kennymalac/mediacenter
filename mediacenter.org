@@ -181,6 +181,9 @@ was created by a less specific serialized endpoint
 
 
 ** Priority 2 (necessary)
+*** Premium membership
+**** TODO custom user titles
+*** TODO My Feed for other users should show only user's posts but otherwise show all the Profile interests relevant
 *** TODO reporting posts for not fitting into interests
 *** TODO figure out incentives for content creators
 
@@ -343,6 +346,7 @@ was created by a less specific serialized endpoint
 ***** TODO Delete
 
 *** Groups
+**** TODO Groups searcheable by name
 **** TODO clickable Group icon in GroupInfoSidebar
 **** DONE FeedContentStashItems comment button is broken
      CLOSED: [2018-07-23 Mon 13:49]
