@@ -68,6 +68,7 @@ class FeedModel extends Model {
         interests: [],
         rules: [],
         content_types: [],
+        has_group: false,
         visibility: {}
     }
 

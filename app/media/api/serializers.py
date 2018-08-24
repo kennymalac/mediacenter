@@ -412,9 +412,14 @@ class FeedSerializer(serializers.ModelSerializer):
         many=True
     )
 
+    has_group = serializers.SerializerMethodField()
+
     class Meta:
         model = Feed
-        fields = ('id', 'name', 'description', 'icon', 'picture', 'owner', 'content_types', 'created', 'interests', 'stashes', 'visibility', 'background_image', 'background_color', 'background_repeat')
+        fields = ('id', 'name', 'description', 'icon', 'picture', 'has_group', 'owner', 'content_types', 'created', 'interests', 'stashes', 'visibility', 'background_image', 'background_color', 'background_repeat')
+
+    def get_has_group(self, instance):
+        return instance.groupforum_set.count() > 0
 
 
 class CommentBasicSerializer(serializers.ModelSerializer):

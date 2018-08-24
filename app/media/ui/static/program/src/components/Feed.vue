@@ -201,7 +201,7 @@ export default {
         async list(params) {
             const store = await feeds()
             this.objects = store.values.filter((feed) => {
-                return feed.name !== ''
+                return !feed.has_group
             })
         },
 
