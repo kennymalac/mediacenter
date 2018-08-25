@@ -32,6 +32,7 @@ export class Collection {
             })
         }
         this.promisedInstances = new Map()
+        this.promisedMutations = new Map()
     }
 
     static async fetchAll(collections, initialData, dataCollections, getters = {}) {
@@ -220,15 +221,24 @@ export class Collection {
         return collection
     }
 
+    addDeferredSync(instance, field, val, promisedCollection, collections = {}) {
+        const deferredSync = async() => {
+            this.collections[field] = await promisedCollection
+            this.sync(instance, {[field]: val}, collections)
+        }
+
+        if (!instance._mutations) {
+            instance._mutations = []
+        }
+        instance._mutations.push(deferredSync())
+    }
+
     diffNestedModelField(instance, field, val, collections = {}, many = false, isPrimaryKeys = false) {
         const collection = this.getNestedCollection(field, instance, collections)
         if (collection instanceof Promise) {
             // This Collection has not resolved yet, the operation needs to be deferred
             // Defer the mutation until the collection resolves
-            collection.then((collectionVal) => {
-                this.collections[field] = collectionVal
-                this.sync(instance, {[field]: val}, collections)
-            })
+            this.addDeferredSync(instance, field, val, collection, collections)
             return [false, undefined]
         }
 
@@ -322,6 +332,15 @@ export class Collection {
 
         changed = Object.keys(changes).length > 0
         return [changed, changes]
+    }
+
+    async resolve(instance) {
+        console.log('awaiting... ', instance._mutations)
+        if (instance._mutations && instance._mutations.length) {
+            await Promise.all(instance._mutations)
+        }
+        instance._mutations = []
+        return instance
     }
 
     sync(instance, data, collections = {}) {

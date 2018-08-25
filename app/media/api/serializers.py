@@ -387,9 +387,14 @@ class FeedCreateUpdateSerializer(serializers.ModelSerializer):
         required=False
     )
 
+    default_owner_feed = serializers.BooleanField(
+        required=False,
+        read_only=True
+    )
+
     class Meta:
         model = Feed
-        fields = ('id', 'name', 'description', 'icon', 'picture', 'owner', 'content_types', 'interests', 'places', 'stashes', 'visibility', 'background_image', 'background_color', 'background_repeat')
+        fields = ('id', 'name', 'description', 'icon', 'picture', 'owner', 'content_types', 'interests', 'places', 'stashes', 'visibility', 'background_image', 'background_color', 'background_repeat', 'default_owner_feed')
 
     def to_representation(self, obj):
         result = super(FeedCreateUpdateSerializer, self).to_representation(obj)
@@ -414,9 +419,14 @@ class FeedSerializer(serializers.ModelSerializer):
 
     has_group = serializers.SerializerMethodField()
 
+    default_owner_feed = serializers.BooleanField(
+        required=False,
+        read_only=True
+    )
+
     class Meta:
         model = Feed
-        fields = ('id', 'name', 'description', 'icon', 'picture', 'has_group', 'owner', 'content_types', 'created', 'interests', 'stashes', 'visibility', 'background_image', 'background_color', 'background_repeat')
+        fields = ('id', 'name', 'description', 'icon', 'picture', 'has_group', 'default_owner_feed', 'owner', 'content_types', 'created', 'interests', 'stashes', 'visibility', 'background_image', 'background_color', 'background_repeat')
 
     def get_has_group(self, instance):
         return instance.groupforum_set.count() > 0

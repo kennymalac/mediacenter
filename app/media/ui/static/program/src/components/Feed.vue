@@ -37,7 +37,11 @@
                     <label class="stack" for="content-types">Content Types</label>
                     <feed-content-type-select v-model="instanceForm.content_types" />
                     <label class="stack" for="interests">Interests</label>
-                    <interest-select v-model="instanceForm.interests" />
+                    <interest-select v-if="!instance.default_owner_feed" v-model="instanceForm.interests" />
+                    <div v-else class="stack" style="border: 1px solid #ccc; padding: 0.3em 0.6em;">
+                        Your profile interests:
+                        <tag-list :tags="instance.owner.profile.interests" tagType="interest" />
+                    </div>
 
                     <!-- <label class="stack" for="">Tags</label> -->
                     <!-- <input class="stack" name="tags" v-model="instanceForm.tags_raw" type="text" /> -->
@@ -66,6 +70,7 @@ import InterestSelect from './InterestSelect'
 import BackgroundSelect from './Gui/BackgroundSelect'
 import ActionList from './ActionList'
 import FeedFilter from './FeedFilter'
+import TagList from './TagList'
 
 import PaginationControls from './PaginationControls'
 
@@ -84,7 +89,8 @@ export default {
         ActionList,
         FeedFilter,
         PaginationControls,
-        BackgroundSelect
+        BackgroundSelect,
+        TagList
     },
     computed: {
         feedStyle() {
@@ -178,7 +184,26 @@ export default {
         },
 
         async manage(params) {
+            // const [feedCollection, profileCollection] = await Promise.all([feeds(), profiles()])
+            // const profile = (await feedCollection.fetchInstance(this.instance, await feedDeps(), false)).owner.instance.profile
             this.instance = await this.showInstance(params.id, 'feed/list', feeds, await feedDeps())
+            const feedCollection = await feeds()
+            await feedCollection.resolve(this.instance)
+
+            // this.$nextTick(async() => {
+            //     const profileCollection = await profiles()
+            //     console.log(instance.owner)
+            //     const profile = this.instance.owner.profile
+
+            //     console.log(profile)
+
+            //     if (!profile.interests.length) {
+            //         // Refetch profile
+            //         // Bug - nested access of this.instance.owner.profile doesn't seem to work
+            //         await profileCollection.fetchInstance(profile, undefined, true)
+            //     }
+            // })
+
             this.instanceForm = this.instance.getForm()
             this.colors.hex = this.instance.background_color ? `#${this.instance.background_color}` : ""
         },

@@ -383,7 +383,7 @@ class FeedContentItemViewSet(RetrieveModelMixin,
             feed = get_object_or_404(Feed, pk=_feed_id)
 
             if feed.default_owner_feed:
-                content_queryset = content_queryset.filter(owner=feed.owner)
+                content_queryset = content_queryset.filter(Q(owner=feed.owner) | Q(interests__in=feed.owner.profile.interests.all()))
 
             if feed.content_types.count() > 0:
                 content_queryset = content_queryset.filter(content_type__in=feed.content_types.all())

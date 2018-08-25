@@ -69,6 +69,7 @@ class FeedModel extends Model {
         rules: [],
         content_types: [],
         has_group: false,
+        default_owner_feed: false,
         visibility: {}
     }
 

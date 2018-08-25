@@ -2,7 +2,6 @@ import {Model, Collection} from './Model.js'
 import {serializeIds} from './serializers.js'
 import {resolveInstances, paginatedList, get, manage} from './generics.js'
 import {InterestCollection} from './Interest.js'
-import {AccountCollection} from './Account.js'
 import {fetchAPI, jsonResponse, makeHeaders} from '../httputil.js'
 
 import BackgroundMixin from './BackgroundMixin.js'
@@ -25,7 +24,7 @@ class ProfileModel extends Model {
 
     static fields = {
         interests: [InterestCollection],
-        account: AccountCollection,
+        account: Collection,
         comments: [Collection]
     }
 }

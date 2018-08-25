@@ -1,6 +1,4 @@
 import {Model, Collection} from './Model.js'
-import {GroupCollection} from './Group'
-import {ProfileCollection} from './Profile'
 import {get, paginatedList} from './generics.js'
 import {makeJsonRequest, jsonResponse} from '../httputil.js'
 
@@ -18,9 +16,9 @@ class AccountModel extends Model {
     }
 
     static fields = {
-        member_groups: [GroupCollection],
-        friends: [AccountCollection],
-        profile: ProfileCollection
+        member_groups: [Collection],
+        friends: [Collection],
+        profile: Collection
     }
 }
 
