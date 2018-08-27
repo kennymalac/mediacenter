@@ -376,7 +376,7 @@ class FeedContentItemViewSet(RetrieveModelMixin,
     @list_route(methods=['POST'], url_path='search', permission_classes=[IsAuthenticated])
     def search(self, request):
         content_queryset = self.get_queryset().\
-            filter(Q(owner=self.request.user) | Q(visibility='0'))
+            filter(Q(owner=self.request.user) | Q(visibility='0')).distinct()
 
         _feed_id = request.data.get('feed', None)
         if _feed_id:
