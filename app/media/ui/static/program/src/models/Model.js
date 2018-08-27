@@ -14,6 +14,15 @@ export async function resolve(resolutions) {
     return await Promise.all([].concat.apply([], resolutions), 0)
 }
 
+// Courtesy: https://stackoverflow.com/users/420097/vincent
+function getNestedValue(obj, str) {
+    return str.split(/\.|\[/g).map(function(crumb) {
+        return crumb.replace(/\]$/, '').trim().replace(/^(["'])((?:(?!\1)[^\\]|\\.)*?)\1$/, (match, quote, str) => str.replace(/\\(\\)?/g, "$1"))
+    }).reduce(function(obj, prop) {
+        return obj ? obj[prop] : undefined
+    }, obj)
+}
+
 export class Collection {
     collections = {}
 
@@ -359,18 +368,25 @@ export class Collection {
         instance.applyDiff(diffTree)
     }
 
-    resolveChildren(parentInstance, modelField, getter, _collections, instance) {
+    resolveChildren(parentInstance, _modelField, getter, _collections, instance) {
         const collections = {..._collections, ...this.collections}
-        if (Array.isArray(parentInstance[modelField])) {
-            if (parentInstance[modelField].length === 0) {
+
+        const [modelField, key] = Array.isArray(_modelField)
+              ? [_modelField.slice(-1), _modelField.join('.')]
+              : [_modelField, _modelField]
+
+        const value = getNestedValue(parentInstance, key)
+
+        if (Array.isArray(value)) {
+            if (value.length === 0) {
                 return []
             }
 
-            const _getter = parentInstance[modelField][0].constructor.parentResource === parentInstance.constructor.resource
+            const _getter = value[0].constructor.parentResource === parentInstance.constructor.resource
                   ? (id, instance) => getter(parentInstance.id, id, collections, instance)
                   : (id, instance) => getter(id, collections, instance)
 
-            return parentInstance[modelField].filter((instance) => {
+            return value.filter((instance) => {
                 if (!instance.instance) {
                     const collection = this.getNestedCollection(modelField, instance, collections)
                     if (collection instanceof Promise) {
@@ -392,12 +408,12 @@ export class Collection {
                 return collections[modelField].fetchInstance(instance, {}, () => _getter(instance.id, instance))
             })
         }
-        else if (parentInstance[modelField].instance._isFake) {
-            const _getter = parentInstance[modelField].constructor.parentResource === parentInstance.constructor.resource
+        else if (value.instance._isFake) {
+            const _getter = value.constructor.parentResource === parentInstance.constructor.resource
                   ? (id, instance) => getter(parentInstance.id, id, instance, collections, instance)
                   : (id, instance) => getter(id, instance, collections, instance)
 
-            return [collections[modelField].fetchInstance(instance, {}, () => _getter(parentInstance[modelField].id, parentInstance[modelField]))]
+            return [collections[modelField].fetchInstance(instance, {}, () => _getter(value.id, value))]
         }
         return []
     }

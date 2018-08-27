@@ -31,7 +31,9 @@ class LinkCollection extends Collection {
     static resource = 'link'
 
     async get(id, collections, instance = null) {
-        return await get(this, id, instance, collections)
+        return await get(this, id, instance, collections, [
+            [['content_item', 'interests'], collections.interests.get.bind(collections.interests)]
+        ])
     }
 
     async manage(instance, form, collections) {
@@ -69,7 +71,7 @@ class LinkCollection extends Collection {
 
     async list(params, collections) {
         return await paginatedList(this, 0, collections, [
-            ['owner', collections.accounts.get.bind(collections.accounts)]
+            [['content_item', 'interests'], collections.interests.get.bind(collections.interests)]
         ])
     }
 

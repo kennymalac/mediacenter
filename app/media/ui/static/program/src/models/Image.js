@@ -31,7 +31,9 @@ class ImageCollection extends Collection {
     static resource = 'image'
 
     async get(id, collections, instance = null) {
-        return await get(this, id, instance, collections)
+        return await get(this, id, instance, collections, [
+            [['content_item', 'interests'], collections.interests.get.bind(collections.interests)]
+        ])
     }
 
     async manage(instance, form, collections) {
