@@ -58,7 +58,7 @@ import RestfulComponent from "./RestfulComponent"
 import PaginatedComponent from "./PaginatedComponent"
 
 import {FeedModel} from "../models/Feed.js"
-import {feeds, activeUser} from '../store.js'
+import {feeds, activeUser, profiles, accounts} from '../store.js'
 import feedDeps from '../dependencies/Feed.js'
 
 import InfoBox from './Gui/InfoBox'
@@ -184,26 +184,15 @@ export default {
         },
 
         async manage(params) {
-            // const [feedCollection, profileCollection] = await Promise.all([feeds(), profiles()])
-            // const profile = (await feedCollection.fetchInstance(this.instance, await feedDeps(), false)).owner.instance.profile
+            const [feedCollection] = await Promise.all([feeds()])
             this.instance = await this.showInstance(params.id, 'feed/list', feeds, await feedDeps())
-            const feedCollection = await feeds()
             await feedCollection.resolve(this.instance)
-
-            // this.$nextTick(async() => {
-            //     const profileCollection = await profiles()
-            //     console.log(instance.owner)
-            //     const profile = this.instance.owner.profile
-
-            //     console.log(profile)
-
-            //     if (!profile.interests.length) {
-            //         // Refetch profile
-            //         // Bug - nested access of this.instance.owner.profile doesn't seem to work
-            //         await profileCollection.fetchInstance(profile, undefined, true)
-            //     }
-            // })
-
+            if (this.instance.owner.instance._isFake || this.instance.owner.profile.interests.length === 0) {
+                const accountCollection = await accounts()
+                const profile = await profiles()
+                await accountCollection.get(this.instance.owner.id, { profile })
+                await profile.get(this.instance.owner.profile.id)
+            }
             this.instanceForm = this.instance.getForm()
             this.colors.hex = this.instance.background_color ? `#${this.instance.background_color}` : ""
         },

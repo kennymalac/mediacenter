@@ -248,7 +248,9 @@ export default {
         },
 
         async manage(params) {
+            const groupCollection = await groups()
             this.instance = await this.showInstance(params.id, `/group/${params.id}/details`, groups, await groupDeps())
+            await groupCollection.resolve(this.instance)
             this.instanceForm = this.instance.getForm()
         },
 

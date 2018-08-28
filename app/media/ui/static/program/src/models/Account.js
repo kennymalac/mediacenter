@@ -38,7 +38,9 @@ class AccountCollection extends Collection {
     }
 
     async get(id, collections, instance = null) {
-        return await get(this, id, instance, {...collections, friends: this})
+        return await get(this, id, instance, {...collections, friends: this}, [
+            ['profile', collections.profile.get.bind(collections.profile)]
+        ])
     }
 
     static create(data) {

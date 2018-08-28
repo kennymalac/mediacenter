@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 function mutateInstance(mutation) {
     const [instance, diff] = mutation
     const [changed, changes] = diff
@@ -239,7 +241,11 @@ export class Collection {
         if (!instance._mutations) {
             instance._mutations = []
         }
-        instance._mutations.push(deferredSync())
+        const i = instance._mutations.length
+        instance._mutations.push(() => {
+            deferredSync()
+            instance._mutations[i] = undefined
+        })
     }
 
     diffNestedModelField(instance, field, val, collections = {}, many = false, isPrimaryKeys = false) {
@@ -343,12 +349,39 @@ export class Collection {
         return [changed, changes]
     }
 
-    async resolve(instance) {
-        console.log('awaiting... ', instance._mutations)
-        if (instance._mutations && instance._mutations.length) {
-            await Promise.all(instance._mutations)
-        }
+    async getInstanceMutations(instance) {
+        await Promise.all(instance._mutations || [])
+    }
+
+    clearMutations(instance, parent = null, typeCheck = null) {
         instance._mutations = []
+        for (const [modelField, val] of Object.entries(instance.constructor.fields)) {
+            // Skip for recursive relations
+            if (parent !== null && instance[modelField].id === parent && typeCheck(instance[modelField])) {
+                continue
+            }
+
+            if (Array.isArray(val)) {
+                for (const item of instance[modelField]) {
+                    this.clearMutations(item, instance.id, instance.constructor.isInstance.bind(this))
+                }
+            }
+            else {
+                this.clearMutations(instance[modelField], instance.id, instance.constructor.isInstance.bind(this))
+            }
+        }
+    }
+
+    async resolve(_instance) {
+        const instance = this.getInstance(_instance, {}, false)
+        console.log('awaiting... ', instance.owner.profile)
+        // Resolve nested model mutations
+        const promisedMutations = instance._mutations || []
+        if (promisedMutations.length) {
+            await Promise.all(promisedMutations)
+            this.clearMutations(instance)
+        }
+
         return instance
     }
 
@@ -429,6 +462,20 @@ export class Model {
         this.instance = {...instance}
 
         for (const field of Object.keys(this.constructor.initialState)) {
+            // Convert the field if there is a conversion function specified for this field
+            if (field in this.constructor.fieldConverters) {
+                Object.defineProperty(this, field, {
+                    get: () => { return this.instance[field] },
+                    set: (val) => { this.instance[field] = this.constructor.fieldConverters[field](val) }
+                })
+            }
+            else {
+                Object.defineProperty(this, field, {
+                    get: () => { return this.instance[field] },
+                    set: (val) => { Vue.set(this.instance, field, val) }
+                })
+            }
+
             // No empty members!
             if (this.instance[field] === null || this.instance[field] === undefined) {
                 // This is a partial instance
@@ -453,20 +500,6 @@ export class Model {
                     console.log(`WARNING: non-fake Model instance field ${field} is missing from collections!`)
                 }
             }
-            // Convert the field if there is a conversion function specified for this field
-            else if (field in this.constructor.fieldConverters) {
-                this.instance[field] = this.constructor.fieldConverters[field](this.instance[field])
-                Object.defineProperty(this, field, {
-                    get: () => { return this.instance[field] },
-                    set: (val) => { this.instance[field] = this.constructor.fieldConverters[field](val) }
-                })
-                continue
-            }
-
-            Object.defineProperty(this, field, {
-                get: () => { return this.instance[field] },
-                set: (val) => { this.instance[field] = val }
-            })
         }
     }
 
@@ -475,9 +508,12 @@ export class Model {
         if (Number.isInteger(this.instance[field]) || Number.isInteger(this.instance[field].id)) {
             if (collections[field] instanceof Promise) {
                 // This is a deferred collection
-                collections[field].then((collection) => {
+                this._mutations = this._mutations || []
+                const i = this._mutations.length
+                this._mutations.push(collections[field].then((collection) => {
                     this.instance[field] = collection.getInstance(this.instance[field], {...collections, [field]: collection})
-                })
+                    this._mutations[i + 1] = undefined
+                }))
             }
             else {
                 this.instance[field] = collections[field].getInstance(this.instance[field], collections)
@@ -486,9 +522,12 @@ export class Model {
         // Multiple instances or multiple primary keys
         else if (Array.isArray(this.constructor.fields[field])) {
             if (collections[field] instanceof Promise) {
-                collections[field].then((collection) => {
+                this._mutations = this._mutations || []
+                const i = this._mutations.length
+                this._mutations.push(collections[field].then((collection) => {
                     this.instance[field] = collection.getInstances(this.instance[field], {...collections, [field]: collection})
-                })
+                    this._mutations[i + 1] = undefined
+                }))
             }
             else {
                 this.instance[field] = collections[field].getInstances(this.instance[field], collections)

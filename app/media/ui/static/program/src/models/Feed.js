@@ -105,7 +105,9 @@ class FeedCollection extends Collection {
     static resource = 'feed'
 
     async get(id, collections, instance = null) {
-        return await get(this, id, instance, collections)
+        return await get(this, id, instance, collections, [
+            [['owner', 'profile'], collections.profile.get.bind(collections.profile)]
+        ])
     }
 
     create(form, collections) {
