@@ -353,23 +353,8 @@ export class Collection {
         await Promise.all(instance._mutations || [])
     }
 
-    clearMutations(instance, parent = null, typeCheck = null) {
+    clearMutations(instance) {
         instance._mutations = []
-        for (const [modelField, val] of Object.entries(instance.constructor.fields)) {
-            // Skip for recursive relations
-            if (parent !== null && instance[modelField].id === parent && typeCheck(instance[modelField])) {
-                continue
-            }
-
-            if (Array.isArray(val)) {
-                for (const item of instance[modelField]) {
-                    this.clearMutations(item, instance.id, instance.constructor.isInstance.bind(this))
-                }
-            }
-            else {
-                this.clearMutations(instance[modelField], instance.id, instance.constructor.isInstance.bind(this))
-            }
-        }
     }
 
     async resolve(_instance) {
@@ -420,7 +405,7 @@ export class Collection {
                   : (id, instance) => getter(id, collections, instance)
 
             return value.filter((instance) => {
-                if (!instance.instance) {
+                if (!instance.instance || instance.instance._isFake) {
                     const collection = this.getNestedCollection(modelField, instance, collections)
                     if (collection instanceof Promise) {
                         // The instance's collection has not been resolved yet
@@ -435,7 +420,7 @@ export class Collection {
                     // Try to get an instance
                     instance = collection.getInstance(instance, collections)
                 }
-                return instance.instance._isFake
+                return instance.instance._isFake || !instance.instance
             }).map((instance) => {
                 //console.log(instance.id)
                 return collections[modelField].fetchInstance(instance, {}, () => _getter(instance.id, instance))
