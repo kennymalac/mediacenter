@@ -18,6 +18,7 @@ class FeedContentItemModel extends Model {
         group_name: "",
         is_anonymous: false,
         is_local: false,
+        last_child: {},
         interests: [],
         places: [],
         comments: [],
@@ -32,6 +33,7 @@ class FeedContentItemModel extends Model {
 
     static fields = {
         owner: AccountCollection,
+        last_child: Collection,
         comments: [Collection],
         interests: [Collection],
         places: [Collection],
@@ -60,6 +62,11 @@ class FeedContentStashItemModel extends Model {
 class FeedContentItemCollection extends Collection {
 
     static Model = FeedContentItemModel
+
+    constructor(instance, collections = {}) {
+        super(instance, collections)
+        this.collections.last_child = this
+    }
 }
 
 class FeedContentStashItemCollection extends Collection {
@@ -75,7 +82,7 @@ class FeedContentStashItemCollection extends Collection {
             ..._collections
         })
 
-        this.collections = _collections
+        this.collections = Object.assign({}, this.collections, _collections)
     }
 
     togglePin(instance, stashId, collections = {}) {

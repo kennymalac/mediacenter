@@ -1,5 +1,5 @@
 <template>
-    <content-item :embed="embedProps" v-bind="item.instance" @togglePin="$emit('togglePin')" :showMenu="showMenu" :showGroupTag="showGroupTag" :detailsUrl="detailsUrl" :commentsUrl="commentsUrl" :groupId="item.group_id" :groupName="item.group_name" :isPinned="item.is_pinned" :isLocal="item.is_local" :owner="item.owner.instance">
+    <content-item :embed="embedProps" v-bind="item.instance" @togglePin="$emit('togglePin')" :showMenu="showMenu" :showGroupTag="showGroupTag" :detailsUrl="detailsUrl" :commentsUrl="commentsUrl" :groupId="item.group_id" :groupName="item.group_name" :isPinned="item.is_pinned" :isLocal="item.is_local" :owner="item.owner.instance" :isAnonymous="item.is_anonymous" :lastChild="item.last_child">
         <span slot="content-type" :class="{ 'content-type': true, [subtype.toLowerCase()]: true }">{{ subtype }}</span>
         <template slot="embed" slot-scope="{ slotProps }">
             <div class="default-preview topic">
@@ -64,12 +64,13 @@ export default {
 <style lang="scss">
 .content-title {
     .content-type {
+        width: 2.5rem;
         display: inline-flex;
         border-radius: 6px;
         background-color: #1F8DD6;
         color: white;
         font-weight: normal;
-        height: 2rem;
+        height: 1.8rem;
         // align-self: flex-start;
         font-size: .8rem;
         &.poll {

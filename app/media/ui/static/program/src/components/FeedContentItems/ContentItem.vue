@@ -1,33 +1,45 @@
 <template>
-    <div class="content-item">
+    <div class="content-item" :class="contentItemClass">
         <slot name="title">
             <div class="content-title">
-                <slot name="content-type">
-                </slot>
+                <div class="content-title-inner">
+                    <slot name="content-type">
+                    </slot>
 
-                <slot name="content-link">
-                    <router-link class="header" :to="detailsUrl"> {{ title }}</router-link>
-                </slot>
+                    <slot name="content-link">
+                        <router-link class="header" :to="detailsUrl"> {{ title }}</router-link>
+                    </slot>
 
-                <context-menu v-if="showMenu" :menuItems="menuItems" />
-                <context-menu v-if="!showMenu" class="hidden" :menuItems="[]" />
+                    <context-menu v-if="showMenu" :menuItems="menuItems" />
+                    <context-menu v-if="!showMenu" class="hidden" :menuItems="[]" />
+                </div>
             </div>
         </slot>
-        <span v-if="isPinned" class="pinned">Pinned</span>
 
-        <router-link href="#" :to="userProfile" class="author">{{ owner.profile.display_name }}</router-link>
+        <div class="content-item-inner">
+            <div v-if="groupId && showGroupTag" style="color: grey; font-size: .8rem;">
+                Group: <tag-list className="tag-box" :tags="[{name: groupName, id: groupId}]" tagType="group" />
+                <span v-if="isLocal" class="local-tag"><i class="ion-ios-pin"></i> Local</span>
+            </div>
 
-        <span class="date">
-            {{ created.fromNow() }}
-            <span class="local-tag" v-if="isLocal"><i class="ion-ios-pin"></i> Local</span>
-            <span v-if="groupId && showGroupTag">
-                <span v-html="'&nbsp;in'"></span>
-                <tag-list className="tag-box" :tags="[{name: groupName, id: groupId}]" tagType="group" />
+            <div v-if="!groupId && isLocal" class="local-tag"><i class="ion-ios-pin"></i> Local</div>
+
+            <span class="date">
+                <router-link v-if="!isAnonymous" href="#" :to="userProfile" class="author">{{ owner.profile.display_name }}</router-link>
+                <span v-else>Anonymous</span>
+                <span style="padding-left: 5px"> {{ created.fromNow() }}</span>
             </span>
-        </span>
 
-        <slot name="embed" :slotProps="embedProps">
-        </slot>
+            <div style="color: grey; font-size: .8rem;" v-if="lastChild && lastChild.id">
+                <span style="padding-right: 5px">{{ lastChild.title }}</span>
+                <router-link v-if="!lastChild.is_anonymous" href="#" :to="lastChildUserProfile" class="author">{{ lastChild.owner.profile.display_name }}</router-link>
+                <span v-else>Anonymous</span>
+                <span style="padding-left: 5px"> {{ lastChild.created.fromNow() }}</span>
+            </div>
+
+            <slot name="embed" :slotProps="embedProps">
+            </slot>
+        </div>
         <div class="actions">
             <router-link tag="div" v-if="commentsUrl" :to="commentsUrl" class="action">
                 <i class="icon ion-md-chatbubbles"></i>
@@ -60,7 +72,15 @@ export default {
         owner: {
             type: Object
         },
+        lastChild: {
+            type: Object,
+            required: false
+        },
         isPinned: {
+            type: Boolean,
+            default: false
+        },
+        isAnonymous: {
             type: Boolean,
             default: false
         },
@@ -95,6 +115,11 @@ export default {
         embedProps: [Object]
     },
     computed: {
+        contentItemClass() {
+            return {
+                pinned: this.isPinned
+            }
+        },
         menuItems() {
             return [
                 {
@@ -117,6 +142,12 @@ export default {
         },
         userProfile() {
             return { name: 'Profile', params: { profileId: this.owner.profile.id, profileAction: 'details' } }
+        },
+        lastChildUserProfile() {
+            if (this.lastChild && this.lastChild.id && !this.lastChild.is_anonymous) {
+                console.log(this.lastChild)
+                return { name: 'Profile', params: { profileId: this.lastChild.owner.profile.id, profileAction: 'details' } }
+            }
         }
     },
     methods: {
@@ -131,8 +162,17 @@ export default {
 <style lang="scss">
 @import "~picnic/src/themes/default/_theme.scss";
 $actions-height: 70px;
-$title-height: 56px;
+$title-height: 72px;
 
+.content-item.pinned::after {
+    position: absolute;
+    top: -5px; bottom: -3px;
+    left: -3px; right: -3px;
+    background: linear-gradient(to bottom, #F7DF1E, #F7A31E, #2c3e50 40%);
+    content: '';
+    z-index: -1;
+    border-radius: 4px / 5px;
+}
 .content-item {
     vertical-align: top;
     background-color: white;
@@ -140,8 +180,10 @@ $title-height: 56px;
     margin: 10px;
     display: inline-flex;
     flex-direction: column;
-    border: 2px solid rgba(52, 73, 94,1.0);
-    border-radius: 4px / 5px;
+    &:not(.pinned) {
+        border: 3px solid rgba(52, 73, 94,1.0);
+        border-radius: 4px / 5px;
+    }
     width: 333px;
     height: 280px;
 
@@ -159,9 +201,8 @@ $title-height: 56px;
     }
 
     .content-title {
-        justify-content: space-between;
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
 
         &:hover, &:focus {
             box-shadow: inset 0 0 0 99em rgba(255, 255, 255, 0.05);
@@ -169,12 +210,18 @@ $title-height: 56px;
 
         color: white;
         background: linear-gradient(180deg, #001f3f, rgba(52, 73, 94,1.0));
+    }
 
+    .content-title-inner {
+        width: 100%;
+        justify-content: space-between;
+        display: flex;
+        flex-direction: row;
         padding-top: 5px;
         padding-bottom: 5px;
         height: $title-height;
-        font-size: 1.5rem;
-        line-height: 1.5rem;
+        font-size: 1.25rem;
+        line-height: 1.25rem;
         font-weight: lighter;
         width: 100%;
         .header { margin-left: auto; }
@@ -182,7 +229,9 @@ $title-height: 56px;
             &.hidden { visibility: hidden; }
             margin-left: auto;
         }
+        i { font-size: 1.5rem; }
         .content-type {
+            font-size: .8rem;
             display: inline-flex;
             border-radius: 6px;
             background: linear-gradient(#2dabff 70%, #1F8DD6);
@@ -190,7 +239,6 @@ $title-height: 56px;
             font-weight: normal;
             padding: 4px;
             margin-left: 8px;
-            font-size: .8rem;
         }
         a {
             color: white;
@@ -201,23 +249,14 @@ $title-height: 56px;
         }
     }
 
-    .pinned {
-        color: white;
-        background: linear-gradient(135deg, #F7DF1E, #F7A31E);
+    .content-item-inner {
         padding-top: 5px;
-        padding-bottom: 5px;
-        text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
-        font-weight: 600;
-        text-align: center;
-        justify-content: center;
-        align-items: center;
-        font-size: .8rem;
-        display: flex;
     }
 
     .date {
         display: inline-flex;
         position: relative;
+        font-size: .8rem;
         padding-top: .25em;
         align-self: center;
         color: grey;

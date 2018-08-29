@@ -498,6 +498,15 @@ class FeedContentItemBasicSerializer(serializers.ModelSerializer):
 
         return result
 
+
+class FeedContentItemOwnerSerializer(FeedContentItemBasicSerializer):
+    owner = AccountBasicSerializer()
+
+    class Meta:
+        model = FeedContentItem
+        fields = ('id', 'title', 'owner', 'is_anonymous', 'created')
+
+
 def get_content_id(instance):
     _model = None
     if instance.content_type.name == FeedContentItemType.TOPIC or \
@@ -534,6 +543,7 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
     group_id = serializers.SerializerMethodField()
     group_name = serializers.SerializerMethodField()
     is_local = serializers.SerializerMethodField()
+    last_child = serializers.SerializerMethodField()
     nested_object = serializers.SerializerMethodField()
     # content_type = serializers.StringRelatedField(
     #     required=False
@@ -541,7 +551,7 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'is_anonymous', 'is_local', 'content_type', 'comments', 'created', 'object_id', 'origin_stash_id', 'feed_id', 'group_id', 'group_name', 'nested_object', 'visibility', 'interests')
+        fields = ('id', 'title', 'description', 'owner', 'is_anonymous', 'is_local', 'last_child', 'content_type', 'comments', 'created', 'object_id', 'origin_stash_id', 'feed_id', 'group_id', 'group_name', 'nested_object', 'visibility', 'interests')
 
     def get_content_id(self, instance):
         return get_content_id(instance)
@@ -571,6 +581,15 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
                 return True
 
         return False
+
+    def get_last_child(self, instance):
+        if instance.content_type.name == FeedContentItemType.TOPIC or \
+           instance.content_type.name == FeedContentItemType.POLL:
+            print(Discussion.objects.filter(parent=Discussion.objects.get(content_item=instance)))
+            last_post = Discussion.objects.filter(parent=Discussion.objects.get(content_item=instance))\
+                                      .annotate(max_order=Max('order')).order_by('-max_order')
+            if last_post.exists():
+                return FeedContentItemOwnerSerializer(instance=last_post.first().content_item).data
 
     def get_nested_object(self, instance):
         """Returns a nested representation of the content item's object"""
