@@ -30,9 +30,7 @@
                     <button type="button" @click="editImage">
                         <i class="ion-md-create"></i> Edit
                     </button>
-                    <button type="button" class="error">
-                        <i class="ion-md-close"></i> Delete
-                    </button>
+                    <delete-button objectName="image" @delete="deleteImage" />
                 </div>
             </div>
             <h2 class="align-left">Comments</h2>
@@ -82,6 +80,8 @@ import PlaceSelect from './PlaceSelect'
 import TagList from './TagList'
 import FileUploadContainer from './FileUploadContainer'
 
+import DeleteButton from './Gui/DeleteButton'
+
 import router from "../router/index.js"
 
 export default {
@@ -93,7 +93,8 @@ export default {
         InterestSelect,
         PlaceSelect,
         TagList,
-        FileUploadContainer
+        FileUploadContainer,
+        DeleteButton
     },
     data() {
         return {
@@ -140,6 +141,12 @@ export default {
             this.instance = await this.showInstance(params.id, '/feed/list', images, await imageDeps(this.stashId))
             const user = await activeUser()
             this.isActiveUser = this.instance.content_item.owner.id === user.details.id
+        },
+
+        async deleteImage() {
+            const imagesCollection = await images()
+            await imagesCollection.destroy(this.instance, await imageDeps(this.stashId))
+            router.replace('../../../..')
         },
 
         async manageImage() {
