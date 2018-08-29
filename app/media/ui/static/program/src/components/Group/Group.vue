@@ -16,7 +16,7 @@
             </section>
         </template>
         <template v-if="actions.details && instance && instance.id">
-            <group-info-sidebar v-bind="{ isActiveUserMember, isActiveUserOwner, instance }" @editGroup="editGroup" @joinGroup="joinGroup" @leaveGroup="leaveGroup" @details="viewGroup" />
+            <group-info-sidebar v-bind="{ isActiveUserMember, isActiveUserOwner, instance }" @editGroup="editGroup" @joinGroup="joinGroup" @leaveGroup="leaveGroup" @details="viewGroup" :showEdit="true" />
             <div class="group-contents">
                 <div v-if="!params.discussionAction && !params.linkAction && !params.imageAction && isActiveUserMember">
                     <content-item-form :stash="resolvedStash" :groupId="instance.id" :feedId="instance.feed.id" :contentTypes="allowedContentTypes" @contentTypeSelected="contentTypeSelected" />
@@ -26,8 +26,8 @@
                 </transition>
             </div>
         </template>
-        <template v-if="(actions.create || actions.manage) && instance && instance.id">
-            <group-info-sidebar v-bind="{ isActiveUserMember, isActiveUserOwner, instance }" @editGroup="editGroup" @joinGroup="joinGroup" @leaveGroup="leaveGroup"  @details="viewGroup" />
+        <template v-if="actions.create || (actions.manage && instance && instance.id)">
+            <group-info-sidebar v-bind="{ isActiveUserMember, isActiveUserOwner, instance }" @editGroup="editGroup" @joinGroup="joinGroup" @leaveGroup="leaveGroup"  @details="viewGroup" :showJoin="actions.manage" />
             <form class="main-form" @submit.prevent="save">
                 <info-box :preErrorMessage="preErrorMessage" :message="infoBoxMessage" :errorData="infoBoxErrorData" :status="infoBoxStatus" />
                 <fieldset>

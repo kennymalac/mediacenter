@@ -20,14 +20,14 @@
                 </ol>
             </div>
 
-            <button type="button" v-if="isActiveUserOwner" @click="$emit('editGroup')">
+            <button type="button" v-if="showEdit && isActiveUserOwner" @click="$emit('editGroup')">
                 <i class="ion-md-create"></i> Edit
             </button>
 
-            <button type="button" v-if="!isActiveUserMember && !instance.is_restricted" @click="$emit('joinGroup')">
+            <button type="button" v-if="showJoin && !isActiveUserMember && !instance.is_restricted" @click="$emit('joinGroup')">
                 <i class="ion-ios-contacts"></i> Join
             </button>
-            <context-menu style="display: inline" v-if="isActiveUserMember" :menuItems="leaveMenuItems">
+            <context-menu style="display: inline" v-if="showJoin && isActiveUserMember" :menuItems="leaveMenuItems">
                 <button type="button" slot="button" class="warning">
                     <i class="ion-md-exit"></i> Leave
                 </button>
@@ -49,6 +49,14 @@ export default {
     props: {
         isActiveUserMember: [Boolean],
         isActiveUserOwner: [Boolean],
+        showEdit: {
+            type: Boolean,
+            default: false
+        },
+        showJoin: {
+            type: Boolean,
+            default: true
+        },
         instance: [Object]
     },
     computed: {
