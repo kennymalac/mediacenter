@@ -28,9 +28,7 @@
                     <button type="button" @click="editLink">
                         <i class="ion-md-create"></i> Edit
                     </button>
-                    <button type="button" class="error">
-                        <i class="ion-md-close"></i> Delete
-                    </button>
+                    <delete-button objectName="link" @delete="deleteLink" />
                 </div>
             </div>
             <h2 class="align-left">Comments</h2>
@@ -70,6 +68,8 @@ import InterestSelect from './InterestSelect'
 import PlaceSelect from './PlaceSelect'
 import TagList from './TagList'
 
+import DeleteButton from './Gui/DeleteButton'
+
 import router from "../router/index.js"
 
 export default {
@@ -80,7 +80,8 @@ export default {
         Comment,
         InterestSelect,
         PlaceSelect,
-        TagList
+        TagList,
+        DeleteButton
     },
     data() {
         return {
@@ -129,6 +130,12 @@ export default {
             this.instance = await this.showInstance(params.id, '/feed/list', links, await linkDeps(this.stashId))
             const user = await activeUser()
             this.isActiveUser = this.instance.content_item.owner.id === user.details.id
+        },
+
+        async deleteLink() {
+            const linksCollection = await links()
+            await linksCollection.destroy(this.instance, await linkDeps(this.stashId))
+            router.replace('../../../..')
         },
 
         async manageLink() {

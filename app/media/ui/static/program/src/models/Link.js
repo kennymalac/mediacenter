@@ -1,7 +1,7 @@
 import {Model, Collection} from './Model.js'
 import {serializeContentItem} from './serializers.js'
 import {makeJsonRequest, jsonResponse, fetchAPI} from '../httputil.js'
-import {get, manage, paginatedList} from './generics.js'
+import {get, manage, destroy, paginatedList} from './generics.js'
 import {FeedContentItemCollection} from './FeedContentItem'
 import {FeedContentStashModel} from './FeedContentStash'
 
@@ -67,6 +67,10 @@ class LinkCollection extends Collection {
         this.sync(instance, created, collections)
 
         return instance
+    }
+
+    async destroy(instance, collections) {
+        return await destroy(this, instance, collections)
     }
 
     async list(params, collections) {

@@ -141,7 +141,7 @@ export default {
             await discussionCollection.destroy(instance, await this.dependencies())
             if (instance.id === this.instance.id) {
                 // The topic was deleted, so redirect out of here
-                router.push(`..`)
+                router.replace(`..`)
             }
         },
 
