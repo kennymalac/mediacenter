@@ -12,14 +12,14 @@
             </section>
         </template>
         <template v-if="actions.details && instance.id">
-            <feed-info-sidebar :instance="instance" @editFeed="editFeed" @details="viewFeed" :isActiveUserOwner="isActiveUserOwner" />
+            <feed-info-sidebar :instance="instance" @editFeed="editFeed" @details="viewFeed" :isActiveUserOwner="isActiveUserOwner" :showEdit="true" />
             <section class="feed" v-if="!params.stashId">
                 <feed-content-item-list :query="query" @listChildren="listContentChildren" :enabledContentTypes="enabledContentTypes" :items="contentItems" />
             </section>
             <router-view v-if="params.stashId" :stashId="params.stashId" :feedId="params.feedId"></router-view>
         </template>
         <template v-if="actions.create || actions.manage">
-            <feed-info-sidebar :instance="instance" @editFeed="editFeed" @details="viewFeed" :isActiveUserOwner="isActiveUserOwner" />
+            <feed-info-sidebar :instance="instance" @details="viewFeed" :isActiveUserOwner="isActiveUserOwner" :showDelete="actions.manage" @deleteFeed="deleteFeed" />
             <form class="main-form" @submit.prevent="save">
                 <info-box :preErrorMessage="preErrorMessage" :message="infoBoxMessage" :errorData="infoBoxErrorData" :status="infoBoxStatus" />
                 <fieldset>
@@ -246,6 +246,12 @@ export default {
 
         toggle(event) {
             console.log(event)
+        },
+
+        async deleteFeed() {
+            const feedsCollection = await feeds()
+            await feedsCollection.destroy(this.instance, await feedDeps(this.stashId))
+            router.replace('/feed/list')
         },
 
         async createFeed() {

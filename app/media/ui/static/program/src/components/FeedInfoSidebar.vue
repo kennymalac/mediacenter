@@ -12,9 +12,11 @@
 
             <p class="description">{{ instance.description }}</p>
 
-            <button type="button" v-if="isActiveUserOwner" @click="$emit('editFeed')">
+            <button type="button" v-if="showEdit && isActiveUserOwner" @click="$emit('editFeed')">
                 <i class="ion-md-create"></i> Edit
             </button>
+
+            <delete-button v-if="showDelete && isActiveUserOwner && !instance.is_local && !instance.default_owner_feed" objectName="feed" @delete="$emit('deleteFeed')" />
 
             <!-- <h3>Filters</h3> -->
             <!-- <feed-filter :specifiers="filters.contentTypes" :filterToggled="toggle" /> -->
@@ -27,12 +29,21 @@
 
 <script>
 import TagList from './TagList'
+import DeleteButton from './Gui/DeleteButton'
 
 export default {
-    components: {TagList},
+    components: {TagList, DeleteButton},
     props: {
         isActiveUserOwner: [Boolean],
-        instance: [Object]
+        instance: [Object],
+        showEdit: {
+            type: Boolean,
+            default: false
+        },
+        showDelete: {
+            type: Boolean,
+            default: false
+        }
     }
 }
 </script>

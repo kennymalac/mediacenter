@@ -1,7 +1,7 @@
 import {momentDate, choice, visibilityChoices} from './converters.js'
 import {Model, Collection} from './Model.js'
 import {serializeIds} from './serializers.js'
-import {get, manage, paginatedList, resolveInstances} from './generics.js'
+import {get, manage, destroy, paginatedList, resolveInstances} from './generics.js'
 import {AccountCollection} from './Account'
 import {FeedContentTypeCollection} from './FeedContentType'
 import {InterestCollection} from './Interest'
@@ -128,6 +128,10 @@ class FeedCollection extends Collection {
 
                 return instance
             })
+    }
+
+    async destroy(instance, collections) {
+        return await destroy(this, instance, collections)
     }
 
     manage(instance, form, collections) {
