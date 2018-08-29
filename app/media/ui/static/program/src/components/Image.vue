@@ -19,12 +19,12 @@
                     </div>
                 </div>
                 <p class="text">
-                    <a :href="instance.image">{{ instance.image }}</a><br />
                     <span v-if="instance.content_item.interests.length">Interests:</span>
                     <tag-list :tags="instance.content_item.interests" tagType="interest" /><br />
-                    <p>{{ instance.content_item.description }}</p>
+                    <span>{{ instance.content_item.description }}</span>
+                    <br/>
 
-                    <img v-if="instance.src" :src="instance.src" />
+                    <img style="margin-top: 20px; max-width: 100%" v-if="instance.src" :src="instance.src" />
                 </p>
                 <div class="actions" v-if="isActiveUser">
                     <button type="button" @click="editImage">
@@ -177,5 +177,8 @@ export default {
 .image-container {
     height: calc(100vh - 60px);
     overflow: scroll;
+    .post p.text {
+        padding: 10px 20px;
+    }
 }
 </style>

@@ -38,7 +38,7 @@
                     <feed-content-type-select v-model="instanceForm.content_types" />
                     <label class="stack" for="interests">Interests</label>
                     <interest-select v-if="!instance.default_owner_feed" v-model="instanceForm.interests" />
-                    <div v-else class="stack" style="border: 1px solid #ccc; padding: 0.3em 0.6em;">
+                    <div v-else class="stack" style="background-color: white; border: 1px solid #ccc; padding: 0.3em 0.6em;">
                         Your profile interests:
                         <tag-list :tags="instance.owner.profile.interests" tagType="interest" />
                     </div>
