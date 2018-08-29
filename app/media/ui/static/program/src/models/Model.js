@@ -38,15 +38,16 @@ export class Collection {
         this.collections = {...this.collections, ...collections}
 
         this.values = this.store
-        this.values.all = (filter = () => true) => {
+        this.values.all = (qFilter = () => true) => {
             return this.values.filter((value) => {
-                return !value.instance._isFake && filter(value)
+                return !value.instance._isFake && qFilter(value)
             })
         }
         this.values$ = new Subject()
         this.values$.all = (qFilter = () => true) => {
             return this.values$.pipe(
-                filter(value => !value.instance._isFake && qFilter(value))
+                filter(values =>
+                       values.filter(value => !value.instance._isFake && qFilter(value)))
             )
         }
         this.values$.next(this.store)

@@ -7,7 +7,7 @@ class GroupForumFilter(filters.FilterSet):
 
     class Meta:
         model = GroupForum
-        fields = ('members', 'interests')
+        fields = ('name', 'members', 'interests')
 
 
 class DiscussionFilter(filters.FilterSet):

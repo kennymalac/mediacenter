@@ -734,6 +734,10 @@ class GroupForumViewSet(NestedViewSetMixin,
         if interests.count():
             group_queryset = group_queryset.filter(feed__interests__in=interests)
 
+        name = request.data.get('name', None)
+        if name:
+            group_queryset = group_queryset.filter(name__contains=name)
+
         # NOTE private groups shouldn't show in list action either
         # TODO make default list action more secure
         serializer = GroupForumSerializer(group_queryset.filter(feed__visibility='0'), many=True)

@@ -71,7 +71,9 @@
                 <form class="search-form">
                     <!-- <restriction-widget :place="place" v-if="isLocalGroups" /> -->
                     <fieldset>
-                        <label class="stack" for="interests">Interests</label>
+                        <label class="stack" for="group__search__name">Name</label>
+                        <input class="stack" name="group__search__name" v-model="filteredName" type="text" />
+                        <label class="stack" for="group__search__interests">Interests</label>
                         <interest-select v-model="filteredInterests" />
                         <button class="stack" type="button" @click="searchGroups">
                             Search
@@ -82,12 +84,12 @@
             <section class="groups" v-if="isLocalGroups">
                 <h1>Find Local Groups</h1>
                 <group-list :items="filteredObjects" />
-                <p v-if="filteredObjects.length == 0">No local groups were found, why not <router-link to="create">create one</router-link>?</p>
+                <p v-if="searchResultsEmpty">No local groups were found, why not <router-link to="create">create one</router-link>?</p>
             </section>
             <section class="groups" v-if="!isLocalGroups">
                 <h1>Find Groups</h1>
                 <group-list :items="filteredObjects" />
-                <p v-if="filteredObjects.length == 0">No groups were found, why not <router-link to="create">create one</router-link>?</p>
+                <p v-if="searchResultsEmpty">No groups were found, why not <router-link to="create">create one</router-link>?</p>
             </section>
         </template>
     </transition>
@@ -177,6 +179,7 @@ export default {
             instance: GroupModel.constructor.initialState,
             instanceForm: { members: [], feed: {} },
             resolvedStash: {},
+            filteredName: "",
             filteredInterests: [],
             filteredObjects: [],
             isActiveUserMember: false,
@@ -194,6 +197,7 @@ export default {
                     title: "Find a Group"
                 }
             ],
+            searchResultsEmpty: false,
             // TODO make dynamic
             allowedContentTypes: ['Image', 'Topic', 'Poll', 'Link'],
             contentItems: [],
@@ -307,7 +311,8 @@ export default {
             this.$store.filteredGroups = {}
 
             const qs = {
-                interests: this.filteredInterests
+                interests: this.filteredInterests,
+                name: this.filteredName
             }
             if (this.isLocalGroups) {
                 qs.place = this.place.id
@@ -315,7 +320,12 @@ export default {
 
             this.$store.groupFilterParams = qs
             const store = await filteredGroups()
-            this.filteredObjects = store.values
+            store.values$.all().subscribe((values) => {
+                this.filteredObjects = values
+                if (values.length === 0) {
+                    this.searchResultsEmpty = true
+                }
+            })
         },
 
         search(params) {

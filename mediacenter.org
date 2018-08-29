@@ -64,8 +64,10 @@ was created by a less specific serialized endpoint
 **** TODO improve zero states
 
 *** UI/UX fixes
-**** TODO make My Feed show interests from Profile
-**** TODO image scaling issues
+**** DONE make My Feed show interests from Profile
+     CLOSED: [2018-08-29 Wed 07:44]
+**** DONE image scaling issues
+     CLOSED: [2018-08-29 Wed 07:44]
 **** DONE user list should have profile images
      CLOSED: [2018-08-20 Mon 20:32]
 **** DONE some sort of grid system & layout
@@ -329,6 +331,7 @@ was created by a less specific serialized endpoint
 **** TODO reordering pinned items
 
 *** FeedContentItems
+**** TODO sorting by last posted / last commented
 **** TODO unlisted feedcontentitems
 **** TODO private feedcontentitems
 **** TODO sort by time posted
@@ -348,12 +351,15 @@ was created by a less specific serialized endpoint
 ***** TODO Delete
 
 *** Groups
-**** TODO Groups searcheable by name
-**** TODO clickable Group icon in GroupInfoSidebar
+**** DONE Groups searchable by name
+     CLOSED: [2018-08-29 Wed 09:36]
+**** DONE clickable Group icon in GroupInfoSidebar
+     CLOSED: [2018-08-29 Wed 08:58]
 **** DONE FeedContentStashItems comment button is broken
      CLOSED: [2018-07-23 Mon 13:49]
 **** TODO hide local Groups from Feeds
-**** TODO tagged content within groups
+**** DONE tagged content within groups
+     CLOSED: [2018-08-29 Wed 07:50]
 **** TODO only members can create new Posts, comment in Group Topic
 **** DONE Group tags should link to group's stash
      CLOSED: [2018-05-31 Thu 14:58]
@@ -374,7 +380,7 @@ was created by a less specific serialized endpoint
      CLOSED: [2018-05-14 Mon 11:07]
 **** DONE group list should only show authenticated user's groups by default
      CLOSED: [2018-05-11 Fri 16:03]
-**** TODO should adding interests to groups make any content items default to those interests?
+**** TODO +should adding interests to groups make any content items default to those interests?+
 **** TODO Creating FeedContentItems
 **** DONE interests tagged
      CLOSED: [2018-05-10 Thu 13:04]
