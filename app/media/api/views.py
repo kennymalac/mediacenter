@@ -421,8 +421,8 @@ class FeedContentStashItemViewSet(NestedViewSetMixin,
     }
     action_permission_classes = {
         'default': [IsAuthenticated, IsParentFeedContentStashNotPrivateOrOwner, IsFeedContentStashItemOwnerOrPublicOrUnlisted],
-        'update': [IsAuthenticated, IsFeedContentStashItemOwner],
-        'partial_update': [IsAuthenticated, IsFeedContentStashItemOwner],
+        'update': [IsAuthenticated, IsStashItemOriginFeedOwner],
+        'partial_update': [IsAuthenticated, IsStashItemOriginFeedOwner],
         'destroy': [IsAuthenticated, IsFeedContentStashItemOwner]
     }
     pagination_class = FeedContentItemPagination

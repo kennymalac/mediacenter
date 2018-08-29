@@ -108,6 +108,11 @@ class IsOriginFeedOwner(permissions.BasePermission):
         return obj.origin_feed and obj.origin_feed.owner == request.user
 
 
+class IsStashItemOriginFeedOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.stash.origin_feed and obj.stash.origin_feed.owner == request.user
+
+
 class IsFeedContentStashItemOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.item.owner and obj.item.owner == request.user
