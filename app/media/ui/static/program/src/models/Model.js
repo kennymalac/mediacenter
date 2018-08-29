@@ -1,4 +1,5 @@
-import Vue from 'vue'
+import {Subject} from 'rxjs'
+import {filter} from 'rxjs/operators'
 
 function mutateInstance(mutation) {
     const [instance, diff] = mutation
@@ -36,12 +37,19 @@ export class Collection {
         })
         this.collections = {...this.collections, ...collections}
 
-        this.values = new Proxy(this.store, {})
+        this.values = this.store
         this.values.all = (filter = () => true) => {
             return this.values.filter((value) => {
                 return !value.instance._isFake && filter(value)
             })
         }
+        this.values$ = new Subject()
+        this.values$.all = (qFilter = () => true) => {
+            return this.values$.pipe(
+                filter(value => !value.instance._isFake && qFilter(value))
+            )
+        }
+        this.values$.next(this.store)
         this.promisedInstances = new Map()
         this.promisedMutations = new Map()
     }
@@ -188,8 +196,26 @@ export class Collection {
     addInstance(data, collections) {
         const instance = new this.constructor.Model({...data}, {...collections, ...this.collections})
         this.storedIds.push(data.id)
+
         this.store.push(instance)
+        this.values$.next(this.store)
         return instance
+    }
+
+    deleteInstance(instance, collections) {
+        if (!this.storedIds.includes(instance.id)) {
+            return
+        }
+        const id = instance.id
+        const i = this.values.findIndex((item) => {
+            return item.id === id
+        })
+
+        this.store.splice(i, 1)
+        this.storedIds = this.storedIds.filter((itemId) => {
+            return itemId !== id
+        })
+        this.values$.next(this.store)
     }
 
     addFakeInstance(id) {
@@ -201,6 +227,7 @@ export class Collection {
 
         this.storedIds.push(id)
         this.store.push(instance)
+        this.values$.next(this.store)
         return instance
     }
 
@@ -359,7 +386,6 @@ export class Collection {
 
     async resolve(_instance) {
         const instance = this.getInstance(_instance, {}, false)
-        console.log('awaiting... ', instance.owner.profile)
         // Resolve nested model mutations
         const promisedMutations = instance._mutations || []
         if (promisedMutations.length) {
@@ -457,7 +483,7 @@ export class Model {
             else {
                 Object.defineProperty(this, field, {
                     get: () => { return this.instance[field] },
-                    set: (val) => { Vue.set(this.instance, field, val) }
+                    set: (val) => { this.instance[field] = val }
                 })
             }
 
@@ -497,7 +523,7 @@ export class Model {
                 const i = this._mutations.length
                 this._mutations.push(collections[field].then((collection) => {
                     this.instance[field] = collection.getInstance(this.instance[field], {...collections, [field]: collection})
-                    this._mutations[i + 1] = undefined
+                    this._mutations.slice(i + 1, 1)
                 }))
             }
             else {
@@ -511,7 +537,7 @@ export class Model {
                 const i = this._mutations.length
                 this._mutations.push(collections[field].then((collection) => {
                     this.instance[field] = collection.getInstances(this.instance[field], {...collections, [field]: collection})
-                    this._mutations[i + 1] = undefined
+                    this._mutations.slice(i + 1, 1)
                 }))
             }
             else {

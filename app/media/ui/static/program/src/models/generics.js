@@ -37,7 +37,6 @@ export async function get(collection, id, instance = null, collections = {}, chi
 }
 
 export async function getNested(collection, id, parentId, instance = null, collections = {}, children = []) {
-    console.log('depito', id, parentId, instance)
     return getResource(`${collection.constructor.parentResource}/${parentId}/${collection.constructor.resource}/${id}/`, collection, instance, collections, children)
 }
 
@@ -124,4 +123,18 @@ export async function makeFilteredCollection(CollectionType, queryset, _deps, re
     )
 
     return collection
+}
+
+export async function destroyResource(uri, collection, instance, collections = {}) {
+    return makeJsonRequest(uri, {
+        method: "DELETE",
+        headers: makeHeaders({})
+    })
+        .then(() => {
+            collection.deleteInstance(instance, collections)
+        })
+}
+
+export function destroy(collection, instance, collections = {}) {
+    return destroyResource(`${collection.constructor.resource}/${instance.id}/`, collection, instance, collections)
 }

@@ -64,6 +64,8 @@ was created by a less specific serialized endpoint
 **** TODO improve zero states
 
 *** UI/UX fixes
+**** TODO make My Feed show interests from Profile
+**** TODO image scaling issues
 **** DONE user list should have profile images
      CLOSED: [2018-08-20 Mon 20:32]
 **** DONE some sort of grid system & layout
@@ -391,7 +393,8 @@ was created by a less specific serialized endpoint
 ***** TODO Delete
 
 *** Discussion
-**** TODO Reply should scroll to bottom
+**** DONE Reply should scroll to bottom
+     CLOSED: [2018-08-28 Tue 17:06]
 **** TODO is_restricted
 **** DONE anonymous replies
      CLOSED: [2018-06-18 Mon 16:29]
@@ -423,14 +426,16 @@ checkbox to show on all pages y/n?
 **** TODO anchor links for individual posts
 **** DONE model, serializer, viewset
      CLOSED: [2018-05-08 Tue 14:31]
-**** TODO CRUD
+**** DONE CRUD
+     CLOSED: [2018-08-28 Tue 17:05]
 ***** DONE Create
       CLOSED: [2018-05-08 Tue 14:32]
 ***** DONE Read
       CLOSED: [2018-05-08 Tue 14:32]
 ***** DONE Update
       CLOSED: [2018-05-24 Thu 18:18]
-***** TODO Delete
+***** DONE Delete
+      CLOSED: [2018-08-28 Tue 17:05]
 
 *** Comments
 **** TODO reply should scroll to top, after reply, scroll to comment in question

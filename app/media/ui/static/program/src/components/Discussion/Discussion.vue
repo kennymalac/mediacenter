@@ -6,8 +6,10 @@
             <section class="posts">
                 <poll-results v-if="instance.poll" :title="instance.content_item.title" :options="instance.poll.options" :userVotes="instance.poll.user_votes" :isOwner="activeUserId === instance.content_item.owner.id" @vote="votePoll" @editPoll="editPoll" />
 
-                <post v-if="currentPage === 1" v-bind="instance.instance" @editPost="editPost(instance.id)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" :isActiveUser="activeUserId === instance.content_item.owner.id" />
-                <post v-for="post in posts" v-bind="post.instance" :isActiveUser="activeUserId === post.content_item.owner.id" @editPost="editPost(post.id)" @userProfile="showUserProfile(post.instance.content_item.owner.profile.id)" />
+                <post v-if="currentPage === 1" v-bind="instance.instance" @editPost="editPost(instance.id)" @deletePost="deletePost(instance)" @userProfile="showUserProfile(instance.content_item.owner.profile.id)" :isActiveUser="activeUserId === instance.content_item.owner.id" />
+                <transition-group name="list" tag="div" class="posts">
+                    <post :key="post.id" v-for="post in posts" v-bind="post.instance" :isActiveUser="activeUserId === post.content_item.owner.id" @editPost="editPost(post.id)" @deletePost="deletePost(post.instance)" @userProfile="showUserProfile(post.instance.content_item.owner.profile.id)" />
+                </transition-group>
 
                 <div class="reply">
                     <button @click="activateQuickReply">Quick Reply</button>
@@ -32,6 +34,9 @@
 </template>
 
 <script>
+import {from} from 'rxjs'
+import {map} from 'rxjs/operators'
+
 import RestfulComponent from "../RestfulComponent"
 import PaginatedComponent from "../PaginatedComponent"
 import {activeUser, discussions, accounts, groups, interests, places, stashes, profiles, feedContentTypes, comments} from "../../store.js"
@@ -75,11 +80,6 @@ export default {
         },
         discussionLink() {
         },
-        posts() {
-            return this.objects.filter((item) => {
-                return item.parent === this.instance.id && this.isItemVisibleOnPage(item)
-            })
-        },
         quickReplyParams() {
             return {
                 parentId: this.instance.id,
@@ -96,31 +96,53 @@ export default {
             quickReplyActive: false,
             activeUserId: 0,
             pollOptions: [],
+            posts: [],
             instanceForm: { content_item: {} }
+        }
+    },
+    mounted() {
+        if (this.quickReply) {
+            this.$watch('params', (params) => {
+                this.instanceForm = {...this.instanceForm, content_item: {...this.instanceForm.content_item, title: `Re: ${this.params.parentTitle}`}}
+            }, { deep: true, immediate: true })
         }
     },
     methods: {
         initialState() {
             this.instance = { id: null, content_item: { feeds: [] } }
-            this.instanceForm = { content_item: {}, text: "" }
+            this.instanceForm = { content_item: { interests: [] }, text: "" }
+        },
+
+        scrollBottom() {
+            const postsContainer = this.$el.querySelector("section.posts")
+            postsContainer.scrollTop = postsContainer.scrollHeight
         },
 
         activateQuickReply() {
             this.quickReplyActive = true
-            this.$nextTick(() => {
-                const postsContainer = this.$el.querySelector("section.posts")
-                postsContainer.scrollTop = postsContainer.scrollHeight
-            })
+
+            this.instanceForm.content_item.interests = []
+            this.$nextTick(this.scrollBottom)
         },
 
         quickReplied() {
             this.quickReplyActive = false
             ++this.itemCount
             this.selectPage(this.pageCount)
+            this.$nextTick(this.scrollBottom)
         },
 
         editPost(id) {
             router.push(`../${id}/manage`)
+        },
+
+        async deletePost(instance) {
+            const discussionCollection = await discussions()
+            await discussionCollection.destroy(instance, await this.dependencies())
+            if (instance.id === this.instance.id) {
+                // The topic was deleted, so redirect out of here
+                router.push(`..`)
+            }
         },
 
         editPoll() {
@@ -129,6 +151,17 @@ export default {
 
         showUserProfile(id) {
             router.push(`/profile/${id}/details`)
+        },
+
+        setCurrentPosts() {
+            return map(items => {
+                items = items.filter((item) => {
+                    return item.parent === this.instance.id && this.isItemVisibleOnPage(item)
+                })
+
+                this.posts = items
+                return items
+            })
         },
 
         async create() {
@@ -142,7 +175,7 @@ export default {
             }
 
             await discussions()
-            if (this.params.parentTitle) {
+            if (this.params && this.params.parentId) {
                 this.instanceForm = {...this.instanceForm, content_item: {...this.instanceForm.content_item, title: `Re: ${this.params.parentTitle}`}}
             }
 
@@ -185,20 +218,43 @@ export default {
         async listChildren(deps = null) {
             const _deps = deps || await this.dependencies()
             const discussionCollection = await discussions()
-            this.paginate(await discussionCollection.list({ parent: this.instance.id, page: this.currentPage }, _deps))
-            if (this.query.last) {
-                this.selectPage(this.pageCount)
-            }
+            from(discussionCollection.list({ parent: this.instance.id, page: this.currentPage }, _deps))
+                .pipe(
+                    map(resp => {
+                        this.paginate(resp)
+                        if (this.query.last) {
+                            this.selectPage(this.pageCount)
+                            if (this.query.created) {
+                                this.$nextTick(() => {
+                                    this.scrollBottom()
+                                })
+                            }
+                        }
+                        resp = resp.results
+                        return resp
+                    }),
+                    this.setCurrentPosts()
+                )
+                .subscribe()
         },
 
         async details(params) {
             const deps = await this.dependencies()
             this.instance = await this.showInstance(params.id, '/feed/list', discussions, deps)
+            const discussionCollection = await discussions()
+            discussionCollection.resolve(this.instance)
 
             const user = await activeUser()
             this.activeUserId = user.details.id
+            await this.listChildren(deps)
 
-            this.listChildren(deps)
+            if (this.query && this.query.created) {
+                this.scrollBottom()
+            }
+
+            this.$subscribeTo(this.objects$.pipe(
+                this.setCurrentPosts()
+            ))
         },
 
         async manageDiscussion() {
@@ -297,7 +353,8 @@ export default {
                                 id: this.params.parentId ? this.params.parentId : data.id
                             },
                             query: {
-                                last: 1
+                                last: 1,
+                                created: true
                             }
                         })
                     }
@@ -318,6 +375,16 @@ textarea {
 section.posts {
     height: calc(100vh - 220px);
     overflow: scroll;
+    &.list-enter-active, &.list-leave-active,
+    .list-enter-active, .list-leave-active {
+        transition: all .5s;
+    }
+    &.list-enter, &.list-leave-to,
+    .list-enter, .list-leave-to  {
+        border-left-color: white;
+        opacity: 0;
+        transform: translateY(-30px);
+    }
 }
 .reply {
     margin: 10px;

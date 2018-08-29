@@ -21,7 +21,8 @@ export default {
     data() {
         return {
             instance: {},
-            objects: []
+            objects: [],
+            objects$: []
         }
     },
     mounted() {
@@ -58,6 +59,7 @@ export default {
             if (this.objects.length === 0 && collection !== undefined) {
                 const store = await collection()
                 this.objects = store.values
+                this.objects$ = store.values$
             }
 
             if (this.objects.length !== 0) {

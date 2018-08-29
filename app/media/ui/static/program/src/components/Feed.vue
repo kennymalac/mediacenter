@@ -19,7 +19,7 @@
             <router-view v-if="params.stashId" :stashId="params.stashId" :feedId="params.feedId"></router-view>
         </template>
         <template v-if="actions.create || actions.manage">
-            <feed-info-sidebar :instance="instance" @editFeed="editFeed" :isActiveUserOwner="isActiveUserOwner" />
+            <feed-info-sidebar :instance="instance" @editFeed="editFeed" @details="viewFeed" :isActiveUserOwner="isActiveUserOwner" />
             <form class="main-form" @submit.prevent="save">
                 <info-box :preErrorMessage="preErrorMessage" :message="infoBoxMessage" :errorData="infoBoxErrorData" :status="infoBoxStatus" />
                 <fieldset>
@@ -186,6 +186,9 @@ export default {
         async manage(params) {
             const [feedCollection] = await Promise.all([feeds()])
             this.instance = await this.showInstance(params.id, 'feed/list', feeds, await feedDeps())
+            const user = await activeUser()
+            this.isActiveUserOwner = this.instance.owner.id === user.details.id
+
             await feedCollection.resolve(this.instance)
             if (this.instance.owner.instance._isFake || this.instance.owner.profile.interests.length === 0) {
                 const accountCollection = await accounts()

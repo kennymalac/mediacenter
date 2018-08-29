@@ -27,15 +27,20 @@
             <button type="button" @click="$emit('editPost')">
                 <i class="ion-md-create"></i> Edit
             </button>
-            <button type="button" class="error">
-                <i class="ion-md-close"></i> Delete
-            </button>
+            <context-menu style="display: inline" :menuItems="deleteMenuItems">
+                <button type="button" slot="button" class="error">
+                    <i class="ion-md-close"></i> Delete
+                </button>
+            </context-menu>
         </div>
     </div>
 </template>
 
 <script>
+import ContextMenu from '../Gui/ContextMenu'
+
 export default {
+    components: {ContextMenu},
     props: {
         content_item: {
             type: Object
@@ -53,6 +58,16 @@ export default {
         userTitle: {
             type: String,
             default: "User"
+        }
+    },
+    data() {
+        return {
+            deleteMenuItems: [
+                {
+                    name: "Yes, delete this post",
+                    action: () => this.$emit('deletePost')
+                }
+            ]
         }
     }
 }

@@ -1,5 +1,6 @@
 *.desktop
 *.desktop.lock
+app/media/media/settings/production.py
 app/bin/*
 app/lib/*
 app/include/*

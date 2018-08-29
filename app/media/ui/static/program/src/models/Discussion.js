@@ -1,7 +1,7 @@
 import {Model, Collection} from './Model.js'
 import {serializeContentItem, serializeIds} from './serializers.js'
 import {makeJsonRequest, jsonResponse, fetchAPI} from '../httputil.js'
-import {get, manage, paginatedList} from './generics.js'
+import {get, manage, destroy, paginatedList} from './generics.js'
 import {FeedContentItemCollection} from './FeedContentItem'
 import {FeedContentStashModel} from './FeedContentStash'
 import {momentDate} from './converters.js'
@@ -121,6 +121,10 @@ class DiscussionCollection extends Collection {
               .then(jsonResponse)
 
         this.sync(instance, {poll: newOptions}, collections)
+    }
+
+    async destroy(instance, collections) {
+        return await destroy(this, instance, collections)
     }
 }
 

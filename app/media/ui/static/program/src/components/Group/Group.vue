@@ -15,7 +15,7 @@
                 <p v-if="items.length == 0">You are not a member of any groups, join a group and it will be listed here.</p>
             </section>
         </template>
-        <template v-if="actions.details && instance.id">
+        <template v-if="actions.details && instance && instance.id">
             <group-info-sidebar v-bind="{ isActiveUserMember, isActiveUserOwner, instance }" @editGroup="editGroup" @joinGroup="joinGroup" @leaveGroup="leaveGroup" @details="viewGroup" />
             <div class="group-contents">
                 <div v-if="!params.discussionAction && !params.linkAction && !params.imageAction && isActiveUserMember">
