@@ -331,7 +331,7 @@ class FeedViewSet(NestedViewSetMixin,
         'destroy': [IsAuthenticated, IsOwner]
     }
     filter_class = FeedFilter
-    pagination_class = FeedContentItemPagination
+    pagination_class = FeedPagination
 
     def list(self, request):
         if 'owner' in request.query_params:
@@ -412,7 +412,7 @@ class FeedContentStashItemViewSet(NestedViewSetMixin,
                                   DestroyModelMixin,
                                   GenericViewSet):
 
-    queryset = FeedContentStashItem.objects.all().order_by('-item__created')
+    queryset = FeedContentStashItem.objects.all()
     serializer_classes = {
         'default': FeedContentStashItemSerializer,
         'partial_update': FeedContentItemCreateUpdateSerializer,
@@ -437,7 +437,9 @@ class FeedContentStashItemViewSet(NestedViewSetMixin,
         else:
             qs = qs.filter(~Q(item__visibility='9'))
 
-        return qs.restrict_local(user=self.request.user)
+        qs = qs.restrict_local(user=self.request.user)
+
+        return qs
 
 
 class FeedContentStashViewSet(NestedViewSetMixin,

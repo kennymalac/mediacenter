@@ -40,6 +40,7 @@ export default {
             objectName: 'stash',
             instanceForm: { },
             content: { results: [] },
+            order: "-updated",
             showMenu: false
         }
     },
@@ -65,7 +66,7 @@ export default {
             const resp = await FeedContentStashModel.listContent(
                 this.instance,
                 this.feedId,
-                {page: currentPage || 1},
+                {page: currentPage || 1, order: this.order},
                 deps,
                 this.content.length)
             this.content = resp
@@ -78,6 +79,14 @@ export default {
             await this.listContentChildren(this.query.page, {...deps, stashes: this.$store.stashes})
             // const user = await activeUser()
             this.showMenu = true
+
+            this.$store.$observe('feedContentItemListSortingOption', (val) => {
+                if (val) {
+                    console.log(val)
+                    this.order = val
+                    this.listContentChildren(1)
+                }
+            })
         },
 
         async list(params) {

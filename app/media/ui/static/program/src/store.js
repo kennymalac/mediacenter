@@ -36,6 +36,7 @@ export const initialState = {
     links: {},
     images: {},
     groups: {},
+    feedContentItemListSortingOption: "-updated",
     groupFilterParams: {},
     filteredGroups: {},
     activityLogs: {},
@@ -257,6 +258,11 @@ store.singleton(
     value => value !== undefined
 )
 
+export const feedContentItemListSortingOption = store.singleton(
+    'feedContentItemListSortingOption',
+    value => value !== undefined
+)
+
 export const groups = groupCollection('groups', activeUserGroups, ['activeUser'])
 export const filteredGroups = groupCollection('filteredGroups', filterGroups, ['groupFilterParams'])
 
@@ -299,7 +305,6 @@ export const filteredActivityLogs = activityLogCollection('filteredActivityLogs'
 export const storePlugin = {
     install(Vue) {
         Vue.prototype.$store = proxiedStore
-        Vue.prototype.$store.$observe = store.observe.bind(store)
         // for debugging
         window.store = store
         Vue.prototype.$resetStore = () => {

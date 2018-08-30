@@ -1,6 +1,9 @@
 <template>
     <div class="feed-content-item-list">
-        <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
+        <div style="display: flex">
+            <pagination-controls :currentPage="currentPage" :pageCount="pageCount" @selected="selectPage" />
+            <feed-settings-menu :sortingOption.sync="sortingOption" />
+        </div>
         <transition-group name="list" tag="div">
             <div style="display: inline-block" v-for="item in pageContent" :key="item.id">
                 <feed-link @togglePin="() => togglePin(item)" v-if="item.content_type.name == 'link'" :showGroupTag="showGroupTag" :showMenu="showMenu" :item="item" />
@@ -21,9 +24,11 @@ import PaginatedComponent from "./PaginatedComponent"
 import FeedLink from './FeedContentItems/Link'
 import FeedImage from './FeedContentItems/Image'
 import FeedDiscussionTopic from './FeedContentItems/DiscussionTopic'
+
 // import {links} from '../store.js'
 // import linkDeps from '../dependencies/Link.js'
 
+import FeedSettingsMenu from './FeedSettingsMenu'
 import PaginationControls from './PaginationControls'
 
 export default {
@@ -52,12 +57,14 @@ export default {
         FeedImage,
         FeedDiscussionTopic,
         PaginatedComponent,
-        PaginationControls
+        PaginationControls,
+        FeedSettingsMenu
     },
     data() {
         return {
             pageSize: 20,
-            content: []
+            content: [],
+            sortingOption: "updated"
         }
     },
     computed: {
@@ -103,6 +110,9 @@ export default {
         }
     },
     watch: {
+        sortingOption(newVal, oldVal) {
+            this.$store.feedContentItemListSortingOption = newVal
+        },
         items(newVal) {
             this.content = newVal.results
             this.paginate(newVal)

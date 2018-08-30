@@ -331,6 +331,7 @@ was created by a less specific serialized endpoint
 **** TODO reordering pinned items
 
 *** FeedContentItems
+**** TODO polls not shown in Feed?
 **** TODO sorting by last posted / last commented
 **** TODO unlisted feedcontentitems
 **** TODO private feedcontentitems

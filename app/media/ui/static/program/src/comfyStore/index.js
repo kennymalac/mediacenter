@@ -3,7 +3,6 @@ import {Singleton} from './singleton.js'
 export class Store {
     state = {}
     store = {}
-    observers = {}
 
     constructor(initialState) {
         this.state = {...initialState}
@@ -21,23 +20,18 @@ export class Store {
                     }
                 },
                 set: (value) => {
-                    const oldVal = this.state[key].value
                     this.state[key].value = value
-                    if (Array.isArray(this.observers[key])) {
-                        for (const func of this.observers[key]) {
-                            func(this.state[key].value, oldVal)
-                        }
+                    if (this.state[key].value$) {
+                        this.state[key].value$.next(value)
                     }
                 }
             })
         }
+        this.store.$observe = this.observe.bind(this)
     }
 
-    observe(singletonName, callback) {
-        if (!Array.isArray(this.observers[singletonName])) {
-            this.observers[singletonName] = []
-        }
-        this.observers[singletonName].push(callback)
+    observe(singletonName, subscriber) {
+        return this.state[singletonName].observe(subscriber)
     }
 
     deferredCollection(field, CollectionType, create, collectionDeps = {}, _deps = []) {

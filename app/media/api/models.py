@@ -382,7 +382,7 @@ class PollOptionVote(models.Model):
 
 class Discussion(models.Model):
     content_item = models.ForeignKey(FeedContentItem, related_name="+")
-    parent = models.ForeignKey('self', null=True)
+    parent = models.ForeignKey('self', null=True, related_name="posts")
     order = models.IntegerField(default=0)
     text = models.TextField(blank=True)
     text_last_edited = models.DateTimeField(null=True)

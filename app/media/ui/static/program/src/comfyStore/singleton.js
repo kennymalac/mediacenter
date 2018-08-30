@@ -1,3 +1,5 @@
+import {Subject} from 'rxjs'
+
 export async function makeSingleton(getStore, storeValue, typeCheck, create) {
     const store = getStore()
 
@@ -18,11 +20,22 @@ export class Singleton {
     dependencies = []
     typeCheck = null
     deferred = false
+    value$ = null
 
     constructor(typeCheck, create, dependencies = []) {
         this.typeCheck = typeCheck
         this.create = create
         this.dependencies = dependencies
+    }
+
+    observe(subscription) {
+        if (!this.value$) {
+            this.value$ = new Subject()
+            const subscriber = this.value$.subscribe(subscription)
+            this.value$.next(this.value)
+            return subscriber
+        }
+        return this.value$.subscribe(subscription)
     }
 
     getValue(deps) {

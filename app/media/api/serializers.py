@@ -593,7 +593,6 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
     def get_last_child(self, instance):
         if instance.content_type.name == FeedContentItemType.TOPIC or \
            instance.content_type.name == FeedContentItemType.POLL:
-            print(Discussion.objects.filter(parent=Discussion.objects.get(content_item=instance)))
             last_post = Discussion.objects.filter(parent=Discussion.objects.get(content_item=instance))\
                                       .annotate(max_order=Max('order')).order_by('-max_order')
             if last_post.exists():
@@ -676,8 +675,8 @@ class FeedContentStashContentSerializer(serializers.ModelSerializer):
         if _interests:
             content_queryset = content_queryset.filter(interests__in=Interest.objects.filter(id__in=_interests))
 
-        paginator = FeedContentItemPagination()
-        page = paginator.paginate_queryset(content_queryset.order_by('-is_pinned', '-item__created'), self.context['request'])
+        paginator = FeedContentStashItemPagination()
+        page = paginator.paginate_queryset(content_queryset, self.context['request'])
         serializer = FeedContentStashItemSerializer(
             page,
             many=True,

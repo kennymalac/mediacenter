@@ -170,6 +170,11 @@ export default {
             infoBoxErrorData: {}
         }
     },
+    watch: {
+        sortingOption() {
+            this.listContentChildren(1)
+        }
+    },
     methods: {
         initialState() {
             this.instance = { id: null, content_types: [] }
@@ -211,7 +216,7 @@ export default {
         async listContentChildren(currentPage, _deps = null) {
             const deps = _deps || await feedDeps()
 
-            const resp = await FeedModel.listItems(this.instance.id, { page: currentPage || 1 }, deps, this.contentItems.length)
+            const resp = await FeedModel.listItems(this.instance.id, { page: currentPage || 1, sort: this.sortingOption }, deps, this.contentItems.length)
             this.contentItems = resp
         },
 
