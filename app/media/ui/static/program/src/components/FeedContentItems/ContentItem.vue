@@ -3,16 +3,21 @@
         <slot name="title">
             <div class="content-title">
                 <div class="content-title-inner">
-                    <slot name="content-type">
-                    </slot>
+                    <div class="content-type-container">
+                        <slot name="content-type">
+                        </slot>
+                    </div>
 
-                    <slot name="content-link">
-                        <router-link class="header" :to="detailsUrl"> {{ title }}</router-link>
-                    </slot>
+                    <div class="content-link-container">
+                        <slot name="content-link">
+                            <router-link class="header" :to="detailsUrl" v-html="truncate(title)"></router-link>
+                        </slot>
+                    </div>
 
                     <context-menu v-if="showMenu" :menuItems="menuItems" />
                     <context-menu v-if="!showMenu" class="hidden" :menuItems="[]" />
                 </div>
+                <span v-if="Number.isInteger(postCount)" class="post-count">{{ postCount }} {{ postCount !== 0 && postCount < 2 ? postNoun : postNounPlural }}</span>
             </div>
         </slot>
 
@@ -27,14 +32,14 @@
             <span class="date">
                 <router-link v-if="!isAnonymous" href="#" :to="userProfile" class="author">{{ owner.profile.display_name }}</router-link>
                 <span v-else>Anonymous</span>
-                <span style="padding-left: 5px"> {{ created.fromNow() }}</span>
+                <span style="padding-left: 3px"> {{ created.fromNow() }}</span>
             </span>
 
             <div style="color: grey; font-size: .8rem;" v-if="lastChild && lastChild.id">
-                <span style="padding-right: 5px">{{ lastChild.title }}</span>
+                <span style="padding-right: 3px" v-html="truncate(lastChild.title, 25)"></span>
                 <router-link v-if="!lastChild.is_anonymous" href="#" :to="lastChildUserProfile" class="author">{{ lastChild.owner.profile.display_name }}</router-link>
                 <span v-else>Anonymous</span>
-                <span style="padding-left: 5px"> {{ lastChild.created.fromNow() }}</span>
+                <span style="padding-left: 3px"> {{ lastChild.created.fromNow() }}</span>
             </div>
 
             <slot name="embed" :slotProps="embedProps">
@@ -108,6 +113,18 @@ export default {
             type: Boolean,
             default: false
         },
+        postNoun: {
+            type: String,
+            default: "comment"
+        },
+        postNounPlural: {
+            type: String,
+            default: "comments"
+        },
+        postCount: {
+            type: Number,
+            required: false
+        },
         showGroupTag: {
             type: Boolean,
             default: true
@@ -154,6 +171,9 @@ export default {
         togglePin() {
             this.$emit('togglePin')
             this.$forceUpdate()
+        },
+        truncate(value, length = 45) {
+            return value.length > length ? `${this.title.slice(0, length)}&hellip;` : value
         }
     }
 }
@@ -186,6 +206,9 @@ $title-height: 72px;
     }
     width: 333px;
     height: 280px;
+    &.pinned {
+        height: 277px;
+    }
 
     span.local-tag {
         padding-left: 5px;
@@ -207,9 +230,17 @@ $title-height: 72px;
         &:hover, &:focus {
             box-shadow: inset 0 0 0 99em rgba(255, 255, 255, 0.05);
         }
+        height: $title-height;
 
         color: white;
         background: linear-gradient(180deg, #001f3f, rgba(52, 73, 94,1.0));
+        .post-count {
+            font-size: .8rem;
+        }
+    }
+    .content-link-container {
+        width: 75%;
+        margin-left: auto;
     }
 
     .content-title-inner {
@@ -219,17 +250,19 @@ $title-height: 72px;
         flex-direction: row;
         padding-top: 5px;
         padding-bottom: 5px;
-        height: $title-height;
         font-size: 1.25rem;
         line-height: 1.25rem;
+        height: 3rem;
         font-weight: lighter;
         width: 100%;
-        .header { margin-left: auto; }
         .context-menu {
             &.hidden { visibility: hidden; }
             margin-left: auto;
         }
         i { font-size: 1.5rem; }
+        .content-type-container {
+            width: 32px;
+        }
         .content-type {
             font-size: .8rem;
             display: inline-flex;
@@ -247,10 +280,6 @@ $title-height: 72px;
                 text-decoration: underline;
             }
         }
-    }
-
-    .content-item-inner {
-        padding-top: 5px;
     }
 
     .date {

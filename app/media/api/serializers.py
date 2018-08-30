@@ -542,6 +542,7 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
     feed_id = serializers.SerializerMethodField()
     group_id = serializers.SerializerMethodField()
     group_name = serializers.SerializerMethodField()
+    post_count = serializers.SerializerMethodField()
     is_local = serializers.SerializerMethodField()
     last_child = serializers.SerializerMethodField()
     nested_object = serializers.SerializerMethodField()
@@ -551,7 +552,7 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
 
     class Meta:
         model = FeedContentItem
-        fields = ('id', 'title', 'description', 'owner', 'is_anonymous', 'is_local', 'last_child', 'content_type', 'comments', 'created', 'object_id', 'origin_stash_id', 'feed_id', 'group_id', 'group_name', 'nested_object', 'visibility', 'interests')
+        fields = ('id', 'title', 'description', 'owner', 'is_anonymous', 'is_local', 'last_child', 'content_type', 'comments', 'created', 'object_id', 'origin_stash_id', 'feed_id', 'group_id', 'group_name', 'post_count', 'nested_object', 'visibility', 'interests')
 
     def get_content_id(self, instance):
         return get_content_id(instance)
@@ -581,6 +582,13 @@ class FeedContentItemSerializer(FeedContentItemBasicSerializer):
                 return True
 
         return False
+
+    def get_post_count(self, instance):
+        if instance.content_type.name == FeedContentItemType.TOPIC or \
+           instance.content_type.name == FeedContentItemType.POLL:
+            return Discussion.objects.filter(parent=Discussion.objects.get(content_item=instance)).count()
+
+        return Comment.objects.filter(content_item=instance).count()
 
     def get_last_child(self, instance):
         if instance.content_type.name == FeedContentItemType.TOPIC or \

@@ -399,6 +399,8 @@ was created by a less specific serialized endpoint
 ***** TODO Delete
 
 *** Discussion
+**** DONE post count
+     CLOSED: [2018-08-29 Wed 17:07]
 **** DONE Reply should scroll to bottom
      CLOSED: [2018-08-28 Tue 17:06]
 **** TODO is_restricted

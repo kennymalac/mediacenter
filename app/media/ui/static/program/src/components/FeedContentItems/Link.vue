@@ -1,5 +1,5 @@
 <template>
-    <content-item :embed="embedProps" v-bind="item.instance" @togglePin="$emit('togglePin')" :showMenu="showMenu" :showGroupTag="showGroupTag" :detailsUrl="detailsUrl" :commentsUrl="commentsUrl" :groupId="item.group_id" :groupName="item.group_name" :isPinned="item.is_pinned" :isLocal="item.is_local" :isAnonymous="item.is_anonymous" :owner="item.owner.instance">
+    <content-item :embed="embedProps" v-bind="item.instance" @togglePin="$emit('togglePin')" :showMenu="showMenu" :showGroupTag="showGroupTag" :detailsUrl="detailsUrl" :commentsUrl="commentsUrl" :groupId="item.group_id" :groupName="item.group_name" :isPinned="item.is_pinned" :isLocal="item.is_local" :isAnonymous="item.is_anonymous" :postCount="item.post_count" :owner="item.owner.instance">
         <span slot="content-type">
             <i class="ion-ios-link"></i>
         </span>

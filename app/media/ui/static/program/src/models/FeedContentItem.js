@@ -19,6 +19,7 @@ class FeedContentItemModel extends Model {
         is_anonymous: false,
         is_local: false,
         last_child: {},
+        post_count: 0,
         interests: [],
         places: [],
         comments: [],
