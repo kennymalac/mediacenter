@@ -250,7 +250,7 @@ export default {
                     owner: deps.owner
                 })
 
-                this.observers.push(this.$store.$observe('feedContentItemListSortingOption', (val) => {
+                this.observers$.push(this.$store.$observe('feedContentItemListSortingOption', (val) => {
                     if (val) {
                         this.contentSortOrder = val
                         this.listContentChildren()
