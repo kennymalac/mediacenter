@@ -10,10 +10,10 @@
         <template slot="embed" slot-scope="{ slotProps }">
             <!-- <div :style="imageBg" v-if="item.nested_object.src"> -->
                 <!-- </div> -->
-            <div class="default-preview">
+            <div class="default-preview topic">
                 <blockquote v-html="slotProps.description">
                 </blockquote>
-           </div>
+            </div>
         </template>
     </content-item>
 </template>
@@ -93,9 +93,5 @@ export default {
 }
 
 .topic {
-    blockquote {
-        overflow: hidden;
-        max-height: 75%;
-    }
 }
 </style>

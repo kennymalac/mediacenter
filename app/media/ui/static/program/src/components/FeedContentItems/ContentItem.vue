@@ -303,6 +303,8 @@ $title-height: 72px;
 
     .actions {
         margin-bottom: 10px;
+        position: absolute;
+        top: 78%;
         display: flex;
         height: $actions-height;
         justify-content: center;

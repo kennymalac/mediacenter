@@ -8,7 +8,7 @@
         </template>
 
         <template slot="embed" slot-scope="{ slotProps }">
-            <div class="default-preview">
+            <div class="default-preview topic">
                 <blockquote v-html="slotProps.description">
                 </blockquote>
             </div>
@@ -75,10 +75,13 @@ export default {
     }
 }
 
-.topic {
+.link {
     blockquote {
-        overflow: hidden;
-        max-height: 75%;
+        width: 100%;
+        padding: 0 10px;
+        height: 5rem;
+        overflow-y: hidden;
+        word-wrap: break-word;
     }
 }
 </style>

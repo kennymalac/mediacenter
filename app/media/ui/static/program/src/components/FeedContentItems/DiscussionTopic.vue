@@ -74,8 +74,12 @@ export default {
 
 .topic {
     blockquote {
-        overflow: hidden;
-        max-height: 75%;
+        margin-top: 5px;
+        width: 100%;
+        padding: 0 10px;
+        height: 5rem;
+        overflow-y: hidden;
+        word-wrap: break-word;
     }
 }
 </style>
