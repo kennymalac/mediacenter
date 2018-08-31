@@ -182,7 +182,7 @@ export default {
             this.$emit('togglePin')
             this.$forceUpdate()
         },
-        truncate(value, length = 45) {
+        truncate(value, length = 48) {
             return value.length > length ? `${value.slice(0, length)}&hellip;` : value
         }
     }
@@ -257,7 +257,7 @@ $title-height: 72px;
     .content-link-container {
         width: 72%;
         overflow-y: hide;
-        word-wrap: break-word;
+        word-wrap: break-all;
         margin-left: auto;
     }
 
@@ -268,8 +268,8 @@ $title-height: 72px;
         flex-direction: row;
         padding-top: 5px;
         padding-bottom: 5px;
-        font-size: 1.25rem;
-        line-height: 1.25rem;
+        font-size: 1.2rem;
+        line-height: 1.2rem;
         height: 3rem;
         font-weight: lighter;
         width: 100%;
