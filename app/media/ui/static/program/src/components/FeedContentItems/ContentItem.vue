@@ -255,9 +255,9 @@ $title-height: 72px;
         }
     }
     .content-link-container {
-        width: 72%;
-        overflow-y: hide;
-        word-wrap: break-all;
+        width: 76%;
+        //overflow-y: hide;
+        word-wrap: break-word;
         margin-left: auto;
     }
 
