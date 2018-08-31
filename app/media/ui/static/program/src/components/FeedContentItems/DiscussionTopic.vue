@@ -66,6 +66,7 @@ export default {
         // align-self: flex-start;
         font-size: .8rem;
         &.poll {
+            width: 2rem;
             background-color: #eb3636;
             background: linear-gradient(#eb3636 90%, #a73535);
         }
@@ -76,8 +77,9 @@ export default {
     blockquote {
         margin-top: 5px;
         width: 100%;
+        font-size: 1rem;
         padding: 0 10px;
-        height: 5rem;
+        height: 4.5rem;
         overflow-y: hidden;
         word-wrap: break-word;
     }

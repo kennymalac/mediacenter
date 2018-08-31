@@ -80,6 +80,7 @@ export default {
 
             await this.listContentChildren(this.query.page, {...deps, stashes: this.$store.stashes})
             // const user = await activeUser()
+            // TODO only show for owners/moderators
             this.showMenu = true
 
             this.$store.$observe('feedContentItemListSortingOption', (val) => {

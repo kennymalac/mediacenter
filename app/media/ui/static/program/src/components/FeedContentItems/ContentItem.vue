@@ -35,7 +35,7 @@
                 <span style="padding-left: 3px"> {{ created.fromNow() }}</span>
             </span>
 
-            <div style="color: grey; font-size: .8rem;" v-if="lastChild && lastChild.id">
+            <div style="color: grey; font-size: .8rem; line-height: .8rem;" v-if="lastChild && lastChild.id">
                 <span style="padding-right: 3px" v-html="truncate(lastChild.title, 25)"></span>
                 <router-link v-if="!lastChild.is_anonymous" href="#" :to="lastChildUserProfile" class="author">{{ lastChild.owner.profile.display_name }}</router-link>
                 <span v-else>Anonymous</span>
@@ -215,9 +215,19 @@ $title-height: 72px;
         border-radius: 4px / 5px;
     }
     width: 333px;
-    height: 280px;
+    height: 290px;
     &.pinned {
-        height: 277px;
+        height: 287px;
+    }
+
+    .tag-box {
+        display: inline-block;
+        .group-tag {
+            font-size: .8rem;
+        }
+    }
+    .content-item-inner {
+        padding-top: 2px;
     }
 
     span.local-tag {
@@ -227,10 +237,6 @@ $title-height: 72px;
             color: #f87373;
         }
         color: #4F8A10;
-    }
-
-    .tag-box {
-        display: inline;
     }
 
     .content-title {
@@ -249,7 +255,9 @@ $title-height: 72px;
         }
     }
     .content-link-container {
-        width: 75%;
+        width: 72%;
+        overflow-y: hide;
+        word-wrap: break-word;
         margin-left: auto;
     }
 
@@ -265,6 +273,7 @@ $title-height: 72px;
         height: 3rem;
         font-weight: lighter;
         width: 100%;
+
         .context-menu {
             &.hidden { visibility: hidden; }
             margin-left: auto;
@@ -296,8 +305,7 @@ $title-height: 72px;
         display: inline-flex;
         position: relative;
         font-size: .8rem;
-        padding-top: .25em;
-        align-self: center;
+        line-height: .8rem;
         color: grey;
     }
 
@@ -352,10 +360,7 @@ $title-height: 72px;
 
     }
     .default-preview {
-        justify-content: center;
-        align-items: center;
         i { font-size: 10rem; }
-        display: flex;
         width: 100%;
         height: calc(100% - #{$actions-height} - #{$title-height});
     }
