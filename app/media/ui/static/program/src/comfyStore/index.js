@@ -35,9 +35,13 @@ export class Store {
     observe(singletonName, subscriber, name) {
         // monkey patch
         if (!this.observers[singletonName]) {
-            this.observers[singletonName] = name
-            return this.state[singletonName].observe(subscriber)
+            this.observers[singletonName] = {}
         }
+        if (this.observers[singletonName][name]) {
+            this.observers[singletonName][name].unsubscribe()
+        }
+        this.observers[singletonName][name] = this.state[singletonName].observe(subscriber)
+        return this.observers[singletonName][name]
     }
 
     deferredCollection(field, CollectionType, create, collectionDeps = {}, _deps = []) {

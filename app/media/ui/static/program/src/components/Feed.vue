@@ -242,18 +242,16 @@ export default {
 
             try {
                 // TODO optimize
-                await this.listContentChildren(this.query.page, {
-                    content_type: deps.content_types,
-                    comments: deps.comments,
-                    places: deps.places,
-                    interests: deps.interests,
-                    owner: deps.owner
-                })
-
                 this.observers$.push(this.$store.$observe('feedContentItemListSortingOption', (val) => {
                     if (val) {
                         this.contentSortOrder = val
-                        this.listContentChildren()
+                        this.listContentChildren(this.query.page, {
+                            content_type: deps.content_types,
+                            comments: deps.comments,
+                            places: deps.places,
+                            interests: deps.interests,
+                            owner: deps.owner
+                        })
                     }
                 }, 'contentSortOrder'))
             }

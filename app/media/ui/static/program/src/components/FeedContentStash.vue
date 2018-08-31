@@ -78,7 +78,6 @@ export default {
             const deps = await stashDeps()
             this.instance = await this.showInstance(params.id, '/feed/list', stashes, deps, this.feedId)
 
-            await this.listContentChildren(this.query.page, {...deps, stashes: this.$store.stashes})
             // const user = await activeUser()
             // TODO only show for owners/moderators
             this.showMenu = true
@@ -86,7 +85,7 @@ export default {
             this.observers$.push(this.$store.$observe('feedContentItemListSortingOption', (val) => {
                 if (val) {
                     this.order = val
-                    this.listContentChildren()
+                    this.listContentChildren(this.query.page, {...deps, stashes: this.$store.stashes})
                 }
             }, 'order'))
         },
