@@ -3,9 +3,6 @@
         <span slot="content-type">
             <i class="ion-ios-image"></i>
         </span>
-        <template slot="content-link">
-            <router-link class="header" :to="detailsUrl">{{ item.title }}</router-link>
-        </template>
 
         <template slot="embed" slot-scope="{ slotProps }">
             <!-- <div :style="imageBg" v-if="item.nested_object.src"> -->

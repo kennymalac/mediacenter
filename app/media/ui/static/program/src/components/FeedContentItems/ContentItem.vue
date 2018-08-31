@@ -9,7 +9,7 @@
                     </div>
 
                     <div class="content-link-container">
-                        <slot name="content-link">
+                        <slot name="content-link" :slotProps="{ title: truncate(title) }">
                             <router-link class="header" :to="detailsUrl" v-html="truncate(title)"></router-link>
                         </slot>
                     </div>

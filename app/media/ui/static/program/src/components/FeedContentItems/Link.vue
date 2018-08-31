@@ -3,8 +3,8 @@
         <span slot="content-type">
             <i class="ion-ios-link"></i>
         </span>
-        <template slot="content-link">
-            <a class="header external-link" :href="item.nested_object.link">{{ item.title }}</a>
+        <template slot="content-link" slot-scope="{ slotProps }">
+            <a class="header external-link" :href="item.nested_object.link" v-html="slotProps.title"></a>
         </template>
 
         <template slot="embed" slot-scope="{ slotProps }">

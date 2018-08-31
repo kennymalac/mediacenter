@@ -715,6 +715,17 @@ class ContentItemCRUDSerializer(serializers.ModelSerializer):
 
         return instance
 
+    def save(self):
+        if 'content_item' in self.validated_data:
+            if 'title' in self.validated_data['content_item']:
+                title = self.validated_data['content_item']['title']
+                self.validated_data['content_item']['title'] = cleaner.clean(title)
+            if 'description' in self.validated_data['content_item']:
+                description = self.validated_data['content_item']['description']
+                self.validated_data['content_item']['description'] = cleaner.clean(description)
+
+        super(ContentItemCRUDSerializer, self).save()
+
     def update(self, instance, validated_data):
         if 'content_item' in validated_data:
             for k,v in validated_data.pop('content_item').items():
