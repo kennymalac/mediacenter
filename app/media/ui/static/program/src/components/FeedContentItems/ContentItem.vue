@@ -42,7 +42,7 @@
                 <span style="padding-left: 3px"> {{ lastChild.created.fromNow() }}</span>
             </div>
 
-            <slot name="embed" :slotProps="embedProps">
+            <slot name="embed" :slotProps="slotProps">
             </slot>
         </div>
         <div class="actions">
@@ -71,6 +71,10 @@ export default {
     mixins: [FeedContentItem],
     props: {
         title: {
+            type: String,
+            default: ""
+        },
+        description: {
             type: String,
             default: ""
         },
@@ -129,9 +133,15 @@ export default {
             type: Boolean,
             default: true
         },
-        embedProps: [Object]
+        embedProps: {
+            type: Object,
+            default: () => {}
+        }
     },
     computed: {
+        slotProps() {
+            return { ...this.embedProps, description: this.truncate(this.description, 95) }
+        },
         contentItemClass() {
             return {
                 pinned: this.isPinned
@@ -173,7 +183,7 @@ export default {
             this.$forceUpdate()
         },
         truncate(value, length = 45) {
-            return value.length > length ? `${this.title.slice(0, length)}&hellip;` : value
+            return value.length > length ? `${value.slice(0, length)}&hellip;` : value
         }
     }
 }

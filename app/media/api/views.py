@@ -357,7 +357,7 @@ class FeedContentItemViewSet(RetrieveModelMixin,
 
     queryset = FeedContentItem.objects.all().order_by('-created')
     serializer_class = FeedContentItemSerializer
-    pagination_class = FeedContentItemPagination
+    pagination_class = FeedContentItemSortedPagination
 
     def get_queryset(self):
         qs = super(FeedContentItemViewSet, self).get_queryset()
@@ -399,6 +399,7 @@ class FeedContentItemViewSet(RetrieveModelMixin,
             if _interests:
                 content_queryset = content_queryset.filter(interests__in=Interest.objects.filter(id__in=_interests))
 
+        print(content_queryset.count())
         serializer = self.get_serializer(self.paginate_queryset(content_queryset), many=True)
 
         return self.get_paginated_response(serializer.data)

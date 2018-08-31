@@ -158,6 +158,10 @@ export default {
                     {
                         name: "Topic",
                         enabled: true
+                    },
+                    {
+                        name: "Poll",
+                        enabled: true
                     }
                 ],
                 subjects: [],
@@ -167,12 +171,9 @@ export default {
             contentItems: {},
             infoBoxStatus: "",
             infoBoxMessage: "",
-            infoBoxErrorData: {}
-        }
-    },
-    watch: {
-        sortingOption() {
-            this.listContentChildren(1)
+            infoBoxErrorData: {},
+            contentSortOrder: "-updated",
+            currentContentItemPage: 1
         }
     },
     methods: {
@@ -214,9 +215,14 @@ export default {
         },
 
         async listContentChildren(currentPage, _deps = null) {
+            this.currentContentItemPage = currentPage || this.currentContentItemPage
             const deps = _deps || await feedDeps()
 
-            const resp = await FeedModel.listItems(this.instance.id, { page: currentPage || 1, sort: this.sortingOption }, deps, this.contentItems.length)
+            const resp = await FeedModel.listItems(
+                this.instance.id,
+                { page: this.currentContentItemPage, order: this.contentSortOrder },
+                deps,
+                this.contentItems.length)
             this.contentItems = resp
         },
 
@@ -242,6 +248,14 @@ export default {
                     places: deps.places,
                     interests: deps.interests,
                     owner: deps.owner
+                })
+
+                this.$store.$observe('feedContentItemListSortingOption', (val) => {
+                    if (val) {
+                        console.log(val)
+                        this.contentSortOrder = val
+                        this.listContentChildren()
+                    }
                 })
             }
             catch (error) {

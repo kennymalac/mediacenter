@@ -64,7 +64,7 @@ export default {
         return {
             pageSize: 20,
             content: [],
-            sortingOption: "updated"
+            sortingOption: ""
         }
     },
     computed: {
@@ -103,7 +103,8 @@ export default {
             })
         }
     },
-    mounted() {
+    async mounted() {
+        this.sortingOption = await this.$store.feedContentItemListSortingOption
         this.paginate(this.items)
         if (this.query.last) {
             this.selectPage(this.pageCount)

@@ -9,8 +9,7 @@
 
         <template slot="embed" slot-scope="{ slotProps }">
             <div class="default-preview">
-                <blockquote>
-                    {{ item.description }}
+                <blockquote v-html="slotProps.description">
                 </blockquote>
             </div>
         </template>

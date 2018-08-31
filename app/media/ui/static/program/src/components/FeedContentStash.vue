@@ -41,7 +41,8 @@ export default {
             instanceForm: { },
             content: { results: [] },
             order: "-updated",
-            showMenu: false
+            showMenu: false,
+            currentPage: 1
         }
     },
     computed: {
@@ -61,12 +62,13 @@ export default {
         },
 
         async listContentChildren(currentPage, _deps = null) {
+            this.currentPage = currentPage || this.currentPage
             const deps = _deps || {...await stashDeps(), stashes: this.$store.stashes}
 
             const resp = await FeedContentStashModel.listContent(
                 this.instance,
                 this.feedId,
-                {page: currentPage || 1, order: this.order},
+                {page: this.currentPage, order: this.order},
                 deps,
                 this.content.length)
             this.content = resp
@@ -82,9 +84,8 @@ export default {
 
             this.$store.$observe('feedContentItemListSortingOption', (val) => {
                 if (val) {
-                    console.log(val)
                     this.order = val
-                    this.listContentChildren(1)
+                    this.listContentChildren()
                 }
             })
         },

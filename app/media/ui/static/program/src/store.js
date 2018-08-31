@@ -260,7 +260,8 @@ store.singleton(
 
 export const feedContentItemListSortingOption = store.singleton(
     'feedContentItemListSortingOption',
-    value => value !== undefined
+    value => value !== undefined,
+    () => '-updated'
 )
 
 export const groups = groupCollection('groups', activeUserGroups, ['activeUser'])

@@ -9,12 +9,11 @@
 
         <template slot="embed" slot-scope="{ slotProps }">
             <!-- <div :style="imageBg" v-if="item.nested_object.src"> -->
-            <!-- </div> -->
+                <!-- </div> -->
             <div class="default-preview">
-                <blockquote>
-                    {{ item.description }}
+                <blockquote v-html="slotProps.description">
                 </blockquote>
-            </div>
+           </div>
         </template>
     </content-item>
 </template>
