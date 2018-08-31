@@ -22,7 +22,8 @@ export default {
         return {
             instance: {},
             objects: [],
-            objects$: []
+            objects$: [],
+            observers$: []
         }
     },
     mounted() {
@@ -31,6 +32,10 @@ export default {
     watch: {
         '$route'(to, from) {
             this.restAction(to, from)
+            for (const o of this.observers$) {
+                // monkey patch
+                o.unsubscribe()
+            }
         }
     },
     computed: {

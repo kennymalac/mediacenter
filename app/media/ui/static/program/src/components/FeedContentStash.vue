@@ -83,12 +83,12 @@ export default {
             // TODO only show for owners/moderators
             this.showMenu = true
 
-            this.$store.$observe('feedContentItemListSortingOption', (val) => {
+            this.observers.push(this.$store.$observe('feedContentItemListSortingOption', (val) => {
                 if (val) {
                     this.order = val
                     this.listContentChildren()
                 }
-            })
+            }, 'order'))
         },
 
         async list(params) {

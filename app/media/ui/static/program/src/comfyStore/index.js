@@ -7,6 +7,8 @@ export class Store {
     constructor(initialState) {
         this.state = {...initialState}
 
+        this.observers = {}
+
         for (const key of Object.keys(initialState)) {
             Object.defineProperty(this.store, key, {
                 get: () => {
@@ -30,8 +32,12 @@ export class Store {
         this.store.$observe = this.observe.bind(this)
     }
 
-    observe(singletonName, subscriber) {
-        return this.state[singletonName].observe(subscriber)
+    observe(singletonName, subscriber, name) {
+        // monkey patch
+        if (!this.observers[singletonName]) {
+            this.observers[singletonName] = name
+            return this.state[singletonName].observe(subscriber)
+        }
     }
 
     deferredCollection(field, CollectionType, create, collectionDeps = {}, _deps = []) {
