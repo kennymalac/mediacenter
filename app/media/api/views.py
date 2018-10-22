@@ -19,6 +19,7 @@ from api.serializers import *
 from api.filters import *
 from api.paginators import *
 from api.permissions import *
+from api.tasks import push_notifications
 
 
 class MultipleSerializerMixin(object):
@@ -523,6 +524,7 @@ class FeedContentStashViewSet(NestedViewSetMixin,
                 log.subscribed=[]
             elif content_type == FeedContentItemType.POST:
                 log = ActivityLog.objects.create(action='Post00', author=item.owner, context={'instance': get_content_id(item), 'group': get_group_id_name(item)[0], 'stash': item.origin_stash.id}, message="Created post")
+                push_notifications(log)
                 log.subscribed=[]
             elif content_type == FeedContentItemType.POLL:
                 log = ActivityLog.objects.create(action='Poll00', author=item.owner, context={'instance': get_content_id(item), 'group': get_group_id_name(item)[0], 'stash': item.origin_stash.id}, message="Created poll")
@@ -820,3 +822,29 @@ class AlbumViewSet(NestedViewSetMixin, MultipleSerializerMixin, ModelViewSet):
     #     )
 
     #     return Response(serializer.data)
+
+class NotificationViewSet(ActionPermissionClassesMixin,
+                          MultipleSerializerMixin,
+                          ModelViewSet):
+
+    queryset = Notification.objects.all().order_by('-log__created')
+    serializer_classes = {
+        'default': NotificationSerializer
+    }
+    action_permission_classes = {
+        'default': [IsAuthenticated, IsOwner]
+    }
+    pagination_class = NotificationPagination
+    model = Notification
+
+    def get_queryset(self):
+        if not self.request.user.is_authenticated():
+            return super(NotificationViewSet, self).get_queryset()
+
+        # Take any web delivery notification subscription owned by this user,
+        # and find notifications that should be shown
+        notify_subscription = NotificationSubscription.objects.filter(owner=self.request.user, web_delivery=True).first()
+        return notify_subscription.current_notifications\
+                                  .order_by('-log__created')
+
+

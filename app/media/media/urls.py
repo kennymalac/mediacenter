@@ -68,6 +68,8 @@ router.register(r'image', ImageViewSet, base_name='image')
 
 router.register(r'group', GroupForumViewSet, base_name='group')
 
+router.register(r'notification', NotificationViewSet, base_name='notification')
+
 
 urlpatterns = [
     url(r'^$', VueView.as_view()),

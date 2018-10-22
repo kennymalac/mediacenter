@@ -20,6 +20,8 @@
             <!-- <router-link :class="menuClass" to="/chat"><i class="ion-ios-chatbubbles"></i> Chat</router-link> -->
             <router-link :class="menuClass" to="/gallery/"><i class="ion-ios-image"></i> Gallery</router-link>
             <router-link :class="menuClass" to="/album/"><i class="ion-ios-albums"></i> Albums</router-link>
+
+            <notification-popover />
             <active-user />
             <label for="modal_1" style="border-radius: 50%; line-height: 1.5rem;" class="button"><i style="font-size: 1.5rem;" class="ion ion-ios-help"></i></label>
         </div>
@@ -28,10 +30,11 @@
 
 <script>
 import ActiveUser from './ActiveUser'
+import NotificationPopover from './Notification/NotificationPopover'
 
 export default {
     name: 'header-menu',
-    components: {ActiveUser},
+    components: {ActiveUser, NotificationPopover},
     props: {
         loggedIn: {
             type: Boolean,

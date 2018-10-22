@@ -46,6 +46,19 @@ class ActivityLogModel extends Model {
                 { instance: collections.discussions, group: collections.groups })
 
             return {...instance.instance, link: `/group/${instance.context.group}/details/stash/${instance.context.stash}/details/discussion/${instance.context.instance}/details/`, context: { instance: topic, group }} // , stash
+        case 'create_post':
+        case 'read_post':
+        case 'update_post':
+        case 'delete_post':
+        case 'save_post':
+            // TODO resolve stash
+            const {instance: post, group: group_} = await Collection.fetchAll(
+                collections,
+                { instance: instance.context.instance, group: instance.context.group },
+                { instance: collections.discussions, group: collections.groups })
+
+            return {...instance.instance, link: `/group/${instance.context.group}/details/stash/${instance.context.stash}/details/discussion/${instance.context.instance}/details/`, context: { instance: post, group: group_ }} // , stash
+
         case 'create_link':
         case 'read_link':
         case 'update_link':

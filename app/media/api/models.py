@@ -17,9 +17,9 @@ from django_countries.fields import CountryField
 from guardian.mixins import GuardianUserMixin
 
 import api.managers
-from api.pubsub import ALL_ACTIONS
+from api.pubsub import SUBSCRIPTION_FREQUENCIES, ALL_ACTIONS, ALL_NOTIFICATIONS
 
-# Create your models here.
+
 class Account(AbstractUser, GuardianUserMixin):
     country = CountryField(null=True)
     email = models.EmailField()
@@ -65,6 +65,15 @@ def pre_delete_user(sender, **kwargs):
         instance.profile.delete()
 
 
+class NotificationSettings(models.Model):
+    account = models.OneToOneField('api.account', on_delete=models.CASCADE, related_name="notify_settings")
+    reply_owned_topic = models.BooleanField(default=True)
+    reply_posted_topic = models.BooleanField(default=True)
+    reply_comment = models.BooleanField(default=True)
+    reply_profile_comment = models.BooleanField(default=True)
+    invite_group = models.BooleanField(default=True)
+
+
 class ActivityLog(models.Model):
     """
     Every log has a representation as a resource.
@@ -75,7 +84,17 @@ class ActivityLog(models.Model):
     message = models.CharField(max_length=255)
     context = JSONField(blank=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, related_name="logs")
-    subscribed = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name="+")
+    created = models.DateTimeField(auto_now_add=True)
+    #subscribed = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name="+")
+
+
+class Notification(models.Model):
+    log = models.ForeignKey(ActivityLog, related_name="+")
+    subtype = models.CharField(max_length=8, choices=ALL_NOTIFICATIONS)
+    message = models.CharField(max_length=255)
+
+    # Whether or not this should be sent immediately
+    deferred = models.BooleanField(default=False)
 
 
 class BlogPost(models.Model):
@@ -317,6 +336,26 @@ class FeedContentItem(TaggedItem):
         return self.title
 
 
+class Subscription(models.Model):
+    owner = models.ForeignKey('api.Account', on_delete=models.CASCADE)
+    frequency = models.CharField(max_length=3, choices=SUBSCRIPTION_FREQUENCIES)
+    web_delivery = models.BooleanField(default=True)
+    email_delivery = models.BooleanField(default=True)
+
+    class Meta:
+        abstract = True
+
+
+# TODO make this attached to Feeds, Groups, etc.
+# class ContentDigestSubscription(Subscription):
+#     actions = ArrayField(models.CharField(max_length=8, choices=ALL_ACTIONS))
+
+
+class NotificationSubscription(Subscription):
+    notifications = ArrayField(models.CharField(max_length=12, choices=ALL_NOTIFICATIONS))
+    current_notifications = models.ManyToManyField(Notification, related_name='+')
+
+
 class Comment(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(Account, blank=True)
@@ -359,6 +398,14 @@ def setup_default_feed(user):
     stash = FeedContentStash.objects.create(name="My Content", description="Anything you upload will be stored here by default", origin_feed=feed)
     feed.content_types.add(*list(FeedContentItemType.objects.all()))
     feed.stashes.add(stash)
+
+def setup_default_activity_notification_settings(user):
+    NotificationSettings.objects.create(account=user)
+    # Instant email & web notifications
+    NotificationSubscription.objects.create(owner=user, frequency='I', notifications=[n[0] for n in ALL_NOTIFICATIONS])
+
+    # TODO Weekly digest of relevant content to the user
+    # ContentDigestSubscription.objects.create(frequency='W', )
 
 
 class Poll(models.Model):

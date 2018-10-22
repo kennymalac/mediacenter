@@ -86,7 +86,7 @@ export default {
                 parentTitle: this.instance.content_item.title,
                 stashId: this.params.stashId,
                 groupId: this.params.groupId,
-                feedId: this.params.feedId
+                feedId: this.feedId
             }
         }
     },

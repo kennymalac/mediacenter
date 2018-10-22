@@ -48,6 +48,13 @@ class GroupForumField(serializers.RelatedField):
         return serialized
 
 
+class NotificationSettingsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = NotificationSettings
+        fields = ('id', 'reply_owned_topic', 'reply_posted_topic', 'reply_comment', 'reply_profile_comment', 'invite_group')
+
+
 class AccountBasicSerializer(serializers.ModelSerializer):
     profile = BasicProfileSerializer()
 
@@ -84,6 +91,7 @@ class FullAccountSerializer(AccountSerializer):
     """Requires full account view permissions (i.e. admin or current user privilege levels) UNLESS it is from a CREATE request."""
     account_settings = serializers.JSONField(read_only=False)
 
+
     def create(self, validated_data):
         invite_code = self.context['request'].data.get('invite_code')
 
@@ -116,11 +124,12 @@ class FullAccountSerializer(AccountSerializer):
 
 class PrivateAccountProfileDetailsSerializer(serializers.ModelSerializer):
     account_settings = serializers.JSONField(read_only=False)
+    notify_settings = NotificationSettingsSerializer()
     profile = BasicProfileSerializer()
 
     class Meta:
         model = Account
-        fields = ('id', 'account_settings', 'profile', 'member_groups')
+        fields = ('id', 'account_settings', 'notify_settings', 'profile', 'member_groups')
 
 
 class LogSerializer(serializers.Serializer):
@@ -134,7 +143,7 @@ class ActivityLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ActivityLog
-        fields = ('id', 'action', 'message', 'context', 'author')
+        fields = ('id', 'created', 'action', 'message', 'context', 'author')
 
 
 class BlogPostSerializer(serializers.Serializer):
@@ -1029,3 +1038,12 @@ class GroupForumCreateUpdateSerializer(GroupForumSerializer):
     class Meta:
         model = GroupForum
         fields = ('id', 'name', 'image', 'description', 'feed', 'owner', 'is_restricted', 'members', 'rules')
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    log = ActivityLogSerializer()
+    subtype = serializers.CharField(source='get_subtype_display')
+
+    class Meta:
+        model = Notification
+        fields = ('id', 'log', 'subtype')

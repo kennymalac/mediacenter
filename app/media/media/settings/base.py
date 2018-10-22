@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'rest_framework_extensions',
     'channels',
     'guardian',
+    'huey.contrib.djhuey',
     'api',
     'ui',
     'chat'

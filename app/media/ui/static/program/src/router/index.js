@@ -17,6 +17,7 @@ import Discussion from 'components/Discussion/Discussion'
 import Link from 'components/Link'
 import Image from 'components/Image'
 import Comment from 'components/Comment/Comment'
+import Notification from 'components/Notification/Notification'
 
 import ComingSoon from 'components/ComingSoon'
 
@@ -223,6 +224,13 @@ export default new Router({
             ]
         },
         {
+            path: '/notification/:action?',
+            name: 'Notifications',
+            component: Notification,
+            props: restAction,
+            canReuse: false
+        },
+        {
             path: '/interest/:id/:action',
             name: 'Interest',
             component: Interest,
@@ -361,4 +369,5 @@ export default new Router({
                 // }
             //            ]
     ]
-})
+}
+)

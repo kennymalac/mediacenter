@@ -48,6 +48,7 @@ class DiscussionCollection extends Collection {
 
     async create(form, collections) {
         const data = {...form}
+        console.log('data', data)
         const stash = data.stash
         const feed = data.feed
         delete data.stash
@@ -61,11 +62,9 @@ class DiscussionCollection extends Collection {
         })
               .then(jsonResponse)
 
-        if (!data.parent) {
-            // TODO replies can be stored on specific stashes
-            // via pubsub
-            await FeedContentStashModel.addContent(stash, feed, [created.content_item], collections)
-        }
+        // TODO replies can be stored on specific stashes
+        // via pubsub
+        await FeedContentStashModel.addContent(stash, feed, [created.content_item], collections)
         const instance = this.addInstance(created, collections)
         this.sync(instance, created, collections)
 

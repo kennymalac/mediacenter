@@ -1,3 +1,12 @@
+SUBSCRIPTION_FREQUENCIES = (
+    ('I', 'instantly'),
+    ('D', 'daily'),
+    ('W', 'weekly'),
+    # Make monthly an option later
+    ('BM', 'bi-monthly'),
+    ('M', 'monthly')
+)
+
 # NOTE: this is technically tracking users, so strict consideration is necessary when adding actions here
 # Some of these actions may or not be trackable for the user's privacy
 
@@ -118,3 +127,26 @@ ALL_ACTIONS = []
 ALL_ACTIONS += CONTENT_ACTIONS
 ALL_ACTIONS += CONTENTTAG_ACTIONS
 #print(ALL_ACTIONS)
+
+
+CONTENT_NOTIFICATIONS = []
+
+
+CONTENT_NOTIFY_DEF = (
+    ('Reply00', 'reply_topic', '{{log.action.author}} replied to {{topic.content_item.title}}.'),
+    ('Reply01', 'reply_comment', '{{log.action.author}} replied to your comment in {{topic.content_item.title}}.'),
+    ('Comment00', 'comment_content', '{{log.action.author}} commented on {{topic.content_item.title}}.'),
+    ('Comment01', 'comment_profile', '{{log.action.author}} commented on your profile.')
+)
+[CONTENT_NOTIFICATIONS, CONTENT_NOTIFICATION_MESSAGES] = to_representations(CONTENT_NOTIFY_DEF)
+
+INVITE_NOTIFY_DEF = (
+    ('Invite00', 'invite_group', '{{log.action.author}} invited you to a group: {{group.title}}'),
+#    ('Invite01', '{{log.action.author}} invited ')
+)
+[INVITE_NOTIFICATIONS, INVITE_NOTIFICATION_MESSAGES] = to_representations(INVITE_NOTIFY_DEF)
+
+
+ALL_NOTIFICATIONS = []
+ALL_NOTIFICATIONS += CONTENT_NOTIFICATIONS
+ALL_NOTIFICATIONS += INVITE_NOTIFICATIONS

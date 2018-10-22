@@ -15,6 +15,7 @@ import {ImageCollection, makeImageCollection} from './models/Image.js'
 import {GroupCollection, makeGroupCollection, filterGroupCollection} from './models/Group.js'
 import {AlbumCollection, makeFilteredAlbumCollection} from './models/Album.js'
 import {ActivityLogCollection, makeActivityLogCollection, filterActivityLogCollection} from './models/ActivityLog.js'
+import {NotificationCollection, makeFilteredNotificationCollection} from './models/Notification.js'
 
 export const initialState = {
     loggedIn: false,
@@ -41,7 +42,8 @@ export const initialState = {
     filteredGroups: {},
     activityLogs: {},
     activityLogFilterParams: {},
-    filteredActivityLogs: {}
+    filteredActivityLogs: {},
+    notifications: {}
 }
 
 const store = new Store(initialState)
@@ -302,6 +304,20 @@ const filterActivityLogs = (deps) => {
 
 export const activityLogs = activityLogCollection('activityLogs', activeUserActivityLogs, ['activeUser'])
 export const filteredActivityLogs = activityLogCollection('filteredActivityLogs', filterActivityLogs, ['activityLogFilterParams'])
+
+export const notifications = store.deferredCollection(
+    'notifications',
+    NotificationCollection,
+    (deps) => {
+        return makeFilteredNotificationCollection(
+            () => NotificationCollection.all(),
+            deps
+        )
+    },
+    {
+        'log': 'activityLogs'
+    }
+)
 
 export const storePlugin = {
     install(Vue) {

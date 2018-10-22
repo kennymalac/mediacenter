@@ -188,3 +188,8 @@ class FeedContentStashItemPagination(FeedContentItemSortingPaginationMixin, Page
 
         return super(FeedContentStashItemPagination, self).paginate_queryset(items, request, view)
 
+
+class NotificationPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 100
