@@ -91,6 +91,7 @@ class Notification(models.Model):
     log = models.ForeignKey(ActivityLog, related_name="+")
     subtype = models.CharField(max_length=12, choices=ALL_NOTIFICATIONS)
     message = models.CharField(max_length=255)
+    created = models.DateTimeField(auto_now_add=True)
 
     # Whether or not this should be sent immediately
     deferred = models.BooleanField(default=False)

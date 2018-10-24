@@ -27,6 +27,14 @@ Contemplate free plan with non-private photo uploads only, max 2MB per photo, an
 ***** TODO Delete
 **** TODO Popover uses live data
 **** TODO Unread/Read notifications
+**** TODO implement notification types
+***** DONE reply_topic
+      CLOSED: [2018-10-23 Tue 21:40]
+***** DONE reply_comment
+      CLOSED: [2018-10-23 Tue 21:40]
+***** DONE comment_content
+      CLOSED: [2018-10-23 Tue 21:40]
+***** TODO comment_profile
 
 *** NotificationSettings
 **** TODO settings UI

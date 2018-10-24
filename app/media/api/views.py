@@ -827,7 +827,7 @@ class NotificationViewSet(ActionPermissionClassesMixin,
                           MultipleSerializerMixin,
                           ModelViewSet):
 
-    queryset = Notification.objects.all().order_by('-log__created')
+    queryset = Notification.objects.all().order_by('-created')
     serializer_classes = {
         'default': NotificationSerializer
     }
@@ -845,6 +845,6 @@ class NotificationViewSet(ActionPermissionClassesMixin,
         # and find notifications that should be shown
         notify_subscription = NotificationSubscription.objects.filter(owner=self.request.user, web_delivery=True).first()
         return notify_subscription.current_notifications\
-                                  .order_by('-log__created')
+                                  .order_by('-created')
 
 
