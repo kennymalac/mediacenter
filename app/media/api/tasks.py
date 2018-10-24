@@ -42,6 +42,13 @@ def push_notifications(log, _instance=None):
             [push_notification(log, sub, 'Reply01') for sub in \
              NotificationSubscription.objects.filter(owner=instance.parent.owner)]
 
+    # Comment on profile
+    elif log.action == 'Profile04':
+        instance = _instance
+        # Notify the user that has this profile
+        [push_notification(log, sub, 'Comment01') for sub in \
+         NotificationSubscription.objects.filter(owner=instance.user_profile.account)]
+
 @db_task()
 def send_notification(notification, send_web, send_email):
     #

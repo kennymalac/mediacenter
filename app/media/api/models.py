@@ -79,7 +79,7 @@ class ActivityLog(models.Model):
     A media log will be pulled from an activity log and the UI will infer how to display the log by information passed into the log through its association with the media.
     """
 
-    action = models.CharField(max_length=8, choices=ALL_ACTIONS)
+    action = models.CharField(max_length=12, choices=ALL_ACTIONS)
     message = models.CharField(max_length=255)
     context = JSONField(blank=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, related_name="logs")
@@ -379,8 +379,6 @@ class Comment(models.Model):
     is_anonymous = models.BooleanField(default=False)
     parent = models.ForeignKey('self', null=True)
     text = models.TextField()
-
-
 
 
 class FeedContentStashItem(TaggedItem):

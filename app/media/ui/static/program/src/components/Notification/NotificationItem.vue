@@ -7,6 +7,10 @@
         <div class="icon-container icon-container-xs"> <img :src="log.author.profile.picture" /></div>
         <span class="notification-text">{{log.author.profile.display_name}} commented on {{log.context.instance.content_item.title}}</span>
     </div>
+    <div v-else-if="subtype === 'comment_profile'" class="notification-item">
+        <div class="icon-container icon-container-xs"> <img :src="log.author.profile.picture" /></div>
+        <span class="notification-text">{{log.author.profile.display_name}} commented on your profile</span>
+    </div>
     <div v-else-if="subtype === 'reply_comment'" class="notification-item">
         <div class="icon-container icon-container-xs"> <img :src="log.author.profile.picture" /></div>
         <span class="notification-text">{{log.author.profile.display_name}} replied to your comment in {{log.context.instance.content_item.title}}</span>

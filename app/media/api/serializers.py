@@ -509,7 +509,22 @@ class CommentSerializer(CommentBasicSerializer):
 class CommentCreateUpdateSerializer(CommentBasicSerializer):
     def create(self, validated_data):
         res = super(CommentCreateUpdateSerializer, self).create(validated_data)
+        if res.content_item:
+            self.log_content_comment(res)
+        elif res.user_profile:
+            self.log_profile_comment(res)
+        return res
 
+    def log_profile_comment(self, res):
+        log = ActivityLog.objects.create(
+            author=res.owner,
+            action='Profile04',
+            context={'profile': res.user_profile.id}
+        )
+
+        push_notifications(log, res)
+
+    def log_content_comment(self, res):
         group = get_group(res.content_item)
         context = { 'author': res.owner.id, 'instance': get_content_id(res.content_item) }
         if group:
@@ -525,9 +540,8 @@ class CommentCreateUpdateSerializer(CommentBasicSerializer):
             action=res.content_item.content_type.get_action('comment'),
             # NOTE: content stash is *always* the origin stash of the content item, reconsider this?
             context=context)
-        print(res)
+
         push_notifications(log, res)
-        return res
 
 
 class FeedContentItemBasicSerializer(serializers.ModelSerializer):

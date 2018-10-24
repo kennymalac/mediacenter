@@ -102,7 +102,7 @@ class ActivityLogModel extends Model {
             return {...instance.instance, link: `/feed/${instance.context.feed}/details/stash/${instance.context.stash}/details/image/${instance.context.instance}/details/`, context: { instance: image, feed_ }}
 
         default:
-            return instance.context
+            return {...instance.instance, context: instance.context}
         }
     }
 }

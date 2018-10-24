@@ -47,8 +47,11 @@ export default {
         },
 
         async resolve(instance) {
+            const deps = instance.subtype !== 'comment_profile'
+                  ? await logDeps(instance.log.action, instance.log.context.stash)
+                  : {}
             const log = await ActivityLogModel.resolveLog(
-                instance.log, await logDeps(instance.log.action, instance.log.context.stash)
+                instance.log, deps
             )
             return {...instance.instance, log}
         }

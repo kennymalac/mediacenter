@@ -123,8 +123,15 @@ CONTENT_ACTIONS += POST_ACTIONS
 CONTENT_ACTIONS += POLL_ACTIONS
 CONTENT_ACTIONS += BLOGPOST_ACTIONS
 
+
+PROFILE_DEF = (
+    ('Profile04', 'comment_profile', '{{action.author}} commented on {{profile.display_name}}\'s profile.'),
+)
+[PROFILE_ACTIONS, PROFILE_MESSAGES] = to_representations(PROFILE_DEF)
+
 ALL_ACTIONS = []
 ALL_ACTIONS += CONTENT_ACTIONS
+ALL_ACTIONS += PROFILE_ACTIONS
 ALL_ACTIONS += CONTENTTAG_ACTIONS
 #print(ALL_ACTIONS)
 
