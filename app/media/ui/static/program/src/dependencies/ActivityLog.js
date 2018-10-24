@@ -1,5 +1,5 @@
 import groupDeps from './Group.js'
-import {stashes, groups, links, discussions} from '../store.js'
+import {stashes, groups, links, images, discussions} from '../store.js'
 
 export default async function dependencies(action, stashId) {
     const stashCollection = await stashes()
@@ -25,6 +25,14 @@ export default async function dependencies(action, stashId) {
     case 'comment_link':
     case 'save_link':
         return { ...gdeps, groups: await groups(), links: await links(), content_item: stash.collections.content.collections.item, content_type: gdeps.content_types }
+
+    case 'create_image':
+    case 'read_image':
+    case 'update_image':
+    case 'delete_image':
+    case 'comment_image':
+    case 'save_image':
+        return { ...gdeps, groups: await groups(), images: await images(), content_item: stash.collections.content.collections.item, content_type: gdeps.content_types }
 
     default:
         return {}

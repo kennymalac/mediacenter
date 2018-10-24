@@ -519,6 +519,7 @@ class CommentCreateUpdateSerializer(CommentBasicSerializer):
             context['feed'] = get_feed_id(res.content_item)
             context['stash'] = res.content_item.origin_stash.id
 
+        print(res.content_item.content_type.get_action('comment'))
         log = ActivityLog.objects.create(
             author=res.owner,
             action=res.content_item.content_type.get_action('comment'),

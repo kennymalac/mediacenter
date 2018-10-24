@@ -80,6 +80,27 @@ class ActivityLogModel extends Model {
 
             return {...instance.instance, link: `/feed/${instance.context.feed}/details/stash/${instance.context.stash}/details/link/${instance.context.instance}/details/`, context: { instance: link, feed }}
 
+        case 'create_image':
+        case 'read_image':
+        case 'update_image':
+        case 'delete_image':
+        case 'comment_image':
+        case 'save_image':
+            if (instance.context.group) {
+                const {instance: image, group: group___} = await Collection.fetchAll(
+                    collections,
+                    { instance: instance.context.instance, group: instance.context.group },
+                    { instance: collections.images, group: collections.groups })
+
+                return {...instance.instance, link: `/group/${instance.context.group}/details/stash/${instance.context.stash}/details/image/${instance.context.instance}/details/`, context: { instance: image, group: group___ }}
+            }
+            const {instance: image, feed: feed_} = await Collection.fetchAll(
+                collections,
+                { instance: instance.context.instance, feed: instance.context.feed },
+                { instance: collections.images, feed: collections.feed })
+
+            return {...instance.instance, link: `/feed/${instance.context.feed}/details/stash/${instance.context.stash}/details/image/${instance.context.instance}/details/`, context: { instance: image, feed_ }}
+
         default:
             return instance.context
         }

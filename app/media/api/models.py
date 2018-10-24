@@ -159,8 +159,8 @@ class FeedContentItemType(models.Model):
         ('blogpost', BLOGPOST),
     )
     ACTION_TYPES = {
-        'image': 'Img',
-        'video': 'Vid',
+        'img': 'Img',
+        'vid': 'Vid',
         'link': 'Link',
         'topic': 'Topic',
         'poll': 'Poll',
