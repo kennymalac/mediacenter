@@ -63,7 +63,16 @@ class ActivityLogModel extends Model {
         case 'read_link':
         case 'update_link':
         case 'delete_link':
+        case 'comment_link':
         case 'save_link':
+            if (instance.context.group) {
+                const {instance: link, group: group__} = await Collection.fetchAll(
+                    collections,
+                    { instance: instance.context.instance, group: instance.context.group },
+                    { instance: collections.links, group: collections.groups })
+
+                return {...instance.instance, link: `/group/${instance.context.group}/details/stash/${instance.context.stash}/details/link/${instance.context.instance}/details/`, context: { instance: link, group: group__ }}
+            }
             const {instance: link, feed} = await Collection.fetchAll(
                 collections,
                 { instance: instance.context.instance, feed: instance.context.feed },

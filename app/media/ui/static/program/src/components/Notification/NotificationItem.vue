@@ -3,6 +3,10 @@
         <div class="icon-container icon-container-xs"> <img :src="log.author.profile.picture" /></div>
         <span class="notification-text">{{log.author.profile.display_name}} replied in a topic you created {{log.context.instance.content_item.title}}</span>
     </div>
+    <div v-else-if="subtype === 'comment_content'" class="notification-item">
+        <div class="icon-container icon-container-xs"> <img :src="log.author.profile.picture" /></div>
+        <span class="notification-text">{{log.author.profile.display_name}} commented on your link {{log.context.instance.content_item.title}}</span>
+    </div>
 </template>
 
 <script>

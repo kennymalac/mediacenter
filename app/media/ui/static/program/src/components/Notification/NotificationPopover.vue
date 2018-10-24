@@ -2,12 +2,15 @@
     <div style="display: inline-block;">
         <popper ref="popper" trigger="click" @show="$emit('toggle', true)" @hide="$emit('toggle', false)" :options="options">
             <div class="popper">
-                <div class="notification-embed-list">
+                <div class="notification-embed-list" v-if="notifications.length > 0">
                     <notification-item v-for="item in notifications" v-bind="item" class="popover-item" />
                 </div>
-                <router-link :to="/notifications/">
-                    View all notifications
-                </router-link>
+                <div v-else>No notifications</div>
+                <div class="all-notifications-text">
+                    <router-link to="/notification">
+                        View all notifications
+                    </router-link>
+                </div>
             </div>
             <template slot="reference">
                 <slot name="button">
@@ -82,6 +85,12 @@ export default {
     font-weight: bold;
     min-width: 1rem;
     min-height: 1rem;
+}
+.all-notifications-text {
+    padding: .5rem .25rem 0rem .25rem;
+    display: flex;
+    align-items: center;
+    text-align: center;
 }
 .notification-embed-list {
     overflow-y: scroll;

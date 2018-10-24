@@ -22,8 +22,9 @@ export default async function dependencies(action, stashId) {
     case 'read_link':
     case 'update_link':
     case 'delete_link':
+    case 'comment_link':
     case 'save_link':
-        return { ...gdeps, links: await links(), content_item: stash.collections.content.collections.item, content_type: gdeps.content_types }
+        return { ...gdeps, groups: await groups(), links: await links(), content_item: stash.collections.content.collections.item, content_type: gdeps.content_types }
 
     default:
         return {}

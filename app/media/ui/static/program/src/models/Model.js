@@ -102,6 +102,10 @@ export class Collection {
             isPrimaryKey = true
         }
 
+        // if (item === undefined) {
+        //     console.log("WUT")
+        // }
+
         const id = isPrimaryKey
             ? item
             : item.id

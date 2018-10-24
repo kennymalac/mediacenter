@@ -7,7 +7,43 @@ from django_countries.serializers import CountryFieldMixin
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 
+from api.tasks import push_notifications
+
 from api.models import *
+
+
+def get_content_id(instance):
+    _model = None
+    if instance.content_type.name == FeedContentItemType.TOPIC or \
+       instance.content_type.name == FeedContentItemType.POST or \
+       instance.content_type.name == FeedContentItemType.POLL:
+        _model = Discussion
+    elif instance.content_type.name == FeedContentItemType.LINK:
+        _model = Link
+    elif instance.content_type.name == FeedContentItemType.IMAGE:
+        _model = Image
+
+    pk = _model.objects.filter(content_item=instance).values_list('id', flat=True).first()
+    return pk
+
+def get_group(instance):
+    # TODO optimize
+    if instance.origin_stash:
+        groups = instance.origin_stash.origin_feed.groupforum_set
+        if groups.count():
+            return groups.first()
+
+def get_group_id_name(instance):
+    # TODO optimize
+    if instance.origin_stash:
+        groups = instance.origin_stash.origin_feed.groupforum_set
+        if groups.count():
+            g = groups.first()
+            return [g.id, g.name]
+
+def get_feed_id(instance):
+    if instance.origin_stash:
+        return instance.origin_stash.feeds.first().id
 
 
 class BasicProfileSerializer(serializers.ModelSerializer):
@@ -471,7 +507,26 @@ class CommentSerializer(CommentBasicSerializer):
 
 
 class CommentCreateUpdateSerializer(CommentBasicSerializer):
-    pass
+    def create(self, validated_data):
+        res = super(CommentCreateUpdateSerializer, self).create(validated_data)
+
+        group = get_group(res.content_item)
+        context = { 'author': res.owner.id, 'instance': get_content_id(res.content_item) }
+        if group:
+            context['group'] = group.id
+            context['stash'] = FeedContentStashItem.objects.filter(item=res.content_item, stash__in=list(group.feed.stashes.all())).values_list('stash__id', flat=True)[0]
+        else:
+            context['feed'] = get_feed_id(res.content_item)
+            context['stash'] = res.content_item.origin_stash.id
+
+        log = ActivityLog.objects.create(
+            author=res.owner,
+            action=res.content_item.content_type.get_action('comment'),
+            # NOTE: content stash is *always* the origin stash of the content item, reconsider this?
+            context=context)
+        print(res)
+        push_notifications(log, res)
+        return res
 
 
 class FeedContentItemBasicSerializer(serializers.ModelSerializer):
@@ -514,32 +569,6 @@ class FeedContentItemOwnerSerializer(FeedContentItemBasicSerializer):
     class Meta:
         model = FeedContentItem
         fields = ('id', 'title', 'owner', 'is_anonymous', 'created')
-
-
-def get_content_id(instance):
-    _model = None
-    if instance.content_type.name == FeedContentItemType.TOPIC or \
-       instance.content_type.name == FeedContentItemType.POST or \
-       instance.content_type.name == FeedContentItemType.POLL:
-        _model = Discussion
-    elif instance.content_type.name == FeedContentItemType.LINK:
-        _model = Link
-    elif instance.content_type.name == FeedContentItemType.IMAGE:
-        _model = Image
-
-    pk = _model.objects.filter(content_item=instance).values_list('id', flat=True).first()
-    return pk
-
-def get_group_id_name(instance):
-    # TODO optimize
-    if instance.origin_stash:
-        groups = instance.origin_stash.origin_feed.groupforum_set
-        if groups.count():
-            return [groups.first().id, groups.first().name]
-
-def get_feed_id(instance):
-    if instance.origin_stash:
-        return instance.origin_stash.feeds.first().id
 
 
 class FeedContentItemSerializer(FeedContentItemBasicSerializer):

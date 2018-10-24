@@ -11,7 +11,6 @@ from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 from django.utils.crypto import get_random_string
 from django.contrib.auth.models import AbstractUser
-from django.contrib.gis.db.models import GeometryField
 
 from django_countries.fields import CountryField
 from guardian.mixins import GuardianUserMixin
@@ -90,7 +89,7 @@ class ActivityLog(models.Model):
 
 class Notification(models.Model):
     log = models.ForeignKey(ActivityLog, related_name="+")
-    subtype = models.CharField(max_length=8, choices=ALL_NOTIFICATIONS)
+    subtype = models.CharField(max_length=12, choices=ALL_NOTIFICATIONS)
     message = models.CharField(max_length=255)
 
     # Whether or not this should be sent immediately
@@ -159,11 +158,26 @@ class FeedContentItemType(models.Model):
         ('poll', POLL),
         ('blogpost', BLOGPOST),
     )
+    ACTION_TYPES = {
+        'image': 'Img',
+        'video': 'Vid',
+        'link': 'Link',
+        'topic': 'Topic',
+        'poll': 'Poll',
+        'post': 'Post'
+    }
     name = models.CharField(max_length=6, choices=CONTENT_TYPES)
 
     def __str__(self):
         return self.name
 
+    @property
+    def action_type(self):
+        return FeedContentItemType.ACTION_TYPES[self.name]
+
+    def get_action(self, action):
+        if action == 'comment':
+            return '{}04'.format(self.action_type)
 
 class ContentTag(models.Model):
     name = models.CharField(max_length=100)
@@ -364,6 +378,8 @@ class Comment(models.Model):
     is_anonymous = models.BooleanField(default=False)
     parent = models.ForeignKey('self', null=True)
     text = models.TextField()
+
+
 
 
 class FeedContentStashItem(TaggedItem):

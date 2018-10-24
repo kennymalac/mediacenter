@@ -47,7 +47,6 @@ export default {
         },
 
         async resolve(instance) {
-            console.log('i', instance)
             const log = await ActivityLogModel.resolveLog(
                 instance.log, await logDeps(instance.log.action, instance.log.context.stash)
             )
