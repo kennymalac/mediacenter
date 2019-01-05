@@ -155,6 +155,50 @@ class AccountViewSet(ActionPermissionClassesMixin,
 
         return super(AccountViewSet, self).create(request, *args, **kwargs)
 
+    @action(methods=['POST'], detail=True, permission_classes=[IsAuthenticated, IsThisUser], url_path='notify-settings')
+    def notify_settings(self, request, pk=None, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+
+        try:
+            frequencies = request.data.pop('frequencies')
+        except KeyError:
+            return Response({'error': 'No frequencies specified'}, status=400)
+
+        if not serializer.is_valid(request.data):
+            return Response(serializer.error, status=400)
+
+        # Create or modify a subscription for each frequency of notifications
+        instant_notifications = []
+        daily_notifications = []
+        weekly_notifications = []
+
+        for f in frequencies:
+            if f == 'I':
+                instant_notifications.append(f)
+            elif f == 'D':
+                daily_notifications.append(f)
+            elif f == 'W':
+                weekly_notifications.append(f)
+            else:
+                return Response({'error': 'Invalid frequency specified'}, status=400)
+
+        instant = NotificationSubscription.objects.get(owner=user, frequency='I')
+        daily = NotificationSubscription.objects.get(owner=user, frequency='D')
+        weekly = NotificationSubscription.objects.get(owner=user, frequency='W')
+
+        instant.notifications = instant_notifications
+        instant.save()
+
+        daily.notifications = daily_notifications
+        daily.save()
+
+        weekly.notifications = weekly_notifications
+        weekly.save()
+
+        return Response({}, status=200)
+
+
     @detail_route(methods=['POST', 'GET'], url_path='profile')
     @parser_classes((JSONParser,))
     def profile(self, request, *args, **kwargs):

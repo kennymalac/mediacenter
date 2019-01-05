@@ -1,5 +1,5 @@
 import {Model, Collection} from './Model.js'
-import {get, paginatedList} from './generics.js'
+import {get, manage, paginatedList} from './generics.js'
 import {makeJsonRequest, jsonResponse} from '../httputil.js'
 
 class AccountModel extends Model {
@@ -10,6 +10,7 @@ class AccountModel extends Model {
         email: "",
         country: "",
         account_settings: {},
+        notify_settings: {},
         member_groups: [],
         friends: [],
         profile: {}
@@ -20,6 +21,8 @@ class AccountModel extends Model {
         friends: [Collection],
         profile: Collection
     }
+
+    static resource = 'account'
 }
 
 export async function makeAccountCollection(deps) {
@@ -34,13 +37,18 @@ class AccountCollection extends Collection {
     constructor(values, collections = {}) {
         super(values, collections)
         this.collections.friends = this
-        console.log('AccountCollection created')
     }
 
     async get(id, collections, instance = null) {
         return await get(this, id, instance, {...collections, friends: this}, [
             ['profile', collections.profile.get.bind(collections.profile)]
         ])
+    }
+
+    async manage(instance, form) {
+        return await manage(this, instance, {
+            ...form
+        })
     }
 
     static create(data) {

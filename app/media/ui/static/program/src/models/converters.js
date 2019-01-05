@@ -20,6 +20,12 @@ export const visibilityChoices = {
     '9': 'Private'
 }
 
+export const frequencyChoices = {
+    'I': 'instantly',
+    'D': 'daily',
+    'W': 'weekly'
+}
+
 export function choice(input, typeMapping) {
     if (typeof input === 'string') {
         return { text: typeMapping[input], value: input }

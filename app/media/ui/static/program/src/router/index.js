@@ -18,6 +18,7 @@ import Link from 'components/Link'
 import Image from 'components/Image'
 import Comment from 'components/Comment/Comment'
 import Notification from 'components/Notification/Notification'
+import NotificationSettings from 'components/Notification/NotificationSettings'
 
 import ComingSoon from 'components/ComingSoon'
 
@@ -227,6 +228,13 @@ export default new Router({
             path: '/notification/:action?',
             name: 'Notifications',
             component: Notification,
+            props: restAction,
+            canReuse: false
+        },
+        {
+            path: '/notification-settings/',
+            name: 'NotificationSettings',
+            component: NotificationSettings,
             props: restAction,
             canReuse: false
         },

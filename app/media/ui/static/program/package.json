@@ -24,6 +24,7 @@
     "md5": "^2.2.1",
     "moment": "^2.22.1",
     "picnic": "^6.4.0",
+    "pretty-checkbox-vue": "^1.1.9",
     "pure-css": "^1.0.4",
     "reconnecting-websocket": "^3.2.2",
     "rxjs": "^6.2.2",

@@ -212,6 +212,7 @@ was created by a less specific serialized endpoint
 *** Groups
 **** TODO make it so you can't add members to Group - only invite them
 *** Account
+**** TODO password reset
 **** DONE AccountSelect search for members
      CLOSED: [2018-05-23 Wed 11:57]
 **** DONE AccountCollection

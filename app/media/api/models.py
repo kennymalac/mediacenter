@@ -418,6 +418,10 @@ def setup_default_activity_notification_settings(user):
     NotificationSettings.objects.create(account=user)
     # Instant email & web notifications
     NotificationSubscription.objects.create(owner=user, frequency='I', notifications=[n[0] for n in ALL_NOTIFICATIONS])
+    # Email notifications
+    NotificationSubscription.objects.create(owner=user, frequency='I', notifications=[], web_delivery=False)
+    NotificationSubscription.objects.create(owner=user, frequency='D', notifications=[], web_delivery=False)
+    NotificationSubscription.objects.create(owner=user, frequency='W', notifications=[], web_delivery=False)
 
     # TODO Weekly digest of relevant content to the user
     # ContentDigestSubscription.objects.create(frequency='W', )

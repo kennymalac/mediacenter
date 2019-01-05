@@ -51,6 +51,7 @@ $ionicons-font-path: "~ionicons/dist/fonts";
 @import "~picnic/picnic.css";
 @import "~ladda/css/ladda.scss";
 @import "classicTheme.scss";
+@import '~pretty-checkbox/src/pretty-checkbox.scss';
 
 .grid { display: grid }
 
